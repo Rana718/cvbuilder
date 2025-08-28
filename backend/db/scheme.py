@@ -12,8 +12,9 @@ class User(Base):
 
     # Authentication
     email = Column(String(255), unique=True, index=True, nullable=False)
-    password_hash = Column(String(255), nullable=True)  # Nullable for Google auth users
-    google_id = Column(String(255), nullable=True)
+    password_hash = Column(String(255))  
+    google_id = Column(String(255))
+    image_url = Column(String(500))
     
     # Profile Info
     full_name = Column(String(255), nullable=False)
@@ -35,6 +36,8 @@ class Resume(Base):
 
     # Personal Information
     name = Column(String(200), nullable=False)
+    email = Column(String(255))
+    image_url = Column(String(500))
     phone = Column(String(20))
     city = Column(String(100))
     state = Column(String(100))
