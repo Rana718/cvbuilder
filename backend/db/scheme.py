@@ -8,32 +8,27 @@ Base = declarative_base()
 class User(Base):
     __tablename__ = "users"
     
-    # Primary Key
     id = Column(Integer, primary_key=True, index=True)
 
     # Authentication
     email = Column(String(255), unique=True, index=True, nullable=False)
-    password_hash = Column(String(255), nullable=False)
+    password_hash = Column(String(255), nullable=True)  # Nullable for Google auth users
     google_id = Column(String(255), nullable=True)
-    github_id = Column(String(255), nullable=True)
+    
+    # Profile Info
+    full_name = Column(String(255), nullable=False)
 
-    # Account Info
-    is_premium = Column(Boolean, default=False)
-
-    # Timestamps
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
-    # Relationships
     resumes = relationship("Resume", back_populates="user", cascade="all, delete-orphan")
 
     def __repr__(self):
-        return f"<User(id={self.id}, email='{self.email}', name='{self.name}')>"
+        return f"<User(id={self.id}, email='{self.email}', name='{self.full_name}')>"
 
 class Resume(Base):
     __tablename__ = "resumes"
 
-    # Primary Key
     id = Column(Integer, primary_key=True, index=True)
 
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
@@ -69,7 +64,6 @@ class Resume(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
-    # Relationship back to User
     user = relationship("User", back_populates="resumes")
 
     def __repr__(self):

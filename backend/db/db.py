@@ -16,7 +16,7 @@ else:
 engine = create_async_engine(
     ASYNC_DATABASE_URL,
     poolclass=NullPool, 
-    echo=True  # Set to False in production
+    echo=True  
 )
 
 AsyncSessionLocal = sessionmaker(
