@@ -24,7 +24,7 @@ interface UserData {
 }
 
 interface TemplateRendererProps {
-  templateId: string;
+  templateId: number;
   userData: UserData;
   colors?: {
     primary: string;
@@ -52,23 +52,23 @@ export default function TemplateRenderer({ templateId, userData, colors }: Templ
 
   // Render the appropriate template component based on ID
   switch (templateId) {
-    case 'executive-elite':
+    case 1: // executive-elite
       return <ExecutiveElite userData={userData} colors={themeColors} />;
 
-    case 'modern-minimalist':
+    case 2: // modern-minimalist
       return <ModernMinimalist userData={userData} colors={themeColors} />;
 
-    case 'creative-designer':
+    case 3: // creative-designer
       return <CreativeDesigner userData={userData} colors={themeColors} />;
 
     // Add more template cases as you create them
-    case 'tech-specialist':
-    case 'healthcare-professional':
-    case 'fresh-graduate':
-    case 'finance-expert':
-    case 'marketing-maven':
-    case 'academic-scholar':
-    case 'sales-champion':
+    case 4: // tech-specialist
+    case 5: // healthcare-professional
+    case 6: // fresh-graduate
+    case 7: // finance-expert
+    case 8: // marketing-maven
+    case 9: // academic-scholar
+    case 10: // sales-champion
       return (
         <div className="max-w-4xl mx-auto p-8 text-center">
           <h2 className="text-2xl font-bold text-gray-800 mb-4">Coming Soon</h2>
@@ -82,7 +82,7 @@ export default function TemplateRenderer({ templateId, userData, colors }: Templ
 }
 
 // Export template preview component for template selection
-export function TemplatePreview({ templateId, scale = 0.3 }: { templateId: string; scale?: number }) {
+export function TemplatePreview({ templateId, scale = 0.3 }: { templateId: number; scale?: number }) {
   const template = getTemplateById(templateId);
 
   if (!template) return null;

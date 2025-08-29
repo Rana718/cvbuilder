@@ -24,7 +24,7 @@ export default function Home() {
             </div>
             
             <div className="hidden md:flex items-center space-x-8">
-              <a href="#templates" className="text-gray-600 hover:text-blue-500 transition-colors">Templates</a>
+              <a href="/template" className="text-gray-600 hover:text-blue-500 transition-colors">Templates</a>
               <a href="#features" className="text-gray-600 hover:text-blue-500 transition-colors">Features</a>
               <a href="#feedback" className="text-gray-600 hover:text-blue-500 transition-colors">Reviews</a>
               <a href="#pricing" className="text-gray-600 hover:text-blue-500 transition-colors">Pricing</a>
@@ -56,7 +56,7 @@ export default function Home() {
               className="md:hidden mt-4 pb-4 border-t border-gray-100"
             >
               <div className="flex flex-col space-y-4 pt-4">
-                <a href="#templates" className="text-gray-600 hover:text-blue-500">Templates</a>
+                <a href="/template" className="text-gray-600 hover:text-blue-500">Templates</a>
                 <a href="#features" className="text-gray-600 hover:text-blue-500">Features</a>
                 <a href="#feedback" className="text-gray-600 hover:text-blue-500">Reviews</a>
                 <a href="#pricing" className="text-gray-600 hover:text-blue-500">Pricing</a>
@@ -112,13 +112,13 @@ export default function Home() {
               transition={{ duration: 0.8, delay: 0.8 }}
               className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start mb-8"
             >
-              <button className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-lg text-lg font-semibold flex items-center justify-center space-x-2 transition-all">
+              <a href="/template" className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-lg text-lg font-semibold flex items-center justify-center space-x-2 transition-all">
                 <span>Build My Resume</span>
                 <ArrowRight className="h-5 w-5" />
-              </button>
-              <button className="border-2 border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white px-8 py-3 rounded-lg text-lg font-semibold transition-all">
+              </a>
+              <a href="/template" className="border-2 border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white px-8 py-3 rounded-lg text-lg font-semibold transition-all text-center">
                 View Templates
-              </button>
+              </a>
             </motion.div>
 
             <motion.div
@@ -241,9 +241,9 @@ export default function Home() {
           </div>
 
           <div className="text-center">
-            <button className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold transition-colors">
+            <a href="/template" className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold transition-colors inline-block">
               View All Templates
-            </button>
+            </a>
           </div>
         </div>
       </section>
@@ -329,12 +329,12 @@ export default function Home() {
               Join over 50,000 professionals who have successfully built their perfect resume with our AI-powered platform.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="bg-blue-500 hover:bg-blue-600 text-white px-12 py-4 rounded-lg text-xl font-semibold transition-all">
+              <a href="/template" className="bg-blue-500 hover:bg-blue-600 text-white px-12 py-4 rounded-lg text-xl font-semibold transition-all text-center">
                 Start Building Now
-              </button>
-              <button className="border-2 border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white px-12 py-4 rounded-lg text-xl font-semibold transition-all">
+              </a>
+              <a href="/template" className="border-2 border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white px-12 py-4 rounded-lg text-xl font-semibold transition-all text-center">
                 Try Free Demo
-              </button>
+              </a>
             </div>
           </motion.div>
         </div>

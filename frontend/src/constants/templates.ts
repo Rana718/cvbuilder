@@ -1,5 +1,5 @@
 export interface Template {
-  id: string;
+  id: number;
   name: string;
   category: string;
   description: string;
@@ -21,7 +21,7 @@ export interface Template {
 
 export const CV_TEMPLATES: Template[] = [
   {
-    id: 'executive-elite',
+    id: 1,
     name: 'Executive Elite',
     category: 'Executive',
     description: 'Sophisticated design for C-level executives and senior management',
@@ -41,7 +41,7 @@ export const CV_TEMPLATES: Template[] = [
     layout: 'two-column'
   },
   {
-    id: 'modern-minimalist',
+    id: 2,
     name: 'Modern Minimalist',
     category: 'Professional',
     description: 'Clean, contemporary design perfect for tech and creative professionals',
@@ -61,7 +61,7 @@ export const CV_TEMPLATES: Template[] = [
     layout: 'single-column'
   },
   {
-    id: 'creative-designer',
+    id: 3,
     name: 'Creative Designer',
     category: 'Creative',
     description: 'Bold and artistic layout for designers and creative professionals',
@@ -81,7 +81,7 @@ export const CV_TEMPLATES: Template[] = [
     layout: 'modern-grid'
   },
   {
-    id: 'tech-specialist',
+    id: 4,
     name: 'Tech Specialist',
     category: 'Technology',
     description: 'Developer-focused template with clean code-like aesthetics',
@@ -101,7 +101,7 @@ export const CV_TEMPLATES: Template[] = [
     layout: 'sidebar'
   },
   {
-    id: 'healthcare-professional',
+    id: 5,
     name: 'Healthcare Professional',
     category: 'Healthcare',
     description: 'Trustworthy and professional design for medical professionals',
@@ -121,7 +121,7 @@ export const CV_TEMPLATES: Template[] = [
     layout: 'two-column'
   },
   {
-    id: 'fresh-graduate',
+    id: 6,
     name: 'Fresh Graduate',
     category: 'Entry Level',
     description: 'Energetic and modern design perfect for new graduates',
@@ -141,7 +141,7 @@ export const CV_TEMPLATES: Template[] = [
     layout: 'single-column'
   },
   {
-    id: 'finance-expert',
+    id: 7,
     name: 'Finance Expert',
     category: 'Finance',
     description: 'Conservative and professional layout for financial sector',
@@ -161,7 +161,7 @@ export const CV_TEMPLATES: Template[] = [
     layout: 'two-column'
   },
   {
-    id: 'marketing-maven',
+    id: 8,
     name: 'Marketing Maven',
     category: 'Marketing',
     description: 'Dynamic and engaging design for marketing professionals',
@@ -181,7 +181,7 @@ export const CV_TEMPLATES: Template[] = [
     layout: 'modern-grid'
   },
   {
-    id: 'academic-scholar',
+    id: 9,
     name: 'Academic Scholar',
     category: 'Academic',
     description: 'Traditional and scholarly design for academic professionals',
@@ -201,7 +201,7 @@ export const CV_TEMPLATES: Template[] = [
     layout: 'single-column'
   },
   {
-    id: 'sales-champion',
+    id: 10,
     name: 'Sales Champion',
     category: 'Sales',
     description: 'Results-driven design that highlights achievements and metrics',
@@ -222,7 +222,7 @@ export const CV_TEMPLATES: Template[] = [
   }
 ];
 
-export const getTemplateById = (id: string): Template | undefined => {
+export const getTemplateById = (id: number): Template | undefined => {
   return CV_TEMPLATES.find(template => template.id === id);
 };
 
