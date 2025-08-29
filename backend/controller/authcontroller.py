@@ -146,6 +146,7 @@ class AuthController:
                 return {
                     "success": True,
                     "access_token": create_access_token(user.id, user.email),
+                    "token_type": "bearer"
                 }
                 
         except Exception as e:

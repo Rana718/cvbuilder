@@ -22,7 +22,7 @@ async def signup(request: SignupRequest):
     
     return result["response"]
 
-@router.post("/signin", response_model=AuthResponse)
+@router.post("/login", response_model=AuthResponse)
 async def signin(request: SigninRequest):
     result = await AuthController.signin(
         email=request.email,

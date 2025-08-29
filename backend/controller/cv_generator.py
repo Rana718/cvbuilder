@@ -146,7 +146,7 @@ class CVGenerator:
             
             context_messages = context_manager.get_openai_messages(document_id)
             
-            prompt = f"""Create a professional summary (50-80 words) for this person based on their CV data and our previous conversation:
+            prompt = f"""Create 3 different professional summaries (50-80 words each) for this person based on their CV data and our previous conversation:
 
             Name: {cv_data.name}
             Current Role: {cv_data.job_title or ""}
@@ -154,7 +154,7 @@ class CVGenerator:
             Work Experience: {work_exp}
             Education: {education}
 
-            Requirements:
+            Requirements for each summary:
             - Exactly 50-80 words
             - Professional tone
             - Highlight key strengths and achievements
@@ -162,7 +162,7 @@ class CVGenerator:
             - Write in third person
             - Consider previous conversation context for personalization
 
-            Return only the summary text, no JSON formatting or extra text."""
+            Return as a JSON array of strings (each string = one full summary)."""
             
             messages = context_messages + [{"role": "user", "content": prompt}]
             
@@ -172,12 +172,17 @@ class CVGenerator:
                 temperature=0.7
             )
             
-            summary = response.choices[0].message.content.strip().strip('"').strip("'")
+            content = response.choices[0].message.content.strip()
+            
+            try:
+                summaries = json.loads(content)
+            except json.JSONDecodeError:
+                summaries = [s.strip("-• ") for s in content.split("\n") if len(s.strip()) > 20]
             
             context_manager.add_message(document_id, "user", prompt)
-            context_manager.add_message(document_id, "assistant", summary)
+            context_manager.add_message(document_id, "assistant", f"Generated {len(summaries)} professional summaries")
             
-            return {"success": True, "summary": summary}
+            return {"success": True, "summaries": summaries}
             
         except Exception as e:
             return {"success": False, "error": str(e)}

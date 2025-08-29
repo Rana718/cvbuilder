@@ -1,5 +1,8 @@
 import redis.asyncio as redis
 import os
+import dotenv
+
+dotenv.load_dotenv()
 
 
 redis_client: redis.Redis = None

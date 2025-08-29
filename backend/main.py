@@ -24,7 +24,7 @@ app.add_middleware(
 app.add_middleware(RateLimitMiddleware)
 app.add_middleware(JWTAuthMiddleware)
 
-app.include_router(mainrouter)
+app.include_router(mainrouter, prefix="/api")
 
 @app.on_event("startup")
 async def startup_event():
