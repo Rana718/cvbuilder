@@ -21,8 +21,8 @@ jobs:
       - name: Log in to DockerHub
         uses: docker/login-action@v2
         with:
-          username: ${{ var.DOCKERHUB_USERNAME }}
-          password: ${{ var.DOCKERHUB_TOKEN }}
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ vars.DOCKERHUB_TOKEN }}
 
       - name: Build and Push Docker image
         id: docker_build
@@ -33,18 +33,17 @@ jobs:
           tags: rana718/resume-backend:latest
 
       - name: Deploy to VPS
-        if: steps.docker_build.outputs.pushed == 'true'
+        if: success()
         uses: appleboy/ssh-action@v1.0.0
         with:
-          host: ${{ var.VPS_HOST }}
-          username: ${{ var.VPS_USER }}
-          password: ${{ var.VPS_PASS }}
+          host: ${{ vars.VPS_HOST }}
+          username: ${{ vars.VPS_USER }}
+          password: ${{ vars.VPS_PASS }}
           script: |
-            cd /home/aydrana/deploymen
+            cd /home/aydrana/deployment
             git pull
-            echo "Pulling code..."
-            cd /home/aydrana/deploymen/cvbuilder/deployment
+            echo "Pulling latest code..."
+            cd /home/aydrana/deployment/cvbuilder/deployment
             chmod +x deploy.sh
             ./deploy.sh
-            echo "Deployment script executed."
-            
+            echo "Deployment script executed successfully."
