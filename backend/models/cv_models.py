@@ -82,6 +82,7 @@ class SummaryResponse(BaseModel):
 # Resume CRUD Models
 class ResumeCreate(BaseModel):
     name: str
+    email: Optional[str] = None
     phone: Optional[str] = None
     city: Optional[str] = None
     state: Optional[str] = None
@@ -104,6 +105,7 @@ class ResumeCreate(BaseModel):
 
 class ResumeUpdate(BaseModel):
     name: Optional[str] = None
+    email: Optional[str] = None
     phone: Optional[str] = None
     city: Optional[str] = None
     state: Optional[str] = None
@@ -128,6 +130,7 @@ class ResumeResponse(BaseModel):
     id: int
     user_id: int
     name: str
+    email: Optional[str] = None
     phone: Optional[str] = None
     city: Optional[str] = None
     state: Optional[str] = None

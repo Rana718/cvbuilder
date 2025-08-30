@@ -35,7 +35,7 @@ def validate_file_extension(filename: str) -> str:
     return file_ext
 
 
-@router.post("/")
+@router.post("")
 async def upload_image(file: UploadFile = File(...)) -> Dict[str, str]:
     file_ext = validate_file_extension(file.filename)
     
