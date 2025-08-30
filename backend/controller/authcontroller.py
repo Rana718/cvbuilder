@@ -151,3 +151,21 @@ class AuthController:
                 
         except Exception as e:
             return {"success": False, "error": "Invalid refresh token"}
+    
+    @staticmethod
+    async def get_user_profile(user_id: int, db: Session) -> Dict[str, Any]:
+        """Get user profile by ID"""
+        try:
+            result = await db.execute(select(User).where(User.id == user_id))
+            user = result.scalar_one_or_none()
+            
+            if not user:
+                return {"success": False, "error": "User not found"}
+            
+            return {
+                "success": True,
+                "user": AuthController._user_response(user)
+            }
+            
+        except Exception as e:
+            return {"success": False, "error": f"Failed to fetch user profile: {str(e)}"}

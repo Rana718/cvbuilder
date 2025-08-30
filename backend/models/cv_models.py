@@ -52,21 +52,22 @@ class CVData(BaseModel):
     portfolio_url: Optional[str] = None
 
 class WorkExperienceRequest(BaseModel):
-    document_id: int 
     job_title: str
     company: str
     location: str
     role: str
     start_date: str
     end_date: str
-    cv_context: Optional[str] = None
-
 class SkillsRequest(BaseModel):
-    document_id: int 
-
+    experience: List[WorkExperience]
 class SummaryRequest(BaseModel):
     document_id: int  
     cv_data: CVData
+
+class DirectSummaryRequest(BaseModel):
+    name: str
+    skills: Optional[List[str]] = None
+    experience: Optional[List[WorkExperience]] = None
 
 class WorkExperienceResponse(BaseModel):
     points: List[str]
@@ -75,7 +76,7 @@ class SkillsResponse(BaseModel):
     skills: List[str]
 
 class SummaryResponse(BaseModel):
-    summary: str
+    suggestions: List[str]
 
 
 # Resume CRUD Models

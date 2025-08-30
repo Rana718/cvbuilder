@@ -46,10 +46,5 @@ jobs:
           username: ${{ vars.VPS_USER }}
           password: ${{ vars.VPS_PASS }}
           script: |
-            cd /home/aydrana/deployment
-            git pull
-            echo "Pulling latest code..."
-            cd /home/aydrana/deployment/cvbuilder/deployment
-            chmod +x deploy.sh
             ./deploy.sh
             echo "Deployment script executed successfully."

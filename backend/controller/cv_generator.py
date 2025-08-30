@@ -1,8 +1,8 @@
 import json
 import re
 from config.openai import client, DEFAULT_MODEL
-from utils.context_manager import context_manager
-from models.cv_models import CVData
+# from utils.context_manager import context_manager
+from models.cv_models import CVData, DirectSummaryRequest, SkillsRequest, WorkExperience
 
 class CVGenerator:
     
@@ -21,8 +21,7 @@ class CVGenerator:
             return [p for p in lines if p and len(p) > 10]
     
     @staticmethod
-    def generate_work_experience(document_id: int, job_title: str, company: str, location: str, role: str, start_date: str, end_date: str, cv_context: str = ""):
-        context_prompt = f"\nCV Context: {cv_context}" if cv_context else ""
+    async def generate_work_experience(job_title: str, company: str, location: str, role: str, start_date: str, end_date: str):
         
         prompt = f"""Generate 20 specific work experience bullet points for:
 
@@ -30,36 +29,35 @@ class CVGenerator:
         Company: {company}
         Location: {location}
         Role/Department: {role}
-        Duration: {start_date} to {end_date}{context_prompt}
+        Duration: {start_date} to {end_date}
 
         Make bullet points specifically relevant to "{job_title}" at "{company}".
 
         Requirements:
         - 10-20 words each
-        - Strong action verbs (Led, Developed, Implemented, Managed)
+        - According to the job title and experience level
         - Specific achievements with metrics
         - Role-specific responsibilities
         - Industry context consideration
+        - Use action verbs
 
         Return as JSON array of strings."""
         
         try:
-            messages = context_manager.get_openai_messages(document_id)
-            messages.append({"role": "user", "content": prompt})
+            messages = [
+                {"role": "system", "content": "You are a professional CV expert. Generate specific work experience bullet points."},
+                {"role": "user", "content": prompt}
+            ]
             
             response = client.chat.completions.create(
                 model=DEFAULT_MODEL,
                 messages=messages,
-                temperature=0.7
+                temperature=0.6,
+                max_tokens=400,
             )
             
             content = response.choices[0].message.content.strip()
             points = CVGenerator._parse_json_response(content)
-            
-            work_summary = f"Generated work experience for {job_title} at {company} in {role} department"
-            context_manager.add_message(document_id, "user", 
-                f"Generate work experience for: {job_title} at {company}, {location}. Role: {role}. Duration: {start_date} to {end_date}")
-            context_manager.add_message(document_id, "assistant", work_summary)
             
             return {"success": True, "points": points}
             
@@ -67,40 +65,27 @@ class CVGenerator:
             return {"success": False, "error": str(e)}
     
     @staticmethod
-    async def generate_skills(document_id: int):
+    async def generate_skills(work_experience: SkillsRequest):
         try:
-            context_messages = context_manager.get_openai_messages(document_id)
             
-            if not context_messages:
-                prompt = """Generate 15 relevant professional skills for a general professional CV.
-                Include both technical and soft skills.
-                Return as a JSON array of strings.
-
-                Example format: ["Communication", "Project Management", "Data Analysis", "Leadership", "Problem Solving"]"""
-                
-                messages = [
-                    {"role": "system", "content": "You are a professional CV expert. Generate relevant skills."},
-                    {"role": "user", "content": prompt}
-                ]
-            else:
-                prompt = """Based on our previous conversation about work experience, generate 15-20 highly relevant professional skills.
-
-                Analyze the job titles, companies, and responsibilities mentioned and generate skills that are:
-                - DIRECTLY relevant to those specific roles and industries
-                - Both technical and soft skills matching the experience level
-                - Specific to the career path discussed, not generic
-                - Appropriate for the industry and seniority level
-
-                Return as JSON array of strings."""
-                
-                messages = [
-                    {"role": "system", "content": "You are a professional CV expert. Based on the work experience context, generate highly relevant and specific skills."}
-                ] + context_messages + [{"role": "user", "content": prompt}]
+            prompt = f"""Based on our previous conversation about work experience, generate 15-20 highly relevant professional skills.
+            Analyze the job titles, companies, and responsibilities mentioned and generate skills that are:
+            - DIRECTLY relevant to those specific roles and industries
+            - Both technical and soft skills matching the experience level
+            - Specific to the career path discussed, not generic
+            - Appropriate for the industry and seniority level
+            - Work Experience: ${work_experience}
+            Return as JSON array of strings."""
+            
+            messages = [
+                {"role": "system", "content": "You are a professional CV expert. Based on the work experience context, generate highly relevant and specific skills."}
+            ] + [{"role": "user", "content": prompt}]
             
             response = client.chat.completions.create(
                 model=DEFAULT_MODEL,
                 messages=messages,
-                temperature=0.7
+                temperature=0.6,
+                max_tokens=300,
             )
             
             content = response.choices[0].message.content.strip()
@@ -120,69 +105,50 @@ class CVGenerator:
                             if skill:
                                 skills.append(skill)
             
-            context_manager.add_message(document_id, "user", "Generate relevant skills based on work experience context")
-            skills_summary = f"Generated {len(skills)} skills relevant to the professional background"
-            context_manager.add_message(document_id, "assistant", skills_summary)
-            
             return {"success": True, "skills": skills}
             
         except Exception as e:
             return {"success": False, "error": str(e)}
     
     @staticmethod
-    def generate_summary(document_id: int, cv_data: CVData):
+    async def generate_summary(cv_data: DirectSummaryRequest):
         try:
             skills_text = ", ".join(cv_data.skills[:8]) if cv_data.skills else ""
             
             work_exp = "".join([
-                f"{exp.title} at {exp.company} ({exp.start_date} to {exp.end_date}). "
+                f"{exp.title} at {exp.company} ({exp.duration}). "
                 for exp in cv_data.experience
             ]) if cv_data.experience else ""
             
-            education = "".join([
-                f"{edu.degree} from {edu.institution}. "
-                for edu in cv_data.education
-            ]) if cv_data.education else ""
+            prompt = f"""Create 1 professional summary (50-80 words) for this person based on their CV data:
             
-            context_messages = context_manager.get_openai_messages(document_id)
-            
-            prompt = f"""Create 3 different professional summaries (50-80 words each) for this person based on their CV data and our previous conversation:
-
-            Name: {cv_data.name}
-            Current Role: {cv_data.job_title or ""}
             Key Skills: {skills_text}
             Work Experience: {work_exp}
-            Education: {education}
 
-            Requirements for each summary:
+            Requirements:
             - Exactly 50-80 words
             - Professional tone
             - Highlight key strengths and achievements
             - Focus on value proposition
             - Write in third person
-            - Consider previous conversation context for personalization
 
             Return as a JSON array of strings (each string = one full summary)."""
             
-            messages = context_messages + [{"role": "user", "content": prompt}]
+            messages = [
+                {"role": "system", "content": "You are a professional CV expert. Generate professional summaries."},
+                {"role": "user", "content": prompt}
+            ]
             
             response = client.chat.completions.create(
                 model=DEFAULT_MODEL,
                 messages=messages,
-                temperature=0.7
+                temperature=0.6,
+                max_tokens=600,
             )
             
             content = response.choices[0].message.content.strip()
             
-            try:
-                summaries = json.loads(content)
-            except json.JSONDecodeError:
-                summaries = [s.strip("-• ") for s in content.split("\n") if len(s.strip()) > 20]
-            
-            context_manager.add_message(document_id, "user", prompt)
-            context_manager.add_message(document_id, "assistant", f"Generated {len(summaries)} professional summaries")
-            
-            return {"success": True, "summaries": summaries}
+            return {"success": True, "summary": content}
             
         except Exception as e:
             return {"success": False, "error": str(e)}

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends, status
+from fastapi import APIRouter, HTTPException, Depends, status, Request
 from sqlalchemy.orm import Session
 from db.db import get_db
 from controller.authcontroller import AuthController
@@ -68,4 +68,18 @@ async def refresh_token(request: RefreshTokenRequest):
         access_token=result["access_token"],
         token_type=result["token_type"]
     )
+
+@router.get("/profile")
+async def get_profile(request: Request, db: Session = Depends(get_db)):
+    """Get current user profile"""
+    user_id = request.state.user_id
+    result = await AuthController.get_user_profile(user_id, db)
+    
+    if not result["success"]:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=result["error"]
+        )
+    
+    return result["user"]
 

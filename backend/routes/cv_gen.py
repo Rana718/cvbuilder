@@ -3,10 +3,12 @@ from controller.cv_generator import CVGenerator
 from models.cv_models import (
     WorkExperienceRequest, 
     SkillsRequest, 
-    SummaryRequest,
+    DirectSummaryRequest,
     WorkExperienceResponse,
+    WorkExperience,
     SkillsResponse,
-    SummaryResponse
+    SummaryResponse,
+    CVData
 )
 
 router = APIRouter()
@@ -14,15 +16,13 @@ router = APIRouter()
 @router.post("/work-experience", response_model=WorkExperienceResponse)
 async def generate_work_experience(request: WorkExperienceRequest):
     """Generate work experience bullet points"""
-    result = CVGenerator.generate_work_experience(
-        document_id=request.document_id,
+    result = await CVGenerator.generate_work_experience(
         job_title=request.job_title,
         company=request.company,
         location=request.location,
         role=request.role,
         start_date=request.start_date,
         end_date=request.end_date,
-        cv_context=request.cv_context or ""
     )
     
     if not result["success"]:
@@ -33,7 +33,7 @@ async def generate_work_experience(request: WorkExperienceRequest):
 @router.post("/skills", response_model=SkillsResponse)
 async def generate_skills(request: SkillsRequest):
     """Generate relevant skills based on CV data and context"""
-    result = await CVGenerator.generate_skills(document_id=request.document_id)
+    result = await CVGenerator.generate_skills(request)
     
     if not result["success"]:
         raise HTTPException(status_code=500, detail=result["error"])
@@ -41,14 +41,11 @@ async def generate_skills(request: SkillsRequest):
     return SkillsResponse(skills=result["skills"])
 
 @router.post("/summary", response_model=SummaryResponse)
-async def generate_summary(request: SummaryRequest):
+async def generate_summary(request: DirectSummaryRequest):
     """Generate professional summary from CV data"""
-    result = CVGenerator.generate_summary(
-        document_id=request.document_id, 
-        cv_data=request.cv_data
-    )
+    result = await CVGenerator.generate_summary(request)
     
     if not result["success"]:
         raise HTTPException(status_code=500, detail=result["error"])
     
-    return SummaryResponse(summary=result["summary"])
+    return SummaryResponse(suggestions=[result["summary"]])
