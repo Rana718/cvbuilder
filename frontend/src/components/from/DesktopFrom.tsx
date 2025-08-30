@@ -62,7 +62,7 @@ function DesktopFrom() {
                     <div className="sticky top-6">
                         <h3 className="text-lg font-semibold text-gray-900 mb-4">Live Preview</h3>
                         <div className="transform scale-75 origin-top-left" style={{ width: '133%', height: '800px', overflow: 'hidden' }}>
-                            <ResumePreview />
+                            <ResumePreview mode="live" />
                         </div>
                     </div>
                 </div>

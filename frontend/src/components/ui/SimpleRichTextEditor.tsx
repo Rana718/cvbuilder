@@ -8,10 +8,13 @@ interface RichTextEditorProps {
     onChange: (value: string) => void
     placeholder?: string
     height?: string
+    // optional external ref to access editor DOM (allow null)
+    editorRefProp?: React.RefObject<HTMLDivElement | null>
 }
 
-function RichTextEditor({ value, onChange, placeholder = "Enter description...", height = "120px" }: RichTextEditorProps) {
-    const editorRef = useRef<HTMLDivElement>(null)
+function RichTextEditor({ value, onChange, placeholder = "Enter description...", height = "120px", editorRefProp }: RichTextEditorProps) {
+    const internalRef = useRef<HTMLDivElement>(null)
+    const editorRef = editorRefProp ?? internalRef
     const [isFocused, setIsFocused] = useState(false)
 
     const handleInput = () => {
@@ -48,15 +51,39 @@ function RichTextEditor({ value, onChange, placeholder = "Enter description...",
         }
     }
 
-    React.useEffect(() => {
-        if (editorRef.current) {
-            if (value) {
-                editorRef.current.innerHTML = value
-            } else if (!isFocused) {
-                editorRef.current.innerHTML = `<div class="text-gray-400">${placeholder}</div>`
-            }
+    // helper to focus editor and move caret to end
+    const focusAtEnd = () => {
+        const el = editorRef.current
+        if (!el) return
+        el.focus()
+        const range = document.createRange()
+        range.selectNodeContents(el)
+        range.collapse(false)
+        const sel = window.getSelection()
+        if (sel) {
+            sel.removeAllRanges()
+            sel.addRange(range)
         }
-    }, [value, placeholder, isFocused])
+    }
+
+    React.useEffect(() => {
+        if (!editorRef.current) return
+
+        const current = editorRef.current.innerHTML
+
+        // If we have a new value and editor content differs, update it.
+        // Avoid overwriting user input while the editor is focused.
+        if (value) {
+            if (!isFocused && current !== value) {
+                editorRef.current.innerHTML = value
+            } else if (!current && !isFocused) {
+                // if editor is empty and not focused, ensure value is applied
+                editorRef.current.innerHTML = value
+            }
+        } else if (!isFocused) {
+            editorRef.current.innerHTML = `<div class="text-gray-400">${placeholder}</div>`
+        }
+    }, [placeholder, value, isFocused])
 
     return (
         <div className="border border-gray-300 rounded-lg overflow-hidden bg-white">

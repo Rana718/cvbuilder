@@ -37,9 +37,11 @@ interface TemplateRendererProps {
     text: string;
     background: string;
   };
+  scale?: number;
+  mode?: 'default' | 'live';
 }
 
-export default function TemplateRenderer({ templateId, userData, colors }: TemplateRendererProps) {
+export default function TemplateRenderer({ templateId, userData, colors, scale = 1, mode = 'default' }: TemplateRendererProps) {
   const template = getTemplateById(templateId);
 
   if (!template) {
@@ -57,16 +59,16 @@ export default function TemplateRenderer({ templateId, userData, colors }: Templ
   // Render the appropriate template component based on ID
   switch (templateId) {
     case 1: // executive-elite
-      return <ExecutiveElite userData={userData} colors={themeColors} />;
+      return <ExecutiveElite userData={userData} colors={themeColors} scale={scale} mode={mode} />;
 
     case 2: // modern-minimalist
-      return <ModernMinimalist userData={userData} colors={themeColors} />;
+      return <ModernMinimalist userData={userData} colors={themeColors} scale={scale} mode={mode} />;
 
     case 3: // creative-designer
-      return <CreativeDesigner userData={userData} colors={themeColors} />;
+      return <CreativeDesigner userData={userData} colors={themeColors} scale={scale} mode={mode} />;
 
     default:
-      return <ModernMinimalist userData={userData} colors={themeColors} />;
+      return <ModernMinimalist userData={userData} colors={themeColors} scale={scale} mode={mode} />;
   }
 }
 

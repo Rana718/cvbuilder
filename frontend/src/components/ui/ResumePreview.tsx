@@ -2,7 +2,11 @@ import React from 'react'
 import { useResumeStore } from '@/store/resumeStore'
 import TemplateRenderer from '@/components/templates/TemplateRenderer'
 
-function ResumePreview() {
+interface ResumePreviewProps {
+    mode?: 'default' | 'live'
+}
+
+function ResumePreview({ mode = 'default' }: ResumePreviewProps) {
     const { 
         personalInfo, 
         workExperience, 
@@ -21,9 +25,12 @@ function ResumePreview() {
         address: [personalInfo.city, personalInfo.country].filter(Boolean).join(', ') || undefined,
         job_title: personalInfo.profession || 'Professional Title',
         summary: summary ? summary.replace(/<[^>]*>/g, '').trim() : undefined,
-        linkedin_url: personalInfo.websites?.find(w => w.label.toLowerCase() === 'linkedin')?.url || '',
-        github_url: personalInfo.websites?.find(w => w.label.toLowerCase() === 'github')?.url || '',
-        portfolio_url: personalInfo.websites?.find(w => w.label.toLowerCase() === 'portfolio')?.url || '',
+        linkedin_url: personalInfo.websites?.find(w => w.label.toLowerCase().includes('linkedin'))?.url || '',
+        github_url: personalInfo.websites?.find(w => w.label.toLowerCase().includes('github'))?.url || '',
+        portfolio_url: personalInfo.websites?.find(w => 
+            w.label.toLowerCase().includes('portfolio') || 
+            w.label.toLowerCase().includes('website')
+        )?.url || '',
         image_url: personalInfo.image_url || '',
         skills: skills.map(skill => ({
             name: skill.name,
@@ -60,23 +67,23 @@ function ResumePreview() {
             .map(section => ({
                 name: section.title,
                 proficiency: section.content.replace(/<[^>]*>/g, '').trim()
-            })),
-        linkedin_url: personalInfo.websites.find(w => w.label.toLowerCase().includes('linkedin'))?.url,
-        github_url: personalInfo.websites.find(w => w.label.toLowerCase().includes('github'))?.url,
-        portfolio_url: personalInfo.websites.find(w => 
-            w.label.toLowerCase().includes('portfolio') || 
-            w.label.toLowerCase().includes('website')
-        )?.url
+            }))
     }
 
     // Parse templateId to number
     const templateIdNumber = parseInt(templateId) || 2 // Default to Modern Minimalist
+
+    // Determine scale and mode based on type
+    const isLiveMode = mode === 'live'
+    const scale = isLiveMode ? 0.6 : 1 // Smaller scale for live mode
 
     return (
         <div className="w-full" data-resume-content>
             <TemplateRenderer 
                 templateId={templateIdNumber}
                 userData={userData}
+                scale={scale}
+                mode={mode}
             />
         </div>
     )

@@ -29,9 +29,11 @@ interface ModernMinimalistProps {
     text: string;
     background: string;
   };
+  scale?: number;
+  mode?: 'default' | 'live';
 }
 
-export default function ModernMinimalist({ userData, colors }: ModernMinimalistProps) {
+export default function ModernMinimalist({ userData, colors, scale = 1, mode = 'default' }: ModernMinimalistProps) {
   const theme = colors || {
     primary: '#2563eb',
     secondary: '#64748b',
@@ -40,25 +42,29 @@ export default function ModernMinimalist({ userData, colors }: ModernMinimalistP
     background: '#ffffff'
   };
 
+  const isLiveMode = mode === 'live'
+
   return (
     <div
-      className="max-w-4xl mx-auto shadow-lg"
+      className="max-w-4xl mx-auto bg-white shadow-lg"
       style={{
         fontFamily: 'Inter, sans-serif',
         backgroundColor: theme.background,
-        color: theme.text
+        color: theme.text,
+        transform: `scale(${scale})`,
+        transformOrigin: 'top left'
       }}
     >
       {/* Header */}
-      <div className="border-b p-8" style={{ borderColor: 'rgba(0,0,0,0.1)' }}>
+      <div className={`border-b ${isLiveMode ? 'p-4' : 'p-8'}`} style={{ borderColor: 'rgba(0,0,0,0.1)' }}>
         <div className="text-center">
-          <h1 className="text-4xl font-bold mb-2" style={{ color: theme.text }}>
+          <h1 className={`${isLiveMode ? 'text-2xl' : 'text-4xl'} font-bold ${isLiveMode ? 'mb-1' : 'mb-2'}`} style={{ color: theme.text }}>
             {userData.name || 'Your Name'}
           </h1>
-          <p className="text-xl mb-4 font-medium" style={{ color: theme.primary }}>
+          <p className={`${isLiveMode ? 'text-base' : 'text-xl'} ${isLiveMode ? 'mb-2' : 'mb-4'} font-medium`} style={{ color: theme.primary }}>
             {userData.job_title || 'Professional Title'}
           </p>
-          <p className="max-w-2xl mx-auto leading-relaxed" style={{ color: theme.secondary }}>
+          <p className={`max-w-2xl mx-auto leading-relaxed ${isLiveMode ? 'text-sm' : ''}`} style={{ color: theme.secondary }}>
             {userData.summary || 'A passionate professional dedicated to creating innovative solutions and driving meaningful impact through technology and collaboration.'}
           </p>
         </div>

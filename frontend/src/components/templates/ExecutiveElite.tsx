@@ -29,9 +29,11 @@ interface ExecutiveEliteProps {
     text: string;
     background: string;
   };
+  scale?: number;
+  mode?: 'default' | 'live';
 }
 
-export default function ExecutiveElite({ userData, colors }: ExecutiveEliteProps) {
+export default function ExecutiveElite({ userData, colors, scale = 1, mode = 'default' }: ExecutiveEliteProps) {
   const theme = colors || {
     primary: '#1a365d',
     secondary: '#2d3748',
@@ -40,18 +42,23 @@ export default function ExecutiveElite({ userData, colors }: ExecutiveEliteProps
     background: '#ffffff'
   };
 
+  const isLiveMode = mode === 'live'
+  
   return (
     <div
       className="max-w-4xl mx-auto shadow-2xl"
       style={{
         fontFamily: 'Source Sans Pro, sans-serif',
         backgroundColor: theme.background,
-        color: theme.text
+        color: theme.text,
+        transform: `scale(${scale})`,
+        transformOrigin: 'top left',
+        height: isLiveMode ? 'auto' : 'auto'
       }}
     >
       {/* Header Section */}
       <div
-        className="text-white p-8"
+        className={`text-white ${isLiveMode ? 'p-3' : scale < 1 ? 'p-4' : 'p-8'}`}
         style={{
           background: `linear-gradient(to right, ${theme.primary}, ${theme.secondary})`
         }}
@@ -59,27 +66,27 @@ export default function ExecutiveElite({ userData, colors }: ExecutiveEliteProps
         <div className="flex items-center justify-between">
           <div>
             <h1
-              className="text-4xl font-bold mb-2"
+              className={`${isLiveMode ? 'text-xl' : scale < 1 ? 'text-2xl' : 'text-4xl'} font-bold ${isLiveMode ? 'mb-1' : 'mb-2'}`}
               style={{ fontFamily: 'Playfair Display, serif' }}
             >
               {userData.name || 'Your Name'}
             </h1>
-            <p className="text-xl mb-4" style={{ color: 'rgba(255,255,255,0.8)' }}>
+            <p className={`${isLiveMode ? 'text-sm' : scale < 1 ? 'text-base' : 'text-xl'} ${isLiveMode ? 'mb-2' : 'mb-4'}`} style={{ color: 'rgba(255,255,255,0.8)' }}>
               {userData.job_title || 'Professional Title'}
             </p>
           </div>
           <div
-            className="w-32 h-32 rounded-full flex items-center justify-center"
+            className={`${isLiveMode ? 'w-16 h-16' : scale < 1 ? 'w-20 h-20' : 'w-32 h-32'} rounded-full flex items-center justify-center`}
             style={{ backgroundColor: 'rgba(255,255,255,0.2)' }}
           >
-            <span className="text-3xl font-bold">
+            <span className={`${isLiveMode ? 'text-sm' : scale < 1 ? 'text-lg' : 'text-3xl'} font-bold`}>
               {userData.name?.split(' ').map(n => n[0]).join('') || 'YN'}
             </span>
           </div>
         </div>
 
         {/* Contact Info */}
-        <div className="flex flex-wrap gap-6 mt-6 text-sm">
+        <div className={`flex flex-wrap gap-6 ${isLiveMode ? 'mt-2' : scale < 1 ? 'mt-3' : 'mt-6'} ${isLiveMode ? 'text-xs' : scale < 1 ? 'text-xs' : 'text-sm'}`}>
           <div className="flex items-center gap-2">
             <Mail className="h-4 w-4" />
             <span>{userData.email || 'your.email@example.com'}</span>
@@ -125,11 +132,11 @@ export default function ExecutiveElite({ userData, colors }: ExecutiveEliteProps
 
       <div className="flex">
         {/* Main Content */}
-        <div className="flex-1 p-8">
+        <div className={`flex-1 ${isLiveMode ? 'p-3' : scale < 1 ? 'p-4' : 'p-8'}`}>
           {/* Executive Summary */}
-          <section className="mb-8">
+          <section className={`${isLiveMode ? 'mb-3' : scale < 1 ? 'mb-4' : 'mb-8'}`}>
             <h2
-              className="text-2xl font-bold mb-4 pb-2"
+              className={`${isLiveMode ? 'text-base' : scale < 1 ? 'text-lg' : 'text-2xl'} font-bold ${isLiveMode ? 'mb-1' : scale < 1 ? 'mb-2' : 'mb-4'} pb-2`}
               style={{
                 fontFamily: 'Playfair Display, serif',
                 color: theme.text,

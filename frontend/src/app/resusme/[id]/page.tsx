@@ -7,6 +7,7 @@ import { useResumeStore } from '@/store/resumeStore'
 import ResumePreview from '@/components/ui/ResumePreview'
 import { ArrowLeft, Download, Save, Edit } from 'lucide-react'
 import Link from 'next/link'
+import html2pdf from "html2pdf.js"
 
 function ResumePage() {
     const params = useParams()
@@ -16,14 +17,12 @@ function ResumePage() {
     const templateId = searchParams.get('template')
     const resumeId = params.id
 
-    const { 
-        personalInfo, 
-        workExperience, 
-        education, 
-        skills, 
+    const {
+        personalInfo,
+        workExperience,
+        skills,
         summary,
         templateId: storeTemplateId,
-        documentId,
         setDocumentId,
         saveResume,
         loadResume
@@ -39,7 +38,7 @@ function ResumePage() {
 
     const handleSave = async () => {
         if (status === 'loading') return
-        
+
         if (!session) {
             handleAuthRedirect()
             return
@@ -51,7 +50,7 @@ function ResumePage() {
             if (resumeId && typeof resumeId === 'string' && !isNaN(Number(resumeId))) {
                 setDocumentId(Number(resumeId))
             }
-            
+
             await saveResume()
             alert('Resume saved successfully!')
         } catch (error: any) {
@@ -67,8 +66,8 @@ function ResumePage() {
     }
 
     const handleDownload = async () => {
-        if (status === 'loading') return
-        
+        if (status === "loading") return
+
         if (!session) {
             handleAuthRedirect()
             return
@@ -76,49 +75,28 @@ function ResumePage() {
 
         setIsDownloading(true)
         try {
-            // First save the resume
-            await handleSave()
+            // await handleSave()
 
-            // Generate PDF using browser's print functionality
-            setTimeout(() => {
-                const printWindow = window.open('', '_blank')
-                if (printWindow) {
-                    const resumeContent = document.querySelector('[data-resume-content]')
-                    if (resumeContent) {
-                        printWindow.document.write(`
-                            <!DOCTYPE html>
-                            <html>
-                            <head>
-                                <title>${personalInfo.firstName} ${personalInfo.lastName} - Resume</title>
-                                <style>
-                                    body { margin: 0; padding: 20px; font-family: Arial, sans-serif; }
-                                    @page { margin: 0.5in; }
-                                    .print-container { max-width: 8.5in; margin: 0 auto; }
-                                </style>
-                            </head>
-                            <body>
-                                <div class="print-container">
-                                    ${resumeContent.innerHTML}
-                                </div>
-                            </body>
-                            </html>
-                        `)
-                        printWindow.document.close()
-                        printWindow.focus()
-                        printWindow.print()
-                        printWindow.close()
-                    }
+            const resumeContent = document.querySelector("[data-resume-content]") as HTMLElement
+            if (resumeContent) {
+                const opt = {
+                    margin: 0.5,
+                    filename: `${personalInfo.firstName}-${personalInfo.lastName}-Resume.pdf`,
+                    image: { type: "jpeg", quality: 0.98 },
+                    html2canvas: { scale: 2 },
+                    jsPDF: { unit: "in", format: "letter", orientation: "portrait" }
                 }
-                setIsDownloading(false)
-            }, 500)
-            
+
+                await html2pdf().set(opt).from(resumeContent).save()
+            }
         } catch (error: any) {
-            console.error('Failed to download resume:', error)
+            console.error("Failed to download resume:", error)
             if (error.response?.status === 401) {
                 handleAuthRedirect()
             } else {
-                alert('Failed to download resume. Please try again.')
+                alert("Failed to download resume. Please try again.")
             }
+        } finally {
             setIsDownloading(false)
         }
     }
@@ -128,10 +106,10 @@ function ResumePage() {
         if (!resumeId || typeof resumeId !== 'string' || isNaN(Number(resumeId))) return
 
         const resumeIdNum = Number(resumeId)
-        
+
         // Set the document ID in store
         setDocumentId(resumeIdNum)
-        
+
         // Load resume data if store is empty
         const shouldFetch = () => {
             const noPersonal = !(personalInfo.firstName || personalInfo.lastName || summary)
@@ -154,7 +132,7 @@ function ResumePage() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between h-16">
                         <div className="flex items-center space-x-4">
-                            <Link 
+                            <Link
                                 href="/template"
                                 className="flex items-center space-x-2 text-gray-600 hover:text-gray-900"
                             >

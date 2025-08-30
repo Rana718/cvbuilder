@@ -30,9 +30,11 @@ interface CreativeDesignerProps {
     text: string;
     background: string;
   };
+  scale?: number;
+  mode?: 'default' | 'live';
 }
 
-export default function CreativeDesigner({ userData, colors }: CreativeDesignerProps) {
+export default function CreativeDesigner({ userData, colors, scale = 1, mode = 'default' }: CreativeDesignerProps) {
   const theme = colors || {
     primary: '#7c3aed',
     secondary: '#a855f7',
@@ -41,12 +43,16 @@ export default function CreativeDesigner({ userData, colors }: CreativeDesignerP
     background: '#fafafa'
   };
 
+  const isLiveMode = mode === 'live'
+
   return (
     <div
       className="max-w-5xl mx-auto shadow-2xl overflow-hidden"
       style={{
         fontFamily: 'Open Sans, sans-serif',
-        background: `linear-gradient(to bottom right, ${theme.primary}10, ${theme.accent}10)`
+        background: `linear-gradient(to bottom right, ${theme.primary}10, ${theme.accent}10)`,
+        transform: `scale(${scale})`,
+        transformOrigin: 'top left'
       }}
     >
       {/* Creative Header */}

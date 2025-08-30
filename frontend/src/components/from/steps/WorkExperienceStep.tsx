@@ -1,8 +1,12 @@
-import React, { useState } from 'react'
-import { Plus, X, Briefcase, MapPin, Calendar, Sparkles } from 'lucide-react'
+import React, { useState, useRef } from 'react'
+import { Plus, X, Briefcase, MapPin, Calendar as CalendarIcon, Sparkles } from 'lucide-react'
 import { useResumeStore, WorkExperience } from '@/store/resumeStore'
 import SimpleRichTextEditor from '@/components/ui/SimpleRichTextEditor'
 import axiosInstance from '@/lib/axios'
+import { Button } from '@/components/ui/button'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Calendar } from '@/components/ui/calendar'
+import { cn } from '@/lib/utils'
 
 interface WorkExperienceStepProps {
   onNext: () => void
@@ -15,6 +19,8 @@ function WorkExperienceStep({ onNext, onPrev }: WorkExperienceStepProps) {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [aiSuggestions, setAiSuggestions] = useState<string[]>([])
   const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false)
+  const [startDateOpen, setStartDateOpen] = useState(false)
+  const [endDateOpen, setEndDateOpen] = useState(false)
   const [formData, setFormData] = useState<Omit<WorkExperience, 'id'> & { role?: string }>({
     jobTitle: '',
     employer: '',
@@ -26,6 +32,7 @@ function WorkExperienceStep({ onNext, onPrev }: WorkExperienceStepProps) {
     isCurrentlyWorking: false,
     description: ''
   })
+  const editorRef = useRef<HTMLDivElement | null>(null)
 
   const resetForm = () => {
     setFormData({
@@ -42,6 +49,79 @@ function WorkExperienceStep({ onNext, onPrev }: WorkExperienceStepProps) {
     setShowAddForm(false)
     setEditingId(null)
     setAiSuggestions([])
+    setStartDateOpen(false)
+    setEndDateOpen(false)
+  }
+
+  function formatMonth(date: Date) {
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
+  }
+
+  function parseMonthString(value?: string) {
+    if (!value) return undefined
+    const [y, m] = value.split('-').map(Number)
+    if (!y || !m) return undefined
+    return new Date(y, m - 1, 1)
+  }
+
+  function displayMonth(value?: string) {
+    const d = parseMonthString(value)
+    return d ? d.toLocaleString(undefined, { month: 'short', year: 'numeric' }) : 'Select month'
+  }
+
+  function MonthYearPicker({
+    label,
+    value,
+    onChange,
+    fromYear = 1950,
+    toYear = new Date().getFullYear() + 10,
+    placeholder = 'Select month',
+    isStart = false
+  }: {
+    label: string
+    value?: string
+    onChange: (v: string) => void
+    fromYear?: number
+    toYear?: number
+    placeholder?: string
+    isStart?: boolean
+  }) {
+    const open = isStart ? startDateOpen : endDateOpen
+    const setOpen = isStart ? setStartDateOpen : setEndDateOpen
+    const selected = parseMonthString(value)
+
+    return (
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              className={cn('w-full justify-start text-left font-normal', !selected && 'text-muted-foreground')}
+            >
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {selected ? displayMonth(value) : placeholder}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar
+              mode="single"
+              captionLayout="dropdown"
+              fromYear={fromYear}
+              toYear={toYear}
+              selected={selected}
+              onSelect={(d) => {
+                if (!d) return
+                const normalized = new Date(d.getFullYear(), d.getMonth(), 1)
+                onChange(formatMonth(normalized))
+                setOpen(false)
+              }}
+              initialFocus
+            />
+          </PopoverContent>
+        </Popover>
+      </div>
+    )
   }
 
   const generateAISuggestions = async () => {
@@ -96,9 +176,35 @@ function WorkExperienceStep({ onNext, onPrev }: WorkExperienceStepProps) {
   }
 
   const addSuggestionToDescription = (suggestion: string) => {
-    const currentDesc = formData.description.replace(/<[^>]*>/g, '').trim()
-    const newDesc = currentDesc ? `${currentDesc}\n• ${suggestion}` : `• ${suggestion}`
+    const cleanSuggestion = suggestion
+      .replace(/^["']|["']$/g, '')
+      .replace(/^,\s*|,\s*$/g, '')
+      .replace(/^•\s*/, '')
+      .trim()
+
+    const currentDesc = formData.description.trim()
+    let newDesc = ''
+
+    if (currentDesc && !currentDesc.includes('text-gray-400')) {
+      newDesc = `${currentDesc}<br>• ${cleanSuggestion}`
+    } else {
+      newDesc = `• ${cleanSuggestion}`
+    }
+
     setFormData({ ...formData, description: newDesc })
+
+    if (editorRef.current) {
+      editorRef.current.innerHTML = newDesc
+      editorRef.current.focus()
+      const range = document.createRange()
+      range.selectNodeContents(editorRef.current)
+      range.collapse(false)
+      const sel = window.getSelection()
+      if (sel) {
+        sel.removeAllRanges()
+        sel.addRange(range)
+      }
+    }
   }
 
   const isFormValid = formData.jobTitle && formData.employer && formData.startDate && (formData.isCurrentlyWorking || formData.endDate)
@@ -110,7 +216,6 @@ function WorkExperienceStep({ onNext, onPrev }: WorkExperienceStepProps) {
         <p className="text-gray-600">Tell us about your professional experience</p>
       </div>
 
-      {/* Existing Work Experience */}
       {workExperience.length > 0 && (
         <div className="space-y-4">
           <h3 className="text-lg font-medium text-gray-900">Work History Summary</h3>
@@ -126,7 +231,7 @@ function WorkExperienceStep({ onNext, onPrev }: WorkExperienceStepProps) {
                       {exp.isRemote ? 'Remote' : exp.location}
                     </span>
                     <span className="flex items-center">
-                      <Calendar className="w-4 h-4 mr-1" />
+                      <CalendarIcon className="w-4 h-4 mr-1" />
                       {exp.startDate} - {exp.isCurrentlyWorking ? 'Present' : exp.endDate}
                     </span>
                   </div>
@@ -157,7 +262,6 @@ function WorkExperienceStep({ onNext, onPrev }: WorkExperienceStepProps) {
         </div>
       )}
 
-      {/* Add Experience Button */}
       {!showAddForm && (
         <button
           onClick={() => setShowAddForm(true)}
@@ -168,7 +272,6 @@ function WorkExperienceStep({ onNext, onPrev }: WorkExperienceStepProps) {
         </button>
       )}
 
-      {/* Add/Edit Form */}
       {showAddForm && (
         <div className="border border-gray-300 rounded-lg p-6 bg-white">
           <h4 className="font-medium text-gray-900 mb-4">
@@ -242,27 +345,20 @@ function WorkExperienceStep({ onNext, onPrev }: WorkExperienceStepProps) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Start Date *
-              </label>
-              <input
-                type="month"
+              <MonthYearPicker
+                label="Start Date *"
                 value={formData.startDate}
-                onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                onChange={(v) => setFormData({ ...formData, startDate: v })}
+                isStart={true}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                End Date {!formData.isCurrentlyWorking && '*'}
-              </label>
-              <input
-                type="month"
+              <MonthYearPicker
+                label={`End Date ${!formData.isCurrentlyWorking ? '*' : ''}`}
                 value={formData.endDate}
-                onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                disabled={formData.isCurrentlyWorking}
+                onChange={(v) => setFormData({ ...formData, endDate: v })}
+                isStart={false}
               />
               <div className="mt-2">
                 <label className="flex items-center space-x-2 cursor-pointer">
@@ -290,7 +386,6 @@ function WorkExperienceStep({ onNext, onPrev }: WorkExperienceStepProps) {
             />
           </div>
 
-          {/* Description Suggestions */}
           <div className="mt-4">
             <div className="flex items-center justify-between mb-3">
               <h5 className="text-sm font-medium text-gray-700">AI-Generated Bullet Points:</h5>
@@ -313,21 +408,15 @@ function WorkExperienceStep({ onNext, onPrev }: WorkExperienceStepProps) {
 
             {aiSuggestions.length > 0 && !isLoadingSuggestions && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                {aiSuggestions.map((suggestion: string, index: number) => (
+                {aiSuggestions.map((suggestion, index) => (
                   <button
                     key={index}
                     onClick={() => addSuggestionToDescription(suggestion)}
-                    className="text-left p-2 text-xs text-gray-600 hover:bg-blue-50 hover:text-blue-700 rounded border border-gray-200 transition-colors"
+                    className="p-3 text-left border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-colors text-sm"
                   >
                     {suggestion}
                   </button>
                 ))}
-              </div>
-            )}
-
-            {aiSuggestions.length === 0 && !isLoadingSuggestions && (
-              <div className="text-center py-4 text-sm text-gray-500">
-                Fill in Job Title and Employer, then click "Generate AI Suggestions" to get personalized bullet points for your role.
               </div>
             )}
           </div>
@@ -335,14 +424,14 @@ function WorkExperienceStep({ onNext, onPrev }: WorkExperienceStepProps) {
           <div className="flex justify-end space-x-3 mt-6">
             <button
               onClick={resetForm}
-              className="px-4 py-2 text-gray-600 hover:text-gray-800"
+              className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
             >
               Cancel
             </button>
             <button
               onClick={handleSave}
               disabled={!isFormValid}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {editingId ? 'Update Experience' : 'Add Experience'}
             </button>
@@ -350,20 +439,18 @@ function WorkExperienceStep({ onNext, onPrev }: WorkExperienceStepProps) {
         </div>
       )}
 
-      {/* Navigation Buttons */}
-      <div className="flex justify-between">
+      <div className="flex justify-between pt-6">
         <button
           onClick={onPrev}
-          className="px-6 py-3 text-gray-600 hover:text-gray-800 font-medium"
+          className="px-6 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
         >
           Previous
         </button>
         <button
           onClick={onNext}
-          disabled={workExperience.length === 0}
-          className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
         >
-          Next: Education
+          Next
         </button>
       </div>
     </div>
