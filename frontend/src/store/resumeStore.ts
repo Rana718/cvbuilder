@@ -200,31 +200,33 @@ export const useResumeStore = create<ResumeStore>()((set, get) => ({
                 websites: websites
             },
             summary: data.summary || '',
-            workExperience: Array.isArray(data.experience) ? data.experience.map((exp: any) => ({
-                id: generateId(),
-                jobTitle: exp.title || '',
-                employer: exp.company || '',
-                location: exp.location || '',
-                isRemote: false,
-                startDate: exp.start_date || '',
-                endDate: exp.end_date || '',
-                isCurrentlyWorking: exp.is_current || false,
-                description: exp.description || ''
-            })) : [],
-            education: Array.isArray(data.education) ? data.education.map((edu: any) => ({
-                id: generateId(),
-                schoolName: edu.institution || '',
-                degree: edu.degree || '',
-                fieldOfStudy: edu.field || '',
-                startDate: edu.start_date || '',
-                endDate: edu.end_date || ''
-            })) : [],
-            skills: Array.isArray(data.skills) ? data.skills.map((skill: any) => ({
-                id: generateId(),
-                name: typeof skill === 'string' ? skill : skill.name || '',
-                rating: skill.rating || 3,
-                level: skill.level || 'Intermediate'
-            })) : []
+            workExperience: data.experience && typeof data.experience === 'object' ? 
+                Object.values(data.experience).map((exp: any) => ({
+                    id: generateId(),
+                    jobTitle: exp.title || '',
+                    employer: exp.company || '',
+                    location: exp.location || '',
+                    isRemote: false,
+                    startDate: exp.start_date || '',
+                    endDate: exp.end_date || '',
+                    isCurrentlyWorking: exp.is_current || false,
+                    description: exp.description || ''
+                })) : [],
+            education: data.education && typeof data.education === 'object' ? 
+                Object.values(data.education).map((edu: any) => ({
+                    id: generateId(),
+                    schoolName: edu.institution || '',
+                    degree: edu.degree || '',
+                    fieldOfStudy: edu.field || '',
+                    startDate: edu.start_date || '',
+                    endDate: edu.end_date || ''
+                })) : [],
+            skills: data.skills && typeof data.skills === 'object' ? 
+                Object.values(data.skills).map((skill: any) => ({
+                    id: generateId(),
+                    name: skill.name || '',
+                    rating: skill.rating || 3
+                })) : []
         })
     },
 

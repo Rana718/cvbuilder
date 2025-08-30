@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useParams, useSearchParams, useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { useResumeStore } from '@/store/resumeStore'
@@ -25,6 +25,8 @@ function ResumePage() {
         summary,
         templateId: storeTemplateId 
     } = useResumeStore()
+
+    const populateFromResumeData = useResumeStore(state => state.populateFromResumeData)
 
     const [isSaving, setIsSaving] = useState(false)
     const [isDownloading, setIsDownloading] = useState(false)
@@ -96,7 +98,9 @@ function ResumePage() {
         setIsSaving(true)
         try {
             const resumeData = buildResumeData()
-            const response = await axiosInstance.post('/api/resume-op/save', resumeData)
+            const response = resumeId 
+                ? await axiosInstance.put(`/api/resume-op/${resumeId}`, resumeData)
+                : await axiosInstance.post('/api/resume-op/save', resumeData)
             
             if (response.data) {
                 alert('Resume saved successfully!')
@@ -171,6 +175,35 @@ function ResumePage() {
             setIsDownloading(false)
         }
     }
+
+    // If store doesn't have resume data, fetch from backend once
+    useEffect(() => {
+        const shouldFetch = () => {
+            // If store has very minimal data, fetch from backend
+            const noPersonal = !(personalInfo.firstName || personalInfo.lastName || summary)
+            const noWork = !workExperience || workExperience.length === 0
+            const noSkills = !skills || skills.length === 0
+            return (noPersonal && noWork && noSkills)
+        }
+
+        if (!resumeId) return
+
+        if (!shouldFetch()) return
+
+        const fetchResume = async () => {
+            try {
+                const resp = await axiosInstance.get(`/api/resume-op/${resumeId}`)
+                if (resp?.data) {
+                    populateFromResumeData(resp.data)
+                }
+            } catch (err) {
+                console.error('Failed to load resume from server:', err)
+            }
+        }
+
+        fetchResume()
+        // run only once on mount or when resumeId changes
+    }, [resumeId])
 
     return (
         <div className="min-h-screen bg-gray-50">
