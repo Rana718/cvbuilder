@@ -38,13 +38,13 @@ jobs:
           push: true
           tags: rana718/resume-backend:latest
 
-      - name: Deploy to VPS
-        if: success()
-        uses: appleboy/ssh-action@v1.0.0
-        with:
-          host: ${{ vars.VPS_HOST }}
-          username: ${{ vars.VPS_USER }}
-          password: ${{ vars.VPS_PASS }}
-          script: |
-            ./deploy.sh
-            echo "Deployment script executed successfully."
+      # - name: Deploy to VPS
+      #   if: success()
+      #   uses: appleboy/ssh-action@v1.0.0
+      #   with:
+      #     host: ${{ vars.VPS_HOST }}
+      #     username: ${{ vars.VPS_USER }}
+      #     password: ${{ vars.VPS_PASS }}
+      #     script: |
+      #       ./deploy.sh
+      #       echo "Deployment script executed successfully."
