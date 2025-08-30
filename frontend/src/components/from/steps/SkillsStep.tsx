@@ -9,7 +9,7 @@ interface SkillsStepProps {
 }
 
 function SkillsStep({ onNext, onPrev }: SkillsStepProps) {
-  const { skills, addSkill, updateSkill, removeSkill, getOrCreateDocumentId, workExperience } = useResumeStore()
+  const { skills, addSkill, updateSkill, removeSkill, workExperience } = useResumeStore()
   const [showAddForm, setShowAddForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [aiSuggestedSkills, setAiSuggestedSkills] = useState<string[]>([])

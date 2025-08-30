@@ -21,7 +21,7 @@ function SummaryStep({ onNext, onPrev }: SummaryStepProps) {
     
     const [aiSuggestions, setAiSuggestions] = useState<string[]>([])
     const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false)
-    const { getOrCreateDocumentId } = useResumeStore()
+    
     const { documentId } = useResumeStore()
     const hasCalledAPI = useRef(false)
 
@@ -42,9 +42,6 @@ function SummaryStep({ onNext, onPrev }: SummaryStepProps) {
         if (hasCalledAPI.current) {
             return
         }
-        
-        // Ensure we have a consistent document ID
-        const docId = getOrCreateDocumentId()
         
         setIsLoadingSuggestions(true)
         hasCalledAPI.current = true

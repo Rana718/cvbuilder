@@ -7,7 +7,6 @@ import { useResumeStore } from '@/store/resumeStore'
 import ResumePreview from '@/components/ui/ResumePreview'
 import { ArrowLeft, Download, Save, Edit } from 'lucide-react'
 import Link from 'next/link'
-import axiosInstance from '@/lib/axios'
 
 function ResumePage() {
     const params = useParams()
@@ -23,64 +22,15 @@ function ResumePage() {
         education, 
         skills, 
         summary,
-        templateId: storeTemplateId 
+        templateId: storeTemplateId,
+        documentId,
+        setDocumentId,
+        saveResume,
+        loadResume
     } = useResumeStore()
-
-    const populateFromResumeData = useResumeStore(state => state.populateFromResumeData)
 
     const [isSaving, setIsSaving] = useState(false)
     const [isDownloading, setIsDownloading] = useState(false)
-
-    const buildResumeData = () => {
-        const websites = personalInfo.websites || []
-        return {
-            name: `${personalInfo.firstName} ${personalInfo.lastName}`.trim(),
-            phone: personalInfo.phone || "",
-            city: personalInfo.city || "",
-            state: "",
-            country: personalInfo.country || "",
-            postal_code: personalInfo.pincode || "",
-            job_title: personalInfo.profession || "",
-            summary: summary || "",
-            skills: skills.reduce((acc, skill, index) => {
-                acc[`skill_${index}`] = {
-                    name: skill.name,
-                    rating: skill.rating,
-                }
-                return acc
-            }, {} as Record<string, any>),
-            experience: workExperience.reduce((acc, exp, index) => {
-                acc[`exp_${index}`] = {
-                    title: exp.jobTitle,
-                    company: exp.employer,
-                    location: exp.location,
-                    start_date: exp.startDate,
-                    end_date: exp.endDate,
-                    is_current: exp.isCurrentlyWorking,
-                    description: exp.description
-                }
-                return acc
-            }, {} as Record<string, any>),
-            education: education.reduce((acc, edu, index) => {
-                acc[`edu_${index}`] = {
-                    degree: edu.degree,
-                    institution: edu.schoolName,
-                    field: edu.fieldOfStudy,
-                    start_date: edu.startDate,
-                    end_date: edu.endDate
-                }
-                return acc
-            }, {} as Record<string, any>),
-            certifications: {},
-            projects: {},
-            languages: {},
-            linkedin_url: websites.find(w => w.label.toLowerCase().includes('linkedin'))?.url || "",
-            github_url: websites.find(w => w.label.toLowerCase().includes('github'))?.url || "",
-            portfolio_url: websites.find(w => w.label.toLowerCase().includes('portfolio'))?.url || "",
-            template_id: parseInt(templateId || storeTemplateId || "1"),
-            theme_color: "blue"
-        }
-    }
 
     const handleAuthRedirect = () => {
         const currentUrl = window.location.pathname + window.location.search
@@ -97,14 +47,13 @@ function ResumePage() {
 
         setIsSaving(true)
         try {
-            const resumeData = buildResumeData()
-            const response = resumeId 
-                ? await axiosInstance.put(`/api/resume-op/${resumeId}`, resumeData)
-                : await axiosInstance.post('/api/resume-op/save', resumeData)
-            
-            if (response.data) {
-                alert('Resume saved successfully!')
+            // Set the document ID if we have a resumeId from URL
+            if (resumeId && typeof resumeId === 'string' && !isNaN(Number(resumeId))) {
+                setDocumentId(Number(resumeId))
             }
+            
+            await saveResume()
+            alert('Resume saved successfully!')
         } catch (error: any) {
             console.error('Failed to save resume:', error)
             if (error.response?.status === 401) {
@@ -128,11 +77,9 @@ function ResumePage() {
         setIsDownloading(true)
         try {
             // First save the resume
-            const resumeData = buildResumeData()
-            await axiosInstance.post('/api/resume-op/save', resumeData)
+            await handleSave()
 
             // Generate PDF using browser's print functionality
-            // Add a slight delay to ensure the page is rendered properly
             setTimeout(() => {
                 const printWindow = window.open('', '_blank')
                 if (printWindow) {
@@ -176,34 +123,29 @@ function ResumePage() {
         }
     }
 
-    // If store doesn't have resume data, fetch from backend once
+    // Load resume data when component mounts
     useEffect(() => {
+        if (!resumeId || typeof resumeId !== 'string' || isNaN(Number(resumeId))) return
+
+        const resumeIdNum = Number(resumeId)
+        
+        // Set the document ID in store
+        setDocumentId(resumeIdNum)
+        
+        // Load resume data if store is empty
         const shouldFetch = () => {
-            // If store has very minimal data, fetch from backend
             const noPersonal = !(personalInfo.firstName || personalInfo.lastName || summary)
             const noWork = !workExperience || workExperience.length === 0
             const noSkills = !skills || skills.length === 0
             return (noPersonal && noWork && noSkills)
         }
 
-        if (!resumeId) return
-
-        if (!shouldFetch()) return
-
-        const fetchResume = async () => {
-            try {
-                const resp = await axiosInstance.get(`/api/resume-op/${resumeId}`)
-                if (resp?.data) {
-                    populateFromResumeData(resp.data)
-                }
-            } catch (err) {
+        if (shouldFetch()) {
+            loadResume(resumeIdNum).catch(err => {
                 console.error('Failed to load resume from server:', err)
-            }
+            })
         }
-
-        fetchResume()
-        // run only once on mount or when resumeId changes
-    }, [resumeId])
+    }, [resumeId, setDocumentId, loadResume])
 
     return (
         <div className="min-h-screen bg-gray-50">

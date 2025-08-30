@@ -25,6 +25,10 @@ export default function TemplatesPage() {
         return matchesSearch && matchesCategory && matchesPremium;
     });
 
+    const handleTemplateClick = (templateId: number) => {
+        console.log('Clicking template with ID:', templateId);
+        router.push(`/template/${templateId}`);
+    };
 
     return (
         <div className="min-h-screen bg-white">
@@ -146,15 +150,14 @@ export default function TemplatesPage() {
                 ) : (
                     <div className={viewMode === "grid" ? "grid md:grid-cols-2 lg:grid-cols-3 gap-8" : "space-y-6"}>
                         {filteredTemplates.map((template, i) => (
-                            <TemplateSelector  templateId={template.id.toString()}>
                             <motion.div
-                                
+                                key={template.id}
                                 initial={{ y: 50, opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
                                 transition={{ duration: 0.6, delay: i * 0.1 }}
                                 className={`group cursor-pointer ${viewMode === "list" ? "flex gap-6 bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-all" : ""
                                     }`}
-                                
+                                onClick={() => handleTemplateClick(template.id)}
                             >
                                 {viewMode === "grid" ? (
                                     // Grid View
@@ -245,7 +248,6 @@ export default function TemplatesPage() {
                                     </>
                                 )}
                             </motion.div>
-                            </TemplateSelector>
                         ))}
                     </div>
                 )}

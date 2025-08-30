@@ -10,7 +10,7 @@ interface WorkExperienceStepProps {
 }
 
 function WorkExperienceStep({ onNext, onPrev }: WorkExperienceStepProps) {
-  const { workExperience, addWorkExperience, updateWorkExperience, removeWorkExperience, getOrCreateDocumentId } = useResumeStore()
+  const { workExperience, addWorkExperience, updateWorkExperience, removeWorkExperience } = useResumeStore()
   const [showAddForm, setShowAddForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [aiSuggestions, setAiSuggestions] = useState<string[]>([])

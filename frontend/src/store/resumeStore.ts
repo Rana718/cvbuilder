@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import axiosInstance from '@/lib/axios'
 
 export interface PersonalInfo {
     firstName: string
@@ -73,8 +74,12 @@ interface ResumeStore extends ResumeState {
 
     // Document ID
     setDocumentId: (id: number) => void
-    getOrCreateDocumentId: () => number
     clearDocumentId: () => void
+
+    // API methods
+    saveResume: () => Promise<void>
+    loadResume: (resumeId: number) => Promise<void>
+    hasData: () => boolean
 
     // Populate from API data
     populateFromResumeData: (data: any) => void
@@ -150,30 +155,99 @@ export const useResumeStore = create<ResumeStore>()((set, get) => ({
     // Document ID
     setDocumentId: (id) => set({ documentId: id }),
 
-    getOrCreateDocumentId: () => {
-        const state = get()
-        if (state.documentId) {
-            return state.documentId
-        }
-        // Generate a consistent document ID based on user data or session
-        // Use a combination of timestamp and random for uniqueness but consistency within session
-        const sessionDocId = sessionStorage.getItem('resume_document_id')
-        if (sessionDocId) {
-            const docId = parseInt(sessionDocId)
-            set({ documentId: docId })
-            return docId
-        }
-        
-        // Generate new document ID and store in session
-        const newDocId = Date.now() + Math.floor(Math.random() * 1000)
-        sessionStorage.setItem('resume_document_id', newDocId.toString())
-        set({ documentId: newDocId })
-        return newDocId
+    clearDocumentId: () => {
+        set({ documentId: null })
     },
 
-    clearDocumentId: () => {
-        sessionStorage.removeItem('resume_document_id')
-        set({ documentId: null })
+    // API methods
+    saveResume: async () => {
+        const state = get()
+        
+        // Transform frontend data to backend format
+        const resumeData = {
+            name: `${state.personalInfo.firstName} ${state.personalInfo.lastName}`.trim(),
+            email: state.personalInfo.email,
+            phone: state.personalInfo.phone,
+            city: state.personalInfo.city,
+            country: state.personalInfo.country,
+            postal_code: state.personalInfo.pincode,
+            job_title: state.personalInfo.profession,
+            summary: state.summary,
+            skills: state.skills.reduce((acc, skill, index) => {
+                acc[`skill_${index}`] = { name: skill.name, rating: skill.rating }
+                return acc
+            }, {} as Record<string, any>),
+            experience: state.workExperience.reduce((acc, exp, index) => {
+                acc[`exp_${index}`] = {
+                    title: exp.jobTitle,
+                    company: exp.employer,
+                    location: exp.location,
+                    start_date: exp.startDate,
+                    end_date: exp.endDate,
+                    is_current: exp.isCurrentlyWorking,
+                    description: exp.description
+                }
+                return acc
+            }, {} as Record<string, any>),
+            education: state.education.reduce((acc, edu, index) => {
+                acc[`edu_${index}`] = {
+                    institution: edu.schoolName,
+                    degree: edu.degree,
+                    field: edu.fieldOfStudy,
+                    start_date: edu.startDate,
+                    end_date: edu.endDate
+                }
+                return acc
+            }, {} as Record<string, any>),
+            certifications: {},
+            projects: {},
+            languages: {},
+            linkedin_url: state.personalInfo.websites.find(w => w.label.toLowerCase() === 'linkedin')?.url || '',
+            github_url: state.personalInfo.websites.find(w => w.label.toLowerCase() === 'github')?.url || '',
+            portfolio_url: state.personalInfo.websites.find(w => w.label.toLowerCase() === 'portfolio')?.url || '',
+            template_id: parseInt(state.templateId) || 1,
+            theme_color: 'blue'
+        }
+
+        try {
+            if (state.documentId && typeof state.documentId === 'number') {
+                // Update existing resume
+                const response = await axiosInstance.put(`/api/resume-op/${state.documentId}`, resumeData)
+                set({ documentId: response.data.id })
+            } else {
+                // Create new resume
+                const response = await axiosInstance.post('/api/resume-op/save', resumeData)
+                set({ documentId: response.data.id })
+            }
+            // Reset store after successful save
+            setTimeout(() => set(initialState), 1000)
+        } catch (error) {
+            console.error('Failed to save resume:', error)
+            throw error
+        }
+    },
+
+    loadResume: async (resumeId: number) => {
+        try {
+            const response = await axiosInstance.get(`/api/resume-op/${resumeId}`)
+            get().populateFromResumeData(response.data)
+        } catch (error) {
+            console.error('Failed to load resume:', error)
+            throw error
+        }
+    },
+
+    // Check if store has data
+    hasData: () => {
+        const state = get()
+        return !!(
+            state.personalInfo.firstName || 
+            state.personalInfo.lastName || 
+            state.summary || 
+            state.workExperience.length > 0 || 
+            state.skills.length > 0 || 
+            state.education.length > 0
+        )
     },
 
     // Populate from API data
@@ -331,8 +405,6 @@ export const useResumeStore = create<ResumeStore>()((set, get) => ({
 
     // Reset
     resetStore: () => {
-        // Clear session storage for document ID
-        sessionStorage.removeItem('resume_document_id')
         set(initialState)
     }
 }))
