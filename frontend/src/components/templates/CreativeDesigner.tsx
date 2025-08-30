@@ -1,6 +1,6 @@
 "use client";
 
-import { Mail, Phone, MapPin, Palette, Award, Briefcase, GraduationCap, Star } from "lucide-react";
+import { Mail, Phone, MapPin, Palette, Award, Briefcase, GraduationCap, Star, Linkedin, Github, Globe } from "lucide-react";
 
 interface UserData {
   name: string;
@@ -125,13 +125,37 @@ export default function CreativeDesigner({ userData, colors }: CreativeDesignerP
                 <p className="text-xs truncate" style={{ color: 'rgba(255,255,255,0.9)' }}>{userData.address}</p>
               </div>
             )}
+            {userData.linkedin_url && (
+              <div
+                className="rounded-lg p-3 text-center backdrop-blur-sm"
+                style={{ backgroundColor: 'rgba(255,255,255,0.2)' }}
+              >
+                <Linkedin className="h-5 w-5 mx-auto mb-1" style={{ color: 'rgba(255,255,255,0.8)' }} />
+                <a href={userData.linkedin_url} target="_blank" rel="noopener noreferrer" className="text-xs hover:underline" style={{ color: 'rgba(255,255,255,0.9)' }}>
+                  LinkedIn
+                </a>
+              </div>
+            )}
+            {userData.github_url && (
+              <div
+                className="rounded-lg p-3 text-center backdrop-blur-sm"
+                style={{ backgroundColor: 'rgba(255,255,255,0.2)' }}
+              >
+                <Github className="h-5 w-5 mx-auto mb-1" style={{ color: 'rgba(255,255,255,0.8)' }} />
+                <a href={userData.github_url} target="_blank" rel="noopener noreferrer" className="text-xs hover:underline" style={{ color: 'rgba(255,255,255,0.9)' }}>
+                  GitHub
+                </a>
+              </div>
+            )}
             {userData.portfolio_url && (
               <div
                 className="rounded-lg p-3 text-center backdrop-blur-sm"
                 style={{ backgroundColor: 'rgba(255,255,255,0.2)' }}
               >
-                <Award className="h-5 w-5 mx-auto mb-1" style={{ color: 'rgba(255,255,255,0.8)' }} />
-                <p className="text-xs" style={{ color: 'rgba(255,255,255,0.9)' }}>Portfolio</p>
+                <Globe className="h-5 w-5 mx-auto mb-1" style={{ color: 'rgba(255,255,255,0.8)' }} />
+                <a href={userData.portfolio_url} target="_blank" rel="noopener noreferrer" className="text-xs hover:underline" style={{ color: 'rgba(255,255,255,0.9)' }}>
+                  Portfolio
+                </a>
               </div>
             )}
           </div>

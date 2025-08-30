@@ -5,6 +5,7 @@ export interface Template {
   description: string;
   preview: string;
   isPremium: boolean;
+  hasPhoto: boolean;
   colors: {
     primary: string;
     secondary: string;
@@ -27,6 +28,7 @@ export const CV_TEMPLATES: Template[] = [
     description: 'Sophisticated design for C-level executives and senior management',
     preview: '/templates/executive-elite.jpg',
     isPremium: true,
+    hasPhoto: true,
     colors: {
       primary: '#1a365d',
       secondary: '#2d3748',
@@ -47,6 +49,7 @@ export const CV_TEMPLATES: Template[] = [
     description: 'Clean, contemporary design perfect for tech and creative professionals',
     preview: '/templates/modern-minimalist.jpg',
     isPremium: false,
+    hasPhoto: false,
     colors: {
       primary: '#2563eb',
       secondary: '#64748b',
@@ -67,6 +70,7 @@ export const CV_TEMPLATES: Template[] = [
     description: 'Bold and artistic layout for designers and creative professionals',
     preview: '/templates/creative-designer.jpg',
     isPremium: true,
+    hasPhoto: true,
     colors: {
       primary: '#7c3aed',
       secondary: '#a855f7',
@@ -87,6 +91,7 @@ export const CV_TEMPLATES: Template[] = [
     description: 'Developer-focused template with clean code-like aesthetics',
     preview: '/templates/tech-specialist.jpg',
     isPremium: false,
+    hasPhoto: false,
     colors: {
       primary: '#059669',
       secondary: '#047857',
@@ -107,6 +112,7 @@ export const CV_TEMPLATES: Template[] = [
     description: 'Trustworthy and professional design for medical professionals',
     preview: '/templates/healthcare-professional.jpg',
     isPremium: true,
+    hasPhoto: true,
     colors: {
       primary: '#dc2626',
       secondary: '#991b1b',
@@ -127,6 +133,7 @@ export const CV_TEMPLATES: Template[] = [
     description: 'Energetic and modern design perfect for new graduates',
     preview: '/templates/fresh-graduate.jpg',
     isPremium: false,
+    hasPhoto: false,
     colors: {
       primary: '#f59e0b',
       secondary: '#d97706',
@@ -147,6 +154,7 @@ export const CV_TEMPLATES: Template[] = [
     description: 'Conservative and professional layout for financial sector',
     preview: '/templates/finance-expert.jpg',
     isPremium: true,
+    hasPhoto: true,
     colors: {
       primary: '#1e40af',
       secondary: '#1e3a8a',
@@ -167,6 +175,7 @@ export const CV_TEMPLATES: Template[] = [
     description: 'Dynamic and engaging design for marketing professionals',
     preview: '/templates/marketing-maven.jpg',
     isPremium: false,
+    hasPhoto: false,
     colors: {
       primary: '#e11d48',
       secondary: '#be185d',
@@ -187,6 +196,7 @@ export const CV_TEMPLATES: Template[] = [
     description: 'Traditional and scholarly design for academic professionals',
     preview: '/templates/academic-scholar.jpg',
     isPremium: true,
+    hasPhoto: true,
     colors: {
       primary: '#374151',
       secondary: '#4b5563',
@@ -207,6 +217,7 @@ export const CV_TEMPLATES: Template[] = [
     description: 'Results-driven design that highlights achievements and metrics',
     preview: '/templates/sales-champion.jpg',
     isPremium: false,
+    hasPhoto: false,
     colors: {
       primary: '#059669',
       secondary: '#047857',

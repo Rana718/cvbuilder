@@ -99,7 +99,25 @@ export default function ExecutiveElite({ userData, colors }: ExecutiveEliteProps
           {userData.linkedin_url && (
             <div className="flex items-center gap-2">
               <Linkedin className="h-4 w-4" />
-              <span>LinkedIn</span>
+              <a href={userData.linkedin_url} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                LinkedIn
+              </a>
+            </div>
+          )}
+          {userData.github_url && (
+            <div className="flex items-center gap-2">
+              <Github className="h-4 w-4" />
+              <a href={userData.github_url} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                GitHub
+              </a>
+            </div>
+          )}
+          {userData.portfolio_url && (
+            <div className="flex items-center gap-2">
+              <Globe className="h-4 w-4" />
+              <a href={userData.portfolio_url} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                Portfolio
+              </a>
             </div>
           )}
         </div>

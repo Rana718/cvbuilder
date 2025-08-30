@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { CV_TEMPLATES, TEMPLATE_CATEGORIES, Template } from "@/constants/templates";
 import { TemplatePreview } from "@/components/templates/TemplateRenderer";
 import TemplateSelector from "@/components/TemplateSelector";
+import Navbar from "@/components/Navbar";
 
 export default function TemplatesPage() {
     const [searchTerm, setSearchTerm] = useState("");
@@ -28,6 +29,7 @@ export default function TemplatesPage() {
 
     return (
         <div className="min-h-screen bg-white">
+            <Navbar/>
             {/* Header */}
             <motion.header
                 initial={{ y: -50, opacity: 0 }}
@@ -146,7 +148,7 @@ export default function TemplatesPage() {
                 ) : (
                     <div className={viewMode === "grid" ? "grid md:grid-cols-2 lg:grid-cols-3 gap-8" : "space-y-6"}>
                         {filteredTemplates.map((template, i) => (
-                            <TemplateSelector  templateId={template.id.toString()}>
+                            <TemplateSelector key={template.id} templateId={template.id.toString()}>
                             <motion.div
                                 
                                 initial={{ y: 50, opacity: 0 }}

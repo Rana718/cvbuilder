@@ -84,13 +84,33 @@ export default function ModernMinimalist({ userData, colors }: ModernMinimalistP
           {userData.linkedin_url && (
             <div className="flex items-center gap-2" style={{ color: theme.secondary }}>
               <Linkedin className="h-4 w-4" style={{ color: theme.primary }} />
-              <span className="text-sm">LinkedIn</span>
+              <a href={userData.linkedin_url} target="_blank" rel="noopener noreferrer" className="text-sm hover:underline">
+                LinkedIn
+              </a>
+            </div>
+          )}
+          {userData.github_url && (
+            <div className="flex items-center gap-2" style={{ color: theme.secondary }}>
+              <Github className="h-4 w-4" style={{ color: theme.primary }} />
+              <a href={userData.github_url} target="_blank" rel="noopener noreferrer" className="text-sm hover:underline">
+                GitHub
+              </a>
             </div>
           )}
           {userData.portfolio_url && (
             <div className="flex items-center gap-2" style={{ color: theme.secondary }}>
               <Globe className="h-4 w-4" style={{ color: theme.primary }} />
-              <span className="text-sm">Portfolio</span>
+              <a href={userData.portfolio_url} target="_blank" rel="noopener noreferrer" className="text-sm hover:underline">
+                Portfolio
+              </a>
+            </div>
+          )}
+          {userData.portfolio_url && (
+            <div className="flex items-center gap-2" style={{ color: theme.secondary }}>
+              <Globe className="h-4 w-4" style={{ color: theme.primary }} />
+              <a href={userData.portfolio_url} target="_blank" rel="noopener noreferrer" className="text-sm hover:underline">
+                Portfolio
+              </a>
             </div>
           )}
         </div>

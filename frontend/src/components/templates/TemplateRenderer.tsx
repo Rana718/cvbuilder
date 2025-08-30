@@ -24,6 +24,7 @@ interface UserData {
   linkedin_url?: string;
   github_url?: string;
   portfolio_url?: string;
+  image_url?: string;
 }
 
 interface TemplateRendererProps {

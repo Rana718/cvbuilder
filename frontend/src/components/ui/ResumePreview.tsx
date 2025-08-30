@@ -21,6 +21,10 @@ function ResumePreview() {
         address: [personalInfo.city, personalInfo.country].filter(Boolean).join(', ') || undefined,
         job_title: personalInfo.profession || 'Professional Title',
         summary: summary ? summary.replace(/<[^>]*>/g, '').trim() : undefined,
+        linkedin_url: personalInfo.websites?.find(w => w.label.toLowerCase() === 'linkedin')?.url || '',
+        github_url: personalInfo.websites?.find(w => w.label.toLowerCase() === 'github')?.url || '',
+        portfolio_url: personalInfo.websites?.find(w => w.label.toLowerCase() === 'portfolio')?.url || '',
+        image_url: personalInfo.image_url || '',
         skills: skills.map(skill => ({
             name: skill.name,
             rating: skill.rating || 3

@@ -10,6 +10,7 @@ export interface PersonalInfo {
     pincode: string
     phone: string
     email: string
+    image_url?: string
     websites: Array<{
         id: string
         label: string
@@ -80,6 +81,7 @@ interface ResumeStore extends ResumeState {
     saveResume: () => Promise<void>
     loadResume: (resumeId: number) => Promise<void>
     hasData: () => boolean
+    uploadImage: (file: File) => Promise<void>
 
     // Populate from API data
     populateFromResumeData: (data: any) => void
@@ -132,6 +134,7 @@ const initialState: ResumeState = {
         pincode: '',
         phone: '',
         email: '',
+        image_url: '',
         websites: []
     },
     workExperience: [],
@@ -173,6 +176,7 @@ export const useResumeStore = create<ResumeStore>()((set, get) => ({
             postal_code: state.personalInfo.pincode,
             job_title: state.personalInfo.profession,
             summary: state.summary,
+            image_url: state.personalInfo.image_url || '',
             skills: state.skills.reduce((acc, skill, index) => {
                 acc[`skill_${index}`] = { name: skill.name, rating: skill.rating }
                 return acc
@@ -237,6 +241,27 @@ export const useResumeStore = create<ResumeStore>()((set, get) => ({
         }
     },
 
+    uploadImage: async (file: File) => {
+        try {
+            const formData = new FormData()
+            formData.append('file', file)
+            
+            const response = await axiosInstance.post('/api/upload', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            })
+            
+            set((state) => ({
+                personalInfo: {
+                    ...state.personalInfo,
+                    image_url: response.data.image_url
+                }
+            }))
+        } catch (error) {
+            console.error('Failed to upload image:', error)
+            throw error
+        }
+    },
+
     // Check if store has data
     hasData: () => {
         const state = get()
@@ -271,6 +296,7 @@ export const useResumeStore = create<ResumeStore>()((set, get) => ({
                 pincode: data.postal_code || '',
                 phone: data.phone || '',
                 email: data.email || '',
+                image_url: data.image_url || '',
                 websites: websites
             },
             summary: data.summary || '',

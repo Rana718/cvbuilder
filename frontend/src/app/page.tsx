@@ -2,114 +2,22 @@
 
 import { motion } from "framer-motion";
 import { FileText, Sparkles, Download, ArrowRight, User, Star, Menu, X, Eye, Edit, Share2, Clock, Shield, Zap } from "lucide-react";
-import { useState } from "react";
-import { useSession, signOut } from "next-auth/react";
-import Link from "next/link";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 export default function Home() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { data: session, status } = useSession();
+
 
   return (
     <div className="min-h-screen bg-white">
       {/* Navbar */}
-      <motion.header 
-        initial={{ y: -100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.8 }}
-        className="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-50"
-      >
-        <nav className="container mx-auto px-6 py-4">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-2">
-              <FileText className="h-8 w-8 text-blue-500" />
-              <span className="text-2xl font-bold text-gray-900">AI CV Builder</span>
-            </div>
-            
-            <div className="hidden md:flex items-center space-x-8">
-              <a href="/template" className="text-gray-600 hover:text-blue-500 transition-colors">Templates</a>
-              <a href="#features" className="text-gray-600 hover:text-blue-500 transition-colors">Features</a>
-              <a href="#feedback" className="text-gray-600 hover:text-blue-500 transition-colors">Reviews</a>
-              <a href="#pricing" className="text-gray-600 hover:text-blue-500 transition-colors">Pricing</a>
-            </div>
-
-            <div className="hidden md:flex items-center space-x-4">
-              {status === "loading" ? (
-                <div className="text-gray-600">Loading...</div>
-              ) : session ? (
-                <div className="flex items-center space-x-4">
-                  <span className="text-gray-600">Welcome, {session.user?.name}</span>
-                  <button 
-                    onClick={() => signOut()}
-                    className="flex items-center space-x-2 text-gray-600 hover:text-blue-500 transition-colors"
-                  >
-                    <User className="h-5 w-5" />
-                    <span>Sign Out</span>
-                  </button>
-                </div>
-              ) : (
-                <>
-                  <Link href="/sign-in">
-                    <button className="flex items-center space-x-2 text-gray-600 hover:text-blue-500 transition-colors">
-                      <User className="h-5 w-5" />
-                      <span>Sign In</span>
-                    </button>
-                  </Link>
-                  <Link href="/sign-up">
-                    <button className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors">
-                      Get Started
-                    </button>
-                  </Link>
-                </>
-              )}
-            </div>
-
-            <button 
-              className="md:hidden"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-            >
-              {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </button>
-          </div>
-
-          {/* Mobile Menu */}
-          {isMenuOpen && (
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="md:hidden mt-4 pb-4 border-t border-gray-100"
-            >
-              <div className="flex flex-col space-y-4 pt-4">
-                <a href="/template" className="text-gray-600 hover:text-blue-500">Templates</a>
-                <a href="#features" className="text-gray-600 hover:text-blue-500">Features</a>
-                <a href="#feedback" className="text-gray-600 hover:text-blue-500">Reviews</a>
-                <a href="#pricing" className="text-gray-600 hover:text-blue-500">Pricing</a>
-                <button className="flex items-center space-x-2 text-gray-600 hover:text-blue-500 justify-start">
-                  <User className="h-5 w-5" />
-                  <span>My Account</span>
-                </button>
-              </div>
-            </motion.div>
-          )}
-        </nav>
-      </motion.header>
+      <Navbar />
 
       {/* Hero Section */}
       <section className="container mx-auto px-6 py-20">
         <div className="grid md:grid-cols-2 gap-12 items-center">
-          <div className="text-center md:text-left">
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="mb-8"
-            >
-              <div className="bg-blue-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto md:mx-0 mb-6">
-                <Sparkles className="h-10 w-10 text-blue-500" />
-              </div>
-            </motion.div>
-          
-                      
+          <div className="text-center md:text-left md:pl-5 pl-0">
+
             <motion.h1
               initial={{ y: 50, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
@@ -119,17 +27,17 @@ export default function Home() {
               Create Your Perfect Resume with
               <span className="text-blue-500"> AI Power</span>
             </motion.h1>
-            
+
             <motion.p
               initial={{ y: 50, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.8, delay: 0.6 }}
               className="text-lg text-gray-600 mb-8 leading-relaxed"
             >
-              Transform your career with AI-powered resume building. Get personalized content suggestions, 
+              Transform your career with AI-powered resume building. Get personalized content suggestions,
               professional templates, and expert guidance to land your dream job faster than ever before.
             </motion.p>
-            
+
             <motion.div
               initial={{ y: 50, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
@@ -144,15 +52,6 @@ export default function Home() {
                 View Templates
               </a>
             </motion.div>
-
-            <motion.div
-              initial={{ y: 50, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ duration: 0.8, delay: 1 }}
-              className="text-sm text-gray-500"
-            >
-              ✨ No credit card required • ⚡ Create in 5 minutes • 🎯 ATS-friendly templates
-            </motion.div>
           </div>
 
           <motion.div
@@ -161,13 +60,23 @@ export default function Home() {
             transition={{ duration: 0.8, delay: 0.6 }}
             className="text-center"
           >
-            <img 
-              src="/img/banner.png" 
-              alt="AI CV Builder Banner" 
+            <img
+              src="/img/banner.png"
+              alt="AI CV Builder Banner"
               className="w-full max-w-lg mx-auto rounded-lg shadow-lg"
             />
           </motion.div>
         </div>
+
+        {/* Centered features - moved outside the grid */}
+        <motion.div
+          initial={{ y: 50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.8, delay: 1 }}
+          className="text-sm text-gray-500 text-center mt-12"
+        >
+          ✨ No credit card required • ⚡ Create in 5 minutes • 🎯 ATS-friendly templates
+        </motion.div>
       </section>
 
       {/* Features */}
@@ -363,65 +272,7 @@ export default function Home() {
           </motion.div>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-16">
-        <div className="container mx-auto px-6">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
-            <div>
-              <div className="flex items-center space-x-2 mb-4">
-                <FileText className="h-8 w-8 text-blue-300" />
-                <span className="text-2xl font-bold">AI CV Builder</span>
-              </div>
-              <p className="text-gray-400 mb-4">
-                Empowering professionals worldwide with AI-powered resume building technology.
-              </p>
-              <div className="flex space-x-4">
-                <button className="bg-gray-800 hover:bg-gray-700 p-2 rounded-lg transition-colors">
-                  <Share2 className="h-5 w-5" />
-                </button>
-                <button className="bg-gray-800 hover:bg-gray-700 p-2 rounded-lg transition-colors">
-                  <Edit className="h-5 w-5" />
-                </button>
-              </div>
-            </div>
-            
-            <div>
-              <h3 className="font-semibold mb-4">Product</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">Templates</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">AI Writer</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Cover Letters</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Resume Examples</a></li>
-              </ul>
-            </div>
-            
-            <div>
-              <h3 className="font-semibold mb-4">Resources</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">Career Tips</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Interview Guide</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Salary Tools</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Job Search</a></li>
-              </ul>
-            </div>
-            
-            <div>
-              <h3 className="font-semibold mb-4">Support</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">Help Center</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Contact Us</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Terms of Service</a></li>
-              </ul>
-            </div>
-          </div>
-          
-          <div className="border-t border-gray-800 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 AI CV Builder. All rights reserved. Made with ❤️ for job seekers worldwide.</p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
