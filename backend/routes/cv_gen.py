@@ -47,5 +47,9 @@ async def generate_summary(request: DirectSummaryRequest):
     
     if not result["success"]:
         raise HTTPException(status_code=500, detail=result["error"])
-    
-    return SummaryResponse(suggestions=[result["summary"]])
+    # result["summary"] is expected to be a list of suggestion strings
+    suggestions = result.get("summary") or []
+    if isinstance(suggestions, str):
+        suggestions = [suggestions]
+
+    return SummaryResponse(suggestions=suggestions)

@@ -11,7 +11,7 @@ JWT_ALGORITHM = "HS256"
 class JWTAuthMiddleware(BaseHTTPMiddleware):
     def __init__(self, app):
         super().__init__(app)
-        self.protected_prefixes = ["/resume-op"]
+        self.protected_prefixes = ["/api/resume-op", "/api/auth/profile"]
 
     async def dispatch(self, request: Request, call_next):
         if request.method == "OPTIONS":
@@ -31,7 +31,7 @@ class JWTAuthMiddleware(BaseHTTPMiddleware):
 
         try:
             payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
-            request.state.user_id = payload.get("user_id")
+            request.state.user_id = int(payload.get("sub"))  # JWT uses "sub" for user_id
             request.state.user_email = payload.get("email")
 
         except jwt.ExpiredSignatureError:

@@ -120,22 +120,23 @@ class CVGenerator:
                 for exp in cv_data.experience
             ]) if cv_data.experience else ""
             
-            prompt = f"""Create 1 professional summary (50-80 words) for this person based on their CV data:
-            
+            prompt = f"""Create 3 to 5 distinct professional summary variations (each 50-80 words) for this person based on their CV data.
+
+            Provide concise, third-person summaries that highlight key strengths, achievements, and value proposition.
+
             Key Skills: {skills_text}
             Work Experience: {work_exp}
 
             Requirements:
-            - Exactly 50-80 words
-            - Professional tone
-            - Highlight key strengths and achievements
-            - Focus on value proposition
-            - Write in third person
+            - Produce between 3 and 5 unique summary variants
+            - Each summary must be 50-80 words
+            - Professional tone, third person
+            - No explanations, no extra text
+            - Return ONLY a raw JSON array of strings (e.g. ["summary1", "summary2", ...]) with no markdown fences
+            """
 
-            Return as a JSON array of strings (each string = one full summary)."""
-            
             messages = [
-                {"role": "system", "content": "You are a professional CV expert. Generate professional summaries."},
+                {"role": "system", "content": "You are a professional CV expert. Return ONLY a JSON array of plain strings, no markdown, no extra commentary."},
                 {"role": "user", "content": prompt}
             ]
             
@@ -145,10 +146,28 @@ class CVGenerator:
                 temperature=0.6,
                 max_tokens=600,
             )
-            
+
             content = response.choices[0].message.content.strip()
-            
-            return {"success": True, "summary": content}
+
+            # Parse model output into a list of summary strings
+            parsed = CVGenerator._parse_json_response(content)
+
+            # Ensure we have a list of strings
+            summaries = []
+            if isinstance(parsed, list):
+                for item in parsed:
+                    if isinstance(item, str):
+                        s = item.strip().strip('"')
+                        if s:
+                            summaries.append(s)
+            elif isinstance(parsed, str):
+                # fallback: single string
+                summaries = [parsed.strip()]
+
+            # Return up to 5 summaries
+            summaries = summaries[:5]
+
+            return {"success": True, "summary": summaries}
             
         except Exception as e:
             return {"success": False, "error": str(e)}

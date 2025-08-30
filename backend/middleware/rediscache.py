@@ -22,14 +22,15 @@ class RedisCache:
                 
                 if request and request.method == "GET":
                     cache_key = self.cache_key(request)
-                    cached = await redis_client.get(cache_key)
-                    
-                    if cached:
-                        return json.loads(cached)
+                    if redis_client is not None:
+                        cached = await redis_client.get(cache_key)
+                        
+                        if cached:
+                            return json.loads(cached)
                 
                 result = await func(*args, **kwargs)
                 
-                if request and request.method == "GET":
+                if request and request.method == "GET" and redis_client is not None:
                     cache_key = self.cache_key(request)
                     await redis_client.setex(
                         cache_key, 
@@ -43,6 +44,8 @@ class RedisCache:
     
     async def purge_pattern(self, pattern: str):
         """Purge cache keys matching pattern"""
+        if redis_client is None:
+            return  # Skip if Redis is not available
         keys = await redis_client.keys(f"cache:*{pattern}*")
         if keys:
             await redis_client.delete(*keys)
