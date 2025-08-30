@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
 import { signIn, getSession } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
-function SignInPage() {
+function SignInForm() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
@@ -98,6 +98,14 @@ function SignInPage() {
                 </form>
             </div>
         </div>
+    );
+}
+
+function SignInPage() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <SignInForm />
+        </Suspense>
     );
 }
 
