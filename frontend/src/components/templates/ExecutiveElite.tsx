@@ -1,6 +1,6 @@
 "use client";
 
-import { Mail, Phone, MapPin, Globe, Linkedin, Github } from "lucide-react";
+import { Mail, Phone, MapPin, Globe, Linkedin, Github, Star } from "lucide-react";
 
 interface UserData {
   name: string;
@@ -9,7 +9,10 @@ interface UserData {
   address?: string;
   job_title?: string;
   summary?: string;
-  skills?: string[];
+  skills?: Array<{
+    name: string;
+    rating: number;
+  }>;
   experience?: any[];
   education?: any[];
   linkedin_url?: string;
@@ -38,24 +41,24 @@ export default function ExecutiveElite({ userData, colors }: ExecutiveEliteProps
   };
 
   return (
-    <div 
+    <div
       className="max-w-4xl mx-auto shadow-2xl"
-      style={{ 
+      style={{
         fontFamily: 'Source Sans Pro, sans-serif',
         backgroundColor: theme.background,
         color: theme.text
       }}
     >
       {/* Header Section */}
-      <div 
+      <div
         className="text-white p-8"
-        style={{ 
+        style={{
           background: `linear-gradient(to right, ${theme.primary}, ${theme.secondary})`
         }}
       >
         <div className="flex items-center justify-between">
           <div>
-            <h1 
+            <h1
               className="text-4xl font-bold mb-2"
               style={{ fontFamily: 'Playfair Display, serif' }}
             >
@@ -65,7 +68,7 @@ export default function ExecutiveElite({ userData, colors }: ExecutiveEliteProps
               {userData.job_title || 'Professional Title'}
             </p>
           </div>
-          <div 
+          <div
             className="w-32 h-32 rounded-full flex items-center justify-center"
             style={{ backgroundColor: 'rgba(255,255,255,0.2)' }}
           >
@@ -74,7 +77,7 @@ export default function ExecutiveElite({ userData, colors }: ExecutiveEliteProps
             </span>
           </div>
         </div>
-        
+
         {/* Contact Info */}
         <div className="flex flex-wrap gap-6 mt-6 text-sm">
           <div className="flex items-center gap-2">
@@ -107,9 +110,9 @@ export default function ExecutiveElite({ userData, colors }: ExecutiveEliteProps
         <div className="flex-1 p-8">
           {/* Executive Summary */}
           <section className="mb-8">
-            <h2 
+            <h2
               className="text-2xl font-bold mb-4 pb-2"
-              style={{ 
+              style={{
                 fontFamily: 'Playfair Display, serif',
                 color: theme.text,
                 borderBottom: `2px solid ${theme.accent}`
@@ -124,9 +127,9 @@ export default function ExecutiveElite({ userData, colors }: ExecutiveEliteProps
 
           {/* Professional Experience */}
           <section className="mb-8">
-            <h2 
+            <h2
               className="text-2xl font-bold mb-4 pb-2"
-              style={{ 
+              style={{
                 fontFamily: 'Playfair Display, serif',
                 color: theme.text,
                 borderBottom: `2px solid ${theme.accent}`
@@ -143,13 +146,13 @@ export default function ExecutiveElite({ userData, colors }: ExecutiveEliteProps
                   <p style={{ color: theme.text }}>{exp.description}</p>
                 </div>
               )) || (
-                <div className="pl-4" style={{ borderLeft: `4px solid ${theme.accent}` }}>
-                  <h3 className="text-lg font-semibold" style={{ color: theme.text }}>Chief Executive Officer</h3>
-                  <p className="font-medium" style={{ color: theme.accent }}>Fortune 500 Company</p>
-                  <p className="text-sm mb-2" style={{ color: theme.secondary }}>2020 - Present</p>
-                  <p style={{ color: theme.text }}>Led organizational transformation initiatives resulting in 40% revenue growth and improved operational efficiency across all business units.</p>
-                </div>
-              )}
+                  <div className="pl-4" style={{ borderLeft: `4px solid ${theme.accent}` }}>
+                    <h3 className="text-lg font-semibold" style={{ color: theme.text }}>Chief Executive Officer</h3>
+                    <p className="font-medium" style={{ color: theme.accent }}>Fortune 500 Company</p>
+                    <p className="text-sm mb-2" style={{ color: theme.secondary }}>2020 - Present</p>
+                    <p style={{ color: theme.text }}>Led organizational transformation initiatives resulting in 40% revenue growth and improved operational efficiency across all business units.</p>
+                  </div>
+                )}
             </div>
           </section>
         </div>
@@ -158,66 +161,88 @@ export default function ExecutiveElite({ userData, colors }: ExecutiveEliteProps
         <div className="w-80 p-6" style={{ backgroundColor: 'rgba(0,0,0,0.03)' }}>
           {/* Core Competencies */}
           <section className="mb-8">
-            <h3 
+            <h3
               className="text-lg font-bold mb-4"
-              style={{ 
+              style={{
                 fontFamily: 'Playfair Display, serif',
                 color: theme.text
               }}
             >
               Core Competencies
             </h3>
-            <div className="space-y-2">
+            <div className="space-y-3">
               {userData.skills?.map((skill, index) => (
-                <div 
-                  key={index} 
-                  className="p-2 rounded"
-                  style={{ 
+                <div
+                  key={index}
+                  className="p-3 rounded"
+                  style={{
                     backgroundColor: theme.background,
                     borderLeft: `4px solid ${theme.accent}`
                   }}
                 >
-                  <span className="text-sm font-medium" style={{ color: theme.text }}>{skill}</span>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium" style={{ color: theme.text }}>
+                      {skill.name}
+                    </span>
+                    <div className="flex space-x-1">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <Star
+                          key={star}
+                          className={`w-3 h-3 ${
+                            star <= skill.rating
+                              ? 'fill-current'
+                              : 'stroke-current fill-transparent'
+                          }`}
+                          style={{ 
+                            color: star <= skill.rating ? theme.accent : theme.secondary 
+                          }}
+                        />
+                      ))}
+                    </div>
+                  </div>
                 </div>
               )) || (
-                <>
-                  <div 
-                    className="p-2 rounded"
-                    style={{ 
-                      backgroundColor: theme.background,
-                      borderLeft: `4px solid ${theme.accent}`
-                    }}
-                  >
-                    <span className="text-sm font-medium" style={{ color: theme.text }}>Strategic Leadership</span>
-                  </div>
-                  <div 
-                    className="p-2 rounded"
-                    style={{ 
-                      backgroundColor: theme.background,
-                      borderLeft: `4px solid ${theme.accent}`
-                    }}
-                  >
-                    <span className="text-sm font-medium" style={{ color: theme.text }}>P&L Management</span>
-                  </div>
-                  <div 
-                    className="p-2 rounded"
-                    style={{ 
-                      backgroundColor: theme.background,
-                      borderLeft: `4px solid ${theme.accent}`
-                    }}
-                  >
-                    <span className="text-sm font-medium" style={{ color: theme.text }}>Digital Transformation</span>
-                  </div>
-                </>
-              )}
+                  <>
+                    <div className="p-3 rounded" style={{ backgroundColor: theme.background, borderLeft: `4px solid ${theme.accent}` }}>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium" style={{ color: theme.text }}>Strategic Leadership</span>
+                        <div className="flex space-x-1">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <Star key={star} className={`w-3 h-3 ${star <= 5 ? 'fill-current' : 'stroke-current fill-transparent'}`} style={{ color: star <= 5 ? theme.accent : theme.secondary }} />
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="p-3 rounded" style={{ backgroundColor: theme.background, borderLeft: `4px solid ${theme.accent}` }}>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium" style={{ color: theme.text }}>P&L Management</span>
+                        <div className="flex space-x-1">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <Star key={star} className={`w-3 h-3 ${star <= 4 ? 'fill-current' : 'stroke-current fill-transparent'}`} style={{ color: star <= 4 ? theme.accent : theme.secondary }} />
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="p-3 rounded" style={{ backgroundColor: theme.background, borderLeft: `4px solid ${theme.accent}` }}>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium" style={{ color: theme.text }}>Digital Transformation</span>
+                        <div className="flex space-x-1">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <Star key={star} className={`w-3 h-3 ${star <= 5 ? 'fill-current' : 'stroke-current fill-transparent'}`} style={{ color: star <= 5 ? theme.accent : theme.secondary }} />
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
             </div>
           </section>
 
           {/* Education */}
           <section className="mb-8">
-            <h3 
+            <h3
               className="text-lg font-bold mb-4"
-              style={{ 
+              style={{
                 fontFamily: 'Playfair Display, serif',
                 color: theme.text
               }}
@@ -232,20 +257,20 @@ export default function ExecutiveElite({ userData, colors }: ExecutiveEliteProps
                   <p className="text-xs" style={{ color: theme.secondary }}>{edu.year}</p>
                 </div>
               )) || (
-                <div className="p-3 rounded shadow-sm" style={{ backgroundColor: theme.background }}>
-                  <h4 className="font-semibold" style={{ color: theme.text }}>MBA</h4>
-                  <p className="text-sm" style={{ color: theme.accent }}>Harvard Business School</p>
-                  <p className="text-xs" style={{ color: theme.secondary }}>2015</p>
-                </div>
-              )}
+                  <div className="p-3 rounded shadow-sm" style={{ backgroundColor: theme.background }}>
+                    <h4 className="font-semibold" style={{ color: theme.text }}>MBA</h4>
+                    <p className="text-sm" style={{ color: theme.accent }}>Harvard Business School</p>
+                    <p className="text-xs" style={{ color: theme.secondary }}>2015</p>
+                  </div>
+                )}
             </div>
           </section>
 
           {/* Key Achievements */}
           <section>
-            <h3 
+            <h3
               className="text-lg font-bold mb-4"
-              style={{ 
+              style={{
                 fontFamily: 'Playfair Display, serif',
                 color: theme.text
               }}
@@ -253,19 +278,19 @@ export default function ExecutiveElite({ userData, colors }: ExecutiveEliteProps
               Key Achievements
             </h3>
             <div className="space-y-3">
-              <div 
+              <div
                 className="p-3 rounded"
                 style={{ backgroundColor: `${theme.accent}20` }}
               >
                 <p className="text-sm" style={{ color: theme.text }}>40% Revenue Growth</p>
               </div>
-              <div 
+              <div
                 className="p-3 rounded"
                 style={{ backgroundColor: `${theme.accent}20` }}
               >
                 <p className="text-sm" style={{ color: theme.text }}>$50M Cost Reduction</p>
               </div>
-              <div 
+              <div
                 className="p-3 rounded"
                 style={{ backgroundColor: `${theme.accent}20` }}
               >

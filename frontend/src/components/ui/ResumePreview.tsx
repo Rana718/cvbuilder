@@ -21,7 +21,10 @@ function ResumePreview() {
         address: [personalInfo.city, personalInfo.country].filter(Boolean).join(', ') || undefined,
         job_title: personalInfo.profession || 'Professional Title',
         summary: summary ? summary.replace(/<[^>]*>/g, '').trim() : undefined,
-        skills: skills.map(skill => skill.name),
+        skills: skills.map(skill => ({
+            name: skill.name,
+            rating: skill.rating || 3
+        })),
         experience: workExperience.map(exp => ({
             title: exp.jobTitle,
             company: exp.employer,
@@ -66,7 +69,7 @@ function ResumePreview() {
     const templateIdNumber = parseInt(templateId) || 2 // Default to Modern Minimalist
 
     return (
-        <div className="w-full">
+        <div className="w-full" data-resume-content>
             <TemplateRenderer 
                 templateId={templateIdNumber}
                 userData={userData}

@@ -1,6 +1,6 @@
 "use client";
 
-import { Mail, Phone, MapPin, Palette, Award, Briefcase, GraduationCap } from "lucide-react";
+import { Mail, Phone, MapPin, Palette, Award, Briefcase, GraduationCap, Star } from "lucide-react";
 
 interface UserData {
   name: string;
@@ -9,7 +9,10 @@ interface UserData {
   address?: string;
   job_title?: string;
   summary?: string;
-  skills?: string[];
+  skills?: Array<{
+    name: string;
+    rating: number;
+  }>;
   experience?: any[];
   education?: any[];
   projects?: any[];
@@ -39,34 +42,34 @@ export default function CreativeDesigner({ userData, colors }: CreativeDesignerP
   };
 
   return (
-    <div 
+    <div
       className="max-w-5xl mx-auto shadow-2xl overflow-hidden"
-      style={{ 
+      style={{
         fontFamily: 'Open Sans, sans-serif',
         background: `linear-gradient(to bottom right, ${theme.primary}10, ${theme.accent}10)`
       }}
     >
       {/* Creative Header */}
-      <div 
+      <div
         className="relative text-white overflow-hidden"
-        style={{ 
+        style={{
           background: `linear-gradient(to right, ${theme.primary}, ${theme.secondary}, ${theme.accent})`
         }}
       >
         <div className="absolute inset-0" style={{ backgroundColor: 'rgba(0,0,0,0.1)' }}></div>
-        <div 
+        <div
           className="absolute top-0 right-0 w-64 h-64 rounded-full -translate-y-32 translate-x-32"
           style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}
         ></div>
-        <div 
+        <div
           className="absolute bottom-0 left-0 w-48 h-48 rounded-full translate-y-24 -translate-x-24"
           style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}
         ></div>
-        
+
         <div className="relative z-10 p-8">
           <div className="flex items-center justify-between">
             <div className="flex-1">
-              <h1 
+              <h1
                 className="text-5xl font-bold mb-3"
                 style={{ fontFamily: 'Poppins, sans-serif' }}
               >
@@ -80,10 +83,10 @@ export default function CreativeDesigner({ userData, colors }: CreativeDesignerP
                 <span style={{ color: 'rgba(255,255,255,0.9)' }}>Creating Beautiful Experiences</span>
               </div>
             </div>
-            
-            <div 
+
+            <div
               className="w-40 h-40 rounded-full flex items-center justify-center shadow-2xl"
-              style={{ 
+              style={{
                 background: `linear-gradient(to bottom right, ${theme.accent}, ${theme.primary})`
               }}
             >
@@ -92,10 +95,10 @@ export default function CreativeDesigner({ userData, colors }: CreativeDesignerP
               </span>
             </div>
           </div>
-          
+
           {/* Contact Info with Creative Layout */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
-            <div 
+            <div
               className="rounded-lg p-3 text-center backdrop-blur-sm"
               style={{ backgroundColor: 'rgba(255,255,255,0.2)' }}
             >
@@ -105,7 +108,7 @@ export default function CreativeDesigner({ userData, colors }: CreativeDesignerP
               </p>
             </div>
             {userData.phone && (
-              <div 
+              <div
                 className="rounded-lg p-3 text-center backdrop-blur-sm"
                 style={{ backgroundColor: 'rgba(255,255,255,0.2)' }}
               >
@@ -114,7 +117,7 @@ export default function CreativeDesigner({ userData, colors }: CreativeDesignerP
               </div>
             )}
             {userData.address && (
-              <div 
+              <div
                 className="rounded-lg p-3 text-center backdrop-blur-sm"
                 style={{ backgroundColor: 'rgba(255,255,255,0.2)' }}
               >
@@ -123,7 +126,7 @@ export default function CreativeDesigner({ userData, colors }: CreativeDesignerP
               </div>
             )}
             {userData.portfolio_url && (
-              <div 
+              <div
                 className="rounded-lg p-3 text-center backdrop-blur-sm"
                 style={{ backgroundColor: 'rgba(255,255,255,0.2)' }}
               >
@@ -141,17 +144,17 @@ export default function CreativeDesigner({ userData, colors }: CreativeDesignerP
           {/* Creative Summary */}
           <section>
             <div className="flex items-center gap-3 mb-4">
-              <div 
+              <div
                 className="w-8 h-8 rounded-full flex items-center justify-center"
-                style={{ 
+                style={{
                   background: `linear-gradient(to right, ${theme.primary}, ${theme.accent})`
                 }}
               >
                 <Palette className="h-4 w-4 text-white" />
               </div>
-              <h2 
+              <h2
                 className="text-2xl font-bold"
-                style={{ 
+                style={{
                   fontFamily: 'Poppins, sans-serif',
                   color: theme.text
                 }}
@@ -159,9 +162,9 @@ export default function CreativeDesigner({ userData, colors }: CreativeDesignerP
                 Creative Vision
               </h2>
             </div>
-            <div 
+            <div
               className="rounded-xl p-6 shadow-lg"
-              style={{ 
+              style={{
                 backgroundColor: theme.background,
                 borderLeft: `4px solid ${theme.primary}`
               }}
@@ -175,17 +178,17 @@ export default function CreativeDesigner({ userData, colors }: CreativeDesignerP
           {/* Experience with Creative Layout */}
           <section>
             <div className="flex items-center gap-3 mb-6">
-              <div 
+              <div
                 className="w-8 h-8 rounded-full flex items-center justify-center"
-                style={{ 
+                style={{
                   background: `linear-gradient(to right, ${theme.primary}, ${theme.accent})`
                 }}
               >
                 <Briefcase className="h-4 w-4 text-white" />
               </div>
-              <h2 
+              <h2
                 className="text-2xl font-bold"
-                style={{ 
+                style={{
                   fontFamily: 'Poppins, sans-serif',
                   color: theme.text
                 }}
@@ -193,13 +196,13 @@ export default function CreativeDesigner({ userData, colors }: CreativeDesignerP
                 Creative Journey
               </h2>
             </div>
-            
+
             <div className="space-y-6">
               {userData.experience?.map((exp, index) => (
                 <div key={index} className="relative">
-                  <div 
+                  <div
                     className="rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow"
-                    style={{ 
+                    style={{
                       backgroundColor: theme.background,
                       borderLeft: `4px solid ${theme.primary}`
                     }}
@@ -209,9 +212,9 @@ export default function CreativeDesigner({ userData, colors }: CreativeDesignerP
                         <h3 className="text-xl font-semibold" style={{ color: theme.text }}>{exp.title}</h3>
                         <p className="font-medium text-lg" style={{ color: theme.primary }}>{exp.company}</p>
                       </div>
-                      <span 
+                      <span
                         className="px-3 py-1 rounded-full text-sm font-medium"
-                        style={{ 
+                        style={{
                           background: `linear-gradient(to right, ${theme.primary}20, ${theme.accent}20)`,
                           color: theme.primary
                         }}
@@ -223,33 +226,33 @@ export default function CreativeDesigner({ userData, colors }: CreativeDesignerP
                   </div>
                 </div>
               )) || (
-                <div 
-                  className="rounded-xl p-6 shadow-lg"
-                  style={{ 
-                    backgroundColor: theme.background,
-                    borderLeft: `4px solid ${theme.primary}`
-                  }}
-                >
-                  <div className="flex justify-between items-start mb-3">
-                    <div>
-                      <h3 className="text-xl font-semibold" style={{ color: theme.text }}>Senior UI/UX Designer</h3>
-                      <p className="font-medium text-lg" style={{ color: theme.primary }}>Creative Studio Inc.</p>
+                  <div
+                    className="rounded-xl p-6 shadow-lg"
+                    style={{
+                      backgroundColor: theme.background,
+                      borderLeft: `4px solid ${theme.primary}`
+                    }}
+                  >
+                    <div className="flex justify-between items-start mb-3">
+                      <div>
+                        <h3 className="text-xl font-semibold" style={{ color: theme.text }}>Senior UI/UX Designer</h3>
+                        <p className="font-medium text-lg" style={{ color: theme.primary }}>Creative Studio Inc.</p>
+                      </div>
+                      <span
+                        className="px-3 py-1 rounded-full text-sm font-medium"
+                        style={{
+                          background: `linear-gradient(to right, ${theme.primary}20, ${theme.accent}20)`,
+                          color: theme.primary
+                        }}
+                      >
+                        2022 - Present
+                      </span>
                     </div>
-                    <span 
-                      className="px-3 py-1 rounded-full text-sm font-medium"
-                      style={{ 
-                        background: `linear-gradient(to right, ${theme.primary}20, ${theme.accent}20)`,
-                        color: theme.primary
-                      }}
-                    >
-                      2022 - Present
-                    </span>
+                    <p className="leading-relaxed" style={{ color: theme.text }}>
+                      Led design initiatives for mobile and web applications, creating user-centered designs that increased engagement by 60% and improved user satisfaction scores.
+                    </p>
                   </div>
-                  <p className="leading-relaxed" style={{ color: theme.text }}>
-                    Led design initiatives for mobile and web applications, creating user-centered designs that increased engagement by 60% and improved user satisfaction scores.
-                  </p>
-                </div>
-              )}
+                )}
             </div>
           </section>
         </div>
@@ -259,15 +262,15 @@ export default function CreativeDesigner({ userData, colors }: CreativeDesignerP
           {/* Skills with Creative Bars */}
           <section>
             <div className="flex items-center gap-3 mb-4">
-              <div 
+              <div
                 className="w-6 h-6 rounded-full"
-                style={{ 
+                style={{
                   background: `linear-gradient(to right, ${theme.primary}, ${theme.accent})`
                 }}
               ></div>
-              <h3 
+              <h3
                 className="text-lg font-bold"
-                style={{ 
+                style={{
                   fontFamily: 'Poppins, sans-serif',
                   color: theme.text
                 }}
@@ -279,69 +282,61 @@ export default function CreativeDesigner({ userData, colors }: CreativeDesignerP
               <div className="space-y-4">
                 {userData.skills?.map((skill, index) => (
                   <div key={index}>
-                    <div className="flex justify-between mb-1">
-                      <span className="text-sm font-medium" style={{ color: theme.text }}>{skill}</span>
-                      <span className="text-sm" style={{ color: theme.primary }}>Expert</span>
-                    </div>
-                    <div className="w-full rounded-full h-2" style={{ backgroundColor: 'rgba(0,0,0,0.1)' }}>
-                      <div 
-                        className="h-2 rounded-full"
-                        style={{ 
-                          width: '90%',
-                          background: `linear-gradient(to right, ${theme.primary}, ${theme.accent})`
-                        }}
-                      ></div>
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-sm font-medium" style={{ color: theme.text }}>
+                        {skill.name}
+                      </span>
+                      <div className="flex space-x-1">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <Star
+                            key={star}
+                            className={`w-4 h-4 ${
+                              star <= skill.rating
+                                ? 'fill-current'
+                                : 'stroke-current fill-transparent'
+                            }`}
+                            style={{ 
+                              color: star <= skill.rating ? theme.primary : 'rgba(0,0,0,0.3)' 
+                            }}
+                          />
+                        ))}
+                      </div>
                     </div>
                   </div>
                 )) || (
-                  <>
-                    <div>
-                      <div className="flex justify-between mb-1">
-                        <span className="text-sm font-medium" style={{ color: theme.text }}>Adobe Creative Suite</span>
-                        <span className="text-sm" style={{ color: theme.primary }}>Expert</span>
+                    <>
+                      <div>
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-sm font-medium" style={{ color: theme.text }}>Adobe Creative Suite</span>
+                          <div className="flex space-x-1">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <Star key={star} className={`w-4 h-4 ${star <= 5 ? 'fill-current' : 'stroke-current fill-transparent'}`} style={{ color: star <= 5 ? theme.primary : 'rgba(0,0,0,0.3)' }} />
+                            ))}
+                          </div>
+                        </div>
                       </div>
-                      <div className="w-full rounded-full h-2" style={{ backgroundColor: 'rgba(0,0,0,0.1)' }}>
-                        <div 
-                          className="h-2 rounded-full"
-                          style={{ 
-                            width: '95%',
-                            background: `linear-gradient(to right, ${theme.primary}, ${theme.accent})`
-                          }}
-                        ></div>
+                      <div>
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-sm font-medium" style={{ color: theme.text }}>Figma</span>
+                          <div className="flex space-x-1">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <Star key={star} className={`w-4 h-4 ${star <= 4 ? 'fill-current' : 'stroke-current fill-transparent'}`} style={{ color: star <= 4 ? theme.primary : 'rgba(0,0,0,0.3)' }} />
+                            ))}
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                    <div>
-                      <div className="flex justify-between mb-1">
-                        <span className="text-sm font-medium" style={{ color: theme.text }}>Figma</span>
-                        <span className="text-sm" style={{ color: theme.primary }}>Expert</span>
+                      <div>
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-sm font-medium" style={{ color: theme.text }}>UI/UX Design</span>
+                          <div className="flex space-x-1">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <Star key={star} className={`w-4 h-4 ${star <= 4 ? 'fill-current' : 'stroke-current fill-transparent'}`} style={{ color: star <= 4 ? theme.primary : 'rgba(0,0,0,0.3)' }} />
+                            ))}
+                          </div>
+                        </div>
                       </div>
-                      <div className="w-full rounded-full h-2" style={{ backgroundColor: 'rgba(0,0,0,0.1)' }}>
-                        <div 
-                          className="h-2 rounded-full"
-                          style={{ 
-                            width: '90%',
-                            background: `linear-gradient(to right, ${theme.primary}, ${theme.accent})`
-                          }}
-                        ></div>
-                      </div>
-                    </div>
-                    <div>
-                      <div className="flex justify-between mb-1">
-                        <span className="text-sm font-medium" style={{ color: theme.text }}>UI/UX Design</span>
-                        <span className="text-sm" style={{ color: theme.primary }}>Expert</span>
-                      </div>
-                      <div className="w-full rounded-full h-2" style={{ backgroundColor: 'rgba(0,0,0,0.1)' }}>
-                        <div 
-                          className="h-2 rounded-full"
-                          style={{ 
-                            width: '88%',
-                            background: `linear-gradient(to right, ${theme.primary}, ${theme.accent})`
-                          }}
-                        ></div>
-                      </div>
-                    </div>
-                  </>
-                )}
+                    </>
+                  )}
               </div>
             </div>
           </section>
@@ -349,17 +344,17 @@ export default function CreativeDesigner({ userData, colors }: CreativeDesignerP
           {/* Education */}
           <section>
             <div className="flex items-center gap-3 mb-4">
-              <div 
+              <div
                 className="w-6 h-6 rounded-full flex items-center justify-center"
-                style={{ 
+                style={{
                   background: `linear-gradient(to right, ${theme.primary}, ${theme.accent})`
                 }}
               >
                 <GraduationCap className="h-3 w-3 text-white" />
               </div>
-              <h3 
+              <h3
                 className="text-lg font-bold"
-                style={{ 
+                style={{
                   fontFamily: 'Poppins, sans-serif',
                   color: theme.text
                 }}
@@ -375,29 +370,29 @@ export default function CreativeDesigner({ userData, colors }: CreativeDesignerP
                   <p className="text-xs" style={{ color: theme.secondary }}>{edu.year}</p>
                 </div>
               )) || (
-                <div className="rounded-xl p-4 shadow-lg" style={{ backgroundColor: theme.background }}>
-                  <h4 className="font-semibold" style={{ color: theme.text }}>Bachelor of Fine Arts</h4>
-                  <p className="text-sm" style={{ color: theme.primary }}>Design Institute</p>
-                  <p className="text-xs" style={{ color: theme.secondary }}>2020</p>
-                </div>
-              )}
+                  <div className="rounded-xl p-4 shadow-lg" style={{ backgroundColor: theme.background }}>
+                    <h4 className="font-semibold" style={{ color: theme.text }}>Bachelor of Fine Arts</h4>
+                    <p className="text-sm" style={{ color: theme.primary }}>Design Institute</p>
+                    <p className="text-xs" style={{ color: theme.secondary }}>2020</p>
+                  </div>
+                )}
             </div>
           </section>
 
           {/* Awards/Recognition */}
           <section>
             <div className="flex items-center gap-3 mb-4">
-              <div 
+              <div
                 className="w-6 h-6 rounded-full flex items-center justify-center"
-                style={{ 
+                style={{
                   background: `linear-gradient(to right, ${theme.primary}, ${theme.accent})`
                 }}
               >
                 <Award className="h-3 w-3 text-white" />
               </div>
-              <h3 
+              <h3
                 className="text-lg font-bold"
-                style={{ 
+                style={{
                   fontFamily: 'Poppins, sans-serif',
                   color: theme.text
                 }}

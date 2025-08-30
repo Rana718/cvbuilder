@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Plus, GraduationCap, Calendar } from 'lucide-react'
 import { useResumeStore, Education } from '@/store/resumeStore'
+import axiosInstance from '@/lib/axios'
 
 interface EducationStepProps {
   onNext: () => void
@@ -207,7 +208,7 @@ function EducationStep({ onNext, onPrev }: EducationStepProps) {
           disabled={education.length === 0}
           className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
         >
-          Next: Skills & Summary
+          Next: Skills
         </button>
       </div>
     </div>

@@ -12,7 +12,10 @@ interface UserData {
   address?: string;
   job_title?: string;
   summary?: string;
-  skills?: string[];
+  skills?: Array<{
+    name: string;
+    rating: number;
+  }>;
   experience?: any[];
   education?: any[];
   projects?: any[];
@@ -61,21 +64,6 @@ export default function TemplateRenderer({ templateId, userData, colors }: Templ
     case 3: // creative-designer
       return <CreativeDesigner userData={userData} colors={themeColors} />;
 
-    // Add more template cases as you create them
-    case 4: // tech-specialist
-    case 5: // healthcare-professional
-    case 6: // fresh-graduate
-    case 7: // finance-expert
-    case 8: // marketing-maven
-    case 9: // academic-scholar
-    case 10: // sales-champion
-      return (
-        <div className="max-w-4xl mx-auto p-8 text-center">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">Coming Soon</h2>
-          <p className="text-gray-600">The {template.name} template is currently under development.</p>
-        </div>
-      );
-
     default:
       return <ModernMinimalist userData={userData} colors={themeColors} />;
   }
@@ -94,7 +82,11 @@ export function TemplatePreview({ templateId, scale = 0.3 }: { templateId: numbe
     address: "New York, NY",
     job_title: "Senior Professional",
     summary: "Experienced professional with a proven track record of success.",
-    skills: ["Leadership", "Strategy", "Innovation"],
+    skills: [
+      { name: "Leadership", rating: 5 },
+      { name: "Strategy", rating: 4 },
+      { name: "Innovation", rating: 5 }
+    ],
     experience: [
       {
         title: "Senior Position",

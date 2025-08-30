@@ -1,31 +1,24 @@
 import React, { useState } from 'react'
-import { Plus, X, Briefcase, MapPin, Calendar } from 'lucide-react'
+import { Plus, X, Briefcase, MapPin, Calendar, Sparkles } from 'lucide-react'
 import { useResumeStore, WorkExperience } from '@/store/resumeStore'
 import SimpleRichTextEditor from '@/components/ui/SimpleRichTextEditor'
+import axiosInstance from '@/lib/axios'
 
 interface WorkExperienceStepProps {
   onNext: () => void
   onPrev: () => void
 }
 
-const jobDescriptionSuggestions = [
-  "Led a team of 5 developers to deliver high-quality software solutions on time and within budget",
-  "Developed and maintained web applications using React, Node.js, and MongoDB",
-  "Collaborated with cross-functional teams to define, design, and ship new features",
-  "Improved application performance by 40% through code optimization and refactoring",
-  "Implemented automated testing procedures that reduced bugs by 30%",
-  "Mentored junior developers and conducted code reviews to ensure best practices",
-  "Designed and implemented RESTful APIs serving over 10,000 daily active users",
-  "Managed project timelines and deliverables using Agile/Scrum methodologies"
-]
-
 function WorkExperienceStep({ onNext, onPrev }: WorkExperienceStepProps) {
-  const { workExperience, addWorkExperience, updateWorkExperience, removeWorkExperience } = useResumeStore()
+  const { workExperience, addWorkExperience, updateWorkExperience, removeWorkExperience, getOrCreateDocumentId } = useResumeStore()
   const [showAddForm, setShowAddForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
-  const [formData, setFormData] = useState<Omit<WorkExperience, 'id'>>({
+  const [aiSuggestions, setAiSuggestions] = useState<string[]>([])
+  const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false)
+  const [formData, setFormData] = useState<Omit<WorkExperience, 'id'> & { role?: string }>({
     jobTitle: '',
     employer: '',
+    role: '',
     location: '',
     isRemote: false,
     startDate: '',
@@ -38,6 +31,7 @@ function WorkExperienceStep({ onNext, onPrev }: WorkExperienceStepProps) {
     setFormData({
       jobTitle: '',
       employer: '',
+      role: '',
       location: '',
       isRemote: false,
       startDate: '',
@@ -47,6 +41,35 @@ function WorkExperienceStep({ onNext, onPrev }: WorkExperienceStepProps) {
     })
     setShowAddForm(false)
     setEditingId(null)
+    setAiSuggestions([])
+  }
+
+  const generateAISuggestions = async () => {
+    if (!formData.jobTitle || !formData.employer) {
+      alert('Please fill in Job Title and Employer first to generate AI suggestions')
+      return
+    }
+
+    setIsLoadingSuggestions(true)
+    try {
+      const response = await axiosInstance.post('/api/cv-gen/work-experience', {
+        job_title: formData.jobTitle,
+        company: formData.employer,
+        location: formData.isRemote ? 'Remote' : formData.location,
+        role: formData.role,
+        start_date: formData.startDate,
+        end_date: formData.isCurrentlyWorking ? 'Present' : formData.endDate,
+      })
+
+      if (response.data?.points) {
+        setAiSuggestions(response.data.points)
+      }
+    } catch (error) {
+      console.error('Failed to generate AI suggestions:', error)
+      alert('Failed to generate AI suggestions. Please try again.')
+    } finally {
+      setIsLoadingSuggestions(false)
+    }
   }
 
   const handleSave = () => {
@@ -108,7 +131,7 @@ function WorkExperienceStep({ onNext, onPrev }: WorkExperienceStepProps) {
                     </span>
                   </div>
                   {exp.description && (
-                    <div 
+                    <div
                       className="mt-2 text-sm text-gray-600 prose prose-sm max-w-none"
                       dangerouslySetInnerHTML={{ __html: exp.description }}
                     />
@@ -176,6 +199,19 @@ function WorkExperienceStep({ onNext, onPrev }: WorkExperienceStepProps) {
                 onChange={(e) => setFormData({ ...formData, employer: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Company Name"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Role (optional)
+              </label>
+              <input
+                type="text"
+                value={formData.role || ''}
+                onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="e.g. Frontend Developer, Team Lead"
               />
             </div>
 
@@ -256,18 +292,44 @@ function WorkExperienceStep({ onNext, onPrev }: WorkExperienceStepProps) {
 
           {/* Description Suggestions */}
           <div className="mt-4">
-            <h5 className="text-sm font-medium text-gray-700 mb-2">Suggested Bullet Points:</h5>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-              {jobDescriptionSuggestions.slice(0, 6).map((suggestion, index) => (
-                <button
-                  key={index}
-                  onClick={() => addSuggestionToDescription(suggestion)}
-                  className="text-left p-2 text-xs text-gray-600 hover:bg-blue-50 hover:text-blue-700 rounded border border-gray-200 transition-colors"
-                >
-                  {suggestion}
-                </button>
-              ))}
+            <div className="flex items-center justify-between mb-3">
+              <h5 className="text-sm font-medium text-gray-700">AI-Generated Bullet Points:</h5>
+              <button
+                onClick={generateAISuggestions}
+                disabled={!formData.jobTitle || !formData.employer || isLoadingSuggestions}
+                className="flex items-center space-x-2 px-3 py-1.5 bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-lg hover:from-purple-600 hover:to-blue-600 disabled:opacity-50 disabled:cursor-not-allowed text-xs font-medium transition-all"
+              >
+                <Sparkles className="w-4 h-4" />
+                <span>{isLoadingSuggestions ? 'Generating...' : 'Generate AI Suggestions'}</span>
+              </button>
             </div>
+
+            {isLoadingSuggestions && (
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+                <span className="ml-2 text-sm text-gray-600">Generating personalized suggestions...</span>
+              </div>
+            )}
+
+            {aiSuggestions.length > 0 && !isLoadingSuggestions && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                {aiSuggestions.map((suggestion: string, index: number) => (
+                  <button
+                    key={index}
+                    onClick={() => addSuggestionToDescription(suggestion)}
+                    className="text-left p-2 text-xs text-gray-600 hover:bg-blue-50 hover:text-blue-700 rounded border border-gray-200 transition-colors"
+                  >
+                    {suggestion}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {aiSuggestions.length === 0 && !isLoadingSuggestions && (
+              <div className="text-center py-4 text-sm text-gray-500">
+                Fill in Job Title and Employer, then click "Generate AI Suggestions" to get personalized bullet points for your role.
+              </div>
+            )}
           </div>
 
           <div className="flex justify-end space-x-3 mt-6">

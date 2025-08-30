@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { 
-  Geist, 
-  Geist_Mono, 
-  Inter, 
-  Playfair_Display, 
-  Source_Sans_3, 
-  Poppins, 
+import {
+  Geist,
+  Geist_Mono,
+  Inter,
+  Playfair_Display,
+  Source_Sans_3,
+  Poppins,
   Open_Sans,
   JetBrains_Mono,
   Roboto,
@@ -15,6 +15,7 @@ import {
   Nunito_Sans
 } from "next/font/google";
 import "./globals.css";
+import AuthContext from "@/components/AuthContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -101,7 +102,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${playfairDisplay.variable} ${sourceSans3.variable} ${poppins.variable} ${openSans.variable} ${jetbrainsMono.variable} ${roboto.variable} ${merriweather.variable} ${lato.variable} ${nunito.variable} ${nunitoSans.variable} antialiased`}
       >
-        {children}
+        <AuthContext>{children}</AuthContext>
       </body>
     </html>
   );

@@ -3,9 +3,12 @@
 import { motion } from "framer-motion";
 import { FileText, Sparkles, Download, ArrowRight, User, Star, Menu, X, Eye, Edit, Share2, Clock, Shield, Zap } from "lucide-react";
 import { useState } from "react";
+import { useSession, signOut } from "next-auth/react";
+import Link from "next/link";
 
 export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { data: session, status } = useSession();
 
   return (
     <div className="min-h-screen bg-white">
@@ -31,13 +34,34 @@ export default function Home() {
             </div>
 
             <div className="hidden md:flex items-center space-x-4">
-              <button className="flex items-center space-x-2 text-gray-600 hover:text-blue-500 transition-colors">
-                <User className="h-5 w-5" />
-                <span>My Account</span>
-              </button>
-              <button className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors">
-                Get Started
-              </button>
+              {status === "loading" ? (
+                <div className="text-gray-600">Loading...</div>
+              ) : session ? (
+                <div className="flex items-center space-x-4">
+                  <span className="text-gray-600">Welcome, {session.user?.name}</span>
+                  <button 
+                    onClick={() => signOut()}
+                    className="flex items-center space-x-2 text-gray-600 hover:text-blue-500 transition-colors"
+                  >
+                    <User className="h-5 w-5" />
+                    <span>Sign Out</span>
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <Link href="/sign-in">
+                    <button className="flex items-center space-x-2 text-gray-600 hover:text-blue-500 transition-colors">
+                      <User className="h-5 w-5" />
+                      <span>Sign In</span>
+                    </button>
+                  </Link>
+                  <Link href="/sign-up">
+                    <button className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors">
+                      Get Started
+                    </button>
+                  </Link>
+                </>
+              )}
             </div>
 
             <button 

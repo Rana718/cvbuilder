@@ -10,7 +10,8 @@ const stepLabels = [
   'Personal Info',
   'Experience', 
   'Education',
-  'Skills & Summary',
+  'Skills',
+  'Summary',
   'Additional Info'
 ]
 

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Check, User, Briefcase, GraduationCap, Award, Plus } from 'lucide-react'
+import { Check, User, Briefcase, GraduationCap, Award, FileText, Plus } from 'lucide-react'
 import { useResumeStore } from '@/store/resumeStore'
 
 interface DesktopSidebarProps {
@@ -28,12 +28,18 @@ const steps = [
   },
   {
     id: 4,
-    title: 'Skills & Summary',
+    title: 'Skills',
     icon: Award,
-    description: 'Professional skills and career summary'
+    description: 'Professional skills with ratings'
   },
   {
     id: 5,
+    title: 'Summary',
+    icon: FileText,
+    description: 'Professional career summary'
+  },
+  {
+    id: 6,
     title: 'Additional Information',
     icon: Plus,
     description: 'Certifications, languages, and more'
@@ -52,8 +58,10 @@ function DesktopSidebar({ currentStep, onStepChange }: DesktopSidebarProps) {
       case 3:
         return education.length > 0
       case 4:
-        return skills.length > 0 || summary
+        return skills.length > 0
       case 5:
+        return summary.trim().length > 0
+      case 6:
         return true // Optional step
       default:
         return false

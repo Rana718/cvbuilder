@@ -12,7 +12,7 @@ export function useStepNavigation() {
   const updateURL = useCallback((step: number) => {
     const params = new URLSearchParams(searchParams.toString())
     const currentUrlStep = params.get('step')
-    
+
     if (currentUrlStep !== step.toString()) {
       params.set('step', step.toString())
       router.push(`${pathname}?${params.toString()}`, { scroll: false })
@@ -24,7 +24,7 @@ export function useStepNavigation() {
     const stepFromURL = searchParams.get('step')
     if (stepFromURL) {
       const step = parseInt(stepFromURL, 10)
-      if (step >= 1 && step <= 5 && step !== currentStep) {
+      if (step >= 1 && step <= 6 && step !== currentStep) {
         setStoreStep(step)
       }
     } else {
