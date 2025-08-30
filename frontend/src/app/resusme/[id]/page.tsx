@@ -44,7 +44,6 @@ function ResumePage() {
                 acc[`skill_${index}`] = {
                     name: skill.name,
                     rating: skill.rating,
-                    level: skill.level
                 }
                 return acc
             }, {} as Record<string, any>),

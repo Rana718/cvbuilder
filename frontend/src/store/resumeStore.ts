@@ -41,7 +41,6 @@ export interface Skill {
     id: string
     name: string
     rating: number // 1-5 stars
-    level?: 'Beginner' | 'Intermediate' | 'Advanced' | 'Expert'
 }
 
 export interface AdditionalSection {

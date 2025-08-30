@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useState, useRef } from 'react'
 import { Plus, Award, Star } from 'lucide-react'
 import { useResumeStore, Skill } from '@/store/resumeStore'
 import axiosInstance from '@/lib/axios'
@@ -23,46 +23,36 @@ function SkillsStep({ onNext, onPrev }: SkillsStepProps) {
 
   const fetchAISkills = async () => {
     // Prevent multiple API calls
-    if (hasCalledAPI.current) {
-      return
-    }
-    
-    // Ensure we have a consistent document ID
-    const docId = getOrCreateDocumentId()
-    
+    if (hasCalledAPI.current) return
+
+    if (!workExperience || workExperience.length === 0) return
+
     // Transform work experience to the required format
     const experienceData = workExperience.map(exp => ({
       title: exp.jobTitle,
       company: exp.employer,
       duration: `${exp.startDate} - ${exp.isCurrentlyWorking ? 'Present' : exp.endDate}`
     }))
-    
+
     setIsLoadingSkills(true)
     hasCalledAPI.current = true
-    
+
     try {
       const response = await axiosInstance.post('/api/cv-gen/skills', {
         experience: experienceData
       })
-      
+
       if (response.data?.skills && Array.isArray(response.data.skills)) {
         setAiSuggestedSkills(response.data.skills)
       }
     } catch (error) {
       console.error('Failed to fetch AI skills:', error)
-      // Reset the flag on error so user can retry
-      hasCalledAPI.current = false
     } finally {
       setIsLoadingSkills(false)
+      // keep hasCalledAPI true to prevent additional automatic calls; allow manual retry only by page refresh
     }
   }
-
-  useEffect(() => {
-    // Only fetch AI skills when component mounts and we have work experience data
-    if (workExperience.length > 0) {
-      fetchAISkills()
-    }
-  }, [workExperience.length]) // Depend on work experience length to trigger when data is available
+  // Removed automatic fetch; user must click the button to generate AI suggestions.
 
   const resetForm = () => {
     setFormData({
@@ -94,10 +84,7 @@ function SkillsStep({ onNext, onPrev }: SkillsStepProps) {
     }
   }
 
-  const retryFetchSkills = () => {
-    hasCalledAPI.current = false
-    fetchAISkills()
-  }
+
 
   const renderStars = (rating: number, interactive: boolean = false, onRatingChange?: (rating: number) => void) => {
     return (
@@ -240,10 +227,10 @@ function SkillsStep({ onNext, onPrev }: SkillsStepProps) {
             <h4 className="text-sm font-medium text-gray-700">AI-Suggested Skills (click to add):</h4>
             {workExperience.length > 0 && !isLoadingSkills && (
               <button
-                onClick={retryFetchSkills}
+                onClick={fetchAISkills}
                 className="text-xs text-blue-600 hover:text-blue-700 font-medium"
               >
-                Regenerate Skills
+                Generate Skills
               </button>
             )}
           </div>

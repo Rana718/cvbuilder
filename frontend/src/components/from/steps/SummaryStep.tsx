@@ -65,17 +65,8 @@ function SummaryStep({ onNext, onPrev }: SummaryStepProps) {
         }
     }
 
-    useEffect(() => {
-        // Only fetch AI summary when component mounts and we have sufficient data
-        if (personalInfo.firstName || workExperience.length > 0 || skills.length > 0) {
-            fetchAISummary()
-        }
-    }, [personalInfo.firstName, workExperience.length, skills.length]) // Depend on key data to trigger when available
-
-    const retryFetchSummary = () => {
-        hasCalledAPI.current = false
-        fetchAISummary()
-    }
+    // Removed automatic fetch; user triggers with button below
+    const retryFetchSummary = () => fetchAISummary()
 
     const useSummaryTemplate = (template: string) => {
         setSummary(template)
@@ -116,10 +107,10 @@ function SummaryStep({ onNext, onPrev }: SummaryStepProps) {
                         <h4 className="text-sm font-medium text-gray-700">AI-Generated Summary Suggestions (click to use):</h4>
                         {(personalInfo.firstName || workExperience.length > 0 || skills.length > 0) && !isLoadingSuggestions && (
                             <button
-                                onClick={retryFetchSummary}
+                                onClick={fetchAISummary}
                                 className="text-xs text-blue-600 hover:text-blue-700 font-medium"
                             >
-                                Regenerate Summary
+                                Generate Summary
                             </button>
                         )}
                     </div>
