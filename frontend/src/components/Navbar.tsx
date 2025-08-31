@@ -46,10 +46,10 @@ function Navbar() {
                             <FileText className="h-6 w-6 text-white" />
                         </div>
                         <span className="text-xl font-bold text-blue-600 hidden sm:block">
-                            AI CV Builder
+                            Resume AI
                         </span>
                         <span className="text-xl font-bold text-blue-600 sm:hidden">
-                            CV Builder
+                            Resume AI
                         </span>
                     </Link>
 
@@ -57,15 +57,15 @@ function Navbar() {
                     <div className="hidden md:flex items-center space-x-6">
                         {session && (
                             <>
-                                <Link 
-                                    href="/my-resumes" 
+                                <Link
+                                    href="/my-resumes"
                                     className="flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-colors px-3 py-2 rounded-lg hover:bg-blue-50"
                                 >
                                     <FolderOpen className="h-4 w-4" />
                                     <span className="font-medium">My Resumes</span>
                                 </Link>
-                                <Link 
-                                    href="/templates" 
+                                <Link
+                                    href="/templates"
                                     className="flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-colors px-3 py-2 rounded-lg hover:bg-blue-50"
                                 >
                                     <LayoutPanelTop className="h-4 w-4" />
@@ -238,7 +238,7 @@ function Navbar() {
                             ) : (
                                 <>
                                     <Link href="/sign-in">
-                                        <button 
+                                        <button
                                             className="flex items-center space-x-3 px-3 py-2 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors w-full text-left"
                                             onClick={() => setIsMenuOpen(false)}
                                         >
@@ -247,7 +247,7 @@ function Navbar() {
                                         </button>
                                     </Link>
                                     <Link href="/sign-up">
-                                        <button 
+                                        <button
                                             className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-4 py-2 rounded-lg transition-all duration-200 font-medium shadow-lg w-full mt-2"
                                             onClick={() => setIsMenuOpen(false)}
                                         >

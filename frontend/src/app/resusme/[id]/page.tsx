@@ -175,8 +175,8 @@ function ResumePage() {
             </div>
 
             {/* Resume Content - Full Width for Better Display */}
-            <div className="max-w-5xl mx-auto p-6">
-                <div className="bg-white rounded-lg shadow-lg">
+            <div className="max-w-5xl mx-auto">
+                <div className="rounded-lg shadow-lg">
                     <ResumePreview />
                 </div>
             </div>
