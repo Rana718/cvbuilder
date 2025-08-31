@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { useSession } from 'next-auth/react'
+import { useAuth } from '@/components/AuthContext'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Plus, FileText, Eye, Edit, Trash2, Calendar, User, Search, Grid, List } from 'lucide-react'
@@ -18,7 +18,7 @@ interface Resume {
 }
 
 function ResumePage() {
-    const { data: session, status } = useSession()
+    const { user, loading: status } = useAuth();
     const router = useRouter()
     const [resumes, setResumes] = useState<Resume[]>([])
     const [loading, setLoading] = useState(true)
@@ -27,15 +27,15 @@ function ResumePage() {
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
 
     useEffect(() => {
-        if (status === 'loading') return
-        
-        if (!session) {
+        if (status) return
+
+        if (!user) {
             router.push('/sign-in?callbackUrl=' + encodeURIComponent('/resusme'))
             return
         }
 
         fetchResumes()
-    }, [session, status])
+    }, [user, status])
 
     const fetchResumes = async () => {
         try {
@@ -79,7 +79,7 @@ function ResumePage() {
         resume.job_title?.toLowerCase().includes(searchTerm.toLowerCase())
     )
 
-    if (status === 'loading' || loading) {
+    if (!status || loading) {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <div className="text-center">
@@ -109,7 +109,7 @@ function ResumePage() {
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div className="flex items-center space-x-4">
                             <div className="relative">
                                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -121,7 +121,7 @@ function ResumePage() {
                                     className="pl-10 pr-4 py-2 w-64 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                                 />
                             </div>
-                            
+
                             <div className="flex items-center bg-gray-100 rounded-xl p-1">
                                 <button
                                     onClick={() => setViewMode('grid')}
@@ -198,18 +198,17 @@ function ResumePage() {
                 ) : (
                     <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' : 'space-y-4'}>
                         {filteredResumes.map((resume) => (
-                            <div 
-                                key={resume.id} 
-                                className={`group bg-white rounded-2xl border border-gray-200 hover:border-blue-300 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 ${
-                                    viewMode === 'list' ? 'flex items-center p-6' : 'p-6'
-                                }`}
+                            <div
+                                key={resume.id}
+                                className={`group bg-white rounded-2xl border border-gray-200 hover:border-blue-300 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 ${viewMode === 'list' ? 'flex items-center p-6' : 'p-6'
+                                    }`}
                             >
                                 {viewMode === 'grid' ? (
                                     <>
                                         <div className="flex items-start justify-between mb-6">
                                             <div className="flex-1">
                                                 <div className="flex items-center space-x-3 mb-2">
-                                                    <div 
+                                                    <div
                                                         className="w-4 h-4 rounded-full shadow-sm"
                                                         style={{ backgroundColor: resume.theme_color || '#3B82F6' }}
                                                     ></div>
@@ -276,7 +275,7 @@ function ResumePage() {
                                             </div>
                                             <div className="flex-1">
                                                 <div className="flex items-center space-x-3 mb-1">
-                                                    <div 
+                                                    <div
                                                         className="w-3 h-3 rounded-full"
                                                         style={{ backgroundColor: resume.theme_color || '#3B82F6' }}
                                                     ></div>

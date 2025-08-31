@@ -4,9 +4,14 @@ import { motion } from "framer-motion";
 import { FileText, Sparkles, Download, ArrowRight, User, Star, Clock, Shield, Zap, CheckCircle } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { useAuth } from "@/components/AuthContext";
+import { useEffect } from "react";
 
 export default function Home() {
-
+  const { user } = useAuth();
+  useEffect(() => {
+    console.log("Current user:", user);
+  }, [user])
 
   return (
     <div className="min-h-screen bg-white">

@@ -1,5 +1,7 @@
 import { create } from 'zustand'
 import axiosInstance from '@/lib/axios'
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { storage } from '@/lib/firebase'
 
 export interface PersonalInfo {
     firstName: string
@@ -243,17 +245,17 @@ export const useResumeStore = create<ResumeStore>()((set, get) => ({
 
     uploadImage: async (file: File) => {
         try {
-            const formData = new FormData()
-            formData.append('file', file)
+
+            if (!file) return;
             
-            const response = await axiosInstance.post('/api/upload', formData, {
-                headers: { 'Content-Type': 'multipart/form-data' }
-            })
+            const storageRef = ref(storage, `profile_images/${Date.now()}_${file.name}`);
+            await uploadBytes(storageRef, file);
+            const downloadURL = await getDownloadURL(storageRef);
             
             set((state) => ({
                 personalInfo: {
                     ...state.personalInfo,
-                    image_url: response.data.image_url
+                    image_url: downloadURL
                 }
             }))
         } catch (error) {

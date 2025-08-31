@@ -1,7 +1,9 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { useSession, signOut } from 'next-auth/react'
+import { useAuth } from '@/components/AuthContext'
+import { signOut } from 'firebase/auth'
+import { auth } from '@/lib/firebase'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { 
@@ -33,7 +35,7 @@ interface ProfileStats {
 }
 
 function ProfilePage() {
-    const { data: session, status } = useSession()
+    const { user, loading: authLoading } = useAuth()
     const router = useRouter()
     const [profile, setProfile] = useState<UserProfile | null>(null)
     const [stats, setStats] = useState<ProfileStats>({ totalResumes: 0, lastResumeCreated: null })
@@ -46,16 +48,16 @@ function ProfilePage() {
     })
 
     useEffect(() => {
-        if (status === 'loading') return
+        if (authLoading) return
         
-        if (!session) {
+        if (!user) {
             router.push('/sign-in?callbackUrl=' + encodeURIComponent('/profile'))
             return
         }
 
         fetchProfile()
         fetchStats()
-    }, [session, status])
+    }, [user, authLoading, router])
 
     const fetchProfile = async () => {
         try {
@@ -70,12 +72,12 @@ function ProfilePage() {
             if (error.response?.status === 401) {
                 router.push('/sign-in?callbackUrl=' + encodeURIComponent('/profile'))
             } else {
-                // Fallback to session data if API fails
+                // Fallback to Firebase user data if API fails
                 const mockProfile: UserProfile = {
                     id: 1,
-                    username: session?.user?.name || 'User',
-                    email: session?.user?.email || '',
-                    full_name: session?.user?.name || '',
+                    username: user?.displayName || 'User',
+                    email: user?.email || '',
+                    full_name: user?.displayName || '',
                     created_at: new Date().toISOString(),
                     updated_at: new Date().toISOString()
                 }
@@ -140,7 +142,12 @@ function ProfilePage() {
 
     const handleSignOut = async () => {
         if (confirm('Are you sure you want to sign out?')) {
-            await signOut({ callbackUrl: '/sign-in' })
+            try {
+                await signOut(auth)
+                router.push('/')
+            } catch (error) {
+                console.error('Sign out error:', error)
+            }
         }
     }
 
@@ -152,7 +159,7 @@ function ProfilePage() {
         })
     }
 
-    if (status === 'loading' || loading) {
+    if (authLoading || loading) {
         return (
             <div className="min-h-screen bg-gray-50 flex items-center justify-center">
                 <div className="text-center">
@@ -181,11 +188,11 @@ function ProfilePage() {
                     <div className="flex items-center justify-between h-16">
                         <div className="flex items-center space-x-4">
                             <Link 
-                                href="/resusme"
+                                href="/dashboard"
                                 className="flex items-center space-x-2 text-gray-600 hover:text-gray-900"
                             >
                                 <ArrowLeft className="w-4 h-4" />
-                                <span>Back to Resumes</span>
+                                <span>Back to Dashboard</span>
                             </Link>
                             <div className="h-4 w-px bg-gray-300" />
                             <h1 className="text-2xl font-bold text-gray-900">Profile</h1>
@@ -248,9 +255,17 @@ function ProfilePage() {
                                 <div className="space-y-6">
                                     {/* Avatar */}
                                     <div className="flex items-center space-x-4">
-                                        <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center">
-                                            <User className="w-10 h-10 text-blue-600" />
-                                        </div>
+                                        {user?.photoURL ? (
+                                            <img 
+                                                src={user.photoURL} 
+                                                alt="Profile" 
+                                                className="w-20 h-20 rounded-full object-cover"
+                                            />
+                                        ) : (
+                                            <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center">
+                                                <User className="w-10 h-10 text-blue-600" />
+                                            </div>
+                                        )}
                                         <div>
                                             <h3 className="text-xl font-semibold text-gray-900">
                                                 {profile.full_name || profile.username}
@@ -358,7 +373,7 @@ function ProfilePage() {
                                         <span>Create New Resume</span>
                                     </Link>
                                     <Link
-                                        href="/resusme"
+                                        href="/dashboard"
                                         className="flex items-center space-x-3 w-full px-4 py-3 text-left text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                                     >
                                         <Settings className="w-5 h-5" />

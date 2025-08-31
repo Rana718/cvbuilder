@@ -58,10 +58,10 @@ function DesktopFrom() {
                 </div>
 
                 {/* Right Preview Section */}
-                <div className="w-96 p-6 border-l border-gray-200 bg-white">
-                    <div className="sticky top-6">
+                <div className="w-80 p-4 border-l border-gray-200 bg-white">
+                    <div className="sticky top-4">
                         <h3 className="text-lg font-semibold text-gray-900 mb-4">Live Preview</h3>
-                        <div className="transform scale-75 origin-top-left" style={{ width: '133%', height: '800px', overflow: 'hidden' }}>
+                        <div className="w-full">
                             <ResumePreview mode="live" />
                         </div>
                     </div>

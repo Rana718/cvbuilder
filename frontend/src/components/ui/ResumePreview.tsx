@@ -44,22 +44,31 @@ function ResumePreview({ mode = 'default' }: ResumePreviewProps) {
             end_date: exp.isCurrentlyWorking ? 'Present' : exp.endDate,
             duration: `${exp.startDate} - ${exp.isCurrentlyWorking ? 'Present' : exp.endDate}`,
             description: exp.description ? exp.description.replace(/<[^>]*>/g, '').trim() : '',
-            is_current: exp.isCurrentlyWorking
+            is_current: exp.isCurrentlyWorking,
+            isRemote: exp.isRemote
         })),
         education: education.map(edu => ({
             degree: edu.degree,
             school: edu.schoolName,
-            institution: edu.schoolName, // For template compatibility
+            institution: edu.schoolName,
             field: edu.fieldOfStudy,
             start_date: edu.startDate,
             end_date: edu.endDate,
-            year: `${edu.startDate} - ${edu.endDate}` // For template compatibility
+            year: `${edu.startDate} - ${edu.endDate}`
         })),
-        projects: [], // Add projects if needed later
+        projects: additionalSections
+            .filter(section => section.type === 'custom' && section.title.toLowerCase().includes('project'))
+            .map(section => ({
+                name: section.title,
+                description: section.content.replace(/<[^>]*>/g, '').trim(),
+                technologies: []
+            })),
         certifications: additionalSections
             .filter(section => section.type === 'certifications')
             .map(section => ({
                 name: section.title,
+                issuer: 'Certification Body',
+                date: new Date().getFullYear().toString(),
                 description: section.content.replace(/<[^>]*>/g, '').trim()
             })),
         languages: additionalSections
@@ -70,19 +79,23 @@ function ResumePreview({ mode = 'default' }: ResumePreviewProps) {
             }))
     }
 
-    // Parse templateId to number
-    const templateIdNumber = parseInt(templateId) || 2 // Default to Modern Minimalist
-
-    // Determine scale and mode based on type
+    const templateIdNumber = parseInt(templateId) || 2
     const isLiveMode = mode === 'live'
-    const scale = isLiveMode ? 0.6 : 1 // Smaller scale for live mode
 
     return (
-        <div className="w-full" data-resume-content>
+        <div 
+            className={`bg-white shadow-lg border border-gray-200 overflow-hidden ${isLiveMode ? '' : 'mx-auto'}`}
+            style={{
+                aspectRatio: '210/297', // A4 ratio
+                width: isLiveMode ? '100%' : '210mm',
+                maxWidth: isLiveMode ? '100%' : '210mm'
+            }}
+            data-resume-content
+        >
             <TemplateRenderer 
                 templateId={templateIdNumber}
                 userData={userData}
-                scale={scale}
+                scale={isLiveMode ? 0.8 : 1}
                 mode={mode}
             />
         </div>

@@ -54,7 +54,10 @@ function SignUpForm() {
 
         try {
             const provider = new GoogleAuthProvider();
-            await signInWithPopup(auth, provider);
+            const userCredential = await signInWithPopup(auth, provider);
+            const token = await userCredential.user.getIdToken();
+            
+            
             router.push(callbackUrl);
         } catch (error: any) {
             setError(error.message || 'Google sign-up failed');

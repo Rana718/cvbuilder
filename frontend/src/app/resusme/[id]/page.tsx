@@ -2,18 +2,17 @@
 
 import React, { useState, useEffect } from 'react'
 import { useParams, useSearchParams, useRouter } from 'next/navigation'
-import { useSession } from 'next-auth/react'
+import { useAuth } from '@/components/AuthContext'
 import { useResumeStore } from '@/store/resumeStore'
 import ResumePreview from '@/components/ui/ResumePreview'
 import { ArrowLeft, Download, Save, Edit } from 'lucide-react'
 import Link from 'next/link'
-import html2pdf from "html2pdf.js"
 
 function ResumePage() {
     const params = useParams()
     const searchParams = useSearchParams()
     const router = useRouter()
-    const { data: session, status } = useSession()
+    const { user, loading } = useAuth()
     const templateId = searchParams.get('template')
     const resumeId = params.id
 
@@ -22,7 +21,6 @@ function ResumePage() {
         workExperience,
         skills,
         summary,
-        templateId: storeTemplateId,
         setDocumentId,
         saveResume,
         loadResume
@@ -37,65 +35,104 @@ function ResumePage() {
     }
 
     const handleSave = async () => {
-        if (status === 'loading') return
+        if (isSaving) return
 
-        if (!session) {
+        if (!user) {
             handleAuthRedirect()
             return
         }
 
         setIsSaving(true)
         try {
-            // Set the document ID if we have a resumeId from URL
             if (resumeId && typeof resumeId === 'string' && !isNaN(Number(resumeId))) {
                 setDocumentId(Number(resumeId))
             }
-
             await saveResume()
             alert('Resume saved successfully!')
         } catch (error: any) {
             console.error('Failed to save resume:', error)
-            if (error.response?.status === 401) {
-                handleAuthRedirect()
-            } else {
-                alert('Failed to save resume. Please try again.')
-            }
+            alert('Failed to save resume. Please try again.')
         } finally {
             setIsSaving(false)
         }
     }
 
     const handleDownload = async () => {
-        if (status === "loading") return
-
-        if (!session) {
-            handleAuthRedirect()
-            return
-        }
+        if (isDownloading) return
 
         setIsDownloading(true)
         try {
-            // await handleSave()
-
             const resumeContent = document.querySelector("[data-resume-content]") as HTMLElement
+            
             if (resumeContent) {
-                const opt = {
-                    margin: 0.5,
-                    filename: `${personalInfo.firstName}-${personalInfo.lastName}-Resume.pdf`,
-                    image: { type: "jpeg", quality: 0.98 },
-                    html2canvas: { scale: 2 },
-                    jsPDF: { unit: "in", format: "letter", orientation: "portrait" }
-                }
+                // Create a new window for printing
+                const printWindow = window.open('', '_blank')
+                if (printWindow) {
+                    // Get all stylesheets from current page
+                    const styles = Array.from(document.styleSheets)
+                        .map(styleSheet => {
+                            try {
+                                return Array.from(styleSheet.cssRules)
+                                    .map(rule => rule.cssText)
+                                    .join('\n')
+                            } catch (e) {
+                                return ''
+                            }
+                        })
+                        .join('\n')
 
-                await html2pdf().set(opt).from(resumeContent).save()
+                    printWindow.document.write(`
+                        <!DOCTYPE html>
+                        <html>
+                        <head>
+                            <title>Resume</title>
+                            <style>
+                                ${styles}
+                                @media print {
+                                    * { 
+                                        -webkit-print-color-adjust: exact !important;
+                                        color-adjust: exact !important;
+                                        print-color-adjust: exact !important;
+                                    }
+                                    @page { 
+                                        size: A4; 
+                                        margin: 0; 
+                                    }
+                                    body { 
+                                        margin: 0; 
+                                        padding: 0; 
+                                    }
+                                    [data-resume-content] {
+                                        width: 100% !important;
+                                        max-width: 100% !important;
+                                        margin: 0 !important;
+                                        box-shadow: none !important;
+                                        border: none !important;
+                                        aspect-ratio: 210/297 !important;
+                                    }
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            ${resumeContent.outerHTML}
+                        </body>
+                        </html>
+                    `)
+                    
+                    printWindow.document.close()
+                    
+                    // Wait for content to load then print
+                    setTimeout(() => {
+                        printWindow.print()
+                        printWindow.close()
+                    }, 500)
+                }
+            } else {
+                alert('Resume content not found. Please refresh and try again.')
             }
         } catch (error: any) {
-            console.error("Failed to download resume:", error)
-            if (error.response?.status === 401) {
-                handleAuthRedirect()
-            } else {
-                alert("Failed to download resume. Please try again.")
-            }
+            console.error("Download error:", error)
+            alert("Download failed. Please try again.")
         } finally {
             setIsDownloading(false)
         }
@@ -106,11 +143,8 @@ function ResumePage() {
         if (!resumeId || typeof resumeId !== 'string' || isNaN(Number(resumeId))) return
 
         const resumeIdNum = Number(resumeId)
-
-        // Set the document ID in store
         setDocumentId(resumeIdNum)
 
-        // Load resume data if store is empty
         const shouldFetch = () => {
             const noPersonal = !(personalInfo.firstName || personalInfo.lastName || summary)
             const noWork = !workExperience || workExperience.length === 0
@@ -133,11 +167,11 @@ function ResumePage() {
                     <div className="flex items-center justify-between h-16">
                         <div className="flex items-center space-x-4">
                             <Link
-                                href="/template"
-                                className="flex items-center space-x-2 text-gray-600 hover:text-gray-900"
+                                href="/dashboard"
+                                className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
                             >
                                 <ArrowLeft className="w-4 h-4" />
-                                <span>Back to Templates</span>
+                                <span>Back to Dashboard</span>
                             </Link>
                             <div className="h-4 w-px bg-gray-300" />
                             <h1 className="text-lg font-semibold text-gray-900">
@@ -147,8 +181,8 @@ function ResumePage() {
 
                         <div className="flex items-center space-x-3">
                             <Link
-                                href={`/template/${templateId}`}
-                                className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50"
+                                href={`/template/${templateId}?resumeId=${resumeId}`}
+                                className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
                             >
                                 <Edit className="w-4 h-4" />
                                 <span>Edit</span>
@@ -156,7 +190,7 @@ function ResumePage() {
                             <button
                                 onClick={handleSave}
                                 disabled={isSaving}
-                                className="flex items-center space-x-2 px-4 py-2 text-green-700 hover:text-green-800 border border-green-300 rounded-lg hover:bg-green-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="flex items-center space-x-2 px-4 py-2 text-green-700 hover:text-green-800 border border-green-300 rounded-lg hover:bg-green-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                             >
                                 <Save className="w-4 h-4" />
                                 <span>{isSaving ? 'Saving...' : 'Save'}</span>
@@ -164,7 +198,7 @@ function ResumePage() {
                             <button
                                 onClick={handleDownload}
                                 disabled={isDownloading}
-                                className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                             >
                                 <Download className="w-4 h-4" />
                                 <span>{isDownloading ? 'Downloading...' : 'Download PDF'}</span>
@@ -174,8 +208,8 @@ function ResumePage() {
                 </div>
             </div>
 
-            {/* Resume Content - Full Width for Better Display */}
-            <div className="max-w-5xl mx-auto">
+            {/* Resume Content */}
+            <div className="max-w-5xl mx-auto p-4">
                 <div className="rounded-lg shadow-lg">
                     <ResumePreview />
                 </div>

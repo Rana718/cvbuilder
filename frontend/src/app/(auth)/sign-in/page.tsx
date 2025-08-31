@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
+import axiosInstance from '@/lib/axios';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Eye, EyeOff, Mail, Lock, Sparkles } from 'lucide-react';
@@ -25,7 +26,14 @@ function SignInForm() {
         setError('');
 
         try {
-            await signInWithEmailAndPassword(auth, email, password);
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            const token = await userCredential.user.getIdToken();
+            
+            // // Sync with backend
+            // await axiosInstance.post('/api/auth/firebase-auth', {
+            //     firebase_token: token
+            // });
+            
             router.push(callbackUrl);
         } catch (error: any) {
             setError(error.message || 'Invalid credentials');
@@ -40,7 +48,14 @@ function SignInForm() {
 
         try {
             const provider = new GoogleAuthProvider();
-            await signInWithPopup(auth, provider);
+            const userCredential = await signInWithPopup(auth, provider);
+            const token = await userCredential.user.getIdToken();
+            
+            // // Sync with backend
+            // await axiosInstance.post('/api/auth/firebase-auth', {
+            //     firebase_token: token
+            // });
+            
             router.push(callbackUrl);
         } catch (error: any) {
             setError(error.message || 'Google sign-in failed');
