@@ -15,4 +15,4 @@ client = OpenAI(
     max_retries=2   # Retry failed requests twice
 )
 
-DEFAULT_MODEL = "gpt-4o-mini"
+DEFAULT_MODEL = "gpt-4.1-mini"
