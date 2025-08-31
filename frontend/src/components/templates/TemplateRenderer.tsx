@@ -108,15 +108,16 @@ export function TemplatePreview({ templateId, scale = 0.3 }: { templateId: numbe
   };
 
   return (
-    <div
-      className="origin-top-left pointer-events-none overflow-hidden"
-      style={{
-        transform: `scale(${scale})`,
-        width: `${100 / scale}%`,
-        height: `${100 / scale}%`
-      }}
-    >
-      <TemplateRenderer templateId={templateId} userData={sampleData} />
+    <div className="relative bg-white border border-gray-200 rounded-lg shadow-md hover:shadow-lg transition-all aspect-[1/1.414] overflow-hidden">
+      <div 
+        className="w-full h-full"
+        style={{
+          transform: `scale(${scale})`,
+          transformOrigin: 'top left'
+        }}
+      >
+        <TemplateRenderer templateId={templateId} userData={sampleData} />
+      </div>
     </div>
   );
 }

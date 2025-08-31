@@ -3,12 +3,11 @@
 import React, { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import axios from 'axios';
+import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, updateProfile } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Eye, EyeOff, Mail, Lock, User, Sparkles, CheckCircle } from 'lucide-react';
-
-const api_key = process.env.NEXT_PUBLIC_API_KEY;
 
 function SignUpForm() {
     const [email, setEmail] = useState('');
@@ -21,7 +20,7 @@ function SignUpForm() {
     const [acceptTerms, setAcceptTerms] = useState(false);
     const router = useRouter();
     const searchParams = useSearchParams();
-    const callbackUrl = searchParams.get('callbackUrl') || '/sign-in';
+    const callbackUrl = searchParams.get('callbackUrl') || '/';
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -35,24 +34,30 @@ function SignUpForm() {
         }
 
         try {
-            const response = await axios.post(`${api_key || 'http://localhost:8000'}/api/auth/signup`, {
-                email,
-                password,
-                full_name: fullName,
-            });
-
-            if (response.data) {
-                setSuccess(true);
-                setTimeout(() => {
-                    // Redirect to sign-in page with the original callback URL
-                    const signInUrl = callbackUrl !== '/sign-in' 
-                        ? `/sign-in?callbackUrl=${encodeURIComponent(callbackUrl)}`
-                        : '/sign-in';
-                    router.push(signInUrl);
-                }, 3000);
-            }
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            await updateProfile(userCredential.user, { displayName: fullName });
+            
+            setSuccess(true);
+            setTimeout(() => {
+                router.push(callbackUrl);
+            }, 2000);
         } catch (error: any) {
-            setError(error.response?.data?.detail || 'An error occurred. Please try again.');
+            setError(error.message || 'An error occurred. Please try again.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleGoogleSignUp = async () => {
+        setLoading(true);
+        setError('');
+
+        try {
+            const provider = new GoogleAuthProvider();
+            await signInWithPopup(auth, provider);
+            router.push(callbackUrl);
+        } catch (error: any) {
+            setError(error.message || 'Google sign-up failed');
         } finally {
             setLoading(false);
         }
@@ -61,12 +66,6 @@ function SignUpForm() {
     if (success) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-4">
-                {/* Background decoration */}
-                <div className="absolute inset-0 overflow-hidden">
-                    <div className="absolute -top-40 -right-40 w-80 h-80 bg-indigo-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
-                    <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
-                </div>
-
                 <Card className="w-full max-w-md relative backdrop-blur-sm bg-white/80 border-0 shadow-2xl">
                     <CardContent className="text-center py-12">
                         <div className="mx-auto w-20 h-20 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center mb-6 animate-bounce">
@@ -78,11 +77,8 @@ function SignUpForm() {
                         </p>
                         <div className="bg-green-50 border border-green-200 rounded-xl p-4">
                             <p className="text-green-700 font-medium">
-                                Redirecting to sign in page...
+                                Redirecting to your dashboard...
                             </p>
-                            <div className="mt-3 w-full bg-green-200 rounded-full h-2">
-                                <div className="bg-green-500 h-2 rounded-full animate-pulse" style={{width: '100%'}}></div>
-                            </div>
                         </div>
                     </CardContent>
                 </Card>
@@ -92,12 +88,6 @@ function SignUpForm() {
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-4">
-            {/* Background decoration */}
-            <div className="absolute inset-0 overflow-hidden">
-                <div className="absolute -top-40 -right-40 w-80 h-80 bg-indigo-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
-                <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
-            </div>
-
             <Card className="w-full max-w-md relative backdrop-blur-sm bg-white/80 border-0 shadow-2xl">
                 <CardHeader className="text-center space-y-4 pb-6">
                     <div className="mx-auto w-16 h-16 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center mb-2">
@@ -184,23 +174,6 @@ function SignUpForm() {
                             </div>
                         </div>
 
-                        {/* Password Strength Indicator */}
-                        <div className="space-y-2">
-                            <div className="text-sm text-gray-600">Password strength:</div>
-                            <div className="flex space-x-1">
-                                <div className={`h-1 w-1/4 rounded ${password.length >= 8 ? 'bg-green-500' : 'bg-gray-200'}`}></div>
-                                <div className={`h-1 w-1/4 rounded ${/[A-Z]/.test(password) ? 'bg-green-500' : 'bg-gray-200'}`}></div>
-                                <div className={`h-1 w-1/4 rounded ${/[0-9]/.test(password) ? 'bg-green-500' : 'bg-gray-200'}`}></div>
-                                <div className={`h-1 w-1/4 rounded ${/[^A-Za-z0-9]/.test(password) ? 'bg-green-500' : 'bg-gray-200'}`}></div>
-                            </div>
-                            <div className="text-xs text-gray-500 space-y-1">
-                                <p className={password.length >= 8 ? 'text-green-600' : ''}>• At least 8 characters</p>
-                                <p className={/[A-Z]/.test(password) ? 'text-green-600' : ''}>• One uppercase letter</p>
-                                <p className={/[0-9]/.test(password) ? 'text-green-600' : ''}>• One number</p>
-                                <p className={/[^A-Za-z0-9]/.test(password) ? 'text-green-600' : ''}>• One special character</p>
-                            </div>
-                        </div>
-
                         <div className="flex items-start">
                             <input
                                 type="checkbox"
@@ -248,7 +221,11 @@ function SignUpForm() {
 
                     <div className="flex justify-center">
                         <div className="w-full max-w-xs">
-                            <button className="w-full inline-flex justify-center py-2.5 px-4 rounded-xl border border-gray-200 bg-white text-sm font-medium text-gray-500 hover:text-gray-900 hover:bg-gray-50 transition-all duration-200">
+                            <button 
+                                onClick={handleGoogleSignUp}
+                                disabled={loading}
+                                className="w-full inline-flex justify-center py-2.5 px-4 rounded-xl border border-gray-200 bg-white text-sm font-medium text-gray-500 hover:text-gray-900 hover:bg-gray-50 transition-all duration-200 disabled:opacity-50"
+                            >
                                 <svg className="w-5 h-5" viewBox="0 0 24 24">
                                     <path fill="#4285f4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                                     <path fill="#34a853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -264,7 +241,7 @@ function SignUpForm() {
                         <p className="text-gray-600">
                             Already have an account?{' '}
                             <Link
-                                href={callbackUrl !== '/sign-in' ? `/sign-in?callbackUrl=${encodeURIComponent(callbackUrl)}` : '/sign-in'}
+                                href="/sign-in"
                                 className="font-semibold text-indigo-600 hover:text-indigo-500 transition-colors"
                             >
                                 Sign in instead

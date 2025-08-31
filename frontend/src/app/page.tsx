@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { FileText, Sparkles, Download, ArrowRight, User, Star, Menu, X, Eye, Edit, Share2, Clock, Shield, Zap, CheckCircle } from "lucide-react";
+import { FileText, Sparkles, Download, ArrowRight, User, Star, Clock, Shield, Zap, CheckCircle } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
@@ -12,8 +12,6 @@ export default function Home() {
     <div className="min-h-screen bg-white">
       {/* Navbar */}
       <Navbar />
-
-      {/* Hero Section - FIXED */}
       <section className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-purple-50">
         {/* Background Elements */}
         <div className="absolute top-20 left-10 w-72 h-72 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
@@ -63,7 +61,7 @@ export default function Home() {
                 transition={{ duration: 0.8, delay: 0.7 }}
                 className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-10"
               >
-                <button className="group bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-8 py-4 rounded-xl text-lg font-semibold flex items-center justify-center space-x-2 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                <button className="group bg-[#ffc05a] text-black px-8 py-4 rounded-xl text-lg font-semibold flex items-center justify-center space-x-2 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1">
                   <span>Create my resume</span>
                   <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </button>
@@ -107,7 +105,7 @@ export default function Home() {
                   alt="AI Resume Builder Preview"
                   className="w-full max-w-lg xl:max-w-xl mx-auto rounded-2xl shadow-2xl border border-gray-200"
                 />
-                
+
                 {/* Floating elements - repositioned */}
                 <motion.div
                   initial={{ scale: 0, opacity: 0 }}
@@ -120,7 +118,7 @@ export default function Home() {
                     <span className="text-xs font-medium text-gray-700">Smart AI Help</span>
                   </div>
                 </motion.div>
-                
+
                 <motion.div
                   initial={{ scale: 0, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
@@ -211,45 +209,45 @@ export default function Home() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {[
-              { 
-                icon: Sparkles, 
-                title: "Intelligent Content Generation", 
-                desc: "AI analyzes your role and suggests powerful, industry-specific bullet points that highlight your achievements and skills effectively.", 
+              {
+                icon: Sparkles,
+                title: "Intelligent Content Generation",
+                desc: "AI analyzes your role and suggests powerful, industry-specific bullet points that highlight your achievements and skills effectively.",
                 color: "blue",
                 gradient: "from-blue-500 to-blue-600"
               },
-              { 
-                icon: FileText, 
-                title: "ATS-Optimized Templates", 
-                desc: "Choose from carefully crafted templates designed to pass Applicant Tracking Systems while maintaining visual appeal.", 
+              {
+                icon: FileText,
+                title: "ATS-Optimized Templates",
+                desc: "Choose from carefully crafted templates designed to pass Applicant Tracking Systems while maintaining visual appeal.",
                 color: "purple",
                 gradient: "from-purple-500 to-purple-600"
               },
-              { 
-                icon: Download, 
-                title: "Flexible Export Options", 
-                desc: "Download your resume as PDF or Word document, or create shareable links for easy online applications.", 
+              {
+                icon: Download,
+                title: "Flexible Export Options",
+                desc: "Download your resume as PDF or Word document, or create shareable links for easy online applications.",
                 color: "green",
                 gradient: "from-green-500 to-green-600"
               },
-              { 
-                icon: Clock, 
-                title: "Save Time & Effort", 
-                desc: "Skip the blank page struggle. Our AI helps you write compelling content quickly, so you can focus on job hunting.", 
+              {
+                icon: Clock,
+                title: "Save Time & Effort",
+                desc: "Skip the blank page struggle. Our AI helps you write compelling content quickly, so you can focus on job hunting.",
                 color: "orange",
                 gradient: "from-orange-500 to-orange-600"
               },
-              { 
-                icon: Shield, 
-                title: "Secure & Private", 
-                desc: "Your personal information stays protected. We prioritize data privacy and never sell or share your details.", 
+              {
+                icon: Shield,
+                title: "Secure & Private",
+                desc: "Your personal information stays protected. We prioritize data privacy and never sell or share your details.",
                 color: "red",
                 gradient: "from-red-500 to-red-600"
               },
-              { 
-                icon: Zap, 
-                title: "Live Preview & Editing", 
-                desc: "See exactly how your resume looks as you build it. Make instant adjustments with real-time preview functionality.", 
+              {
+                icon: Zap,
+                title: "Live Preview & Editing",
+                desc: "See exactly how your resume looks as you build it. Make instant adjustments with real-time preview functionality.",
                 color: "indigo",
                 gradient: "from-indigo-500 to-indigo-600"
               }
@@ -270,32 +268,6 @@ export default function Home() {
               </motion.div>
             ))}
           </div>
-
-          {/* Additional Benefits */}
-          <motion.div
-            initial={{ y: 30, opacity: 0 }}
-            whileInView={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-            viewport={{ once: true }}
-            className="mt-16 text-center"
-          >
-            <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 max-w-4xl mx-auto">
-              <h3 className="text-2xl font-bold text-gray-900 mb-6">Everything You Need to Get Hired</h3>
-              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {[
-                  { icon: CheckCircle, text: "No watermarks or branding" },
-                  { icon: CheckCircle, text: "Mobile-friendly builder" },
-                  { icon: CheckCircle, text: "Multiple language support" },
-                  { icon: CheckCircle, text: "Unlimited downloads" }
-                ].map((benefit, i) => (
-                  <div key={i} className="flex items-center space-x-3 justify-center md:justify-start">
-                    <benefit.icon className="h-5 w-5 text-green-500 flex-shrink-0" />
-                    <span className="text-gray-700 font-medium">{benefit.text}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </motion.div>
         </div>
       </section>
 
@@ -336,7 +308,7 @@ export default function Home() {
                       Choose
                     </button>
                   </div>
-                  
+
                   {/* A4 Template Preview */}
                   <div className="relative bg-white border border-gray-200 rounded-lg shadow-md group-hover:shadow-lg transition-all aspect-[1/1.414] overflow-hidden">
                     {/* Template Content - A4 Ratio */}
@@ -347,7 +319,7 @@ export default function Home() {
                         <div className="h-3 bg-gray-300 rounded w-24 mx-auto mb-1"></div>
                         <div className="h-2 bg-gray-200 rounded w-20 mx-auto"></div>
                       </div>
-                      
+
                       {/* Content Sections */}
                       <div className="space-y-3">
                         {/* Section 1 */}
@@ -359,7 +331,7 @@ export default function Home() {
                             <div className="h-1.5 bg-gray-200 rounded w-3/4"></div>
                           </div>
                         </div>
-                        
+
                         {/* Section 2 */}
                         <div>
                           <div className="h-2 bg-blue-300 rounded w-20 mb-2"></div>
@@ -368,7 +340,7 @@ export default function Home() {
                             <div className="h-1.5 bg-gray-200 rounded w-5/6"></div>
                           </div>
                         </div>
-                        
+
                         {/* Section 3 */}
                         <div>
                           <div className="h-2 bg-blue-300 rounded w-14 mb-2"></div>

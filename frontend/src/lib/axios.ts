@@ -1,5 +1,5 @@
 import axios from "axios";
-import { getSession, signOut } from "next-auth/react";
+import { auth } from "./firebase";
 
 const api_key = process.env.NEXT_PUBLIC_API_KEY;
 
@@ -9,9 +9,9 @@ const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use(
     async (config) => {
-        const session = await getSession();
-        const token = session?.user?.accessToken;
-        if (token) {
+        const user = auth.currentUser;
+        if (user) {
+            const token = await user.getIdToken();
             config.headers["Authorization"] = `Bearer ${token}`;
         }
         return config;
@@ -25,12 +25,8 @@ axiosInstance.interceptors.response.use(
     (response) => response,
     async (error) => {
         if (error.response?.status === 401) {
-            const session = await getSession();
-            if (session?.error === "RefreshAccessTokenError") {
-                await signOut({ redirect: true, callbackUrl: '/sign-in' });
-            } else {
-                window.location.reload();
-            }
+            // Redirect to sign-in on unauthorized
+            window.location.href = '/sign-in';
         }
         return Promise.reject(error);
     }

@@ -42,287 +42,158 @@ export default function ExecutiveElite({ userData, colors, scale = 1, mode = 'de
     background: '#ffffff'
   };
 
-  const isLiveMode = mode === 'live'
-  
   return (
     <div
-      className="max-w-4xl mx-auto shadow-2xl"
+      className="w-full h-full flex"
       style={{
-        fontFamily: 'Source Sans Pro, sans-serif',
+        fontFamily: 'Playfair Display, serif',
         backgroundColor: theme.background,
         color: theme.text,
-        transform: `scale(${scale})`,
-        transformOrigin: 'top left',
-        height: isLiveMode ? 'auto' : 'auto'
+        fontSize: '0.7rem',
+        lineHeight: '1.1'
       }}
     >
-      {/* Header Section */}
-      <div
-        className={`text-white ${isLiveMode ? 'p-3' : scale < 1 ? 'p-4' : 'p-8'}`}
-        style={{
-          background: `linear-gradient(to right, ${theme.primary}, ${theme.secondary})`
-        }}
-      >
-        <div className="flex items-center justify-between">
-          <div>
-            <h1
-              className={`${isLiveMode ? 'text-xl' : scale < 1 ? 'text-2xl' : 'text-4xl'} font-bold ${isLiveMode ? 'mb-1' : 'mb-2'}`}
-              style={{ fontFamily: 'Playfair Display, serif' }}
-            >
-              {userData.name || 'Your Name'}
-            </h1>
-            <p className={`${isLiveMode ? 'text-sm' : scale < 1 ? 'text-base' : 'text-xl'} ${isLiveMode ? 'mb-2' : 'mb-4'}`} style={{ color: 'rgba(255,255,255,0.8)' }}>
-              {userData.job_title || 'Professional Title'}
-            </p>
-          </div>
-          <div
-            className={`${isLiveMode ? 'w-16 h-16' : scale < 1 ? 'w-20 h-20' : 'w-32 h-32'} rounded-full flex items-center justify-center`}
-            style={{ backgroundColor: 'rgba(255,255,255,0.2)' }}
-          >
-            <span className={`${isLiveMode ? 'text-sm' : scale < 1 ? 'text-lg' : 'text-3xl'} font-bold`}>
-              {userData.name?.split(' ').map(n => n[0]).join('') || 'YN'}
-            </span>
+      {/* Left Sidebar */}
+      <div className="w-1/3 p-2" style={{ backgroundColor: theme.primary, color: 'white' }}>
+        {/* Profile */}
+        <div className="text-center mb-3">
+          <div className="w-16 h-16 bg-white/20 rounded-full mx-auto mb-2"></div>
+          <h1 className="text-sm font-bold mb-1">{userData.name || "Your Name"}</h1>
+          {userData.job_title && (
+            <p className="text-xs opacity-90">{userData.job_title}</p>
+          )}
+        </div>
+
+        {/* Contact */}
+        <div className="mb-3">
+          <h3 className="text-xs font-bold mb-1 uppercase tracking-wide">Contact</h3>
+          <div className="space-y-1 text-xs">
+            {userData.email && (
+              <div className="flex items-center gap-1">
+                <Mail className="h-2 w-2" />
+                <span className="break-all">{userData.email}</span>
+              </div>
+            )}
+            {userData.phone && (
+              <div className="flex items-center gap-1">
+                <Phone className="h-2 w-2" />
+                <span>{userData.phone}</span>
+              </div>
+            )}
+            {userData.address && (
+              <div className="flex items-center gap-1">
+                <MapPin className="h-2 w-2" />
+                <span>{userData.address}</span>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Contact Info */}
-        <div className={`flex flex-wrap gap-6 ${isLiveMode ? 'mt-2' : scale < 1 ? 'mt-3' : 'mt-6'} ${isLiveMode ? 'text-xs' : scale < 1 ? 'text-xs' : 'text-sm'}`}>
-          <div className="flex items-center gap-2">
-            <Mail className="h-4 w-4" />
-            <span>{userData.email || 'your.email@example.com'}</span>
-          </div>
-          {userData.phone && (
-            <div className="flex items-center gap-2">
-              <Phone className="h-4 w-4" />
-              <span>{userData.phone}</span>
-            </div>
-          )}
-          {userData.address && (
-            <div className="flex items-center gap-2">
-              <MapPin className="h-4 w-4" />
-              <span>{userData.address}</span>
-            </div>
-          )}
-          {userData.linkedin_url && (
-            <div className="flex items-center gap-2">
-              <Linkedin className="h-4 w-4" />
-              <a href={userData.linkedin_url} target="_blank" rel="noopener noreferrer" className="hover:underline">
-                LinkedIn
-              </a>
-            </div>
-          )}
-          {userData.github_url && (
-            <div className="flex items-center gap-2">
-              <Github className="h-4 w-4" />
-              <a href={userData.github_url} target="_blank" rel="noopener noreferrer" className="hover:underline">
-                GitHub
-              </a>
-            </div>
-          )}
-          {userData.portfolio_url && (
-            <div className="flex items-center gap-2">
-              <Globe className="h-4 w-4" />
-              <a href={userData.portfolio_url} target="_blank" rel="noopener noreferrer" className="hover:underline">
-                Portfolio
-              </a>
-            </div>
-          )}
-        </div>
-      </div>
-
-      <div className="flex">
-        {/* Main Content */}
-        <div className={`flex-1 ${isLiveMode ? 'p-3' : scale < 1 ? 'p-4' : 'p-8'}`}>
-          {/* Executive Summary */}
-          <section className={`${isLiveMode ? 'mb-3' : scale < 1 ? 'mb-4' : 'mb-8'}`}>
-            <h2
-              className={`${isLiveMode ? 'text-base' : scale < 1 ? 'text-lg' : 'text-2xl'} font-bold ${isLiveMode ? 'mb-1' : scale < 1 ? 'mb-2' : 'mb-4'} pb-2`}
-              style={{
-                fontFamily: 'Playfair Display, serif',
-                color: theme.text,
-                borderBottom: `2px solid ${theme.accent}`
-              }}
-            >
-              Executive Summary
-            </h2>
-            <p className="leading-relaxed" style={{ color: theme.text }}>
-              {userData.summary || 'A results-driven executive with extensive experience in strategic leadership, operational excellence, and organizational transformation. Proven track record of driving growth, optimizing performance, and delivering exceptional results in competitive markets.'}
-            </p>
-          </section>
-
-          {/* Professional Experience */}
-          <section className="mb-8">
-            <h2
-              className="text-2xl font-bold mb-4 pb-2"
-              style={{
-                fontFamily: 'Playfair Display, serif',
-                color: theme.text,
-                borderBottom: `2px solid ${theme.accent}`
-              }}
-            >
-              Professional Experience
-            </h2>
-            <div className="space-y-6">
-              {userData.experience?.map((exp, index) => (
-                <div key={index} className="pl-4" style={{ borderLeft: `4px solid ${theme.accent}` }}>
-                  <h3 className="text-lg font-semibold" style={{ color: theme.text }}>{exp.title}</h3>
-                  <p className="font-medium" style={{ color: theme.accent }}>{exp.company}</p>
-                  <p className="text-sm mb-2" style={{ color: theme.secondary }}>{exp.duration}</p>
-                  <p style={{ color: theme.text }}>{exp.description}</p>
-                </div>
-              )) || (
-                  <div className="pl-4" style={{ borderLeft: `4px solid ${theme.accent}` }}>
-                    <h3 className="text-lg font-semibold" style={{ color: theme.text }}>Chief Executive Officer</h3>
-                    <p className="font-medium" style={{ color: theme.accent }}>Fortune 500 Company</p>
-                    <p className="text-sm mb-2" style={{ color: theme.secondary }}>2020 - Present</p>
-                    <p style={{ color: theme.text }}>Led organizational transformation initiatives resulting in 40% revenue growth and improved operational efficiency across all business units.</p>
-                  </div>
-                )}
-            </div>
-          </section>
-        </div>
-
-        {/* Sidebar */}
-        <div className="w-80 p-6" style={{ backgroundColor: 'rgba(0,0,0,0.03)' }}>
-          {/* Core Competencies */}
-          <section className="mb-8">
-            <h3
-              className="text-lg font-bold mb-4"
-              style={{
-                fontFamily: 'Playfair Display, serif',
-                color: theme.text
-              }}
-            >
-              Core Competencies
-            </h3>
-            <div className="space-y-3">
-              {userData.skills?.map((skill, index) => (
-                <div
-                  key={index}
-                  className="p-3 rounded"
-                  style={{
-                    backgroundColor: theme.background,
-                    borderLeft: `4px solid ${theme.accent}`
-                  }}
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium" style={{ color: theme.text }}>
-                      {skill.name}
-                    </span>
-                    <div className="flex space-x-1">
-                      {[1, 2, 3, 4, 5].map((star) => (
+        {/* Skills */}
+        {userData.skills && userData.skills.length > 0 && (
+          <div className="mb-3">
+            <h3 className="text-xs font-bold mb-1 uppercase tracking-wide">Skills</h3>
+            <div className="space-y-1">
+              {userData.skills.slice(0, 6).map((skill, i) => (
+                <div key={i}>
+                  <div className="flex justify-between items-center mb-0.5">
+                    <span className="text-xs">{skill.name}</span>
+                    <div className="flex gap-0.5">
+                      {[...Array(5)].map((_, j) => (
                         <Star
-                          key={star}
-                          className={`w-3 h-3 ${
-                            star <= skill.rating
-                              ? 'fill-current'
-                              : 'stroke-current fill-transparent'
-                          }`}
-                          style={{ 
-                            color: star <= skill.rating ? theme.accent : theme.secondary 
-                          }}
+                          key={j}
+                          className="h-1.5 w-1.5"
+                          fill={j < skill.rating ? 'white' : 'none'}
+                          color={j < skill.rating ? 'white' : 'rgba(255,255,255,0.3)'}
                         />
                       ))}
                     </div>
                   </div>
                 </div>
-              )) || (
-                  <>
-                    <div className="p-3 rounded" style={{ backgroundColor: theme.background, borderLeft: `4px solid ${theme.accent}` }}>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium" style={{ color: theme.text }}>Strategic Leadership</span>
-                        <div className="flex space-x-1">
-                          {[1, 2, 3, 4, 5].map((star) => (
-                            <Star key={star} className={`w-3 h-3 ${star <= 5 ? 'fill-current' : 'stroke-current fill-transparent'}`} style={{ color: star <= 5 ? theme.accent : theme.secondary }} />
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="p-3 rounded" style={{ backgroundColor: theme.background, borderLeft: `4px solid ${theme.accent}` }}>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium" style={{ color: theme.text }}>P&L Management</span>
-                        <div className="flex space-x-1">
-                          {[1, 2, 3, 4, 5].map((star) => (
-                            <Star key={star} className={`w-3 h-3 ${star <= 4 ? 'fill-current' : 'stroke-current fill-transparent'}`} style={{ color: star <= 4 ? theme.accent : theme.secondary }} />
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="p-3 rounded" style={{ backgroundColor: theme.background, borderLeft: `4px solid ${theme.accent}` }}>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium" style={{ color: theme.text }}>Digital Transformation</span>
-                        <div className="flex space-x-1">
-                          {[1, 2, 3, 4, 5].map((star) => (
-                            <Star key={star} className={`w-3 h-3 ${star <= 5 ? 'fill-current' : 'stroke-current fill-transparent'}`} style={{ color: star <= 5 ? theme.accent : theme.secondary }} />
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </>
-                )}
+              ))}
             </div>
-          </section>
+          </div>
+        )}
 
-          {/* Education */}
-          <section className="mb-8">
-            <h3
-              className="text-lg font-bold mb-4"
-              style={{
-                fontFamily: 'Playfair Display, serif',
-                color: theme.text
-              }}
-            >
-              Education
-            </h3>
-            <div className="space-y-4">
-              {userData.education?.map((edu, index) => (
-                <div key={index} className="p-3 rounded shadow-sm" style={{ backgroundColor: theme.background }}>
-                  <h4 className="font-semibold" style={{ color: theme.text }}>{edu.degree}</h4>
-                  <p className="text-sm" style={{ color: theme.accent }}>{edu.institution}</p>
-                  <p className="text-xs" style={{ color: theme.secondary }}>{edu.year}</p>
+        {/* Education */}
+        {userData.education && userData.education.length > 0 && (
+          <div>
+            <h3 className="text-xs font-bold mb-1 uppercase tracking-wide">Education</h3>
+            <div className="space-y-2">
+              {userData.education.slice(0, 2).map((edu, i) => (
+                <div key={i}>
+                  <p className="text-xs font-medium">{edu.degree || edu.institution}</p>
+                  <p className="text-xs opacity-80">{edu.institution || edu.degree}</p>
+                  <p className="text-xs opacity-70">{edu.year}</p>
                 </div>
-              )) || (
-                  <div className="p-3 rounded shadow-sm" style={{ backgroundColor: theme.background }}>
-                    <h4 className="font-semibold" style={{ color: theme.text }}>MBA</h4>
-                    <p className="text-sm" style={{ color: theme.accent }}>Harvard Business School</p>
-                    <p className="text-xs" style={{ color: theme.secondary }}>2015</p>
-                  </div>
-                )}
+              ))}
             </div>
-          </section>
+          </div>
+        )}
+      </div>
 
-          {/* Key Achievements */}
-          <section>
-            <h3
-              className="text-lg font-bold mb-4"
-              style={{
-                fontFamily: 'Playfair Display, serif',
-                color: theme.text
-              }}
-            >
-              Key Achievements
-            </h3>
-            <div className="space-y-3">
-              <div
-                className="p-3 rounded"
-                style={{ backgroundColor: `${theme.accent}20` }}
-              >
-                <p className="text-sm" style={{ color: theme.text }}>40% Revenue Growth</p>
-              </div>
-              <div
-                className="p-3 rounded"
-                style={{ backgroundColor: `${theme.accent}20` }}
-              >
-                <p className="text-sm" style={{ color: theme.text }}>$50M Cost Reduction</p>
-              </div>
-              <div
-                className="p-3 rounded"
-                style={{ backgroundColor: `${theme.accent}20` }}
-              >
-                <p className="text-sm" style={{ color: theme.text }}>Team of 500+ Professionals</p>
-              </div>
+      {/* Right Content */}
+      <div className="flex-1 p-3">
+        {/* Summary */}
+        {userData.summary && (
+          <div className="mb-3">
+            <h2 className="text-sm font-bold mb-1" style={{ color: theme.primary }}>
+              EXECUTIVE SUMMARY
+            </h2>
+            <p className="text-xs leading-relaxed">{userData.summary}</p>
+          </div>
+        )}
+
+        {/* Experience */}
+        {userData.experience && userData.experience.length > 0 && (
+          <div className="mb-3">
+            <h2 className="text-sm font-bold mb-1" style={{ color: theme.primary }}>
+              PROFESSIONAL EXPERIENCE
+            </h2>
+            <div className="space-y-2">
+              {userData.experience.slice(0, 3).map((exp, i) => (
+                <div key={i}>
+                  <div className="flex justify-between items-start mb-0.5">
+                    <h3 className="text-xs font-bold">{exp.title || exp.jobTitle}</h3>
+                    <span className="text-xs text-gray-500">{exp.duration || `${exp.startDate} - ${exp.endDate}`}</span>
+                  </div>
+                  <p className="text-xs font-medium text-gray-600 mb-1">{exp.company || exp.employer}</p>
+                  {exp.description && (
+                    <p className="text-xs text-gray-700 leading-relaxed">
+                      {exp.description.length > 120 ? exp.description.substring(0, 120) + '...' : exp.description}
+                    </p>
+                  )}
+                </div>
+              ))}
             </div>
-          </section>
+          </div>
+        )}
+
+        {/* Links */}
+        <div>
+          <h2 className="text-sm font-bold mb-1" style={{ color: theme.primary }}>
+            PROFESSIONAL LINKS
+          </h2>
+          <div className="flex gap-3 text-xs">
+            {userData.linkedin_url && (
+              <div className="flex items-center gap-1">
+                <Linkedin className="h-3 w-3" />
+                <span>LinkedIn</span>
+              </div>
+            )}
+            {userData.github_url && (
+              <div className="flex items-center gap-1">
+                <Github className="h-3 w-3" />
+                <span>GitHub</span>
+              </div>
+            )}
+            {userData.portfolio_url && (
+              <div className="flex items-center gap-1">
+                <Globe className="h-3 w-3" />
+                <span>Portfolio</span>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

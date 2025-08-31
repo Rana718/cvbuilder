@@ -1,6 +1,6 @@
 "use client";
 
-import { Mail, Phone, MapPin, Globe, Linkedin, Github, Calendar, Star } from "lucide-react";
+import { Mail, Phone, MapPin, Globe, Linkedin, Github, Star } from "lucide-react";
 
 interface UserData {
   name: string;
@@ -15,9 +15,13 @@ interface UserData {
   }>;
   experience?: any[];
   education?: any[];
+  projects?: any[];
+  certifications?: any[];
+  languages?: any[];
   linkedin_url?: string;
   github_url?: string;
   portfolio_url?: string;
+  image_url?: string;
 }
 
 interface ModernMinimalistProps {
@@ -42,249 +46,227 @@ export default function ModernMinimalist({ userData, colors, scale = 1, mode = '
     background: '#ffffff'
   };
 
-  const isLiveMode = mode === 'live'
-
   return (
     <div
-      className="max-w-4xl mx-auto bg-white shadow-lg"
+      className="w-full h-full flex flex-col"
       style={{
         fontFamily: 'Inter, sans-serif',
         backgroundColor: theme.background,
         color: theme.text,
-        transform: `scale(${scale})`,
-        transformOrigin: 'top left'
+        fontSize: '0.55rem',
+        lineHeight: '1.0'
       }}
     >
       {/* Header */}
-      <div className={`border-b ${isLiveMode ? 'p-4' : 'p-8'}`} style={{ borderColor: 'rgba(0,0,0,0.1)' }}>
-        <div className="text-center">
-          <h1 className={`${isLiveMode ? 'text-2xl' : 'text-4xl'} font-bold ${isLiveMode ? 'mb-1' : 'mb-2'}`} style={{ color: theme.text }}>
-            {userData.name || 'Your Name'}
-          </h1>
-          <p className={`${isLiveMode ? 'text-base' : 'text-xl'} ${isLiveMode ? 'mb-2' : 'mb-4'} font-medium`} style={{ color: theme.primary }}>
-            {userData.job_title || 'Professional Title'}
+      <div className="text-center py-1 px-1 border-b" style={{ borderColor: 'rgba(0,0,0,0.1)' }}>
+        <h1 className="text-sm font-bold mb-0.5" style={{ color: theme.primary }}>
+          {userData.name || "Your Name"}
+        </h1>
+        {userData.job_title && (
+          <p className="text-xs font-medium mb-0.5" style={{ color: theme.secondary }}>
+            {userData.job_title}
           </p>
-          <p className={`max-w-2xl mx-auto leading-relaxed ${isLiveMode ? 'text-sm' : ''}`} style={{ color: theme.secondary }}>
-            {userData.summary || 'A passionate professional dedicated to creating innovative solutions and driving meaningful impact through technology and collaboration.'}
-          </p>
-        </div>
-
-        {/* Contact Bar */}
-        <div className="flex justify-center flex-wrap gap-6 mt-6 pt-6" style={{ borderTop: '1px solid rgba(0,0,0,0.1)' }}>
-          <div className="flex items-center gap-2" style={{ color: theme.secondary }}>
-            <Mail className="h-4 w-4" style={{ color: theme.primary }} />
-            <span className="text-sm">{userData.email || 'your.email@example.com'}</span>
-          </div>
+        )}
+        <div className="flex flex-wrap justify-center gap-1 text-xs">
+          {userData.email && (
+            <div className="flex items-center gap-0.5">
+              <Mail className="h-1.5 w-1.5" />
+              <span>{userData.email}</span>
+            </div>
+          )}
           {userData.phone && (
-            <div className="flex items-center gap-2" style={{ color: theme.secondary }}>
-              <Phone className="h-4 w-4" style={{ color: theme.primary }} />
-              <span className="text-sm">{userData.phone}</span>
+            <div className="flex items-center gap-0.5">
+              <Phone className="h-1.5 w-1.5" />
+              <span>{userData.phone}</span>
             </div>
           )}
           {userData.address && (
-            <div className="flex items-center gap-2" style={{ color: theme.secondary }}>
-              <MapPin className="h-4 w-4" style={{ color: theme.primary }} />
-              <span className="text-sm">{userData.address}</span>
-            </div>
-          )}
-          {userData.linkedin_url && (
-            <div className="flex items-center gap-2" style={{ color: theme.secondary }}>
-              <Linkedin className="h-4 w-4" style={{ color: theme.primary }} />
-              <a href={userData.linkedin_url} target="_blank" rel="noopener noreferrer" className="text-sm hover:underline">
-                LinkedIn
-              </a>
-            </div>
-          )}
-          {userData.github_url && (
-            <div className="flex items-center gap-2" style={{ color: theme.secondary }}>
-              <Github className="h-4 w-4" style={{ color: theme.primary }} />
-              <a href={userData.github_url} target="_blank" rel="noopener noreferrer" className="text-sm hover:underline">
-                GitHub
-              </a>
-            </div>
-          )}
-          {userData.portfolio_url && (
-            <div className="flex items-center gap-2" style={{ color: theme.secondary }}>
-              <Globe className="h-4 w-4" style={{ color: theme.primary }} />
-              <a href={userData.portfolio_url} target="_blank" rel="noopener noreferrer" className="text-sm hover:underline">
-                Portfolio
-              </a>
-            </div>
-          )}
-          {userData.portfolio_url && (
-            <div className="flex items-center gap-2" style={{ color: theme.secondary }}>
-              <Globe className="h-4 w-4" style={{ color: theme.primary }} />
-              <a href={userData.portfolio_url} target="_blank" rel="noopener noreferrer" className="text-sm hover:underline">
-                Portfolio
-              </a>
+            <div className="flex items-center gap-0.5">
+              <MapPin className="h-1.5 w-1.5" />
+              <span>{userData.address}</span>
             </div>
           )}
         </div>
       </div>
 
-      <div className="p-8">
-        {/* Skills Section */}
-        <section className="mb-10">
-          <h2 className="text-2xl font-bold mb-6 relative" style={{ color: theme.text }}>
-            Skills & Expertise
-            <div
-              className="absolute bottom-0 left-0 w-12 h-1 rounded"
-              style={{ backgroundColor: theme.primary }}
-            ></div>
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {userData.skills?.map((skill, index) => (
-              <div
-                key={index}
-                className="flex items-center justify-between p-3 rounded-lg"
-                style={{ backgroundColor: `${theme.primary}10` }}
-              >
-                <span className="font-medium text-sm" style={{ color: theme.text }}>
-                  {skill.name}
-                </span>
-                <div className="flex space-x-1">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Star
-                      key={star}
-                      className={`w-4 h-4 ${
-                        star <= skill.rating
-                          ? 'fill-current'
-                          : 'stroke-current fill-transparent'
-                      }`}
-                      style={{ 
-                        color: star <= skill.rating ? theme.primary : theme.secondary 
-                      }}
-                    />
-                  ))}
-                </div>
+      {/* Content */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* Left Column */}
+        <div className="w-1/3 p-1 bg-gray-50">
+          {/* Skills */}
+          {userData.skills && userData.skills.length > 0 && (
+            <div className="mb-1">
+              <h3 className="text-xs font-bold mb-0.5" style={{ color: theme.primary }}>
+                SKILLS
+              </h3>
+              <div className="space-y-0.5">
+                {userData.skills.slice(0, 10).map((skill, i) => (
+                  <div key={i} className="flex items-center justify-between">
+                    <span className="text-xs">{skill.name}</span>
+                    <div className="flex gap-0.5">
+                      {[...Array(5)].map((_, j) => (
+                        <Star
+                          key={j}
+                          className="h-1 w-1"
+                          fill={j < skill.rating ? theme.accent : 'none'}
+                          color={j < skill.rating ? theme.accent : '#e5e7eb'}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                ))}
               </div>
-            )) || (
-                <>
-                  <div className="flex items-center justify-between p-3 rounded-lg" style={{ backgroundColor: `${theme.primary}10` }}>
-                    <span className="font-medium text-sm" style={{ color: theme.text }}>React</span>
-                    <div className="flex space-x-1">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <Star key={star} className={`w-4 h-4 ${star <= 5 ? 'fill-current' : 'stroke-current fill-transparent'}`} style={{ color: star <= 5 ? theme.primary : theme.secondary }} />
-                      ))}
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between p-3 rounded-lg" style={{ backgroundColor: `${theme.primary}10` }}>
-                    <span className="font-medium text-sm" style={{ color: theme.text }}>TypeScript</span>
-                    <div className="flex space-x-1">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <Star key={star} className={`w-4 h-4 ${star <= 4 ? 'fill-current' : 'stroke-current fill-transparent'}`} style={{ color: star <= 4 ? theme.primary : theme.secondary }} />
-                      ))}
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between p-3 rounded-lg" style={{ backgroundColor: `${theme.primary}10` }}>
-                    <span className="font-medium text-sm" style={{ color: theme.text }}>Node.js</span>
-                    <div className="flex space-x-1">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <Star key={star} className={`w-4 h-4 ${star <= 4 ? 'fill-current' : 'stroke-current fill-transparent'}`} style={{ color: star <= 4 ? theme.primary : theme.secondary }} />
-                      ))}
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between p-3 rounded-lg" style={{ backgroundColor: `${theme.primary}10` }}>
-                    <span className="font-medium text-sm" style={{ color: theme.text }}>Python</span>
-                    <div className="flex space-x-1">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <Star key={star} className={`w-4 h-4 ${star <= 3 ? 'fill-current' : 'stroke-current fill-transparent'}`} style={{ color: star <= 3 ? theme.primary : theme.secondary }} />
-                      ))}
-                    </div>
-                  </div>
-                </>
-              )}
-          </div>
-        </section>
+            </div>
+          )}
 
-        {/* Experience Section */}
-        <section className="mb-10">
-          <h2 className="text-2xl font-bold mb-6 relative" style={{ color: theme.text }}>
-            Professional Experience
-            <div
-              className="absolute bottom-0 left-0 w-12 h-1 rounded"
-              style={{ backgroundColor: theme.primary }}
-            ></div>
-          </h2>
-          <div className="space-y-8">
-            {userData.experience?.map((exp, index) => (
-              <div key={index} className="relative pl-8" style={{ borderLeft: '2px solid rgba(0,0,0,0.1)' }}>
-                <div
-                  className="absolute -left-2 top-0 w-4 h-4 rounded-full"
-                  style={{ backgroundColor: theme.primary }}
-                ></div>
-                <div className="rounded-lg p-6" style={{ backgroundColor: 'rgba(0,0,0,0.03)' }}>
-                  <div className="flex justify-between items-start mb-3">
-                    <div>
-                      <h3 className="text-lg font-semibold" style={{ color: theme.text }}>{exp.title}</h3>
-                      <p className="font-medium" style={{ color: theme.primary }}>{exp.company}</p>
-                    </div>
-                    <div className="flex items-center gap-1 text-sm" style={{ color: theme.secondary }}>
-                      <Calendar className="h-4 w-4" />
-                      <span>{exp.duration}</span>
-                    </div>
+          {/* Education */}
+          {userData.education && userData.education.length > 0 && (
+            <div className="mb-1">
+              <h3 className="text-xs font-bold mb-0.5" style={{ color: theme.primary }}>
+                EDUCATION
+              </h3>
+              <div className="space-y-0.5">
+                {userData.education.slice(0, 4).map((edu, i) => (
+                  <div key={i}>
+                    <p className="text-xs font-medium">{edu.degree || edu.institution}</p>
+                    <p className="text-xs text-gray-600">{edu.institution || edu.degree}</p>
+                    <p className="text-xs text-gray-500">{edu.year}</p>
+                    {edu.gpa && <p className="text-xs text-gray-500">GPA: {edu.gpa}</p>}
                   </div>
-                  <p className="leading-relaxed" style={{ color: theme.text }}>{exp.description}</p>
-                </div>
+                ))}
               </div>
-            )) || (
-                <div className="relative pl-8" style={{ borderLeft: '2px solid rgba(0,0,0,0.1)' }}>
-                  <div
-                    className="absolute -left-2 top-0 w-4 h-4 rounded-full"
-                    style={{ backgroundColor: theme.primary }}
-                  ></div>
-                  <div className="rounded-lg p-6" style={{ backgroundColor: 'rgba(0,0,0,0.03)' }}>
-                    <div className="flex justify-between items-start mb-3">
-                      <div>
-                        <h3 className="text-lg font-semibold" style={{ color: theme.text }}>Senior Software Engineer</h3>
-                        <p className="font-medium" style={{ color: theme.primary }}>Tech Innovation Inc.</p>
-                      </div>
-                      <div className="flex items-center gap-1 text-sm" style={{ color: theme.secondary }}>
-                        <Calendar className="h-4 w-4" />
-                        <span>2022 - Present</span>
-                      </div>
+            </div>
+          )}
+
+          {/* Certifications */}
+          {userData.certifications && userData.certifications.length > 0 && (
+            <div className="mb-1">
+              <h3 className="text-xs font-bold mb-0.5" style={{ color: theme.primary }}>
+                CERTIFICATIONS
+              </h3>
+              <div className="space-y-0.5">
+                {userData.certifications.slice(0, 3).map((cert, i) => (
+                  <div key={i}>
+                    <p className="text-xs font-medium">{cert.name}</p>
+                    <p className="text-xs text-gray-600">{cert.issuer}</p>
+                    <p className="text-xs text-gray-500">{cert.date}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Languages */}
+          {userData.languages && userData.languages.length > 0 && (
+            <div className="mb-1">
+              <h3 className="text-xs font-bold mb-0.5" style={{ color: theme.primary }}>
+                LANGUAGES
+              </h3>
+              <div className="space-y-0.5">
+                {userData.languages.slice(0, 4).map((lang, i) => (
+                  <div key={i} className="flex justify-between">
+                    <span className="text-xs">{lang.name}</span>
+                    <span className="text-xs text-gray-500">{lang.proficiency}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Links */}
+          <div>
+            <h3 className="text-xs font-bold mb-0.5" style={{ color: theme.primary }}>
+              LINKS
+            </h3>
+            <div className="space-y-0.5">
+              {userData.linkedin_url && (
+                <div className="flex items-center gap-0.5">
+                  <Linkedin className="h-1.5 w-1.5" />
+                  <span className="text-xs">LinkedIn</span>
+                </div>
+              )}
+              {userData.github_url && (
+                <div className="flex items-center gap-0.5">
+                  <Github className="h-1.5 w-1.5" />
+                  <span className="text-xs">GitHub</span>
+                </div>
+              )}
+              {userData.portfolio_url && (
+                <div className="flex items-center gap-0.5">
+                  <Globe className="h-1.5 w-1.5" />
+                  <span className="text-xs">Portfolio</span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column */}
+        <div className="flex-1 p-1">
+          {/* Summary */}
+          {userData.summary && (
+            <div className="mb-1">
+              <h3 className="text-xs font-bold mb-0.5" style={{ color: theme.primary }}>
+                PROFESSIONAL SUMMARY
+              </h3>
+              <p className="text-xs leading-tight">{userData.summary}</p>
+            </div>
+          )}
+
+          {/* Experience */}
+          {userData.experience && userData.experience.length > 0 && (
+            <div className="mb-1">
+              <h3 className="text-xs font-bold mb-0.5" style={{ color: theme.primary }}>
+                WORK EXPERIENCE
+              </h3>
+              <div className="space-y-1">
+                {userData.experience.slice(0, 5).map((exp, i) => (
+                  <div key={i}>
+                    <div className="flex justify-between items-start mb-0.5">
+                      <h4 className="text-xs font-semibold">{exp.title || exp.jobTitle}</h4>
+                      <span className="text-xs text-gray-500">{exp.duration || `${exp.startDate} - ${exp.endDate}`}</span>
                     </div>
-                    <p className="leading-relaxed" style={{ color: theme.text }}>
-                      Led development of scalable web applications serving 100K+ users. Implemented modern React architecture and improved application performance by 40%.
+                    <p className="text-xs font-medium text-gray-600 mb-0.5">{exp.company || exp.employer}</p>
+                    {(exp.location || exp.isRemote) && (
+                      <p className="text-xs text-gray-500 mb-0.5">
+                        {exp.location} {exp.isRemote && "(Remote)"}
+                      </p>
+                    )}
+                    {exp.description && (
+                      <p className="text-xs text-gray-700 leading-tight">
+                        {exp.description.length > 80 ? exp.description.substring(0, 80) + '...' : exp.description}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Projects */}
+          {userData.projects && userData.projects.length > 0 && (
+            <div>
+              <h3 className="text-xs font-bold mb-0.5" style={{ color: theme.primary }}>
+                PROJECTS
+              </h3>
+              <div className="space-y-1">
+                {userData.projects.slice(0, 3).map((project, i) => (
+                  <div key={i}>
+                    <h4 className="text-xs font-semibold">{project.name}</h4>
+                    <p className="text-xs text-gray-700 leading-tight">
+                      {project.description.length > 60 ? project.description.substring(0, 60) + '...' : project.description}
                     </p>
+                    {project.technologies && (
+                      <p className="text-xs text-gray-500">
+                        {project.technologies.slice(0, 3).join(', ')}
+                      </p>
+                    )}
                   </div>
-                </div>
-              )}
-          </div>
-        </section>
-
-        {/* Education Section */}
-        <section>
-          <h2 className="text-2xl font-bold mb-6 relative" style={{ color: theme.text }}>
-            Education
-            <div
-              className="absolute bottom-0 left-0 w-12 h-1 rounded"
-              style={{ backgroundColor: theme.primary }}
-            ></div>
-          </h2>
-          <div className="grid md:grid-cols-2 gap-6">
-            {userData.education?.map((edu, index) => (
-              <div key={index} className="rounded-lg p-6" style={{ backgroundColor: 'rgba(0,0,0,0.03)' }}>
-                <h3 className="text-lg font-semibold mb-2" style={{ color: theme.text }}>{edu.degree}</h3>
-                <p className="font-medium mb-1" style={{ color: theme.primary }}>{edu.institution}</p>
-                <p className="text-sm" style={{ color: theme.secondary }}>{edu.year}</p>
+                ))}
               </div>
-            )) || (
-                <>
-                  <div className="rounded-lg p-6" style={{ backgroundColor: 'rgba(0,0,0,0.03)' }}>
-                    <h3 className="text-lg font-semibold mb-2" style={{ color: theme.text }}>Bachelor of Computer Science</h3>
-                    <p className="font-medium mb-1" style={{ color: theme.primary }}>University of Technology</p>
-                    <p className="text-sm" style={{ color: theme.secondary }}>2020</p>
-                  </div>
-                  <div className="rounded-lg p-6" style={{ backgroundColor: 'rgba(0,0,0,0.03)' }}>
-                    <h3 className="text-lg font-semibold mb-2" style={{ color: theme.text }}>AWS Certified Solutions Architect</h3>
-                    <p className="font-medium mb-1" style={{ color: theme.primary }}>Amazon Web Services</p>
-                    <p className="text-sm" style={{ color: theme.secondary }}>2023</p>
-                  </div>
-                </>
-              )}
-          </div>
-        </section>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

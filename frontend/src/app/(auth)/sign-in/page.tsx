@@ -1,9 +1,10 @@
 "use client";
 
 import React, { useState, Suspense } from 'react';
-import { signIn, getSession } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Eye, EyeOff, Mail, Lock, Sparkles } from 'lucide-react';
@@ -24,20 +25,25 @@ function SignInForm() {
         setError('');
 
         try {
-            const result = await signIn('credentials', {
-                email,
-                password,
-                redirect: false,
-            });
+            await signInWithEmailAndPassword(auth, email, password);
+            router.push(callbackUrl);
+        } catch (error: any) {
+            setError(error.message || 'Invalid credentials');
+        } finally {
+            setLoading(false);
+        }
+    };
 
-            if (result?.error) {
-                setError('Invalid credentials');
-            } else {
-                // Successful login - redirect to callback URL
-                router.push(callbackUrl);
-            }
-        } catch (error) {
-            setError('An error occurred. Please try again.');
+    const handleGoogleSignIn = async () => {
+        setLoading(true);
+        setError('');
+
+        try {
+            const provider = new GoogleAuthProvider();
+            await signInWithPopup(auth, provider);
+            router.push(callbackUrl);
+        } catch (error: any) {
+            setError(error.message || 'Google sign-in failed');
         } finally {
             setLoading(false);
         }
@@ -121,22 +127,6 @@ function SignInForm() {
                             </div>
                         </div>
 
-                        <div className="flex items-center justify-between text-sm">
-                            <label className="flex items-center">
-                                <input
-                                    type="checkbox"
-                                    className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                                />
-                                <span className="ml-2 text-gray-600">Remember me</span>
-                            </label>
-                            <Link
-                                href="/forgot-password"
-                                className="text-indigo-600 hover:text-indigo-500 font-medium transition-colors"
-                            >
-                                Forgot password?
-                            </Link>
-                        </div>
-
                         <button
                             type="submit"
                             disabled={loading}
@@ -164,7 +154,11 @@ function SignInForm() {
 
                     <div className="flex justify-center">
                         <div className="w-full max-w-xs">
-                            <button className="w-full inline-flex justify-center py-2.5 px-4 rounded-xl border border-gray-200 bg-white text-sm font-medium text-gray-500 hover:text-gray-900 hover:bg-gray-50 transition-all duration-200">
+                            <button 
+                                onClick={handleGoogleSignIn}
+                                disabled={loading}
+                                className="w-full inline-flex justify-center py-2.5 px-4 rounded-xl border border-gray-200 bg-white text-sm font-medium text-gray-500 hover:text-gray-900 hover:bg-gray-50 transition-all duration-200 disabled:opacity-50"
+                            >
                                 <svg className="w-5 h-5" viewBox="0 0 24 24">
                                     <path fill="#4285f4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
                                     <path fill="#34a853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
