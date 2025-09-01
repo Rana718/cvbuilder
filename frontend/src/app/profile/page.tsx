@@ -189,7 +189,7 @@ function ProfilePage() {
                     <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-4">
                             <Link
-                                href="/dashboard"
+                                href="/resusme"
                                 className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
                             >
                                 <ArrowLeft className="w-4 h-4" />
@@ -383,7 +383,7 @@ function ProfilePage() {
                                         <span className="font-medium">Create Resume</span>
                                     </Link>
                                     <Link
-                                        href="/dashboard"
+                                        href="/resusme"
                                         className="flex items-center space-x-3 w-full px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors group"
                                     >
                                         <div className="w-8 h-8 bg-gray-100 group-hover:bg-blue-200 rounded-lg flex items-center justify-center">
