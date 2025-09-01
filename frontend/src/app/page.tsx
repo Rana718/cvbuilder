@@ -68,9 +68,9 @@ export default function Home() {
                 transition={{ duration: 0.8, delay: 0.7 }}
                 className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-10"
               >
-                <button 
+                <button
                   className="group bg-[#ffc05a] text-black px-8 py-4 rounded-xl text-lg font-semibold flex items-center justify-center space-x-2 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-                  onClick={()=> router.push("/template")}  
+                  onClick={() => router.push("/template")}
                 >
                   <span>Create my resume</span>
                   <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
@@ -278,6 +278,146 @@ export default function Home() {
               </motion.div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Pricing Plans Section */}
+      <section id="pricing" className="py-20 bg-gradient-to-br from-blue-50 to-purple-50">
+        <div className="container mx-auto px-6">
+          <motion.div
+            initial={{ y: 50, opacity: 0 }}
+            whileInView={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">Choose Your Plan</h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Start for free or upgrade for unlimited resumes without watermarks
+            </p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            {/* Free Plan */}
+            <motion.div
+              initial={{ y: 50, opacity: 0 }}
+              whileInView={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+              className="bg-white rounded-2xl p-8 shadow-lg border-2 border-gray-200 relative flex flex-col h-full"
+            >
+              <div className="flex-1">
+                <div className="text-center mb-6">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">Free Plan</h3>
+                  <div className="text-4xl font-bold text-gray-900 mb-2">₹0</div>
+                  <p className="text-gray-600">Forever free</p>
+                </div>
+
+                <div className="space-y-4 mb-8">
+                  <div className="flex items-center space-x-3">
+                    <CheckCircle className="h-5 w-5 text-green-500" />
+                    <span className="text-gray-700">1 Resume creation</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <CheckCircle className="h-5 w-5 text-green-500" />
+                    <span className="text-gray-700">AI-powered content suggestions</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <CheckCircle className="h-5 w-5 text-green-500" />
+                    <span className="text-gray-700">Professional templates</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <CheckCircle className="h-5 w-5 text-green-500" />
+                    <span className="text-gray-700">PDF download</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <div className="h-5 w-5 bg-orange-100 rounded-full flex items-center justify-center">
+                      <span className="text-orange-600 text-xs">!</span>
+                    </div>
+                    <span className="text-gray-700">Resume includes watermark</span>
+                  </div>
+                </div>
+              </div>
+
+              <button className="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 rounded-lg font-semibold transition-colors mt-auto">
+                Get Started Free
+              </button>
+            </motion.div>
+
+            {/* Monthly Premium Plan */}
+            <motion.div
+              initial={{ y: 50, opacity: 0 }}
+              whileInView={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              viewport={{ once: true }}
+              className="bg-white rounded-2xl p-8 shadow-xl border-2 border-blue-500 relative flex flex-col h-full"
+            >
+              {/* Popular Badge */}
+              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                <span className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-2 rounded-full text-sm font-semibold">
+                  Most Popular
+                </span>
+              </div>
+
+              <div className="flex-1">
+                <div className="text-center mb-6">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">Premium Plan</h3>
+                  <div className="text-4xl font-bold text-blue-600 mb-1">₹90</div>
+                  <p className="text-gray-600">per month</p>
+                  <p className="text-sm text-gray-500 mt-1">Cancel anytime</p>
+                </div>
+
+                <div className="space-y-4 mb-8">
+                  <div className="flex items-center space-x-3">
+                    <CheckCircle className="h-5 w-5 text-green-500" />
+                    <span className="text-gray-700">Unlimited resume creation</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <CheckCircle className="h-5 w-5 text-green-500" />
+                    <span className="text-gray-700">AI-powered content suggestions</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <CheckCircle className="h-5 w-5 text-green-500" />
+                    <span className="text-gray-700">All professional templates</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <CheckCircle className="h-5 w-5 text-green-500" />
+                    <span className="text-gray-700">High-quality PDF downloads</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <CheckCircle className="h-5 w-5 text-green-500" />
+                    <span className="text-gray-700 font-medium">No watermark</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <CheckCircle className="h-5 w-5 text-green-500" />
+                    <span className="text-gray-700">Priority support</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <CheckCircle className="h-5 w-5 text-green-500" />
+                    <span className="text-gray-700">Multiple format exports</span>
+                  </div>
+                </div>
+              </div>
+
+              <button className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white py-3 rounded-lg font-semibold transition-all transform hover:-translate-y-1 shadow-lg mt-auto">
+                Upgrade to Premium
+              </button>
+            </motion.div>
+          </div>
+
+          {/* Money Back Guarantee */}
+          <motion.div
+            initial={{ y: 30, opacity: 0 }}
+            whileInView={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            viewport={{ once: true }}
+            className="text-center mt-12"
+          >
+            <div className="inline-flex items-center bg-green-100 text-green-700 px-6 py-3 rounded-full">
+              <Shield className="h-5 w-5 mr-2" />
+              <span className="font-medium">30-day money-back guarantee</span>
+            </div>
+          </motion.div>
         </div>
       </section>
 

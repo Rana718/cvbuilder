@@ -5,7 +5,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
-import axiosInstance from '@/lib/axios';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Eye, EyeOff, Mail, Lock, Sparkles } from 'lucide-react';
@@ -26,14 +25,7 @@ function SignInForm() {
         setError('');
 
         try {
-            const userCredential = await signInWithEmailAndPassword(auth, email, password);
-            const token = await userCredential.user.getIdToken();
-            
-            // // Sync with backend
-            // await axiosInstance.post('/api/auth/firebase-auth', {
-            //     firebase_token: token
-            // });
-            
+            await signInWithEmailAndPassword(auth, email, password);
             router.push(callbackUrl);
         } catch (error: any) {
             setError(error.message || 'Invalid credentials');
@@ -48,14 +40,7 @@ function SignInForm() {
 
         try {
             const provider = new GoogleAuthProvider();
-            const userCredential = await signInWithPopup(auth, provider);
-            const token = await userCredential.user.getIdToken();
-            
-            // // Sync with backend
-            // await axiosInstance.post('/api/auth/firebase-auth', {
-            //     firebase_token: token
-            // });
-            
+            await signInWithPopup(auth, provider);
             router.push(callbackUrl);
         } catch (error: any) {
             setError(error.message || 'Google sign-in failed');
@@ -169,7 +154,7 @@ function SignInForm() {
 
                     <div className="flex justify-center">
                         <div className="w-full max-w-xs">
-                            <button 
+                            <button
                                 onClick={handleGoogleSignIn}
                                 disabled={loading}
                                 className="w-full inline-flex justify-center py-2.5 px-4 rounded-xl border border-gray-200 bg-white text-sm font-medium text-gray-500 hover:text-gray-900 hover:bg-gray-50 transition-all duration-200 disabled:opacity-50"
