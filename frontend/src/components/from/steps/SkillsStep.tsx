@@ -1,7 +1,8 @@
 import React, { useState, useRef } from 'react'
-import { Plus, Award, Star } from 'lucide-react'
+import { Plus, Award, Star, ChevronLeft, ChevronRight, Sparkles, Target } from 'lucide-react'
 import { useResumeStore, Skill } from '@/store/resumeStore'
 import axiosInstance from '@/lib/axios'
+import { motion, AnimatePresence } from 'framer-motion'
 
 interface SkillsStepProps {
   onNext: () => void
@@ -115,185 +116,422 @@ function SkillsStep({ onNext, onPrev }: SkillsStepProps) {
   const isFormValid = formData.name.trim().length > 0
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Skills</h2>
-        <p className="text-gray-600">Add your professional skills and rate your proficiency</p>
-      </div>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.3 }}
+      className="space-y-8"
+    >
+      {/* Header */}
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="text-center"
+      >
+        <div className="flex items-center justify-center mb-4">
+          <div className="p-3 bg-blue-100 rounded-full">
+            <Award className="w-8 h-8 text-blue-600" />
+          </div>
+        </div>
+        <h2 className="text-3xl font-bold text-gray-900 mb-2">Skills</h2>
+        <p className="text-lg text-gray-600">Showcase your professional skills and expertise</p>
+        <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full mx-auto mt-4"></div>
+      </motion.div>
 
       {/* Existing Skills */}
-      {skills.length > 0 && (
-        <div className="space-y-4">
-          <h3 className="text-lg font-medium text-gray-900">Your Skills</h3>
-          {skills.map((skill) => (
-            <div key={skill.id} className="border border-gray-200 rounded-lg p-4 bg-white">
-              <div className="flex justify-between items-start">
-                <div className="flex-1">
-                  <h4 className="font-semibold text-gray-900">{skill.name}</h4>
-                  <div className="flex items-center space-x-2 mt-2">
-                    <span className="text-sm text-gray-600">Proficiency:</span>
-                    {renderStars(skill.rating)}
-                    <span className="text-sm text-gray-500">({skill.rating}/5)</span>
+      <AnimatePresence>
+        {skills.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2 }}
+            className="space-y-4"
+          >
+            <h3 className="text-xl font-semibold text-gray-900 flex items-center">
+              <Target className="w-5 h-5 mr-2 text-blue-600" />
+              Your Skills
+            </h3>
+            {skills.map((skill, index) => (
+              <motion.div
+                key={skill.id}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.1 * index }}
+                className="group relative overflow-hidden border border-gray-200 rounded-xl p-6 bg-white hover:shadow-lg transition-all duration-300 hover:border-blue-300"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-50 to-indigo-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="relative">
+                  <div className="flex justify-between items-start">
+                    <div className="flex-1">
+                      <h4 className="font-bold text-lg text-gray-900 mb-2">{skill.name}</h4>
+                      <div className="flex items-center space-x-3">
+                        <span className="text-sm font-medium text-gray-600">Proficiency:</span>
+                        <div className="flex items-center space-x-1">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <motion.button
+                              key={star}
+                              whileHover={{ scale: 1.2 }}
+                              whileTap={{ scale: 0.9 }}
+                              onClick={() => updateSkill(skill.id, { ...skill, rating: star })}
+                              className="focus:outline-none"
+                            >
+                              <Star
+                                className={`w-5 h-5 transition-colors ${
+                                  star <= skill.rating
+                                    ? 'text-yellow-400 fill-current'
+                                    : 'text-gray-300 hover:text-yellow-200'
+                                }`}
+                              />
+                            </motion.button>
+                          ))}
+                        </div>
+                        <span className="text-sm text-blue-600 font-semibold bg-blue-100 px-2 py-1 rounded-full">
+                          {skill.rating}/5
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex space-x-2 ml-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => removeSkill(skill.id)}
+                        className="px-4 py-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg text-sm font-medium transition-colors"
+                      >
+                        Remove
+                      </motion.button>
+                    </div>
                   </div>
                 </div>
-                <div className="flex space-x-2 ml-4">
-                  <button
-                    onClick={() => handleEdit(skill)}
-                    className="text-blue-600 hover:text-blue-700 text-sm font-medium"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => removeSkill(skill.id)}
-                    className="text-red-600 hover:text-red-700 text-sm font-medium"
-                  >
-                    Remove
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+              </motion.div>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Add Skill Button */}
       {!showAddForm && (
-        <button
-          onClick={() => setShowAddForm(true)}
-          className="flex items-center space-x-2 text-blue-600 hover:text-blue-700 font-medium"
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="flex justify-center"
         >
-          <Plus className="w-5 h-5" />
-          <span>Add Skill</span>
-        </button>
+          <motion.button
+            whileHover={{ scale: 1.02, y: -2 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => setShowAddForm(true)}
+            className="flex items-center space-x-3 px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+          >
+            <Plus className="w-5 h-5" />
+            <span>Add Skill</span>
+          </motion.button>
+        </motion.div>
       )}
 
       {/* Add/Edit Form */}
-      {showAddForm && (
-        <div className="border border-gray-300 rounded-lg p-6 bg-white">
-          <h4 className="font-medium text-gray-900 mb-4">
-            {editingId ? 'Edit Skill' : 'Add Skill'}
-          </h4>
+      <AnimatePresence>
+        {showAddForm && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: -20 }}
+            transition={{ duration: 0.3 }}
+            className="border-2 border-blue-200 rounded-2xl p-8 bg-gradient-to-br from-white to-blue-50 shadow-lg"
+          >
+            <h4 className="text-xl font-bold text-gray-900 mb-6">
+              {editingId ? 'Edit Skill' : 'Add Skill'}
+            </h4>
 
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Skill Name *
-              </label>
-              <input
-                type="text"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="e.g., JavaScript, Project Management"
-              />
+            <div className="space-y-6">
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.1 }}
+              >
+                <label className="block text-sm font-semibold text-gray-700 mb-3">
+                  Skill Name *
+                </label>
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                  placeholder="e.g., JavaScript, Project Management"
+                />
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+                <label className="block text-sm font-semibold text-gray-700 mb-3">
+                  Proficiency Rating *
+                </label>
+                <div className="flex items-center space-x-3 mb-2">
+                  {renderStars(formData.rating, true, (rating) => setFormData({ ...formData, rating }))}
+                  <span className="text-sm font-semibold text-blue-600 bg-blue-100 px-3 py-1 rounded-full">
+                    {formData.rating}/5
+                  </span>
+                </div>
+                <div className="grid grid-cols-5 gap-2 text-xs text-gray-500 mt-3">
+                  <span className="text-center">Beginner</span>
+                  <span className="text-center">Basic</span>
+                  <span className="text-center">Intermediate</span>
+                  <span className="text-center">Advanced</span>
+                  <span className="text-center">Expert</span>
+                </div>
+              </motion.div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Proficiency Rating *
-              </label>
-              <div className="flex items-center space-x-2">
-                {renderStars(formData.rating, true, (rating) => setFormData({ ...formData, rating }))}
-                <span className="text-sm text-gray-500 ml-2">({formData.rating}/5)</span>
-              </div>
-              <p className="text-xs text-gray-500 mt-1">
-                1 = Beginner, 2 = Basic, 3 = Intermediate, 4 = Advanced, 5 = Expert
-              </p>
+            <div className="flex justify-end space-x-4 mt-8">
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={resetForm}
+                className="px-6 py-3 text-gray-700 bg-gray-200 rounded-xl hover:bg-gray-300 transition-all duration-200 font-medium"
+              >
+                Cancel
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={handleSave}
+                disabled={!isFormValid}
+                className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium shadow-lg"
+              >
+                {editingId ? 'Update Skill' : 'Add Skill'}
+              </motion.button>
             </div>
-          </div>
-
-          <div className="flex justify-end space-x-3 mt-6">
-            <button
-              onClick={resetForm}
-              className="px-4 py-2 text-gray-600 hover:text-gray-800"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleSave}
-              disabled={!isFormValid}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {editingId ? 'Update Skill' : 'Add Skill'}
-            </button>
-          </div>
-        </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* AI-Generated Suggested Skills */}
       {!showAddForm && (
-        <div className="space-y-3">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="space-y-4"
+        >
           <div className="flex items-center justify-between">
-            <h4 className="text-sm font-medium text-gray-700">AI-Suggested Skills (click to add):</h4>
+            <h4 className="text-lg font-semibold text-gray-700 flex items-center">
+              <Sparkles className="w-5 h-5 mr-2 text-blue-500" />
+              AI-Suggested Skills
+            </h4>
             {workExperience.length > 0 && !isLoadingSkills && (
-              <button
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={fetchAISkills}
-                className="text-xs text-blue-600 hover:text-blue-700 font-medium"
+                className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:from-blue-600 hover:to-indigo-700 text-sm font-medium transition-all shadow-md"
               >
-                Generate Skills
-              </button>
+                <Sparkles className="w-4 h-4" />
+                <span>Generate Skills</span>
+              </motion.button>
             )}
           </div>
           
-          {workExperience.length === 0 && (
-            <div className="text-center py-6 text-sm text-gray-500">
-              Add work experience first to get AI-suggested skills.
-            </div>
-          )}
-          
-          {workExperience.length > 0 && isLoadingSkills && (
-            <div className="flex items-center justify-center py-6">
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500"></div>
-              <span className="ml-2 text-sm text-gray-600">Generating personalized skills...</span>
-            </div>
-          )}
-          
-          {workExperience.length > 0 && aiSuggestedSkills.length > 0 && !isLoadingSkills && (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-              {aiSuggestedSkills.map((skillName: string) => {
-                const isAdded = skills.find(s => s.name.toLowerCase() === skillName.toLowerCase())
-                return (
-                  <button
-                    key={skillName}
-                    onClick={() => addSuggestedSkill(skillName)}
-                    disabled={!!isAdded}
-                    className={`text-left p-2 text-sm rounded border transition-colors ${isAdded
-                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                        : 'bg-white text-gray-700 hover:bg-blue-50 hover:text-blue-700 border-gray-200'
+          <AnimatePresence>
+            {workExperience.length === 0 && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-center py-8 bg-gray-50 rounded-xl border border-gray-200"
+              >
+                <Award className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+                <p className="text-sm text-gray-500">
+                  Add work experience first to get AI-suggested skills.
+                </p>
+              </motion.div>
+            )}
+            
+            {workExperience.length > 0 && isLoadingSkills && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="flex items-center justify-center py-12 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200"
+              >
+                <div className="text-center">
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                    className="w-8 h-8 border-3 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"
+                  />
+                  <p className="text-sm text-gray-600 font-medium">
+                    AI is analyzing your experience to suggest relevant skills...
+                  </p>
+                </div>
+              </motion.div>
+            )}
+            
+            {workExperience.length > 0 && aiSuggestedSkills.length > 0 && !isLoadingSkills && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3"
+              >
+                {aiSuggestedSkills.map((skillName: string, index: number) => {
+                  const isAdded = skills.find(s => s.name.toLowerCase() === skillName.toLowerCase())
+                  return (
+                    <motion.button
+                      key={skillName}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: index * 0.05 }}
+                      whileHover={{ scale: isAdded ? 1 : 1.05, y: isAdded ? 0 : -2 }}
+                      whileTap={{ scale: isAdded ? 1 : 0.95 }}
+                      onClick={() => addSuggestedSkill(skillName)}
+                      disabled={!!isAdded}
+                      className={`text-left p-4 text-sm rounded-xl border-2 transition-all duration-200 font-medium ${
+                        isAdded
+                          ? 'bg-green-100 text-green-700 border-green-300 cursor-not-allowed'
+                          : 'bg-white text-gray-700 hover:bg-blue-50 hover:text-blue-700 border-gray-200 hover:border-blue-300 shadow-sm hover:shadow-md'
                       }`}
-                  >
-                    {skillName}
-                  </button>
-                )
-              })}
-            </div>
-          )}
-          
-          {workExperience.length > 0 && aiSuggestedSkills.length === 0 && !isLoadingSkills && (
-            <div className="text-center py-6 text-sm text-gray-500">
-              No AI suggestions available. Add skills manually or try regenerating.
-            </div>
-          )}
-        </div>
+                    >
+                      {isAdded && <span className="text-green-600 mr-1">✓</span>}
+                      {skillName}
+                    </motion.button>
+                  )
+                })}
+              </motion.div>
+            )}
+            
+            {workExperience.length > 0 && aiSuggestedSkills.length === 0 && !isLoadingSkills && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-center py-8 bg-gray-50 rounded-xl border border-gray-200"
+              >
+                <Award className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+                <p className="text-sm text-gray-500">
+                  No AI suggestions available. Add skills manually or try regenerating.
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
       )}
 
+      {/* Add Skill Form */}
+      <AnimatePresence>
+        {showAddForm && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-xl border border-blue-200 shadow-lg"
+          >
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <h4 className="text-lg font-semibold text-gray-700 flex items-center">
+                  <Plus className="w-5 h-5 mr-2 text-blue-500" />
+                  Add New Skill
+                </h4>
+                <motion.button
+                  whileHover={{ scale: 1.1, rotate: 90 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => setShowAddForm(false)}
+                  className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-200 text-gray-600 hover:bg-gray-300 transition-colors"
+                >
+                  ×
+                </motion.button>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Skill Name
+                </label>
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-sm"
+                  placeholder="e.g., JavaScript, Project Management"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Proficiency Level (1-5 stars)
+                </label>
+                <div className="flex items-center space-x-1">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <motion.button
+                      key={star}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => setFormData(prev => ({ ...prev, rating: star }))}
+                      className="text-2xl focus:outline-none"
+                    >
+                      <Star
+                        className={`w-6 h-6 ${
+                          star <= formData.rating
+                            ? 'text-yellow-400 fill-current'
+                            : 'text-gray-300'
+                        }`}
+                      />
+                    </motion.button>
+                  ))}
+                  <span className="ml-2 text-sm text-gray-600">
+                    {formData.rating} star{formData.rating !== 1 ? 's' : ''}
+                  </span>
+                </div>
+              </div>
+              <div className="flex justify-end space-x-3">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={resetForm}
+                  className="px-6 py-2 text-sm text-gray-600 hover:text-gray-800 font-medium"
+                >
+                  Cancel
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={handleSave}
+                  disabled={!formData.name.trim()}
+                  className="px-6 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white text-sm rounded-lg hover:from-blue-600 hover:to-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed font-medium shadow-md transition-all"
+                >
+                  {editingId ? 'Update Skill' : 'Add Skill'}
+                </motion.button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Navigation Buttons */}
-      <div className="flex justify-between">
-        <button
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.6 }}
+        className="flex justify-between pt-6"
+      >
+        <motion.button
+          whileHover={{ scale: 1.02, x: -5 }}
+          whileTap={{ scale: 0.98 }}
           onClick={onPrev}
-          className="px-6 py-3 text-gray-600 hover:text-gray-800 font-medium"
+          className="flex items-center space-x-2 px-6 py-3 text-gray-600 hover:text-gray-800 font-medium transition-colors"
         >
-          Previous
-        </button>
-        <button
+          <ChevronLeft className="w-4 h-4" />
+          <span>Previous</span>
+        </motion.button>
+        <motion.button
+          whileHover={{ scale: 1.02, x: 5 }}
+          whileTap={{ scale: 0.98 }}
           onClick={onNext}
           disabled={skills.length === 0}
-          className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+          className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg hover:from-blue-600 hover:to-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed font-medium shadow-md transition-all"
         >
-          Next: Summary
-        </button>
-      </div>
-    </div>
+          <span>Next: Summary</span>
+          <ChevronRight className="w-4 h-4" />
+        </motion.button>
+      </motion.div>
+    </motion.div>
   )
 }
 

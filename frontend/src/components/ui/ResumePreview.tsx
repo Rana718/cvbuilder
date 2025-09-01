@@ -84,11 +84,12 @@ function ResumePreview({ mode = 'default' }: ResumePreviewProps) {
 
     return (
         <div 
-            className={`bg-white shadow-lg border border-gray-200 overflow-hidden ${isLiveMode ? '' : 'mx-auto'}`}
+            className={`bg-white overflow-hidden ${isLiveMode ? 'border border-gray-300' : 'shadow-2xl border border-gray-300'}`}
             style={{
                 aspectRatio: '210/297', // A4 ratio
                 width: isLiveMode ? '100%' : '210mm',
-                maxWidth: isLiveMode ? '100%' : '210mm'
+                maxWidth: isLiveMode ? '100%' : '210mm',
+                minHeight: isLiveMode ? 'auto' : '297mm'
             }}
             data-resume-content
         >

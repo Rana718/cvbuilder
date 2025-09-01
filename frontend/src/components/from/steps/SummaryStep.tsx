@@ -1,8 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react'
-import { FileText } from 'lucide-react'
+import { FileText, ChevronLeft, ChevronRight, Sparkles, Target, User } from 'lucide-react'
 import { useResumeStore } from '@/store/resumeStore'
 import SimpleRichTextEditor from '@/components/ui/SimpleRichTextEditor'
 import axiosInstance from '@/lib/axios'
+import { motion, AnimatePresence } from 'framer-motion'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 interface SummaryStepProps {
     onNext: () => void
@@ -10,20 +12,55 @@ interface SummaryStepProps {
 }
 
 function SummaryStep({ onNext, onPrev }: SummaryStepProps) {
+    const router = useRouter()
+    const searchParams = useSearchParams()
     const { 
         summary, 
         setSummary,  
         personalInfo, 
         workExperience, 
         education, 
-        skills 
+        skills,
+        saveResume,
+        documentId,
+        templateId
     } = useResumeStore()
     
     const [aiSuggestions, setAiSuggestions] = useState<string[]>([])
     const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false)
+    const [isSaving, setIsSaving] = useState(false)
     
-    const { documentId } = useResumeStore()
     const hasCalledAPI = useRef(false)
+
+    const handleFinish = async () => {
+        if (isSaving) return
+        
+        setIsSaving(true)
+        try {
+            // Save the resume first
+            await saveResume()
+            
+            // Get the resume ID from either documentId or URL params
+            const resumeId = documentId || searchParams.get('resumeId')
+            const currentTemplateId = templateId || searchParams.get('template')
+            
+            if (resumeId && currentTemplateId) {
+                // Add a small delay to ensure state is properly saved
+                setTimeout(() => {
+                    // Redirect to the resume preview page
+                    router.push(`/resusme/${resumeId}?template=${currentTemplateId}`)
+                }, 100)
+            } else {
+                alert('Resume saved successfully!')
+                onNext() // Fallback to original behavior
+            }
+        } catch (error) {
+            console.error('Failed to save resume:', error)
+            alert('Failed to save resume. Please try again.')
+            setIsSaving(false)
+        }
+        // Don't set isSaving to false here - let the navigation handle it
+    }
 
     const buildCvData = () => {
         return {
@@ -72,98 +109,204 @@ function SummaryStep({ onNext, onPrev }: SummaryStepProps) {
     const isStepValid = summary.trim().length > 0
 
     return (
-        <div className="space-y-6">
-            <div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Professional Summary</h2>
-                <p className="text-gray-600">Write a compelling summary that highlights your experience and career objectives</p>
-            </div>
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="space-y-8 max-w-4xl mx-auto"
+        >
+            {/* Header Section */}
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="text-center"
+            >
+                <motion.div
+                    animate={{ rotate: [0, 5, -5, 0] }}
+                    transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+                    className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg"
+                >
+                    <Target className="w-8 h-8 text-white" />
+                </motion.div>
+                <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-3">
+                    Professional Summary
+                </h2>
+                <p className="text-gray-600 text-lg">
+                    Create a compelling summary that highlights your experience and career objectives
+                </p>
+            </motion.div>
 
             {/* Professional Summary Section */}
-            <div className="space-y-4">
-                <div className="flex items-center">
-                    <h3 className="text-lg font-medium text-gray-900 flex items-center">
-                        <FileText className="w-5 h-5 mr-2" />
-                        Your Professional Summary
-                    </h3>
-                </div>
-
-                <p className="text-sm text-gray-600">
-                    Write a brief summary that highlights your experience, skills, and career objectives.
-                </p>
-
-                <SimpleRichTextEditor
-                    value={summary}
-                    onChange={setSummary}
-                    placeholder="Write a compelling summary that showcases your professional background, key skills, and what you bring to potential employers..."
-                    height="120px"
-                />
-
-                {/* AI Summary Suggestions */}
-                <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                        <h4 className="text-sm font-medium text-gray-700">AI-Generated Summary Suggestions (click to use):</h4>
-                        {(personalInfo.firstName || workExperience.length > 0 || skills.length > 0) && !isLoadingSuggestions && (
-                            <button
-                                onClick={fetchAISummary}
-                                className="text-xs text-blue-600 hover:text-blue-700 font-medium"
-                            >
-                                Generate Summary
-                            </button>
-                        )}
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="bg-gradient-to-br from-blue-50 to-indigo-50 p-8 rounded-2xl border border-blue-200 shadow-lg"
+            >
+                <div className="space-y-6">
+                    <div className="flex items-center">
+                        <motion.div
+                            whileHover={{ scale: 1.1, rotate: 5 }}
+                            className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center mr-3 shadow-md"
+                        >
+                            <FileText className="w-5 h-5 text-white" />
+                        </motion.div>
+                        <h3 className="text-xl font-semibold text-gray-800">
+                            Your Professional Summary
+                        </h3>
                     </div>
-                    
-                    {(!personalInfo.firstName && workExperience.length === 0 && skills.length === 0) && (
-                        <div className="text-center py-6 text-sm text-gray-500">
-                            Add personal information, work experience, or skills first to get AI-generated summary suggestions.
-                        </div>
-                    )}
-                    
-                    {(personalInfo.firstName || workExperience.length > 0 || skills.length > 0) && isLoadingSuggestions && (
-                        <div className="flex items-center justify-center py-6">
-                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500"></div>
-                            <span className="ml-2 text-sm text-gray-600">Generating personalized summary suggestions...</span>
-                        </div>
-                    )}
-                    
-                    {(personalInfo.firstName || workExperience.length > 0 || skills.length > 0) && aiSuggestions.length > 0 && !isLoadingSuggestions && (
-                        <div className="space-y-2">
-                            {aiSuggestions.map((suggestion: string, index: number) => (
-                                <button
-                                    key={index}
-                                    onClick={() => useSummaryTemplate(suggestion)}
-                                    className="w-full text-left p-3 text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-700 rounded border border-gray-200 transition-colors"
+
+                    <motion.p
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.3 }}
+                        className="text-gray-600 leading-relaxed"
+                    >
+                        Write a brief summary that highlights your experience, skills, and career objectives.
+                    </motion.p>
+
+                    <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.4 }}
+                        className="relative"
+                    >
+                        <SimpleRichTextEditor
+                            value={summary}
+                            onChange={setSummary}
+                            placeholder="Write a compelling summary that showcases your professional background, key skills, and what you bring to potential employers..."
+                            height="120px"
+                        />
+                    </motion.div>
+
+                    {/* AI Summary Suggestions */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.3 }}
+                        className="space-y-4"
+                    >
+                        <div className="flex items-center justify-between">
+                            <h4 className="text-lg font-semibold text-gray-700 flex items-center">
+                                <Sparkles className="w-5 h-5 mr-2 text-blue-500" />
+                                AI-Generated Summary Suggestions
+                            </h4>
+                            {(personalInfo.firstName || workExperience.length > 0 || skills.length > 0) && !isLoadingSuggestions && (
+                                <motion.button
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    onClick={fetchAISummary}
+                                    className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:from-blue-600 hover:to-indigo-700 text-sm font-medium transition-all shadow-md"
                                 >
-                                    {suggestion}
-                                </button>
-                            ))}
+                                    <Sparkles className="w-4 h-4" />
+                                    <span>Generate Summary</span>
+                                </motion.button>
+                            )}
                         </div>
-                    )}
-                    
-                    {(personalInfo.firstName || workExperience.length > 0 || skills.length > 0) && aiSuggestions.length === 0 && !isLoadingSuggestions && (
-                        <div className="text-center py-6 text-sm text-gray-500">
-                            No AI suggestions available. Write your summary manually or try regenerating.
-                        </div>
-                    )}
+                        
+                        <AnimatePresence>
+                            {(!personalInfo.firstName && workExperience.length === 0 && skills.length === 0) && (
+                                <motion.div
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    className="text-center py-8 bg-gray-50 rounded-xl border border-gray-200"
+                                >
+                                    <User className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+                                    <p className="text-sm text-gray-500">
+                                        Add personal information, work experience, or skills first to get AI-generated summary suggestions.
+                                    </p>
+                                </motion.div>
+                            )}
+                            
+                            {(personalInfo.firstName || workExperience.length > 0 || skills.length > 0) && isLoadingSuggestions && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                    className="flex items-center justify-center py-12 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200"
+                                >
+                                    <div className="text-center">
+                                        <motion.div
+                                            animate={{ rotate: 360 }}
+                                            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                                            className="w-8 h-8 border-3 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"
+                                        />
+                                        <p className="text-sm text-gray-600 font-medium">
+                                            AI is crafting personalized summary suggestions...
+                                        </p>
+                                    </div>
+                                </motion.div>
+                            )}
+                            
+                            {(personalInfo.firstName || workExperience.length > 0 || skills.length > 0) && aiSuggestions.length > 0 && !isLoadingSuggestions && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    className="space-y-3"
+                                >
+                                    {aiSuggestions.map((suggestion: string, index: number) => (
+                                        <motion.button
+                                            key={index}
+                                            initial={{ opacity: 0, x: -20 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            transition={{ delay: index * 0.1 }}
+                                            whileHover={{ scale: 1.02, y: -2 }}
+                                            whileTap={{ scale: 0.98 }}
+                                            onClick={() => useSummaryTemplate(suggestion)}
+                                            className="w-full text-left p-4 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-xl border border-gray-200 hover:border-blue-300 transition-all shadow-sm hover:shadow-md"
+                                        >
+                                            {suggestion}
+                                        </motion.button>
+                                    ))}
+                                </motion.div>
+                            )}
+                            
+                            {(personalInfo.firstName || workExperience.length > 0 || skills.length > 0) && aiSuggestions.length === 0 && !isLoadingSuggestions && (
+                                <motion.div
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    className="text-center py-8 bg-gray-50 rounded-xl border border-gray-200"
+                                >
+                                    <FileText className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+                                    <p className="text-sm text-gray-500">
+                                        No AI suggestions available. Write your summary manually or try regenerating.
+                                    </p>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </motion.div>
                 </div>
-            </div>
+            </motion.div>
 
             {/* Navigation Buttons */}
-            <div className="flex justify-between">
-                <button
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+                className="flex justify-between pt-6"
+            >
+                <motion.button
+                    whileHover={{ scale: 1.02, x: -5 }}
+                    whileTap={{ scale: 0.98 }}
                     onClick={onPrev}
-                    className="px-6 py-3 text-gray-600 hover:text-gray-800 font-medium"
+                    className="flex items-center space-x-2 px-6 py-3 text-gray-600 hover:text-gray-800 font-medium transition-colors"
                 >
-                    Previous
-                </button>
-                <button
-                    onClick={onNext}
-                    disabled={!isStepValid}
-                    className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                    <ChevronLeft className="w-4 h-4" />
+                    <span>Previous</span>
+                </motion.button>
+                <motion.button
+                    whileHover={{ scale: 1.02, x: 5 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={handleFinish}
+                    disabled={!isStepValid || isSaving}
+                    className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:from-blue-600 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium shadow-md transition-all"
                 >
-                    Next: Additional Information
-                </button>
-            </div>
-        </div>
+                    <span>{isSaving ? 'Saving & Redirecting...' : 'Finish & Preview Resume'}</span>
+                    <ChevronRight className="w-4 h-4" />
+                </motion.button>
+            </motion.div>
+        </motion.div>
     )
 }
 

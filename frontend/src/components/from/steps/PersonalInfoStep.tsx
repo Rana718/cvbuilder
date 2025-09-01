@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
-import { Plus, X, Globe, Linkedin, Github } from 'lucide-react'
+import { Plus, X, Globe, Linkedin, Github, User, ChevronRight } from 'lucide-react'
 import { useResumeStore } from '@/store/resumeStore'
 import { CV_TEMPLATES } from '@/constants/templates'
 import ImageUpload from '@/components/ImageUpload'
+import { motion, AnimatePresence } from 'framer-motion'
 
 interface PersonalInfoStepProps {
   onNext: () => void
@@ -37,12 +38,36 @@ function PersonalInfoStep({ onNext }: PersonalInfoStepProps) {
   const isFormValid = personalInfo.firstName && personalInfo.lastName && personalInfo.email && personalInfo.profession
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
-      <div className="text-center">
-        <h2 className="text-3xl font-bold text-gray-900">Personal Information</h2>
-      </div>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.3 }}
+      className="max-w-4xl mx-auto space-y-8"
+    >
+      {/* Header */}
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="text-center"
+      >
+        <div className="flex items-center justify-center mb-4">
+          <div className="p-3 bg-blue-100 rounded-full">
+            <User className="w-8 h-8 text-blue-600" />
+          </div>
+        </div>
+        <h2 className="text-3xl font-bold text-gray-900 mb-2">Personal Information</h2>
+        <p className="text-lg text-gray-600">Let's start with your basic details</p>
+        <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full mx-auto mt-4"></div>
+      </motion.div>
 
-      <div className="bg-white rounded-xl border border-gray-200 p-8 shadow-sm">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 0.2 }}
+        className="bg-gradient-to-br from-white to-blue-50 rounded-2xl border-2 border-blue-200 p-8 shadow-lg"
+      >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-semibold text-gray-800 mb-2">First Name *</label>
@@ -127,10 +152,17 @@ function PersonalInfoStep({ onNext }: PersonalInfoStepProps) {
             />
           </div>
         </div>
-      </div>
+      </motion.div>
 
-      {personalInfo.websites.length > 0 && (
-        <div className="bg-white rounded-xl border border-gray-200 p-8 shadow-sm">
+      <AnimatePresence>
+        {personalInfo.websites.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ delay: 0.3 }}
+            className="bg-white rounded-xl border border-gray-200 p-8 shadow-sm"
+          >
           <h3 className="text-xl font-bold text-gray-900 mb-6">Professional Links</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {personalInfo.websites.map((website) => (
@@ -141,17 +173,23 @@ function PersonalInfoStep({ onNext }: PersonalInfoStepProps) {
                 </div>
                 <button
                   onClick={() => removeWebsite(website.id)}
-                  className="text-red-500 hover:text-red-700 p-2 hover:bg-red-50 rounded-lg transition-all"
+                  className="text-blue-500 hover:text-blue-700 p-2 hover:bg-blue-50 rounded-lg transition-all"
                 >
                   <X className="w-4 h-4" />
                 </button>
               </div>
             ))}
           </div>
-        </div>
-      )}
+        </motion.div>
+        )}
+      </AnimatePresence>
 
-      <div className="bg-white rounded-xl border border-gray-200 p-8 shadow-sm">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4 }}
+        className="bg-white rounded-xl border border-gray-200 p-8 shadow-sm"
+      >
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-xl font-bold text-gray-900">Add Website</h3>
         </div>
@@ -226,18 +264,26 @@ function PersonalInfoStep({ onNext }: PersonalInfoStepProps) {
             </div>
           </div>
         )}
-      </div>
+      </motion.div>
 
-      <div className="flex justify-end pt-4">
-        <button
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4 }}
+        className="flex justify-end pt-6 border-t border-gray-200"
+      >
+        <motion.button
+          whileHover={{ scale: 1.02, x: 5 }}
+          whileTap={{ scale: 0.98 }}
           onClick={onNext}
           disabled={!isFormValid}
-          className="px-8 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 font-semibold shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+          className="flex items-center space-x-2 px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold shadow-lg hover:shadow-xl transition-all"
         >
-          Continue
-        </button>
-      </div>
-    </div>
+          <span>Continue</span>
+          <ChevronRight className="w-5 h-5" />
+        </motion.button>
+      </motion.div>
+    </motion.div>
   )
 }
 

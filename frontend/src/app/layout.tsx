@@ -16,6 +16,7 @@ import {
 } from "next/font/google";
 import "./globals.css";
 import AuthContext from "@/components/AuthContext";
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -103,6 +104,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${playfairDisplay.variable} ${sourceSans3.variable} ${poppins.variable} ${openSans.variable} ${jetbrainsMono.variable} ${roboto.variable} ${merriweather.variable} ${lato.variable} ${nunito.variable} ${nunitoSans.variable} antialiased`}
       >
         <AuthContext>{children}</AuthContext>
+        <Toaster/>
       </body>
     </html>
   );

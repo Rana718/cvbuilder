@@ -27,7 +27,7 @@ function ResumePage() {
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
 
     useEffect(() => {
-        if (status) return
+        if (status) return // Still loading auth
 
         if (!user) {
             router.push('/sign-in?callbackUrl=' + encodeURIComponent('/resusme'))
@@ -35,7 +35,7 @@ function ResumePage() {
         }
 
         fetchResumes()
-    }, [user, status])
+    }, [user, status, router])
 
     const fetchResumes = async () => {
         try {
@@ -79,14 +79,23 @@ function ResumePage() {
         resume.job_title?.toLowerCase().includes(searchTerm.toLowerCase())
     )
 
-    if (!status || loading) {
+    // Show loading while auth is loading or resumes are loading
+    if (status || (user && loading)) {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <div className="text-center">
-                    <p className="mt-6 text-gray-700 font-medium">Loading your resumes...</p>
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                    <p className="mt-6 text-gray-700 font-medium">
+                        {status ? 'Checking authentication...' : 'Loading your resumes...'}
+                    </p>
                 </div>
             </div>
         )
+    }
+
+    // If auth is done and no user, redirect will happen in useEffect
+    if (!status && !user) {
+        return null
     }
 
     return (

@@ -21,88 +21,130 @@ export default function TemplatesPage() {
     });
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-white">
             <Navbar />
 
-            <div className="container mx-auto px-4 py-8">
-                <div className="text-center mb-8">
-                    <h1 className="text-4xl font-bold text-gray-900 mb-4">Choose Your Template</h1>
-                    <p className="text-xl text-gray-600">Professional templates designed to get you hired</p>
+            <div className="container mx-auto px-4 py-6">
+                {/* Simple Header */}
+                <div className="mb-8">
+                    <h1 className="text-2xl font-semibold text-gray-900 mb-1">Templates</h1>
+                    <p className="text-gray-600">Choose a professional template for your resume</p>
                 </div>
 
-                <div className="flex flex-col lg:flex-row gap-4 items-center justify-between mb-8">
-                    <div className="relative w-full max-w-md">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                {/* Search and Filter Section */}
+                <div className="mb-8">
+                    {/* Search Bar */}
+                    <div className="relative mb-4">
+                        <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                         <input
                             type="text"
                             placeholder="Search templates..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                            className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
                         />
                     </div>
 
-                    <div className="flex flex-wrap gap-2">
-                        <button
-                            onClick={() => setSelectedCategory("All")}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${"All" === selectedCategory
-                                    ? "bg-blue-600 text-white"
-                                    : "bg-white text-gray-600 hover:bg-blue-50"
-                                }`}
-                        >
-                            All
-                        </button>
-                        {TEMPLATE_CATEGORIES.map((category) => (
+                    {/* Category Filter - Horizontal Scrollable */}
+                    <div className="overflow-x-auto scrollbar-hide">
+                        <div className="flex space-x-3 pb-2 min-w-max">
                             <button
-                                key={category}
-                                onClick={() => setSelectedCategory(category)}
-                                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${selectedCategory === category
+                                onClick={() => setSelectedCategory("All")}
+                                className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
+                                    "All" === selectedCategory
                                         ? "bg-blue-600 text-white"
-                                        : "bg-white text-gray-600 hover:bg-blue-50"
-                                    }`}
+                                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                }`}
                             >
-                                {category}
+                                All Templates
                             </button>
-                        ))}
+                            {TEMPLATE_CATEGORIES.map((category) => (
+                                <button
+                                    key={category}
+                                    onClick={() => setSelectedCategory(category)}
+                                    className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
+                                        selectedCategory === category
+                                            ? "bg-blue-600 text-white"
+                                            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                    }`}
+                                >
+                                    {category}
+                                </button>
+                            ))}
+                        </div>
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                {/* Templates Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     {filteredTemplates.map((template, i) => (
                         <TemplateSelector key={template.id} templateId={template.id.toString()}>
                             <motion.div
-                                initial={{ y: 30, opacity: 0 }}
-                                animate={{ y: 0, opacity: 1 }}
-                                transition={{ duration: 0.4, delay: i * 0.05 }}
-                                className="group cursor-pointer hover:scale-105 transition-transform duration-300"
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.3, delay: i * 0.05 }}
+                                className="group cursor-pointer"
                             >
-                                <div className="relative">
-                                    <TemplatePreview templateId={template.id} scale={1} />
-                                    {template.isPremium && (
-                                        <div className="absolute top-3 right-3 bg-yellow-500 text-white rounded-full px-2 py-1 text-xs font-medium flex items-center space-x-1">
-                                            <Crown className="h-3 w-3" />
-                                            <span>Pro</span>
-                                        </div>
-                                    )}
+                                <div className="relative bg-white border border-gray-200 rounded-lg overflow-hidden hover:border-blue-300 hover:shadow-lg transition-all duration-200">
+                                    {/* Template Preview */}
+                                    <div className="relative">
+                                        <TemplatePreview templateId={template.id} scale={1} />
+                                        
+                                        {/* Premium Badge */}
+                                        {template.isPremium && (
+                                            <div className="absolute top-3 right-3 bg-amber-500 text-white rounded-md px-2 py-1 text-xs font-medium flex items-center space-x-1">
+                                                <Crown className="h-3 w-3" />
+                                                <span>PRO</span>
+                                            </div>
+                                        )}
+                                    </div>
+
                                 </div>
-                                <div className="mt-4 text-center">
-                                    <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors text-lg">
+
+                                {/* Template Info - Outside card */}
+                                <div className="text-center mt-3">
+                                    <h3 className="font-medium text-gray-900 text-base mb-1 group-hover:text-blue-600 transition-colors">
                                         {template.name}
                                     </h3>
-                                    <p className="text-sm text-blue-600 font-medium mt-1">{template.category}</p>
+                                    <span className="text-sm text-gray-500">
+                                        {template.category}
+                                    </span>
                                 </div>
                             </motion.div>
                         </TemplateSelector>
                     ))}
                 </div>
 
+                {/* Empty State */}
                 {filteredTemplates.length === 0 && (
-                    <div className="text-center py-16">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">No templates found</h3>
-                        <p className="text-gray-500">Try adjusting your search or filter criteria</p>
+                    <div className="text-center py-12">
+                        <div className="text-gray-400 mb-4">
+                            <Search className="h-12 w-12 mx-auto" />
+                        </div>
+                        <h3 className="text-lg font-medium text-gray-900 mb-2">No templates found</h3>
+                        <p className="text-gray-500 mb-4">Try adjusting your search or filter</p>
+                        <button 
+                            onClick={() => {
+                                setSearchTerm("");
+                                setSelectedCategory("All");
+                            }}
+                            className="text-blue-600 hover:text-blue-700 font-medium"
+                        >
+                            Clear filters
+                        </button>
                     </div>
                 )}
             </div>
+
+            <style jsx global>{`
+                .scrollbar-hide {
+                    -ms-overflow-style: none;
+                    scrollbar-width: none;
+                }
+                .scrollbar-hide::-webkit-scrollbar {
+                    display: none;
+                }
+            `}</style>
         </div>
     );
 }

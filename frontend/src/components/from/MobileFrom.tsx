@@ -6,13 +6,13 @@ import WorkExperienceStep from './steps/WorkExperienceStep'
 import EducationStep from './steps/EducationStep'
 import SkillsStep from './steps/SkillsStep'
 import SummaryStep from './steps/SummaryStep'
-import AdditionalInfoStep from './steps/AdditionalInfoStep'
+// import AdditionalInfoStep from './steps/AdditionalInfoStep'
 
 function MobileFrom() {
     const { currentStep, setCurrentStep } = useStepNavigation()
 
     const nextStep = () => {
-        if (currentStep < 6) {
+        if (currentStep < 5) {  // Changed from 6 to 5
             setCurrentStep(currentStep + 1)
         }
     }
@@ -35,8 +35,8 @@ function MobileFrom() {
                 return <SkillsStep onNext={nextStep} onPrev={prevStep} />
             case 5:
                 return <SummaryStep onNext={nextStep} onPrev={prevStep} />
-            case 6:
-                return <AdditionalInfoStep onPrev={prevStep} />
+            // case 6:
+            //     return <AdditionalInfoStep onPrev={prevStep} />
             default:
                 return <PersonalInfoStep onNext={nextStep} />
         }
@@ -45,7 +45,7 @@ function MobileFrom() {
     return (
         <div className="min-h-screen bg-gray-50">
             {/* Step Indicator */}
-            <StepIndicator currentStep={currentStep} totalSteps={6} />
+            <StepIndicator currentStep={currentStep} totalSteps={5} />
 
             {/* Main Content */}
             <div className="p-4">

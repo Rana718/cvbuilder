@@ -7,13 +7,13 @@ import WorkExperienceStep from './steps/WorkExperienceStep'
 import EducationStep from './steps/EducationStep'
 import SkillsStep from './steps/SkillsStep'
 import SummaryStep from './steps/SummaryStep'
-import AdditionalInfoStep from './steps/AdditionalInfoStep'
+// import AdditionalInfoStep from './steps/AdditionalInfoStep'
 
 function DesktopFrom() {
     const { currentStep, setCurrentStep } = useStepNavigation()
 
     const nextStep = () => {
-        if (currentStep < 6) {
+        if (currentStep < 5) {  // Changed from 6 to 5
             setCurrentStep(currentStep + 1)
         }
     }
@@ -36,8 +36,8 @@ function DesktopFrom() {
                 return <SkillsStep onNext={nextStep} onPrev={prevStep} />
             case 5:
                 return <SummaryStep onNext={nextStep} onPrev={prevStep} />
-            case 6:
-                return <AdditionalInfoStep onPrev={prevStep} />
+            // case 6:
+            //     return <AdditionalInfoStep onPrev={prevStep} />
             default:
                 return <PersonalInfoStep onNext={nextStep} />
         }
@@ -58,10 +58,10 @@ function DesktopFrom() {
                 </div>
 
                 {/* Right Preview Section */}
-                <div className="w-80 p-4 border-l border-gray-200 bg-white">
-                    <div className="sticky top-4">
+                <div className="w-96 p-6 border-l border-gray-200 bg-white">
+                    <div className="sticky top-6">
                         <h3 className="text-lg font-semibold text-gray-900 mb-4">Live Preview</h3>
-                        <div className="w-full">
+                        <div className="transform scale-75 origin-top-left" style={{ width: '133%', height: '800px', overflow: 'hidden' }}>
                             <ResumePreview mode="live" />
                         </div>
                     </div>

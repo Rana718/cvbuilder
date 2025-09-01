@@ -6,9 +6,11 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/components/AuthContext";
 import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
   const { user } = useAuth();
+  const router = useRouter();
   useEffect(() => {
     console.log("Current user:", user);
   }, [user])
@@ -66,7 +68,10 @@ export default function Home() {
                 transition={{ duration: 0.8, delay: 0.7 }}
                 className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-10"
               >
-                <button className="group bg-[#ffc05a] text-black px-8 py-4 rounded-xl text-lg font-semibold flex items-center justify-center space-x-2 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                <button 
+                  className="group bg-[#ffc05a] text-black px-8 py-4 rounded-xl text-lg font-semibold flex items-center justify-center space-x-2 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                  onClick={()=> router.push("/template")}  
+                >
                   <span>Create my resume</span>
                   <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </button>

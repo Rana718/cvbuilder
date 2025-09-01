@@ -12,8 +12,7 @@ const steps = [
   { id: 2, title: 'Work Experience', icon: Briefcase },
   { id: 3, title: 'Education', icon: GraduationCap },
   { id: 4, title: 'Skills', icon: Award },
-  { id: 5, title: 'Summary', icon: FileText },
-  { id: 6, title: 'Additional Information', icon: Plus }
+  { id: 5, title: 'Summary', icon: FileText }
 ]
 
 function DesktopSidebar({ currentStep, onStepChange }: DesktopSidebarProps) {
