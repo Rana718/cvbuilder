@@ -1,162 +1,94 @@
 from typing import Dict, Any, Optional
-from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 from sqlalchemy import select, or_
 from db.scheme import User
-from utils.jwtgen import create_access_token, create_refresh_token, decode_refresh_token
+from config.firebase import set_custom_user_claims
 from db.db import get_db
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+from models.auth_models import AddUserProfileRequest
 
 class AuthController:
     
     @staticmethod
-    def hash_password(password: str) -> str:
-        return pwd_context.hash(password)
-    
-    @staticmethod
-    def verify_password(plain_password: str, hashed_password: str) -> bool:
-        return pwd_context.verify(plain_password, hashed_password)
-    
-    @staticmethod
-    def _generate_tokens(user_id: int, email: str) -> Dict[str, str]:
-        return {
-            "access_token": create_access_token(user_id, email),
-            "refresh_token": create_refresh_token(user_id, email),
-        }
-    
-    @staticmethod
-    def _user_response(user: User) -> Dict[str, Any]:
-        return {
-            "id": user.id,
-            "email": user.email,
-            "full_name": user.full_name
-        }
-    
-    @staticmethod
-    async def _get_user_by_email(db: Session, email: str) -> Optional[User]:
-        result = await db.execute(select(User).where(User.email == email))
-        return result.scalar_one_or_none()
-    
-    @staticmethod
-    async def signup(email: str, password: str, full_name: str = "") -> Dict[str, Any]:
+    async def AdduserDb(userdata: AddUserProfileRequest) -> Dict[str, Any]:
         try:
             async for db in get_db():
-                existing_user = await AuthController._get_user_by_email(db, email)
-                if existing_user:
-                    return {"success": False, "error": "User already exists"}
-                
-                user = User(
-                    email=email,
-                    password_hash=AuthController.hash_password(password),
-                    full_name=full_name or email.split('@')[0]
-                )
-                
-                db.add(user)
-                await db.commit()
-                await db.refresh(user)
-                
-                tokens = AuthController._generate_tokens(user.id, user.email)
-                
-                return {
-                    "success": True,
-                    "response": {
-                        **tokens,
-                        "user": AuthController._user_response(user)
-                    }
-                }
-                
-        except Exception as e:
-            return {"success": False, "error": str(e)}
-    
-    @staticmethod
-    async def signin(email: str, password: str) -> Dict[str, Any]:
-        try:
-            async for db in get_db():
-                user = await AuthController._get_user_by_email(db, email)
-                
-                if not user or not user.password_hash or not AuthController.verify_password(password, user.password_hash):
-                    return {"success": False, "error": "Invalid credentials"}
-                
-                tokens = AuthController._generate_tokens(user.id, user.email)
-                
-                return {
-                    "success": True,
-                    "response": {
-                        **tokens,
-                        "user": AuthController._user_response(user)
-                    }
-                }
-                
-        except Exception as e:
-            return {"success": False, "error": str(e)}
-    
-    @staticmethod
-    async def google_auth(google_id: str, email: str, full_name: str = "") -> Dict[str, Any]:
-        try:
-            async for db in get_db():
+                # Check if user already exists
                 result = await db.execute(
-                    select(User).where(or_(User.email == email, User.google_id == google_id))
-                )
-                user = result.scalar_one_or_none()
-                
-                if user:
-                    if not user.google_id:
-                        user.google_id = google_id
-                        await db.commit()
-                else:
-                    user = User(
-                        email=email,
-                        google_id=google_id,
-                        full_name=full_name or email.split('@')[0]
+                    select(User).where(
+                        or_(
+                            User.email == userdata.email,
+                            User.firebase_uid == userdata.firebase_uid
+                        )
                     )
-                    db.add(user)
-                    await db.commit()
-                    await db.refresh(user)
+                )
+                existing_user = result.scalar_one_or_none()
                 
-                tokens = AuthController._generate_tokens(user.id, user.email)
+                if existing_user:
+                    # Update existing user with new info if needed
+                    updated = False
+                    if existing_user.firebase_uid != userdata.firebase_uid:
+                        existing_user.firebase_uid = userdata.firebase_uid
+                        updated = True
+                    if not existing_user.image_url and userdata.image_url:
+                        existing_user.image_url = userdata.image_url
+                        updated = True
+                    if not existing_user.full_name and userdata.full_name:
+                        existing_user.full_name = userdata.full_name
+                        updated = True
+                    if not existing_user.google_id and userdata.google_id:
+                        existing_user.google_id = userdata.google_id
+                        updated = True
+                    
+                    if updated:
+                        await db.commit()
+                        await db.refresh(existing_user)
+                    
+                    # Set custom claims with the correct UID
+                    set_custom_user_claims(userdata.firebase_uid, {"dbUser": "true"})
+                    
+                    return {"success": True, "user": {
+                        "id": existing_user.id,
+                        "email": existing_user.email,
+                        "full_name": existing_user.full_name,
+                        "firebase_uid": existing_user.firebase_uid,
+                        "image_url": existing_user.image_url,
+                        "dbUser": "true"
+                    }}
                 
-                return {
-                    "success": True,
-                    "response": {
-                        **tokens,
-                        "user": AuthController._user_response(user)
-                    }
-                }
+                # Create new user
+                new_user = User(
+                    email=userdata.email,
+                    full_name=userdata.full_name or userdata.email.split('@')[0],
+                    firebase_uid=userdata.firebase_uid,
+                    google_id=userdata.google_id,
+                    image_url=userdata.image_url
+                )
+                db.add(new_user)
+                await db.commit()
+                await db.refresh(new_user)
+
+                # Set custom claims
+                set_custom_user_claims(new_user.firebase_uid, {"dbUser": "true"})
                 
+                return {"success": True, "user": {
+                    "id": new_user.id,
+                    "email": new_user.email,
+                    "full_name": new_user.full_name,
+                    "firebase_uid": new_user.firebase_uid,
+                    "image_url": new_user.image_url,
+                    "dbUser": "true"
+                }}
+
         except Exception as e:
-            return {"success": False, "error": str(e)}
+            print(f"Error in AdduserDb: {e}")
+            return {"success": False, "error": f"Database error: {str(e)}"}
+       
     
     @staticmethod
-    async def refresh_access_token(refresh_token: str) -> Dict[str, Any]:
+    async def get_user_profile(firebase_uid: str, db: Session) -> Dict[str, Any]:
+        """Get user profile by Firebase UID"""
         try:
-            payload = decode_refresh_token(refresh_token)
-            if not payload:
-                return {"success": False, "error": "Invalid refresh token"}
-            
-            user_id = int(payload.get("sub"))
-            
-            async for db in get_db():
-                result = await db.execute(select(User).where(User.id == user_id))
-                user = result.scalar_one_or_none()
-                
-                if not user:
-                    return {"success": False, "error": "User not found"}
-                
-                return {
-                    "success": True,
-                    "access_token": create_access_token(user.id, user.email),
-                    "token_type": "bearer"
-                }
-                
-        except Exception as e:
-            return {"success": False, "error": "Invalid refresh token"}
-    
-    @staticmethod
-    async def get_user_profile(user_id: int, db: Session) -> Dict[str, Any]:
-        """Get user profile by ID"""
-        try:
-            result = await db.execute(select(User).where(User.id == user_id))
+            result = await db.execute(select(User).where(User.firebase_uid == firebase_uid))
             user = result.scalar_one_or_none()
             
             if not user:
@@ -164,7 +96,12 @@ class AuthController:
             
             return {
                 "success": True,
-                "user": AuthController._user_response(user)
+                "user": {
+                    "id": user.id,
+                    "email": user.email,
+                    "full_name": user.full_name,
+                    "firebase_uid": user.firebase_uid
+                }
             }
             
         except Exception as e:

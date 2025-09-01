@@ -9,8 +9,21 @@ from typing import List, Dict
 class ResumeController:
     
     @staticmethod
-    async def _get_resume_by_id_and_user(resume_id: int, user_id: int, db: AsyncSession) -> Resume:
-        query = select(Resume).where(Resume.id == resume_id, Resume.user_id == user_id)
+    async def _get_user_by_firebase_uid(firebase_uid: str, db: AsyncSession) -> User:
+        result = await db.execute(select(User).where(User.firebase_uid == firebase_uid))
+        user = result.scalar_one_or_none()
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found. Please complete registration."
+            )
+        return user
+    
+    @staticmethod
+    async def _get_resume_by_id_and_firebase_uid(resume_id: int, firebase_uid: str, db: AsyncSession) -> Resume:
+        user = await ResumeController._get_user_by_firebase_uid(firebase_uid, db)
+        
+        query = select(Resume).where(Resume.id == resume_id, Resume.user_id == user.id)
         result = await db.execute(query)
         resume = result.scalar_one_or_none()
         
@@ -22,15 +35,6 @@ class ResumeController:
         return resume
     
     @staticmethod
-    async def _check_user_exists(user_id: int, db: AsyncSession) -> None:
-        result = await db.execute(select(User).where(User.id == user_id))
-        if not result.scalar_one_or_none():
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="User not found"
-            )
-    
-    @staticmethod
     def _create_resume_from_data(resume_data: ResumeCreate, user_id: int) -> Resume:
         return Resume(
             user_id=user_id,
@@ -38,11 +42,11 @@ class ResumeController:
         )
     
     @staticmethod
-    async def create_resume(resume_data: ResumeCreate, user_id: int, db: AsyncSession) -> ResumeResponse:
+    async def create_resume(resume_data: ResumeCreate, firebase_uid: str, db: AsyncSession) -> ResumeResponse:
         try:
-            await ResumeController._check_user_exists(user_id, db)
+            user = await ResumeController._get_user_by_firebase_uid(firebase_uid, db)
             
-            new_resume = ResumeController._create_resume_from_data(resume_data, user_id)
+            new_resume = ResumeController._create_resume_from_data(resume_data, user.id)
             db.add(new_resume)
             await db.commit()
             await db.refresh(new_resume)
@@ -59,14 +63,18 @@ class ResumeController:
             )
     
     @staticmethod
-    async def get_user_resumes(user_id: int, db: AsyncSession) -> List[ResumeResponse]:
+    async def get_user_resumes(firebase_uid: str, db: AsyncSession) -> List[ResumeResponse]:
         try:
-            query = select(Resume).where(Resume.user_id == user_id).order_by(Resume.created_at.desc())
+            user = await ResumeController._get_user_by_firebase_uid(firebase_uid, db)
+            
+            query = select(Resume).where(Resume.user_id == user.id).order_by(Resume.created_at.desc())
             result = await db.execute(query)
             resumes = result.scalars().all()
             
             return [ResumeResponse.from_orm(resume) for resume in resumes]
             
+        except HTTPException:
+            raise
         except Exception as e:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -74,9 +82,9 @@ class ResumeController:
             )
     
     @staticmethod
-    async def get_resume_by_id(resume_id: int, user_id: int, db: AsyncSession) -> ResumeResponse:
+    async def get_resume_by_id(resume_id: int, firebase_uid: str, db: AsyncSession) -> ResumeResponse:
         try:
-            resume = await ResumeController._get_resume_by_id_and_user(resume_id, user_id, db)
+            resume = await ResumeController._get_resume_by_id_and_firebase_uid(resume_id, firebase_uid, db)
             return ResumeResponse.from_orm(resume)
             
         except HTTPException:
@@ -88,9 +96,9 @@ class ResumeController:
             )
     
     @staticmethod
-    async def update_resume(resume_id: int, resume_data: ResumeUpdate, user_id: int, db: AsyncSession) -> ResumeResponse:
+    async def update_resume(resume_id: int, resume_data: ResumeUpdate, firebase_uid: str, db: AsyncSession) -> ResumeResponse:
         try:
-            resume = await ResumeController._get_resume_by_id_and_user(resume_id, user_id, db)
+            resume = await ResumeController._get_resume_by_id_and_firebase_uid(resume_id, firebase_uid, db)
             
             update_data = resume_data.dict(exclude_unset=True)
             for field, value in update_data.items():
@@ -111,9 +119,9 @@ class ResumeController:
             )
     
     @staticmethod
-    async def delete_resume(resume_id: int, user_id: int, db: AsyncSession) -> Dict[str, str]:
+    async def delete_resume(resume_id: int, firebase_uid: str, db: AsyncSession) -> Dict[str, str]:
         try:
-            resume = await ResumeController._get_resume_by_id_and_user(resume_id, user_id, db)
+            resume = await ResumeController._get_resume_by_id_and_firebase_uid(resume_id, firebase_uid, db)
             
             await db.delete(resume)
             await db.commit()

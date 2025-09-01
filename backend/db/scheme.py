@@ -12,8 +12,8 @@ class User(Base):
 
     # Authentication
     email = Column(String(255), unique=True, index=True, nullable=False)
-    password_hash = Column(String(255))  
     google_id = Column(String(255))
+    firebase_uid = Column(String(255), unique=True, index=True)  
     image_url = Column(String(500))
     
     # Profile Info
@@ -53,7 +53,7 @@ class Resume(Base):
     certifications = Column(JSON)
     projects = Column(JSON)
     languages = Column(JSON)
-
+    
     # Social Links
     linkedin_url = Column(String(500))
     github_url = Column(String(500))

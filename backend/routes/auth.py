@@ -2,78 +2,27 @@ from fastapi import APIRouter, HTTPException, Depends, status, Request
 from sqlalchemy.orm import Session
 from db.db import get_db
 from controller.authcontroller import AuthController
-from models.auth_models import SignupRequest, SigninRequest, GoogleAuthRequest,RefreshTokenRequest,AuthResponse,RefreshTokenResponse 
+from models.auth_models import AddUserProfileRequest
 
 router = APIRouter()
 
-@router.post("/signup", response_model=AuthResponse)
-async def signup(request: SignupRequest):
-    result = await AuthController.signup(
-        email=request.email,
-        password=request.password,
-        full_name=request.full_name
-    )
+@router.post("/add-user")
+async def firebase_auth(request: AddUserProfileRequest):
+    result = await AuthController.AdduserDb(request)
     
     if not result["success"]:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=result["error"]
         )
     
-    return result["response"]
-
-@router.post("/login", response_model=AuthResponse)
-async def signin(request: SigninRequest):
-    result = await AuthController.signin(
-        email=request.email,
-        password=request.password
-    )
-    
-    if not result["success"]:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=result["error"]
-        )
-    
-    return result["response"]
-
-@router.post("/google", response_model=AuthResponse)
-async def google_auth(request: GoogleAuthRequest):
-    result = await AuthController.google_auth(
-        google_id=request.google_id,
-        email=request.email,
-        full_name=request.full_name
-    )
-    
-    if not result["success"]:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=result["error"]
-        )
-    
-    return result["response"]
-
-@router.post("/refresh", response_model=RefreshTokenResponse)
-async def refresh_token(request: RefreshTokenRequest):
-    """Generate new access token using refresh token"""
-    result = await AuthController.refresh_access_token(request.refresh_token)
-    
-    if not result["success"]:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=result["error"]
-        )
-    
-    return RefreshTokenResponse(
-        access_token=result["access_token"],
-        token_type=result["token_type"]
-    )
+    return result["user"]
 
 @router.get("/profile")
 async def get_profile(request: Request, db: Session = Depends(get_db)):
     """Get current user profile"""
-    user_id = request.state.user_id
-    result = await AuthController.get_user_profile(user_id, db)
+    firebase_uid = request.state.user_id  
+    result = await AuthController.get_user_profile(firebase_uid, db)
     
     if not result["success"]:
         raise HTTPException(
@@ -82,4 +31,3 @@ async def get_profile(request: Request, db: Session = Depends(get_db)):
         )
     
     return result["user"]
-

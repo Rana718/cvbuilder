@@ -1,12 +1,7 @@
 from fastapi import Request, status
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
-import jwt
-import os
-
-JWT_SECRET = os.getenv("JWT_SECRET", "top-secret")
-JWT_ALGORITHM = "HS256"
-
+from config.firebase import verify_firebase_token
 
 class JWTAuthMiddleware(BaseHTTPMiddleware):
     def __init__(self, app):
@@ -28,21 +23,16 @@ class JWTAuthMiddleware(BaseHTTPMiddleware):
             )
 
         token = auth_header.split(" ")[1]
-
-        try:
-            payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
-            request.state.user_id = int(payload.get("sub"))  # JWT uses "sub" for user_id
-            request.state.user_email = payload.get("email")
-
-        except jwt.ExpiredSignatureError:
-            return JSONResponse(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                content={"detail": "Token expired"}
-            )
-        except jwt.InvalidTokenError:
+        decoded_token = verify_firebase_token(token)
+        
+        if not decoded_token:
             return JSONResponse(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 content={"detail": "Invalid token"}
             )
+
+        # Keep same request state structure as before
+        request.state.user_id = decoded_token.get("uid")  
+        request.state.user_email = decoded_token.get("email")
 
         return await call_next(request)
