@@ -159,7 +159,7 @@ function SkillsStep({ onNext, onPrev }: SkillsStepProps) {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.1 * index }}
-                className="group relative overflow-hidden border border-gray-200 rounded-xl p-6 bg-white hover:shadow-lg transition-all duration-300 hover:border-blue-300"
+                className="group relative overflow-hidden border border-gray-200 rounded-xl p-4 md:p-6 bg-white hover:shadow-lg transition-all duration-300 hover:border-blue-300"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-50 to-indigo-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 <div className="relative">
@@ -238,7 +238,7 @@ function SkillsStep({ onNext, onPrev }: SkillsStepProps) {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: -20 }}
             transition={{ duration: 0.3 }}
-            className="border-2 border-blue-200 rounded-2xl p-8 bg-gradient-to-br from-white to-blue-50 shadow-lg"
+            className="border-2 border-blue-200 rounded-2xl p-4 md:p-8 bg-gradient-to-br from-white to-blue-50 shadow-lg"
           >
             <h4 className="text-xl font-bold text-gray-900 mb-6">
               {editingId ? 'Edit Skill' : 'Add Skill'}
@@ -373,7 +373,7 @@ function SkillsStep({ onNext, onPrev }: SkillsStepProps) {
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3"
+                className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-3"
               >
                 {aiSuggestedSkills.map((skillName: string, index: number) => {
                   const isAdded = skills.find(s => s.name.toLowerCase() === skillName.toLowerCase())
@@ -387,7 +387,7 @@ function SkillsStep({ onNext, onPrev }: SkillsStepProps) {
                       whileTap={{ scale: isAdded ? 1 : 0.95 }}
                       onClick={() => addSuggestedSkill(skillName)}
                       disabled={!!isAdded}
-                      className={`text-left p-4 text-sm rounded-xl border-2 transition-all duration-200 font-medium ${
+                      className={`text-left p-3 md:p-4 text-xs md:text-sm rounded-xl border-2 transition-all duration-200 font-medium ${
                         isAdded
                           ? 'bg-green-100 text-green-700 border-green-300 cursor-not-allowed'
                           : 'bg-white text-gray-700 hover:bg-blue-50 hover:text-blue-700 border-gray-200 hover:border-blue-300 shadow-sm hover:shadow-md'
@@ -424,7 +424,7 @@ function SkillsStep({ onNext, onPrev }: SkillsStepProps) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-xl border border-blue-200 shadow-lg"
+            className="bg-gradient-to-br from-blue-50 to-indigo-50 p-4 md:p-6 rounded-xl border border-blue-200 shadow-lg"
           >
             <div className="space-y-6">
               <div className="flex items-center justify-between">
@@ -449,7 +449,7 @@ function SkillsStep({ onNext, onPrev }: SkillsStepProps) {
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-sm"
+                  className="w-full p-2 md:p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-sm text-sm md:text-base"
                   placeholder="e.g., JavaScript, Project Management"
                 />
               </div>

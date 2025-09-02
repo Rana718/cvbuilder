@@ -172,7 +172,7 @@ export default function EducationStep({ onNext, onPrev }: EducationStepProps) {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.1 * index }}
-                className="group relative overflow-hidden border border-gray-200 rounded-xl p-6 bg-white hover:shadow-lg transition-all duration-300 hover:border-blue-300"
+                className="group relative overflow-hidden border border-gray-200 rounded-xl p-4 md:p-6 bg-white hover:shadow-lg transition-all duration-300 hover:border-blue-300"
               >
                 <div className="absolute inset-0 bg-blue-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 <div className="relative">
@@ -193,17 +193,17 @@ export default function EducationStep({ onNext, onPrev }: EducationStepProps) {
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={() => handleEdit(edu)}
-                        className="p-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
+                        className="p-1.5 md:p-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
                       >
-                        <Edit className="w-4 h-4" />
+                        <Edit className="w-3 h-3 md:w-4 md:h-4" />
                       </motion.button>
                       <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={() => removeEducation(edu.id)}
-                        className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
+                        className="p-1.5 md:p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
                       >
-                        <Trash className="w-4 h-4" />
+                        <Trash className="w-3 h-3 md:w-4 md:h-4" />
                       </motion.button>
                     </div>
                   </div>
@@ -240,13 +240,13 @@ export default function EducationStep({ onNext, onPrev }: EducationStepProps) {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: -20 }}
             transition={{ duration: 0.3 }}
-            className="border-2 border-blue-200 rounded-2xl p-8 bg-white shadow-lg"
+            className="border-2 border-blue-200 rounded-2xl p-4 md:p-8 bg-white shadow-lg"
           >
             <h4 className="text-xl font-bold text-gray-900 mb-6">
               {editingId ? "Edit Education" : "Add Education"}
             </h4>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
               <div className="md:col-span-2">
                 <label className="block text-sm font-semibold text-gray-700 mb-2">School Name *</label>
                 <input

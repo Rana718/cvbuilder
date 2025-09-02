@@ -40,13 +40,14 @@ function TemplatePage() {
 
     return (
         <>
-            <Navbar/>
+            {/* Desktop Version */}
             <div className="hidden lg:block">
                 <DesktopFrom />
             </div>
 
             {/* Mobile Version */}
             <div className="lg:hidden">
+                <Navbar/>
                 <MobileFrom />
             </div>
         </>

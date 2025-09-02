@@ -1,6 +1,7 @@
 import React from 'react'
 import { useStepNavigation } from '@/hooks/useStepNavigation'
 import DesktopSidebar from '@/components/ui/DesktopSidebar'
+import StepIndicator from '@/components/ui/StepIndicator'
 import ResumePreview from '@/components/ui/ResumePreview'
 import PersonalInfoStep from './steps/PersonalInfoStep'
 import WorkExperienceStep from './steps/WorkExperienceStep'
@@ -47,25 +48,39 @@ function DesktopFrom() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 flex">
-            {/* Left Sidebar */}
-            <DesktopSidebar currentStep={currentStep} onStepChange={setCurrentStep} />
-            
-            {/* Main Content */}
-            <div className="flex-1 flex">
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+            {/* Mobile Step Indicator - shown on small/medium screens */}
+            <div className="lg:hidden">
+                <StepIndicator currentStep={currentStep} totalSteps={6} />
+            </div>
+
+            {/* Left Sidebar - Hidden on mobile */}
+            <div className="hidden lg:block">
+                <DesktopSidebar currentStep={currentStep} onStepChange={setCurrentStep} />
+            </div>
+
+            {/* Main Content - responsive layout */}
+            <div className="lg:ml-16 flex flex-col lg:flex-row min-h-screen">
                 {/* Form Section */}
-                <div className="flex-1 max-w-4xl mx-auto p-8">
-                    <div className="bg-white rounded-lg shadow-sm p-8">
-                        {renderCurrentStep()}
+                <div className="flex-1 p-3 md:p-6">
+                    <div className="max-w-4xl mx-auto">
+                        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+                            <div className="p-4 md:p-8">
+                                {renderCurrentStep()}
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                {/* Right Preview Section */}
-                <div className="w-96 p-6 border-l border-gray-200 bg-white">
-                    <div className="sticky top-6">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Live Preview</h3>
-                        <div className="transform scale-75 origin-top-left" style={{ width: '133%', height: '800px', overflow: 'hidden' }}>
-                            <ResumePreview mode="live" />
+                {/* Right Preview Section - Hidden on mobile/tablet, shown on large screens */}
+                <div className="hidden xl:block w-96 border-l">
+                    <div className="sticky top-0 h-screen flex flex-col">
+                        <div className="flex-1 p-6 overflow-hidden">
+                            <div className="scale-75 origin-top h-full overflow-hidden">
+                                <div className="h-full">
+                                    <ResumePreview mode="live" />
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

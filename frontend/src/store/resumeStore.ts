@@ -24,6 +24,7 @@ export interface WorkExperience {
     id: string
     jobTitle: string
     employer: string
+    role?: string
     location: string
     isRemote: boolean
     startDate: string
