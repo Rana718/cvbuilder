@@ -11,8 +11,8 @@ const stepLabels = [
   'Experience', 
   'Education',
   'Skills',
-  'Summary',
-  'Additional Info'
+  'Projects',
+  'Summary'
 ]
 
 function StepIndicator({ currentStep, totalSteps }: StepIndicatorProps) {

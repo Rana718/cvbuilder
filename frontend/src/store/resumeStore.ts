@@ -47,6 +47,14 @@ export interface Skill {
     rating: number // 1-5 stars
 }
 
+export interface Project {
+    id: string
+    name: string
+    description: string
+    url?: string
+    github_url?: string
+}
+
 export interface AdditionalSection {
     id: string
     type: 'personalDetails' | 'websites' | 'certifications' | 'languages' | 'software' | 'accomplishments' | 'additionalInfo' | 'affiliations' | 'interests' | 'hobbies' | 'custom'
@@ -62,6 +70,7 @@ export interface ResumeState {
     workExperience: WorkExperience[]
     education: Education[]
     skills: Skill[]
+    projects: Project[]
     summary: string
     additionalSections: AdditionalSection[]
 }
@@ -103,6 +112,11 @@ interface ResumeStore extends ResumeState {
     updateEducation: (id: string, education: Partial<Education>) => void
     removeEducation: (id: string) => void
 
+    // Projects
+    addProject: (project: Omit<Project, 'id'>) => void
+    updateProject: (id: string, project: Partial<Project>) => void
+    removeProject: (id: string) => void
+
     // Skills
     addSkill: (skill: Omit<Skill, 'id'>) => void
     updateSkill: (id: string, skill: Partial<Skill>) => void
@@ -142,6 +156,7 @@ const initialState: ResumeState = {
     workExperience: [],
     education: [],
     skills: [],
+    projects: [],
     summary: '',
     additionalSections: []
 }
@@ -206,7 +221,15 @@ export const useResumeStore = create<ResumeStore>()((set, get) => ({
                 return acc
             }, {} as Record<string, any>),
             certifications: {},
-            projects: {},
+            projects: state.projects.reduce((acc, project, index) => {
+                acc[`project_${index}`] = {
+                    name: project.name,
+                    description: project.description,
+                    url: project.url || '',
+                    github_url: project.github_url || ''
+                }
+                return acc
+            }, {} as Record<string, any>),
             languages: {},
             linkedin_url: state.personalInfo.websites.find(w => w.label.toLowerCase() === 'linkedin')?.url || '',
             github_url: state.personalInfo.websites.find(w => w.label.toLowerCase() === 'github')?.url || '',
@@ -273,7 +296,8 @@ export const useResumeStore = create<ResumeStore>()((set, get) => ({
             state.summary || 
             state.workExperience.length > 0 || 
             state.skills.length > 0 || 
-            state.education.length > 0
+            state.education.length > 0 ||
+            state.projects.length > 0
         )
     },
 
@@ -328,6 +352,14 @@ export const useResumeStore = create<ResumeStore>()((set, get) => ({
                     id: generateId(),
                     name: skill.name || '',
                     rating: skill.rating || 3
+                })) : [],
+            projects: data.projects && typeof data.projects === 'object' ? 
+                Object.values(data.projects).map((project: any) => ({
+                    id: generateId(),
+                    name: project.name || '',
+                    description: project.description || '',
+                    url: project.url || '',
+                    github_url: project.github_url || ''
                 })) : []
         })
     },
@@ -388,6 +420,24 @@ export const useResumeStore = create<ResumeStore>()((set, get) => ({
     removeEducation: (id) =>
         set((state) => ({
             education: state.education.filter(edu => edu.id !== id)
+        })),
+
+    // Projects
+    addProject: (project) =>
+        set((state) => ({
+            projects: [...state.projects, { ...project, id: generateId() }]
+        })),
+
+    updateProject: (id, project) =>
+        set((state) => ({
+            projects: state.projects.map(proj =>
+                proj.id === id ? { ...proj, ...project } : proj
+            )
+        })),
+
+    removeProject: (id) =>
+        set((state) => ({
+            projects: state.projects.filter(proj => proj.id !== id)
         })),
 
     // Skills

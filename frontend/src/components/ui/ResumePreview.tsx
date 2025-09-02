@@ -12,6 +12,7 @@ function ResumePreview({ mode = 'default' }: ResumePreviewProps) {
         workExperience, 
         education, 
         skills, 
+        projects,
         summary, 
         additionalSections, 
         templateId 
@@ -56,13 +57,12 @@ function ResumePreview({ mode = 'default' }: ResumePreviewProps) {
             end_date: edu.endDate,
             year: `${edu.startDate} - ${edu.endDate}`
         })),
-        projects: additionalSections
-            .filter(section => section.type === 'custom' && section.title.toLowerCase().includes('project'))
-            .map(section => ({
-                name: section.title,
-                description: section.content.replace(/<[^>]*>/g, '').trim(),
-                technologies: []
-            })),
+        projects: projects.map(project => ({
+            name: project.name,
+            description: project.description ? project.description.replace(/<[^>]*>/g, '').trim() : '',
+            url: project.url || '',
+            github_url: project.github_url || ''
+        })),
         certifications: additionalSections
             .filter(section => section.type === 'certifications')
             .map(section => ({
@@ -81,6 +81,7 @@ function ResumePreview({ mode = 'default' }: ResumePreviewProps) {
 
     const templateIdNumber = parseInt(templateId) || 2
     const isLiveMode = mode === 'live'
+    const resumeSize = isLiveMode ? 'small' : 'normal'
 
     return (
         <div 
@@ -96,7 +97,7 @@ function ResumePreview({ mode = 'default' }: ResumePreviewProps) {
             <TemplateRenderer 
                 templateId={templateIdNumber}
                 userData={userData}
-                scale={isLiveMode ? 0.8 : 1}
+                size={resumeSize}
                 mode={mode}
             />
         </div>

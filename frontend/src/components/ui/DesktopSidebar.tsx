@@ -1,6 +1,5 @@
 import React from 'react'
-import { User, Briefcase, GraduationCap, Award, FileText, Plus } from 'lucide-react'
-import { useResumeStore } from '@/store/resumeStore'
+import { User, Briefcase, GraduationCap, Award, FolderOpen, FileText, Plus } from 'lucide-react'
 
 interface DesktopSidebarProps {
   currentStep: number
@@ -12,7 +11,8 @@ const steps = [
   { id: 2, title: 'Work Experience', icon: Briefcase },
   { id: 3, title: 'Education', icon: GraduationCap },
   { id: 4, title: 'Skills', icon: Award },
-  { id: 5, title: 'Summary', icon: FileText }
+  { id: 5, title: 'Projects', icon: FolderOpen },
+  { id: 6, title: 'Summary', icon: FileText }
 ]
 
 function DesktopSidebar({ currentStep, onStepChange }: DesktopSidebarProps) {

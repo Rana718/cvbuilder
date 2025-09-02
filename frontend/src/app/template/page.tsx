@@ -88,7 +88,7 @@ export default function TemplatesPage() {
                                 <div className="relative bg-white border border-gray-200 rounded-lg overflow-hidden hover:border-blue-300 hover:shadow-lg transition-all duration-200">
                                     {/* Template Preview */}
                                     <div className="relative">
-                                        <TemplatePreview templateId={template.id} scale={1} />
+                                        <TemplatePreview templateId={template.id} size="small" />
                                         
                                         {/* Premium Badge */}
                                         {template.isPremium && (

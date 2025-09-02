@@ -1,6 +1,6 @@
 "use client";
 
-import { Mail, Phone, MapPin, Globe, Linkedin, Github, Star } from "lucide-react";
+import { Mail, Phone, MapPin, Linkedin, Github, Globe } from 'lucide-react'
 
 interface UserData {
   name: string;
@@ -33,11 +33,11 @@ interface ModernMinimalistProps {
     text: string;
     background: string;
   };
-  scale?: number;
+  size?: 'small' | 'normal';
   mode?: 'default' | 'live';
 }
 
-export default function ModernMinimalist({ userData, colors, scale = 1, mode = 'default' }: ModernMinimalistProps) {
+export default function ModernMinimalist({ userData, colors, size = 'normal', mode = 'default' }: ModernMinimalistProps) {
   const theme = colors || {
     primary: '#2563eb',
     secondary: '#64748b',
@@ -46,43 +46,75 @@ export default function ModernMinimalist({ userData, colors, scale = 1, mode = '
     background: '#ffffff'
   };
 
+  const isSmall = size === 'small';
+  
+  // Size-based styling
+  const styles = {
+    container: {
+      fontSize: isSmall ? '0.35rem' : '0.875rem',
+      lineHeight: isSmall ? '1.1' : '1.4',
+      padding: isSmall ? '0.25rem' : '1rem'
+    },
+    heading: {
+      fontSize: isSmall ? '0.5rem' : '1.25rem',
+      marginBottom: isSmall ? '0.125rem' : '0.5rem'
+    },
+    subheading: {
+      fontSize: isSmall ? '0.4rem' : '1rem',
+      marginBottom: isSmall ? '0.125rem' : '0.375rem'
+    },
+    sectionTitle: {
+      fontSize: isSmall ? '0.4rem' : '0.875rem',
+      marginBottom: isSmall ? '0.125rem' : '0.25rem'
+    },
+    text: {
+      fontSize: isSmall ? '0.35rem' : '0.75rem',
+      marginBottom: isSmall ? '0.125rem' : '0.25rem'
+    },
+    spacing: {
+      section: isSmall ? '0.25rem' : '1rem',
+      item: isSmall ? '0.125rem' : '0.5rem'
+    }
+  };
+
   return (
     <div
-      className="w-full h-full flex flex-col"
+      className="w-full h-full flex flex-col bg-white"
       style={{
         fontFamily: 'Inter, sans-serif',
         backgroundColor: theme.background,
         color: theme.text,
-        fontSize: '0.55rem',
-        lineHeight: '1.0'
+        fontSize: styles.container.fontSize,
+        lineHeight: styles.container.lineHeight,
+        padding: styles.container.padding
       }}
     >
       {/* Header */}
-      <div className="text-center py-1 px-1 border-b" style={{ borderColor: 'rgba(0,0,0,0.1)' }}>
-        <h1 className="text-sm font-bold mb-0.5" style={{ color: theme.primary }}>
+      <div className="text-center border-b border-gray-200" style={{ paddingBottom: styles.spacing.item, marginBottom: styles.spacing.section }}>
+        <h1 className="font-bold" style={{ ...styles.heading, color: theme.primary }}>
           {userData.name || "Your Name"}
         </h1>
         {userData.job_title && (
-          <p className="text-xs font-medium mb-0.5" style={{ color: theme.secondary }}>
+          <p className="font-medium" style={{ ...styles.subheading, color: theme.secondary }}>
             {userData.job_title}
           </p>
         )}
-        <div className="flex flex-wrap justify-center gap-1 text-xs">
+        <div className="flex flex-wrap justify-center gap-1" style={{ fontSize: styles.text.fontSize }}>
           {userData.email && (
             <div className="flex items-center gap-0.5">
-              <Mail className="h-1.5 w-1.5" />
+              <Mail className="h-2 w-2" />
               <span>{userData.email}</span>
             </div>
           )}
           {userData.phone && (
             <div className="flex items-center gap-0.5">
-              <Phone className="h-1.5 w-1.5" />
+              <Phone className="h-2 w-2" />
               <span>{userData.phone}</span>
             </div>
           )}
           {userData.address && (
             <div className="flex items-center gap-0.5">
-              <MapPin className="h-1.5 w-1.5" />
+              <MapPin className="h-2 w-2" />
               <span>{userData.address}</span>
             </div>
           )}
@@ -90,28 +122,28 @@ export default function ModernMinimalist({ userData, colors, scale = 1, mode = '
       </div>
 
       {/* Content */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex">
         {/* Left Column */}
-        <div className="w-1/3 p-1 bg-gray-50">
+        <div className="w-1/3 bg-gray-50" style={{ padding: styles.spacing.item }}>
           {/* Skills */}
           {userData.skills && userData.skills.length > 0 && (
-            <div className="mb-1">
-              <h3 className="text-xs font-bold mb-0.5" style={{ color: theme.primary }}>
-                SKILLS
+            <div style={{ marginBottom: styles.spacing.section }}>
+              <h3 className="font-bold uppercase tracking-wide" style={{ ...styles.sectionTitle, color: theme.primary }}>
+                Skills
               </h3>
-              <div className="space-y-0.5">
-                {userData.skills.slice(0, 10).map((skill, i) => (
-                  <div key={i} className="flex items-center justify-between">
-                    <span className="text-xs">{skill.name}</span>
-                    <div className="flex gap-0.5">
-                      {[...Array(5)].map((_, j) => (
-                        <Star
-                          key={j}
-                          className="h-1 w-1"
-                          fill={j < skill.rating ? theme.accent : 'none'}
-                          color={j < skill.rating ? theme.accent : '#e5e7eb'}
-                        />
-                      ))}
+              <div>
+                {userData.skills.slice(0, isSmall ? 8 : 12).map((skill, i) => (
+                  <div key={i} style={{ marginBottom: styles.spacing.item }}>
+                    <div className="flex justify-between items-center">
+                      <span style={{ fontSize: styles.text.fontSize }}>{skill.name}</span>
+                      <div className="flex gap-0.5">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <div
+                            key={star}
+                            className={`w-1 h-1 rounded-full ${star <= skill.rating ? 'bg-blue-500' : 'bg-gray-300'}`}
+                          />
+                        ))}
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -121,52 +153,24 @@ export default function ModernMinimalist({ userData, colors, scale = 1, mode = '
 
           {/* Education */}
           {userData.education && userData.education.length > 0 && (
-            <div className="mb-1">
-              <h3 className="text-xs font-bold mb-0.5" style={{ color: theme.primary }}>
-                EDUCATION
+            <div style={{ marginBottom: styles.spacing.section }}>
+              <h3 className="font-bold uppercase tracking-wide" style={{ ...styles.sectionTitle, color: theme.primary }}>
+                Education
               </h3>
-              <div className="space-y-0.5">
-                {userData.education.slice(0, 4).map((edu, i) => (
-                  <div key={i}>
-                    <p className="text-xs font-medium">{edu.degree || edu.institution}</p>
-                    <p className="text-xs text-gray-600">{edu.institution || edu.degree}</p>
-                    <p className="text-xs text-gray-500">{edu.year}</p>
-                    {edu.gpa && <p className="text-xs text-gray-500">GPA: {edu.gpa}</p>}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Certifications */}
-          {userData.certifications && userData.certifications.length > 0 && (
-            <div className="mb-1">
-              <h3 className="text-xs font-bold mb-0.5" style={{ color: theme.primary }}>
-                CERTIFICATIONS
-              </h3>
-              <div className="space-y-0.5">
-                {userData.certifications.slice(0, 3).map((cert, i) => (
-                  <div key={i}>
-                    <p className="text-xs font-medium">{cert.name}</p>
-                    <p className="text-xs text-gray-600">{cert.issuer}</p>
-                    <p className="text-xs text-gray-500">{cert.date}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Languages */}
-          {userData.languages && userData.languages.length > 0 && (
-            <div className="mb-1">
-              <h3 className="text-xs font-bold mb-0.5" style={{ color: theme.primary }}>
-                LANGUAGES
-              </h3>
-              <div className="space-y-0.5">
-                {userData.languages.slice(0, 4).map((lang, i) => (
-                  <div key={i} className="flex justify-between">
-                    <span className="text-xs">{lang.name}</span>
-                    <span className="text-xs text-gray-500">{lang.proficiency}</span>
+              <div>
+                {userData.education.slice(0, isSmall ? 2 : 4).map((edu, i) => (
+                  <div key={i} style={{ marginBottom: styles.spacing.item }}>
+                    <p className="font-medium" style={{ fontSize: styles.text.fontSize }}>
+                      {edu.degree || 'Degree'}
+                    </p>
+                    <p style={{ fontSize: styles.text.fontSize, color: theme.secondary }}>
+                      {edu.institution || edu.school || 'Institution'}
+                    </p>
+                    {edu.year && (
+                      <p style={{ fontSize: styles.text.fontSize, color: theme.secondary }}>
+                        {edu.year}
+                      </p>
+                    )}
                   </div>
                 ))}
               </div>
@@ -175,26 +179,26 @@ export default function ModernMinimalist({ userData, colors, scale = 1, mode = '
 
           {/* Links */}
           <div>
-            <h3 className="text-xs font-bold mb-0.5" style={{ color: theme.primary }}>
-              LINKS
+            <h3 className="font-bold uppercase tracking-wide" style={{ ...styles.sectionTitle, color: theme.primary }}>
+              Links
             </h3>
-            <div className="space-y-0.5">
+            <div>
               {userData.linkedin_url && (
-                <div className="flex items-center gap-0.5">
-                  <Linkedin className="h-1.5 w-1.5" />
-                  <span className="text-xs">LinkedIn</span>
+                <div className="flex items-center gap-0.5" style={{ marginBottom: styles.spacing.item }}>
+                  <Linkedin className="h-2 w-2" />
+                  <span style={{ fontSize: styles.text.fontSize }}>LinkedIn</span>
                 </div>
               )}
               {userData.github_url && (
-                <div className="flex items-center gap-0.5">
-                  <Github className="h-1.5 w-1.5" />
-                  <span className="text-xs">GitHub</span>
+                <div className="flex items-center gap-0.5" style={{ marginBottom: styles.spacing.item }}>
+                  <Github className="h-2 w-2" />
+                  <span style={{ fontSize: styles.text.fontSize }}>GitHub</span>
                 </div>
               )}
               {userData.portfolio_url && (
-                <div className="flex items-center gap-0.5">
-                  <Globe className="h-1.5 w-1.5" />
-                  <span className="text-xs">Portfolio</span>
+                <div className="flex items-center gap-0.5" style={{ marginBottom: styles.spacing.item }}>
+                  <Globe className="h-2 w-2" />
+                  <span style={{ fontSize: styles.text.fontSize }}>Portfolio</span>
                 </div>
               )}
             </div>
@@ -202,39 +206,44 @@ export default function ModernMinimalist({ userData, colors, scale = 1, mode = '
         </div>
 
         {/* Right Column */}
-        <div className="flex-1 p-1">
+        <div className="flex-1" style={{ padding: styles.spacing.item }}>
           {/* Summary */}
           {userData.summary && (
-            <div className="mb-1">
-              <h3 className="text-xs font-bold mb-0.5" style={{ color: theme.primary }}>
-                PROFESSIONAL SUMMARY
+            <div style={{ marginBottom: styles.spacing.section }}>
+              <h3 className="font-bold uppercase tracking-wide" style={{ ...styles.sectionTitle, color: theme.primary }}>
+                Professional Summary
               </h3>
-              <p className="text-xs leading-tight">{userData.summary}</p>
+              <p style={{ fontSize: styles.text.fontSize, lineHeight: '1.4' }}>
+                {userData.summary}
+              </p>
             </div>
           )}
 
           {/* Experience */}
           {userData.experience && userData.experience.length > 0 && (
-            <div className="mb-1">
-              <h3 className="text-xs font-bold mb-0.5" style={{ color: theme.primary }}>
-                WORK EXPERIENCE
+            <div style={{ marginBottom: styles.spacing.section }}>
+              <h3 className="font-bold uppercase tracking-wide" style={{ ...styles.sectionTitle, color: theme.primary }}>
+                Work Experience
               </h3>
-              <div className="space-y-1">
-                {userData.experience.slice(0, 5).map((exp, i) => (
-                  <div key={i}>
-                    <div className="flex justify-between items-start mb-0.5">
-                      <h4 className="text-xs font-semibold">{exp.title || exp.jobTitle}</h4>
-                      <span className="text-xs text-gray-500">{exp.duration || `${exp.startDate} - ${exp.endDate}`}</span>
+              <div>
+                {userData.experience.slice(0, isSmall ? 2 : 4).map((exp, i) => (
+                  <div key={i} style={{ marginBottom: styles.spacing.section }}>
+                    <div className="flex justify-between items-start">
+                      <h4 className="font-bold" style={{ fontSize: styles.text.fontSize }}>
+                        {exp.title || exp.jobTitle || 'Position'}
+                      </h4>
+                      <span style={{ fontSize: styles.text.fontSize, color: theme.secondary }}>
+                        {exp.duration || `${exp.start_date || ''} - ${exp.end_date || 'Present'}`}
+                      </span>
                     </div>
-                    <p className="text-xs font-medium text-gray-600 mb-0.5">{exp.company || exp.employer}</p>
-                    {(exp.location || exp.isRemote) && (
-                      <p className="text-xs text-gray-500 mb-0.5">
-                        {exp.location} {exp.isRemote && "(Remote)"}
-                      </p>
-                    )}
+                    <p className="font-medium" style={{ fontSize: styles.text.fontSize, color: theme.secondary }}>
+                      {exp.company || exp.employer || 'Company'}
+                    </p>
                     {exp.description && (
-                      <p className="text-xs text-gray-700 leading-tight">
-                        {exp.description.length > 80 ? exp.description.substring(0, 80) + '...' : exp.description}
+                      <p style={{ fontSize: styles.text.fontSize, marginTop: styles.spacing.item }}>
+                        {isSmall && exp.description.length > 100 
+                          ? exp.description.substring(0, 100) + '...' 
+                          : exp.description}
                       </p>
                     )}
                   </div>
@@ -246,19 +255,20 @@ export default function ModernMinimalist({ userData, colors, scale = 1, mode = '
           {/* Projects */}
           {userData.projects && userData.projects.length > 0 && (
             <div>
-              <h3 className="text-xs font-bold mb-0.5" style={{ color: theme.primary }}>
-                PROJECTS
+              <h3 className="font-bold uppercase tracking-wide" style={{ ...styles.sectionTitle, color: theme.primary }}>
+                Projects
               </h3>
-              <div className="space-y-1">
-                {userData.projects.slice(0, 3).map((project, i) => (
-                  <div key={i}>
-                    <h4 className="text-xs font-semibold">{project.name}</h4>
-                    <p className="text-xs text-gray-700 leading-tight">
-                      {project.description.length > 60 ? project.description.substring(0, 60) + '...' : project.description}
-                    </p>
-                    {project.technologies && (
-                      <p className="text-xs text-gray-500">
-                        {project.technologies.slice(0, 3).join(', ')}
+              <div>
+                {userData.projects.slice(0, isSmall ? 2 : 3).map((project, i) => (
+                  <div key={i} style={{ marginBottom: styles.spacing.section }}>
+                    <h4 className="font-bold" style={{ fontSize: styles.text.fontSize }}>
+                      {project.name || 'Project Name'}
+                    </h4>
+                    {project.description && (
+                      <p style={{ fontSize: styles.text.fontSize, marginTop: styles.spacing.item }}>
+                        {isSmall && project.description.length > 80 
+                          ? project.description.substring(0, 80) + '...' 
+                          : project.description}
                       </p>
                     )}
                   </div>

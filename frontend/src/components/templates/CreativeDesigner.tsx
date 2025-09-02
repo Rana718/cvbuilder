@@ -1,6 +1,6 @@
 "use client";
 
-import { Mail, Phone, MapPin, Globe, Linkedin, Github, Star } from "lucide-react";
+import { Mail, Phone, MapPin, Linkedin, Github, Globe } from 'lucide-react'
 
 interface UserData {
   name: string;
@@ -15,9 +15,13 @@ interface UserData {
   }>;
   experience?: any[];
   education?: any[];
+  projects?: any[];
+  certifications?: any[];
+  languages?: any[];
   linkedin_url?: string;
   github_url?: string;
   portfolio_url?: string;
+  image_url?: string;
 }
 
 interface CreativeDesignerProps {
@@ -29,17 +33,51 @@ interface CreativeDesignerProps {
     text: string;
     background: string;
   };
-  scale?: number;
+  size?: 'small' | 'normal';
   mode?: 'default' | 'live';
 }
 
-export default function CreativeDesigner({ userData, colors, scale = 1, mode = 'default' }: CreativeDesignerProps) {
+export default function CreativeDesigner({ userData, colors, size = 'normal', mode = 'default' }: CreativeDesignerProps) {
   const theme = colors || {
     primary: '#7c3aed',
     secondary: '#a855f7',
     accent: '#ec4899',
     text: '#374151',
     background: '#fafafa'
+  };
+
+  const isSmall = size === 'small';
+
+  // Size-based styling
+  const styles = {
+    container: {
+      fontSize: isSmall ? '0.35rem' : '0.875rem',
+      lineHeight: isSmall ? '1.1' : '1.4'
+    },
+    heading: {
+      fontSize: isSmall ? '0.5rem' : '1.25rem',
+      marginBottom: isSmall ? '0.125rem' : '0.5rem'
+    },
+    subheading: {
+      fontSize: isSmall ? '0.4rem' : '1rem',
+      marginBottom: isSmall ? '0.125rem' : '0.375rem'
+    },
+    sectionTitle: {
+      fontSize: isSmall ? '0.4rem' : '0.875rem',
+      marginBottom: isSmall ? '0.125rem' : '0.25rem'
+    },
+    text: {
+      fontSize: isSmall ? '0.35rem' : '0.75rem',
+      marginBottom: isSmall ? '0.125rem' : '0.25rem'
+    },
+    spacing: {
+      section: isSmall ? '0.25rem' : '1rem',
+      item: isSmall ? '0.125rem' : '0.5rem'
+    },
+    padding: {
+      container: isSmall ? '0.25rem' : '1rem',
+      section: isSmall ? '0.125rem' : '0.5rem'
+    }
   };
 
   return (
@@ -49,24 +87,41 @@ export default function CreativeDesigner({ userData, colors, scale = 1, mode = '
         fontFamily: 'Poppins, sans-serif',
         backgroundColor: theme.background,
         color: theme.text,
-        fontSize: '0.7rem',
-        lineHeight: '1.1'
+        fontSize: styles.container.fontSize,
+        lineHeight: styles.container.lineHeight
       }}
     >
       {/* Header */}
-      <div className="relative p-3" style={{ background: `linear-gradient(135deg, ${theme.primary}, ${theme.secondary})`, color: 'white' }}>
+      <div 
+        className="relative"
+        style={{ 
+          background: `linear-gradient(135deg, ${theme.primary}, ${theme.secondary})`, 
+          color: 'white',
+          padding: styles.padding.container
+        }}
+      >
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 bg-white/20 rounded-full flex-shrink-0"></div>
+          <div 
+            className="bg-white/20 rounded-full flex-shrink-0"
+            style={{ 
+              width: isSmall ? '2rem' : '3rem', 
+              height: isSmall ? '2rem' : '3rem' 
+            }}
+          />
           <div className="flex-1">
-            <h1 className="text-lg font-bold mb-0.5">{userData.name || "Your Name"}</h1>
+            <h1 className="font-bold" style={{ ...styles.heading }}>
+              {userData.name || "Your Name"}
+            </h1>
             {userData.job_title && (
-              <p className="text-sm opacity-90">{userData.job_title}</p>
+              <p style={{ fontSize: styles.subheading.fontSize, opacity: 0.9 }}>
+                {userData.job_title}
+              </p>
             )}
           </div>
         </div>
         
         {/* Contact Info */}
-        <div className="flex flex-wrap gap-2 mt-2 text-xs">
+        <div className="flex flex-wrap gap-2 mt-2" style={{ fontSize: styles.text.fontSize }}>
           {userData.email && (
             <div className="flex items-center gap-1">
               <Mail className="h-2 w-2" />
@@ -91,35 +146,34 @@ export default function CreativeDesigner({ userData, colors, scale = 1, mode = '
       {/* Content Grid */}
       <div className="flex h-full">
         {/* Left Column */}
-        <div className="w-2/5 p-2 bg-white">
+        <div className="w-2/5 bg-white" style={{ padding: styles.padding.section }}>
           {/* Summary */}
           {userData.summary && (
-            <div className="mb-3">
-              <h3 className="text-sm font-bold mb-1" style={{ color: theme.primary }}>
+            <div style={{ marginBottom: styles.spacing.section }}>
+              <h3 className="font-bold" style={{ ...styles.sectionTitle, color: theme.primary, marginBottom: styles.spacing.item }}>
                 ABOUT ME
               </h3>
-              <p className="text-xs leading-relaxed">{userData.summary}</p>
+              <p style={{ fontSize: styles.text.fontSize, lineHeight: '1.5' }}>
+                {userData.summary}
+              </p>
             </div>
           )}
 
           {/* Skills */}
           {userData.skills && userData.skills.length > 0 && (
-            <div className="mb-3">
-              <h3 className="text-sm font-bold mb-1" style={{ color: theme.primary }}>
+            <div style={{ marginBottom: styles.spacing.section }}>
+              <h3 className="font-bold" style={{ ...styles.sectionTitle, color: theme.primary, marginBottom: styles.spacing.item }}>
                 SKILLS
               </h3>
-              <div className="space-y-1">
-                {userData.skills.slice(0, 6).map((skill, i) => (
-                  <div key={i} className="flex items-center justify-between">
-                    <span className="text-xs">{skill.name}</span>
+              <div>
+                {userData.skills.slice(0, isSmall ? 4 : 6).map((skill, i) => (
+                  <div key={i} className="flex items-center justify-between" style={{ marginBottom: styles.spacing.item }}>
+                    <span style={{ fontSize: styles.text.fontSize }}>{skill.name}</span>
                     <div className="flex gap-0.5">
-                      {[...Array(5)].map((_, j) => (
+                      {[1, 2, 3, 4, 5].map((star) => (
                         <div
-                          key={j}
-                          className="w-2 h-1 rounded"
-                          style={{
-                            backgroundColor: j < skill.rating ? theme.accent : '#e5e7eb'
-                          }}
+                          key={star}
+                          className={`w-1 h-1 rounded-full ${star <= skill.rating ? 'bg-purple-500' : 'bg-gray-300'}`}
                         />
                       ))}
                     </div>
@@ -132,15 +186,21 @@ export default function CreativeDesigner({ userData, colors, scale = 1, mode = '
           {/* Education */}
           {userData.education && userData.education.length > 0 && (
             <div>
-              <h3 className="text-sm font-bold mb-1" style={{ color: theme.primary }}>
+              <h3 className="font-bold" style={{ ...styles.sectionTitle, color: theme.primary, marginBottom: styles.spacing.item }}>
                 EDUCATION
               </h3>
-              <div className="space-y-2">
-                {userData.education.slice(0, 2).map((edu, i) => (
-                  <div key={i}>
-                    <p className="text-xs font-medium">{edu.degree || edu.institution}</p>
-                    <p className="text-xs text-gray-600">{edu.institution || edu.degree}</p>
-                    <p className="text-xs text-gray-500">{edu.year}</p>
+              <div>
+                {userData.education.slice(0, isSmall ? 1 : 2).map((edu, i) => (
+                  <div key={i} style={{ marginBottom: styles.spacing.section }}>
+                    <p className="font-medium" style={{ fontSize: styles.text.fontSize }}>
+                      {edu.degree || edu.institution}
+                    </p>
+                    <p style={{ fontSize: styles.text.fontSize, color: '#6b7280' }}>
+                      {edu.institution || edu.degree}
+                    </p>
+                    <p style={{ fontSize: styles.text.fontSize, color: '#9ca3af' }}>
+                      {edu.year}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -149,28 +209,61 @@ export default function CreativeDesigner({ userData, colors, scale = 1, mode = '
         </div>
 
         {/* Right Column */}
-        <div className="flex-1 p-2">
+        <div className="flex-1" style={{ padding: styles.padding.section }}>
           {/* Experience */}
           {userData.experience && userData.experience.length > 0 && (
-            <div className="mb-3">
-              <h3 className="text-sm font-bold mb-1" style={{ color: theme.primary }}>
+            <div style={{ marginBottom: styles.spacing.section }}>
+              <h3 className="font-bold" style={{ ...styles.sectionTitle, color: theme.primary, marginBottom: styles.spacing.item }}>
                 EXPERIENCE
               </h3>
-              <div className="space-y-2">
-                {userData.experience.slice(0, 3).map((exp, i) => (
-                  <div key={i} className="relative pl-3">
+              <div>
+                {userData.experience.slice(0, isSmall ? 2 : 3).map((exp, i) => (
+                  <div key={i} className="relative pl-3" style={{ marginBottom: styles.spacing.section }}>
                     <div 
                       className="absolute left-0 top-1 w-1.5 h-1.5 rounded-full"
                       style={{ backgroundColor: theme.accent }}
                     />
-                    <div className="flex justify-between items-start mb-0.5">
-                      <h4 className="text-xs font-bold">{exp.title || exp.jobTitle}</h4>
-                      <span className="text-xs text-gray-500">{exp.duration || `${exp.startDate} - ${exp.endDate}`}</span>
+                    <div className="flex justify-between items-start">
+                      <h4 className="font-bold" style={{ fontSize: styles.text.fontSize }}>
+                        {exp.title || exp.jobTitle || 'Position'}
+                      </h4>
+                      <span style={{ fontSize: styles.text.fontSize, color: '#6b7280' }}>
+                        {exp.duration || `${exp.start_date || ''} - ${exp.end_date || 'Present'}`}
+                      </span>
                     </div>
-                    <p className="text-xs font-medium text-gray-600 mb-1">{exp.company || exp.employer}</p>
+                    <p className="font-medium" style={{ fontSize: styles.text.fontSize, color: theme.secondary }}>
+                      {exp.company || exp.employer || 'Company'}
+                    </p>
                     {exp.description && (
-                      <p className="text-xs text-gray-700 leading-relaxed">
-                        {exp.description.length > 100 ? exp.description.substring(0, 100) + '...' : exp.description}
+                      <p style={{ fontSize: styles.text.fontSize, marginTop: styles.spacing.item, lineHeight: '1.4' }}>
+                        {isSmall && exp.description.length > 100 
+                          ? exp.description.substring(0, 100) + '...' 
+                          : exp.description}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Projects */}
+          {userData.projects && userData.projects.length > 0 && (
+            <div style={{ marginBottom: styles.spacing.section }}>
+              <h3 className="font-bold" style={{ ...styles.sectionTitle, color: theme.primary, marginBottom: styles.spacing.item }}>
+                PROJECTS
+              </h3>
+              <div>
+                {userData.projects.slice(0, isSmall ? 1 : 2).map((project, i) => (
+                  <div key={i} style={{ marginBottom: styles.spacing.section }}>
+                    <h4 className="font-bold" style={{ fontSize: styles.text.fontSize }}>
+                      {project.name || 'Project Name'}
+                    </h4>
+                    {project.description && (
+                      <p style={{ fontSize: styles.text.fontSize, marginTop: styles.spacing.item, lineHeight: '1.4' }}>
+                        {isSmall && project.description.length > 80 
+                          ? project.description.substring(0, 80) + '...' 
+                          : project.description}
                       </p>
                     )}
                   </div>
@@ -181,24 +274,33 @@ export default function CreativeDesigner({ userData, colors, scale = 1, mode = '
 
           {/* Links */}
           <div>
-            <h3 className="text-sm font-bold mb-1" style={{ color: theme.primary }}>
+            <h3 className="font-bold" style={{ ...styles.sectionTitle, color: theme.primary, marginBottom: styles.spacing.item }}>
               PORTFOLIO
             </h3>
-            <div className="flex gap-2 text-xs">
+            <div className="flex gap-2" style={{ fontSize: styles.text.fontSize }}>
               {userData.linkedin_url && (
-                <div className="flex items-center gap-1 px-2 py-1 rounded" style={{ backgroundColor: theme.primary, color: 'white' }}>
+                <div 
+                  className="flex items-center gap-1 px-2 py-1 rounded" 
+                  style={{ backgroundColor: theme.primary, color: 'white' }}
+                >
                   <Linkedin className="h-2 w-2" />
                   <span>LinkedIn</span>
                 </div>
               )}
               {userData.github_url && (
-                <div className="flex items-center gap-1 px-2 py-1 rounded" style={{ backgroundColor: theme.secondary, color: 'white' }}>
+                <div 
+                  className="flex items-center gap-1 px-2 py-1 rounded" 
+                  style={{ backgroundColor: theme.secondary, color: 'white' }}
+                >
                   <Github className="h-2 w-2" />
                   <span>GitHub</span>
                 </div>
               )}
               {userData.portfolio_url && (
-                <div className="flex items-center gap-1 px-2 py-1 rounded" style={{ backgroundColor: theme.accent, color: 'white' }}>
+                <div 
+                  className="flex items-center gap-1 px-2 py-1 rounded" 
+                  style={{ backgroundColor: theme.accent, color: 'white' }}
+                >
                   <Globe className="h-2 w-2" />
                   <span>Portfolio</span>
                 </div>

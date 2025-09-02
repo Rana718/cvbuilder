@@ -37,11 +37,11 @@ interface TemplateRendererProps {
     text: string;
     background: string;
   };
-  scale?: number;
+  size?: 'small' | 'normal';
   mode?: 'default' | 'live';
 }
 
-export default function TemplateRenderer({ templateId, userData, colors, scale = 1, mode = 'default' }: TemplateRendererProps) {
+export default function TemplateRenderer({ templateId, userData, colors, size = 'normal', mode = 'default' }: TemplateRendererProps) {
   const template = getTemplateById(templateId);
 
   if (!template) {
@@ -59,21 +59,21 @@ export default function TemplateRenderer({ templateId, userData, colors, scale =
   // Render the appropriate template component based on ID
   switch (templateId) {
     case 1: // executive-elite
-      return <ExecutiveElite userData={userData} colors={themeColors} scale={scale} mode={mode} />;
+      return <ExecutiveElite userData={userData} colors={themeColors} size={size} mode={mode} />;
 
     case 2: // modern-minimalist
-      return <ModernMinimalist userData={userData} colors={themeColors} scale={scale} mode={mode} />;
+      return <ModernMinimalist userData={userData} colors={themeColors} size={size} mode={mode} />;
 
     case 3: // creative-designer
-      return <CreativeDesigner userData={userData} colors={themeColors} scale={scale} mode={mode} />;
+      return <CreativeDesigner userData={userData} colors={themeColors} size={size} mode={mode} />;
 
     default:
-      return <ModernMinimalist userData={userData} colors={themeColors} scale={scale} mode={mode} />;
+      return <ModernMinimalist userData={userData} colors={themeColors} size={size} mode={mode} />;
   }
 }
 
 // Export template preview component for template selection
-export function TemplatePreview({ templateId, scale = 0.3 }: { templateId: number; scale?: number }) {
+export function TemplatePreview({ templateId, size = 'small' }: { templateId: number; size?: 'small' | 'normal' }) {
   const template = getTemplateById(templateId);
 
   if (!template) return null;
@@ -109,15 +109,7 @@ export function TemplatePreview({ templateId, scale = 0.3 }: { templateId: numbe
 
   return (
     <div className="relative bg-white border border-gray-200 rounded-lg shadow-md hover:shadow-lg transition-all aspect-[1/1.414] overflow-hidden">
-      <div 
-        className="w-full h-full"
-        style={{
-          transform: `scale(${scale})`,
-          transformOrigin: 'top left'
-        }}
-      >
-        <TemplateRenderer templateId={templateId} userData={sampleData} />
-      </div>
+      <TemplateRenderer templateId={templateId} userData={sampleData} size="small" />
     </div>
   );
 }

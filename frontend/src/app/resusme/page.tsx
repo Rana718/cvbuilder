@@ -4,8 +4,9 @@ import React, { useState, useEffect } from 'react'
 import { useAuth } from '@/components/AuthContext'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Plus, FileText, Eye, Edit, Trash2, Calendar, User, Search, Grid, List } from 'lucide-react'
+import { Plus, Edit, Trash2, Calendar, User, Search, Grid, List } from 'lucide-react'
 import axiosInstance from '@/lib/axios'
+import TemplateRenderer from '@/components/templates/TemplateRenderer'
 
 interface Resume {
     id: number
@@ -15,6 +16,16 @@ interface Resume {
     theme_color: string
     created_at: string
     updated_at: string
+    // Add other resume data fields
+    email?: string
+    phone?: string
+    city?: string
+    country?: string
+    summary?: string
+    skills?: any
+    experience?: any
+    education?: any
+    projects?: any
 }
 
 function ResumePage() {
@@ -79,6 +90,40 @@ function ResumePage() {
         resume.job_title?.toLowerCase().includes(searchTerm.toLowerCase())
     )
 
+    // Convert resume data to UserData format for template rendering
+    const convertToUserData = (resume: Resume) => ({
+        name: resume.name || 'Your Name',
+        email: resume.email || 'your.email@example.com',
+        phone: resume.phone || '',
+        address: [resume.city, resume.country].filter(Boolean).join(', ') || '',
+        job_title: resume.job_title || 'Professional Title',
+        summary: resume.summary || '',
+        skills: resume.skills ? Object.values(resume.skills).map((skill: any) => ({
+            name: skill.name || '',
+            rating: skill.rating || 3
+        })) : [],
+        experience: resume.experience ? Object.values(resume.experience).map((exp: any) => ({
+            title: exp.title || '',
+            company: exp.company || '',
+            duration: `${exp.start_date || ''} - ${exp.end_date || 'Present'}`,
+            description: exp.description || ''
+        })) : [],
+        education: resume.education ? Object.values(resume.education).map((edu: any) => ({
+            degree: edu.degree || '',
+            institution: edu.institution || '',
+            year: `${edu.start_date || ''} - ${edu.end_date || ''}`
+        })) : [],
+        projects: resume.projects ? Object.values(resume.projects).map((project: any) => ({
+            name: project.name || '',
+            description: project.description || '',
+            url: project.url || '',
+            github_url: project.github_url || ''
+        })) : [],
+        linkedin_url: '',
+        github_url: '',
+        portfolio_url: ''
+    })
+
     // Show loading while auth is loading or resumes are loading
     if (status || (user && loading)) {
         return (
@@ -99,48 +144,40 @@ function ResumePage() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50">
-            <div className="bg-white/80 backdrop-blur-sm border-b border-blue-100 sticky top-0 z-10">
-                <div className="max-w-7xl mx-auto px-6 lg:px-8">
-                    <div className="flex items-center justify-between h-20">
-                        <div className="flex items-center space-x-6">
-                            <div className="flex items-center space-x-3">
-                                <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-2 rounded-xl">
-                                    <FileText className="w-6 h-6 text-white" />
-                                </div>
-                                <div>
-                                    <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-                                        My Resumes
-                                    </h1>
-                                    <p className="text-sm text-gray-500">
-                                        {filteredResumes.length} of {resumes.length} resume{resumes.length !== 1 ? 's' : ''}
-                                    </p>
-                                </div>
-                            </div>
+        <div className="min-h-screen bg-gray-50/50">
+            {/* Header */}
+            <div className="bg-white/95 backdrop-blur-sm border-b border-gray-200/50 sticky top-0 z-10 shadow-sm">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="flex items-center justify-between h-16">
+                        <div className="flex items-center space-x-2 sm:space-x-4">
+                            <h1 className="text-lg sm:text-xl font-semibold text-gray-900">My Resumes</h1>
+                            <span className="text-xs sm:text-sm text-gray-500">
+                                ({filteredResumes.length} of {resumes.length})
+                            </span>
                         </div>
 
-                        <div className="flex items-center space-x-4">
-                            <div className="relative">
+                        <div className="flex items-center space-x-2 sm:space-x-4">
+                            <div className="relative hidden sm:block">
                                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                                 <input
                                     type="text"
                                     placeholder="Search resumes..."
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="pl-10 pr-4 py-2 w-64 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                    className="pl-10 pr-4 py-2 w-48 lg:w-64 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 />
                             </div>
 
-                            <div className="flex items-center bg-gray-100 rounded-xl p-1">
+                            <div className="flex items-center bg-gray-100 rounded-lg p-1">
                                 <button
                                     onClick={() => setViewMode('grid')}
-                                    className={`p-2 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                                    className={`p-2 rounded transition-all ${viewMode === 'grid' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
                                 >
                                     <Grid className="w-4 h-4" />
                                 </button>
                                 <button
                                     onClick={() => setViewMode('list')}
-                                    className={`p-2 rounded-lg transition-all ${viewMode === 'list' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                                    className={`p-2 rounded transition-all ${viewMode === 'list' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
                                 >
                                     <List className="w-4 h-4" />
                                 </button>
@@ -148,38 +185,50 @@ function ResumePage() {
 
                             <Link
                                 href="/profile"
-                                className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:text-blue-600 border border-gray-200 rounded-xl hover:border-blue-200 hover:bg-blue-50/50 transition-all"
+                                className="hidden sm:flex items-center space-x-2 px-4 py-2 text-gray-700 hover:text-blue-600 border border-gray-300 rounded-lg hover:border-blue-300 transition-all"
                             >
                                 <User className="w-4 h-4" />
-                                <span className="font-medium">Profile</span>
+                                <span>Profile</span>
                             </Link>
                             <Link
                                 href="/template"
-                                className="flex items-center space-x-2 px-6 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl hover:from-blue-600 hover:to-blue-700 shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+                                className="flex items-center space-x-2 px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all"
                             >
                                 <Plus className="w-4 h-4" />
-                                <span className="font-semibold">Create New</span>
+                                <span className="hidden sm:inline">Create New</span>
+                                <span className="sm:hidden">New</span>
                             </Link>
+                        </div>
+                    </div>
+                    
+                    {/* Mobile Search */}
+                    <div className="sm:hidden pb-4">
+                        <div className="relative">
+                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                            <input
+                                type="text"
+                                placeholder="Search resumes..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            />
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12">
                 {error && (
-                    <div className="mb-8 bg-red-50 border border-red-200 text-red-800 px-6 py-4 rounded-xl">
-                        <div className="flex items-center">
-                            <div className="w-2 h-2 bg-red-500 rounded-full mr-3"></div>
-                            {error}
-                        </div>
+                    <div className="mb-8 bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg">
+                        {error}
                     </div>
                 )}
 
                 {filteredResumes.length === 0 && searchTerm ? (
                     <div className="text-center py-16">
-                        <Search className="w-20 h-20 text-gray-300 mx-auto mb-6" />
-                        <h3 className="text-xl font-semibold text-gray-900 mb-2">No matching resumes</h3>
-                        <p className="text-gray-600 mb-6">Try adjusting your search terms or create a new resume</p>
+                        <Search className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                        <h3 className="text-lg font-medium text-gray-900 mb-2">No matching resumes</h3>
+                        <p className="text-gray-600 mb-4">Try adjusting your search terms or create a new resume</p>
                         <button
                             onClick={() => setSearchTerm('')}
                             className="text-blue-600 hover:text-blue-700 font-medium"
@@ -189,145 +238,128 @@ function ResumePage() {
                     </div>
                 ) : resumes.length === 0 ? (
                     <div className="text-center py-20">
-                        <div className="bg-gradient-to-br from-blue-100 to-blue-200 w-32 h-32 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-lg">
-                            <FileText className="w-16 h-16 text-blue-600" />
+                        <div className="bg-blue-100 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <Plus className="w-12 h-12 text-blue-600" />
                         </div>
-                        <h3 className="text-2xl font-bold text-gray-900 mb-3">Welcome to your resume dashboard</h3>
-                        <p className="text-gray-600 mb-8 max-w-md mx-auto leading-relaxed">
-                            Start building your professional resume with our AI-powered tools and beautiful templates
+                        <h3 className="text-xl font-semibold text-gray-900 mb-3">Welcome to your resume dashboard</h3>
+                        <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                            Start building your professional resume with our templates
                         </p>
                         <Link
                             href="/template"
-                            className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl hover:from-blue-600 hover:to-blue-700 font-semibold shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+                            className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
                         >
                             <Plus className="w-5 h-5 mr-2" />
                             Create Your First Resume
                         </Link>
                     </div>
                 ) : (
-                    <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' : 'space-y-4'}>
+                    <div className={viewMode === 'grid' ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6' : 'space-y-1 divide-y divide-gray-100'}>
                         {filteredResumes.map((resume) => (
-                            <div
-                                key={resume.id}
-                                className={`group bg-white rounded-2xl border border-gray-200 hover:border-blue-300 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 ${viewMode === 'list' ? 'flex items-center p-6' : 'p-6'
-                                    }`}
-                            >
+                            <div key={resume.id} className={viewMode === 'grid' ? 'group' : 'py-3'}>
                                 {viewMode === 'grid' ? (
-                                    <>
-                                        <div className="flex items-start justify-between mb-6">
-                                            <div className="flex-1">
-                                                <div className="flex items-center space-x-3 mb-2">
-                                                    <div
-                                                        className="w-4 h-4 rounded-full shadow-sm"
-                                                        style={{ backgroundColor: resume.theme_color || '#3B82F6' }}
-                                                    ></div>
-                                                    <h3 className="text-lg font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
-                                                        {resume.name || 'Untitled Resume'}
-                                                    </h3>
-                                                </div>
-                                                <p className="text-gray-600 font-medium">
-                                                    {resume.job_title || 'No position specified'}
-                                                </p>
-                                            </div>
-                                        </div>
-
-                                        <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-4 mb-6 border">
-                                            <div className="flex items-center justify-center h-24">
-                                                <FileText className="w-12 h-12 text-gray-400" />
-                                            </div>
-                                        </div>
-
-                                        <div className="flex items-center justify-between text-sm text-gray-500 mb-6">
-                                            <div className="flex items-center space-x-2">
-                                                <Calendar className="w-4 h-4" />
-                                                <span>Updated {formatDate(resume.updated_at)}</span>
-                                            </div>
-                                            <div className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-medium">
-                                                Template #{resume.template_id}
-                                            </div>
-                                        </div>
-
-                                        <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                                            <div className="text-xs text-gray-400 font-medium">
-                                                ACTIONS
-                                            </div>
-                                            <div className="flex items-center space-x-2">
-                                                <Link
-                                                    href={`/resusme/${resume.id}?template=${resume.template_id}`}
-                                                    className="p-3 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all"
-                                                    title="View Resume"
-                                                >
-                                                    <Eye className="w-4 h-4" />
-                                                </Link>
+                                    <div className="space-y-3">
+                                        {/* Action Buttons */}
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-xs sm:text-sm text-gray-500">
+                                                {formatDate(resume.updated_at)}
+                                            </span>
+                                            <div className="flex items-center space-x-1">
                                                 <Link
                                                     href={`/template/${resume.template_id}?resumeId=${resume.id}`}
-                                                    className="p-3 text-gray-500 hover:text-green-600 hover:bg-green-50 rounded-xl transition-all"
+                                                    className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-md transition-all"
                                                     title="Edit Resume"
                                                 >
                                                     <Edit className="w-4 h-4" />
                                                 </Link>
                                                 <button
                                                     onClick={() => handleDeleteResume(resume.id)}
-                                                    className="p-3 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all"
+                                                    className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-all"
                                                     title="Delete Resume"
                                                 >
                                                     <Trash2 className="w-4 h-4" />
                                                 </button>
                                             </div>
                                         </div>
-                                    </>
-                                ) : (
-                                    <>
-                                        <div className="flex items-center space-x-4 flex-1">
-                                            <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-4 border">
-                                                <FileText className="w-8 h-8 text-gray-400" />
+
+                                        {/* Resume Preview - Clickable */}
+                                        <Link href={`/resusme/${resume.id}?template=${resume.template_id}`}>
+                                            <div className="aspect-[1/1.414] bg-white shadow-sm hover:shadow-md transition-shadow border border-gray-100 rounded-sm overflow-hidden cursor-pointer">
+                                                <TemplateRenderer
+                                                    templateId={resume.template_id}
+                                                    userData={convertToUserData(resume)}
+                                                    size="small"
+                                                />
                                             </div>
-                                            <div className="flex-1">
-                                                <div className="flex items-center space-x-3 mb-1">
-                                                    <div
-                                                        className="w-3 h-3 rounded-full"
-                                                        style={{ backgroundColor: resume.theme_color || '#3B82F6' }}
-                                                    ></div>
-                                                    <h3 className="text-lg font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
-                                                        {resume.name || 'Untitled Resume'}
-                                                    </h3>
-                                                    <div className="bg-blue-100 text-blue-700 px-2 py-1 rounded-lg text-xs font-medium">
-                                                        #{resume.template_id}
-                                                    </div>
-                                                </div>
-                                                <p className="text-gray-600 font-medium mb-2">
-                                                    {resume.job_title || 'No position specified'}
-                                                </p>
-                                                <div className="flex items-center text-sm text-gray-500">
-                                                    <Calendar className="w-4 h-4 mr-2" />
-                                                    <span>Updated {formatDate(resume.updated_at)}</span>
-                                                </div>
+                                        </Link>
+
+                                        {/* Resume Info */}
+                                        <div className="space-y-1">
+                                            <p className="font-medium text-gray-900 text-sm truncate">
+                                                {resume.job_title || 'No position specified'}
+                                            </p>
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-xs text-gray-400">
+                                                    Template #{resume.template_id}
+                                                </span>
+                                                <div
+                                                    className="w-2 h-2 rounded-full"
+                                                    style={{ backgroundColor: resume.theme_color || '#3B82F6' }}
+                                                />
                                             </div>
                                         </div>
-                                        <div className="flex items-center space-x-2">
-                                            <Link
-                                                href={`/resusme/${resume.id}?template=${resume.template_id}`}
-                                                className="p-3 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all"
-                                                title="View Resume"
-                                            >
-                                                <Eye className="w-5 h-5" />
-                                            </Link>
+                                    </div>
+                                ) : (
+                                    <div className="flex items-center space-x-4 py-3 hover:bg-gray-50 -mx-6 px-6 transition-colors">
+                                        {/* Small Resume Preview - Clickable */}
+                                        <Link href={`/resusme/${resume.id}?template=${resume.template_id}`} className="flex-shrink-0">
+                                            <div className="w-12 h-16 overflow-hidden rounded border border-gray-200 bg-white shadow-sm cursor-pointer hover:shadow-md transition-shadow">
+                                                <TemplateRenderer
+                                                    templateId={resume.template_id}
+                                                    userData={convertToUserData(resume)}
+                                                    size="small"
+                                                />
+                                            </div>
+                                        </Link>
+
+                                        {/* Resume Info - Clickable */}
+                                        <Link href={`/resusme/${resume.id}?template=${resume.template_id}`} className="flex-1 min-w-0">
+                                            <div className="flex items-center space-x-2 mb-1">
+                                                <div
+                                                    className="w-2 h-2 rounded-full flex-shrink-0"
+                                                    style={{ backgroundColor: resume.theme_color || '#3B82F6' }}
+                                                />
+                                                <h3 className="font-medium text-gray-900 truncate">
+                                                    {resume.job_title || 'No position specified'}
+                                                </h3>
+                                                <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded flex-shrink-0 hidden sm:inline">
+                                                    #{resume.template_id}
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center text-sm text-gray-500">
+                                                <Calendar className="w-3 h-3 mr-1" />
+                                                <span className="text-xs sm:text-sm">{formatDate(resume.updated_at)}</span>
+                                            </div>
+                                        </Link>
+
+                                        {/* Action Buttons */}
+                                        <div className="flex items-center space-x-1 flex-shrink-0">
                                             <Link
                                                 href={`/template/${resume.template_id}?resumeId=${resume.id}`}
-                                                className="p-3 text-gray-500 hover:text-green-600 hover:bg-green-50 rounded-xl transition-all"
+                                                className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-md transition-all"
                                                 title="Edit Resume"
                                             >
-                                                <Edit className="w-5 h-5" />
+                                                <Edit className="w-4 h-4" />
                                             </Link>
                                             <button
                                                 onClick={() => handleDeleteResume(resume.id)}
-                                                className="p-3 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all"
+                                                className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-all"
                                                 title="Delete Resume"
                                             >
-                                                <Trash2 className="w-5 h-5" />
+                                                <Trash2 className="w-4 h-4" />
                                             </button>
                                         </div>
-                                    </>
+                                    </div>
                                 )}
                             </div>
                         ))}

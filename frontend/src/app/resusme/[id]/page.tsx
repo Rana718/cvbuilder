@@ -67,11 +67,81 @@ function ResumePage() {
         try {
             const resumeContent = document.querySelector("[data-resume-content]") as HTMLElement
             
-            if (resumeContent) {
-                // Create a new window for printing
+            if (!resumeContent) {
+                alert('Resume content not found. Please refresh and try again.')
+                return
+            }
+
+            // Try modern approach first, fallback to print if needed
+            try {
+                // Import libraries dynamically
+                const [{ default: html2canvas }, { default: jsPDF }] = await Promise.all([
+                    import('html2canvas'),
+                    import('jspdf')
+                ])
+
+                // Clone the element to avoid modifying the original
+                const clonedElement = resumeContent.cloneNode(true) as HTMLElement
+                
+                // Create a temporary container
+                const tempContainer = document.createElement('div')
+                tempContainer.style.position = 'absolute'
+                tempContainer.style.left = '-9999px'
+                tempContainer.style.top = '0'
+                tempContainer.style.width = '794px'
+                tempContainer.style.height = '1123px'
+                tempContainer.style.backgroundColor = '#ffffff'
+                tempContainer.appendChild(clonedElement)
+                document.body.appendChild(tempContainer)
+
+                // Set styles for PDF generation
+                clonedElement.style.width = '794px'
+                clonedElement.style.height = '1123px'
+                clonedElement.style.transform = 'scale(1)'
+                clonedElement.style.margin = '0'
+                clonedElement.style.padding = '20px'
+                clonedElement.style.boxSizing = 'border-box'
+
+                // Wait a bit for styles to apply
+                await new Promise(resolve => setTimeout(resolve, 100))
+
+                // Capture the content
+                const canvas = await html2canvas(clonedElement, {
+                    scale: 2,
+                    useCORS: true,
+                    allowTaint: true,
+                    backgroundColor: '#ffffff',
+                    width: 794,
+                    height: 1123,
+                    scrollX: 0,
+                    scrollY: 0
+                })
+
+                // Remove temporary container
+                document.body.removeChild(tempContainer)
+
+                // Create PDF
+                const imgData = canvas.toDataURL('image/png', 1.0)
+                const pdf = new jsPDF({
+                    orientation: 'portrait',
+                    unit: 'mm',
+                    format: 'a4'
+                })
+
+                pdf.addImage(imgData, 'PNG', 0, 0, 210, 297)
+
+                // Generate filename
+                const filename = `${personalInfo.firstName || 'Resume'}_${personalInfo.lastName || 'Document'}.pdf`.replace(/\s+/g, '_')
+
+                // Download
+                pdf.save(filename)
+
+            } catch (canvasError) {
+                console.warn('Canvas method failed, using print fallback:', canvasError)
+                
+                // Fallback to print method
                 const printWindow = window.open('', '_blank')
                 if (printWindow) {
-                    // Get all stylesheets from current page
                     const styles = Array.from(document.styleSheets)
                         .map(styleSheet => {
                             try {
@@ -99,11 +169,12 @@ function ResumePage() {
                                     }
                                     @page { 
                                         size: A4; 
-                                        margin: 0; 
+                                        margin: 10mm; 
                                     }
                                     body { 
                                         margin: 0; 
                                         padding: 0; 
+                                        font-family: system-ui, -apple-system, sans-serif;
                                     }
                                     [data-resume-content] {
                                         width: 100% !important;
@@ -111,7 +182,6 @@ function ResumePage() {
                                         margin: 0 !important;
                                         box-shadow: none !important;
                                         border: none !important;
-                                        aspect-ratio: 210/297 !important;
                                     }
                                 }
                             </style>
@@ -124,18 +194,18 @@ function ResumePage() {
                     
                     printWindow.document.close()
                     
-                    // Wait for content to load then print
                     setTimeout(() => {
                         printWindow.print()
                         printWindow.close()
                     }, 500)
+                } else {
+                    throw new Error('Unable to open print dialog')
                 }
-            } else {
-                alert('Resume content not found. Please refresh and try again.')
             }
+
         } catch (error: any) {
             console.error("Download error:", error)
-            alert("Download failed. Please try again.")
+            alert(`Download failed: ${error.message || 'Please try again.'}`)
         } finally {
             setIsDownloading(false)
         }
@@ -166,43 +236,45 @@ function ResumePage() {
             <div className="bg-white/90 backdrop-blur-sm border-b border-gray-200/50 print:hidden shadow-sm">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between h-16">
-                        <div className="flex items-center space-x-4">
+                        <div className="flex items-center space-x-2 sm:space-x-4 min-w-0">
                             <Link
                                 href="/resusme"
-                                className="flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-colors"
+                                className="flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-colors flex-shrink-0"
                             >
                                 <ArrowLeft className="w-4 h-4" />
-                                <span>Back to Dashboard</span>
+                                <span className="hidden sm:inline">Back to Dashboard</span>
+                                <span className="sm:hidden">Back</span>
                             </Link>
-                            <div className="h-4 w-px bg-gray-300" />
-                            <h1 className="text-lg font-semibold text-gray-900">
-                                {personalInfo.firstName} {personalInfo.lastName}'s Resume
+                            <div className="h-4 w-px bg-gray-300 hidden sm:block" />
+                            <h1 className="text-sm sm:text-lg font-semibold text-gray-900 truncate">
+                                <span className="hidden sm:inline">{personalInfo.firstName} {personalInfo.lastName}'s Resume</span>
+                                <span className="sm:hidden">Resume</span>
                             </h1>
                         </div>
 
-                        <div className="flex items-center space-x-3">
+                        <div className="flex items-center space-x-2 sm:space-x-3 flex-shrink-0">
                             <Link
                                 href={`/template/${templateId}?resumeId=${resumeId}`}
-                                className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:text-blue-600 border border-gray-300 rounded-lg hover:bg-blue-50 hover:border-blue-300 transition-all"
+                                className="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-4 py-2 text-gray-700 hover:text-blue-600 border border-gray-300 rounded-lg hover:bg-blue-50 hover:border-blue-300 transition-all"
                             >
                                 <Edit className="w-4 h-4" />
-                                <span>Edit</span>
+                                <span className="hidden sm:inline">Edit</span>
                             </Link>
                             <button
                                 onClick={handleSave}
                                 disabled={isSaving}
-                                className="flex items-center space-x-2 px-4 py-2 text-green-700 hover:text-green-800 border border-green-300 rounded-lg hover:bg-green-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                                className="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-4 py-2 text-green-700 hover:text-green-800 border border-green-300 rounded-lg hover:bg-green-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                             >
                                 <Save className="w-4 h-4" />
-                                <span>{isSaving ? 'Saving...' : 'Save'}</span>
+                                <span className="hidden sm:inline">{isSaving ? 'Saving...' : 'Save'}</span>
                             </button>
                             <button
                                 onClick={handleDownload}
                                 disabled={isDownloading}
-                                className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md hover:shadow-lg"
+                                className="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md hover:shadow-lg"
                             >
                                 <Download className="w-4 h-4" />
-                                <span>{isDownloading ? 'Downloading...' : 'Download PDF'}</span>
+                                <span className="hidden sm:inline">{isDownloading ? 'Downloading...' : 'Download PDF'}</span>
                             </button>
                         </div>
                     </div>
@@ -210,8 +282,8 @@ function ResumePage() {
             </div>
 
             {/* Resume Content */}
-            <div className="flex justify-center items-start min-h-screen py-8 px-4">
-                <div className="w-fit mx-auto">
+            <div className="flex justify-center items-start min-h-screen py-4 sm:py-8 px-2 sm:px-4">
+                <div className="w-fit mx-auto max-w-full">
                     <ResumePreview />
                 </div>
             </div>
