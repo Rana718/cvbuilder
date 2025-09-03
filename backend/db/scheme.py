@@ -19,13 +19,14 @@ class User(Base):
     
     # Profile Info
     full_name = Column(String(255), nullable=False)
-
+    
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
     resumes = relationship("Resume", back_populates="user", cascade="all, delete-orphan")
     cover_letters = relationship("CoverLetter", back_populates="user", cascade="all, delete-orphan")
     subscription = relationship("Subscription", uselist=False, back_populates="user", cascade="all, delete-orphan")
+    linkedin_profile = relationship("LinkedInProfile", uselist=False, back_populates="user", cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"<User(id={self.id}, email='{self.email}', name='{self.full_name}')>"
@@ -105,6 +106,45 @@ class CoverLetter(Base):
         return f"<CoverLetter(id={self.id}, user_id={self.user_id}, name='{self.name}')>"
     
 
+class LinkedInProfile(Base):
+    __tablename__ = "linkedin_profiles"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, unique=True)
+    
+    # LinkedIn Authentication
+    linkedin_id = Column(String(255), unique=True, index=True, nullable=False)
+    access_token = Column(String(500), nullable=False)
+    refresh_token = Column(String(500))
+    token_expires_at = Column(DateTime(timezone=True))
+    
+    # LinkedIn Profile Information
+    profile_url = Column(String(500))
+    picture_url = Column(String(500))
+    headline = Column(String(500))
+    location = Column(String(255))
+    industry = Column(String(255))
+    summary = Column(Text)
+    first_name = Column(String(255))
+    last_name = Column(String(255))
+    email_address = Column(String(255))
+    
+    # Connection Status
+    is_connected = Column(Boolean, default=True)
+    connected_at = Column(DateTime(timezone=True), server_default=func.now())
+    last_synced_at = Column(DateTime(timezone=True), server_default=func.now())
+    
+    # Timestamps
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+    
+    # Relationship
+    user = relationship("User", back_populates="linkedin_profile")
+    
+    def __repr__(self):
+        return f"<LinkedInProfile(user_id={self.user_id}, linkedin_id={self.linkedin_id}, is_connected={self.is_connected})>"
+
+
 class Subscription(Base):
     __tablename__ = "subscriptions"
 
@@ -119,7 +159,7 @@ class Subscription(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
-    user = relationship("User")
+    user = relationship("User", back_populates="subscription")
 
     def __repr__(self):
         return f"<Subscription(id={self.id}, user_id={self.user_id}, plan='{self.plan}', status='{self.status}')>"

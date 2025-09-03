@@ -22,7 +22,9 @@ dependencies = [
     "pytesseract>=0.3.13",
     "python-dotenv>=1.1.1",
     "python-multipart>=0.0.20",
+    "razorpay>=1.4.2",
     "redis>=6.4.0",
+    "setuptools>=80.9.0",
     "sqlalchemy[asyncio]>=2.0.43",
     "uvicorn>=0.35.0",
 ]

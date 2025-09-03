@@ -1,28 +1,43 @@
-from fastapi import Request, status, HTTPException
+from fastapi import Request, status, HTTPException, Depends
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
+from sqlalchemy.ext.asyncio import AsyncSession
 from config.firebase import verify_firebase_token
+from db.db import get_db
+from db.scheme import User
+from utils.auth_utils import get_user_from_firebase_uid
 
-# def get_current_user(request: Request) -> dict:
-#     """Dependency to get current user from request state"""
-#     if not hasattr(request.state, 'user_id'):
-#         raise HTTPException(
-#             status_code=status.HTTP_401_UNAUTHORIZED,
-#             detail="User not authenticated"
-#         )
+async def get_current_user(request: Request, db: AsyncSession = Depends(get_db)) -> User:
+    """Dependency to get current user from database using Firebase UID"""
+    firebase_uid = getattr(request.state, 'user_id', None)
+    email = getattr(request.state, 'user_email', None)
     
-#     return {
-#         "user_id": request.state.user_id,
-#         "email": getattr(request.state, 'user_email', None)
-#     }
+    if not firebase_uid:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not authenticated"
+        )
+    
+    # Use the auth_utils function for consistent user retrieval
+    return await get_user_from_firebase_uid(db, firebase_uid, email)
 
 class JWTAuthMiddleware(BaseHTTPMiddleware):
     def __init__(self, app):
         super().__init__(app)
-        self.protected_prefixes = ["/api/resume-op", "/api/auth/profile", "/api/cover-letters"]
+        self.protected_prefixes = [
+            "/api/resume-op", 
+            "/api/auth/profile", 
+            "/api/cover-letters", 
+            "/api/linkedin", 
+            "/api/payment"
+        ]
 
     async def dispatch(self, request: Request, call_next):
         if request.method == "OPTIONS":
+            return await call_next(request)
+
+        # Allow payment-plans endpoint without auth
+        if request.url.path == "/api/payment/payment-plans":
             return await call_next(request)
 
         if not any(request.url.path.startswith(prefix) for prefix in self.protected_prefixes):
@@ -45,7 +60,7 @@ class JWTAuthMiddleware(BaseHTTPMiddleware):
             )
 
         # Keep same request state structure as before
-        request.state.user_id = decoded_token.get("uid")  
+        request.state.user_id = decoded_token.get("uid")  # Store Firebase UID
         request.state.user_email = decoded_token.get("email")
 
         return await call_next(request)

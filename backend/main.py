@@ -26,7 +26,7 @@ app.add_middleware(RateLimitMiddleware)
 app.add_middleware(JWTAuthMiddleware)
 
 app.include_router(mainrouter, prefix="/api")
-app.include_router(callbackrouter, prefix="/callback")
+app.include_router(callbackrouter, prefix="/webhook")
 
 @app.on_event("startup")
 async def startup_event():
