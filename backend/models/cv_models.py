@@ -135,6 +135,7 @@ class ResumeResponse(BaseModel):
     city: Optional[str] = None
     state: Optional[str] = None
     country: Optional[str] = None
+    sharedable_uuid: Optional[str] = None
     postal_code: Optional[str] = None
     job_title: Optional[str] = None
     summary: Optional[str] = None
@@ -154,3 +155,18 @@ class ResumeResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class ResumeFeedbackRequest(BaseModel):
+    """Request model for resume feedback generation"""
+    job_title: Optional[str] = None
+    job_description: Optional[str] = None
+
+
+class ResumeFeedbackResponse(BaseModel):
+    """Response model for resume feedback"""
+    overall_rating: int  # Rating out of 10
+    feedback: str
+    strengths: List[str]
+    areas_for_improvement: List[str]
+    recommendations: List[str]

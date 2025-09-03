@@ -5,10 +5,8 @@ from models.cv_models import (
     SkillsRequest, 
     DirectSummaryRequest,
     WorkExperienceResponse,
-    WorkExperience,
     SkillsResponse,
-    SummaryResponse,
-    CVData
+    SummaryResponse
 )
 
 router = APIRouter()
