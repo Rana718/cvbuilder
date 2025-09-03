@@ -85,7 +85,7 @@ function SummaryStep({ onNext, onPrev }: SummaryStepProps) {
         
         try {
             const cvData = buildCvData()
-            const response = await axiosInstance.post('/api/cv-gen/summary', cvData)
+            const response = await axiosInstance.post('/api/public/cv-gen/summary', cvData)
             
             if (response.data?.suggestions && Array.isArray(response.data.suggestions)) {
                 setAiSuggestions(response.data.suggestions)

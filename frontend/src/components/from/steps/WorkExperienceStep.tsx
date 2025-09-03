@@ -79,7 +79,7 @@ function WorkExperienceStep({ onNext, onPrev }: WorkExperienceStepProps) {
 
     // Generate AI suggestions in background
     try {
-      const response = await axiosInstance.post('/api/cv-gen/work-experience', {
+      const response = await axiosInstance.post('/api/public/cv-gen/work-experience', {
         job_title: formData.jobTitle,
         company: formData.employer,
         location: formData.isRemote ? 'Remote' : (formData.location || 'Not specified'),

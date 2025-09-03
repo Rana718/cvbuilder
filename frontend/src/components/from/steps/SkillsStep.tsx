@@ -39,7 +39,7 @@ function SkillsStep({ onNext, onPrev }: SkillsStepProps) {
     hasCalledAPI.current = true
 
     try {
-      const response = await axiosInstance.post('/api/cv-gen/skills', {
+      const response = await axiosInstance.post('/api/public/cv-gen/skills', {
         experience: experienceData
       })
 

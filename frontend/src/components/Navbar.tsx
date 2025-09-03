@@ -1,18 +1,25 @@
 "use client";
 
 import { motion } from 'framer-motion';
-import { FileText, User, X, Menu, LogOut, Settings, FolderOpen, LayoutPanelTop } from 'lucide-react';
+import { FileText, User, X, Menu, LogOut, Settings, FolderOpen, LayoutPanelTop, Mail, TrendingUp } from 'lucide-react';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { useAuth } from './AuthContext';
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const { user, loading } = useAuth();
     const profileRef = useRef<HTMLDivElement>(null);
+    const pathname = usePathname();
+
+    // Function to check if link is active
+    const isActiveLink = (href: string) => {
+        return pathname === href;
+    };
 
     // Close profile dropdown when clicking outside
     useEffect(() => {
@@ -51,16 +58,54 @@ function Navbar() {
 
                     {/* Desktop Navigation */}
                     <div className="hidden md:flex items-center space-x-8">
-                        <Link href="/template" className="text-gray-700 hover:text-blue-600 transition-colors flex items-center space-x-1">
+                        <Link 
+                            href="/template" 
+                            className={`transition-colors flex items-center space-x-1 ${
+                                isActiveLink('/template') 
+                                    ? 'text-blue-600 font-medium' 
+                                    : 'text-gray-700 hover:text-blue-600'
+                            }`}
+                        >
                             <LayoutPanelTop className="h-4 w-4" />
                             <span>Templates</span>
                         </Link>
                         
                         {user && (
-                            <Link href="/resusme" className="text-gray-700 hover:text-blue-600 transition-colors flex items-center space-x-1">
-                                <FolderOpen className="h-4 w-4" />
-                                <span>My Resumes</span>
-                            </Link>
+                            <>
+                                <Link 
+                                    href="/resusme" 
+                                    className={`transition-colors flex items-center space-x-1 ${
+                                        isActiveLink('/resusme') 
+                                            ? 'text-blue-600 font-medium' 
+                                            : 'text-gray-700 hover:text-blue-600'
+                                    }`}
+                                >
+                                    <FolderOpen className="h-4 w-4" />
+                                    <span>My Resumes</span>
+                                </Link>
+                                <Link 
+                                    href="/cover-letter" 
+                                    className={`transition-colors flex items-center space-x-1 ${
+                                        isActiveLink('/cover-letter') 
+                                            ? 'text-blue-600 font-medium' 
+                                            : 'text-gray-700 hover:text-blue-600'
+                                    }`}
+                                >
+                                    <Mail className="h-4 w-4" />
+                                    <span>Cover Letters</span>
+                                </Link>
+                                <Link 
+                                    href="/rateing" 
+                                    className={`transition-colors flex items-center space-x-1 ${
+                                        isActiveLink('/rateing') 
+                                            ? 'text-blue-600 font-medium' 
+                                            : 'text-gray-700 hover:text-blue-600'
+                                    }`}
+                                >
+                                    <TrendingUp className="h-4 w-4" />
+                                    <span>Resume Feedback</span>
+                                </Link>
+                            </>
                         )}
                     </div>
 
@@ -102,6 +147,22 @@ function Navbar() {
                                         >
                                             <FolderOpen className="h-4 w-4" />
                                             <span>My Resumes</span>
+                                        </Link>
+                                        <Link
+                                            href="/cover-letter"
+                                            className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                                            onClick={() => setIsProfileOpen(false)}
+                                        >
+                                            <Mail className="h-4 w-4" />
+                                            <span>Cover Letters</span>
+                                        </Link>
+                                        <Link
+                                            href="/rateing"
+                                            className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                                            onClick={() => setIsProfileOpen(false)}
+                                        >
+                                            <TrendingUp className="h-4 w-4" />
+                                            <span>Resume Feedback</span>
                                         </Link>
                                         <hr className="my-1" />
                                         <button
@@ -154,7 +215,11 @@ function Navbar() {
                         <div className="flex flex-col space-y-4">
                             <Link
                                 href="/template"
-                                className="text-gray-700 hover:text-blue-600 transition-colors flex items-center space-x-2"
+                                className={`transition-colors flex items-center space-x-2 ${
+                                    isActiveLink('/template') 
+                                        ? 'text-blue-600 font-medium' 
+                                        : 'text-gray-700 hover:text-blue-600'
+                                }`}
                                 onClick={() => setIsMenuOpen(false)}
                             >
                                 <LayoutPanelTop className="h-4 w-4" />
@@ -162,14 +227,44 @@ function Navbar() {
                             </Link>
                             
                             {user && (
-                                <Link
-                                    href="/resusme"
-                                    className="text-gray-700 hover:text-blue-600 transition-colors flex items-center space-x-2"
-                                    onClick={() => setIsMenuOpen(false)}
-                                >
-                                    <FolderOpen className="h-4 w-4" />
-                                    <span>My Resumes</span>
-                                </Link>
+                                <>
+                                    <Link
+                                        href="/resusme"
+                                        className={`transition-colors flex items-center space-x-2 ${
+                                            isActiveLink('/resusme') 
+                                                ? 'text-blue-600 font-medium' 
+                                                : 'text-gray-700 hover:text-blue-600'
+                                        }`}
+                                        onClick={() => setIsMenuOpen(false)}
+                                    >
+                                        <FolderOpen className="h-4 w-4" />
+                                        <span>My Resumes</span>
+                                    </Link>
+                                    <Link
+                                        href="/cover-letter"
+                                        className={`transition-colors flex items-center space-x-2 ${
+                                            isActiveLink('/cover-letter') 
+                                                ? 'text-blue-600 font-medium' 
+                                                : 'text-gray-700 hover:text-blue-600'
+                                        }`}
+                                        onClick={() => setIsMenuOpen(false)}
+                                    >
+                                        <Mail className="h-4 w-4" />
+                                        <span>Cover Letters</span>
+                                    </Link>
+                                    <Link
+                                        href="/rateing"
+                                        className={`transition-colors flex items-center space-x-2 ${
+                                            isActiveLink('/rateing') 
+                                                ? 'text-blue-600 font-medium' 
+                                                : 'text-gray-700 hover:text-blue-600'
+                                        }`}
+                                        onClick={() => setIsMenuOpen(false)}
+                                    >
+                                        <FileText className="h-4 w-4" />
+                                        <span>Resume Feedback</span>
+                                    </Link>
+                                </>
                             )}
 
                             {user ? (

@@ -1,12 +1,18 @@
 import React from 'react'
 import { useResumeStore } from '@/store/resumeStore'
 import TemplateRenderer from '@/components/templates/TemplateRenderer'
+import { useAuth } from '@/components/AuthContext'
+import { usePremiumStatus } from '@/hooks/usePremiumStatus'
+import Watermark from '@/components/ui/Watermark'
 
 interface ResumePreviewProps {
     mode?: 'default' | 'live'
+    pass?: boolean
 }
 
-function ResumePreview({ mode = 'default' }: ResumePreviewProps) {
+function ResumePreview({ mode = 'default', pass}: ResumePreviewProps) {
+    const { user } = useAuth()
+    const { isPremium } = usePremiumStatus()
     const { 
         personalInfo, 
         workExperience, 
@@ -82,10 +88,13 @@ function ResumePreview({ mode = 'default' }: ResumePreviewProps) {
     const templateIdNumber = parseInt(templateId) || 2
     const isLiveMode = mode === 'live'
     const resumeSize = isLiveMode ? 'small' : 'normal'
+    
+    // Show watermark if user is not logged in or not premium, but not on shared pages when pass=true
+    const showWatermark = pass ? false : (!user || !isPremium)
 
     return (
         <div 
-            className={`bg-white overflow-hidden ${isLiveMode ? 'border border-gray-300' : 'shadow-2xl border border-gray-300'}`}
+            className={`bg-white overflow-hidden relative ${isLiveMode ? 'border border-gray-300' : 'shadow-2xl border border-gray-300'}`}
             style={{
                 aspectRatio: '210/297', // A4 ratio
                 width: isLiveMode ? '100%' : '210mm',
@@ -100,6 +109,12 @@ function ResumePreview({ mode = 'default' }: ResumePreviewProps) {
                 size={resumeSize}
                 mode={mode}
             />
+            {showWatermark && (
+                <Watermark 
+                    text="AI CV Builder - Upgrade to Premium"
+                    opacity={0.15}
+                />
+            )}
         </div>
     )
 }

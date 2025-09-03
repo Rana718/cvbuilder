@@ -67,6 +67,7 @@ export interface ResumeState {
     currentStep: number
     templateId: string
     documentId: number | null
+    shareableUuid: string | null
     personalInfo: PersonalInfo
     workExperience: WorkExperience[]
     education: Education[]
@@ -88,6 +89,9 @@ interface ResumeStore extends ResumeState {
     // Document ID
     setDocumentId: (id: number) => void
     clearDocumentId: () => void
+
+    // Shareable UUID
+    setShareableUuid: (uuid: string | null) => void
 
     // API methods
     saveResume: () => Promise<void>
@@ -142,6 +146,7 @@ const initialState: ResumeState = {
     currentStep: 1,
     templateId: '',
     documentId: null,
+    shareableUuid: null,
     personalInfo: {
         firstName: '',
         lastName: '',
@@ -179,6 +184,9 @@ export const useResumeStore = create<ResumeStore>()((set, get) => ({
     clearDocumentId: () => {
         set({ documentId: null })
     },
+
+    // Shareable UUID
+    setShareableUuid: (uuid) => set({ shareableUuid: uuid }),
 
     // API methods
     saveResume: async () => {
@@ -313,6 +321,7 @@ export const useResumeStore = create<ResumeStore>()((set, get) => ({
 
         set({
             documentId: data.id,
+            shareableUuid: data.sharedable_uuid || null,
             templateId: data.template_id?.toString() || '',
             personalInfo: {
                 firstName: data.name?.split(' ')[0] || '',
