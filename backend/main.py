@@ -6,6 +6,7 @@ from routes import mainrouter
 from middleware.auth import JWTAuthMiddleware 
 from middleware.retelimter import RateLimitMiddleware
 from config.redis import init_redis
+from callback import callbackrouter
 
 load_dotenv()
 
@@ -25,6 +26,7 @@ app.add_middleware(RateLimitMiddleware)
 app.add_middleware(JWTAuthMiddleware)
 
 app.include_router(mainrouter, prefix="/api")
+app.include_router(callbackrouter, prefix="/callback")
 
 @app.on_event("startup")
 async def startup_event():

@@ -3,23 +3,23 @@ from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 from config.firebase import verify_firebase_token
 
-def get_current_user(request: Request) -> dict:
-    """Dependency to get current user from request state"""
-    if not hasattr(request.state, 'user_id'):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User not authenticated"
-        )
+# def get_current_user(request: Request) -> dict:
+#     """Dependency to get current user from request state"""
+#     if not hasattr(request.state, 'user_id'):
+#         raise HTTPException(
+#             status_code=status.HTTP_401_UNAUTHORIZED,
+#             detail="User not authenticated"
+#         )
     
-    return {
-        "user_id": request.state.user_id,
-        "email": getattr(request.state, 'user_email', None)
-    }
+#     return {
+#         "user_id": request.state.user_id,
+#         "email": getattr(request.state, 'user_email', None)
+#     }
 
 class JWTAuthMiddleware(BaseHTTPMiddleware):
     def __init__(self, app):
         super().__init__(app)
-        self.protected_prefixes = ["/api/resume-op", "/api/auth/profile"]
+        self.protected_prefixes = ["/api/resume-op", "/api/auth/profile", "/api/cover-letters"]
 
     async def dispatch(self, request: Request, call_next):
         if request.method == "OPTIONS":

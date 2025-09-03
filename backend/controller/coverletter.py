@@ -201,13 +201,56 @@ class CoverLetterController:
         except Exception as e:
             await db.rollback()
             raise HTTPException(status_code=500, detail=f"Error deleting cover letter: {str(e)}")
+    
+    @staticmethod
+    async def update_cover_letter(
+        db: AsyncSession, 
+        user_id: str, 
+        cover_letter_id: int,
+        cover_letter_data: CoverLetterCreateRequest
+    ) -> CoverLetterResponse:
+        try:
+            user = await CoverLetterController._get_user_by_firebase_uid(db, user_id)
+            
+            result = await db.execute(
+                select(CoverLetter).filter(
+                    CoverLetter.id == cover_letter_id,
+                    CoverLetter.user_id == user.id
+                )
+            )
+            cover_letter = result.scalar_one_or_none()
+            
+            if not cover_letter:
+                raise HTTPException(status_code=404, detail="Cover letter not found")
+            
+            # Update the cover letter fields
+            cover_letter.name = cover_letter_data.name
+            cover_letter.email = cover_letter_data.email
+            cover_letter.phone = cover_letter_data.phone
+            cover_letter.address = cover_letter_data.address
+            cover_letter.recipient_title = cover_letter_data.recipient_title
+            cover_letter.recipient_company = cover_letter_data.recipient_company
+            cover_letter.body = cover_letter_data.body
+            cover_letter.template_id = cover_letter_data.template_id
+            cover_letter.resume_id = cover_letter_data.resume_id
+            
+            await db.commit()
+            await db.refresh(cover_letter)
+            
+            return CoverLetterResponse.model_validate(cover_letter)
+            
+        except HTTPException:
+            raise
+        except Exception as e:
+            await db.rollback()
+            raise HTTPException(status_code=500, detail=f"Error updating cover letter: {str(e)}")
         
     @staticmethod
-    async def get_cover_letter_by_shareable_link(db: AsyncSession, shareable_link: str) -> CoverLetterResponse:
+    async def get_cover_letter_by_shareable_uuid(db: AsyncSession, shareable_uuid: str) -> CoverLetterResponse:
         try:
             result = await db.execute(
                 select(CoverLetter).filter(
-                    CoverLetter.shareable_link == shareable_link
+                    CoverLetter.shareable_uuid == shareable_uuid
                 )
             )
             cover_letter = result.scalar_one_or_none()
@@ -239,12 +282,12 @@ class CoverLetterController:
             if not cover_letter:
                 raise HTTPException(status_code=404, detail="Cover letter not found")
             
-            if not cover_letter.shareable_link:
-                cover_letter.shareable_link = str(uuid.uuid4())
+            if not cover_letter.shareable_uuid:
+                cover_letter.shareable_uuid = str(uuid.uuid4())
                 await db.commit()
                 await db.refresh(cover_letter)
             
-            return {"shareable_link": cover_letter.shareable_link}
+            return {"shareable_link": cover_letter.shareable_uuid}
             
         except HTTPException:
             raise
