@@ -6,6 +6,7 @@ import { signOut } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import LinkedInIntegration from '@/components/LinkedInIntegration'
 import {
     User,
     Mail,
@@ -342,6 +343,11 @@ function ProfilePage() {
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                        
+                        {/* LinkedIn Integration */}
+                        <div className="mt-6">
+                            <LinkedInIntegration />
                         </div>
                     </div>
 

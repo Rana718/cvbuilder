@@ -6,6 +6,7 @@ import { useAuth } from '@/components/AuthContext'
 import { useResumeStore } from '@/store/resumeStore'
 import { usePremiumStatus } from '@/hooks/usePremiumStatus'
 import ResumePreview from '@/components/ui/ResumePreview'
+import PaymentCard from '@/components/PaymentCard'
 import { ArrowLeft, Download, Save, Edit, Share, Copy, CheckCircle } from 'lucide-react'
 import Link from 'next/link'
 import axiosInstance from '@/lib/axios'
@@ -15,7 +16,7 @@ function ResumePage() {
     const searchParams = useSearchParams()
     const router = useRouter()
     const { user, loading } = useAuth()
-    const { isPremium } = usePremiumStatus()
+    const { isPremium, refreshStatus } = usePremiumStatus()
     const templateId = searchParams.get('template')
     const resumeId = params.id
 
@@ -36,6 +37,7 @@ function ResumePage() {
     const [shareUrl, setShareUrl] = useState('')
     const [showShareSuccess, setShowShareSuccess] = useState(false)
     const [hasLoadedOnce, setHasLoadedOnce] = useState(false)
+    const [showPaymentCard, setShowPaymentCard] = useState(false)
 
     const handleAuthRedirect = () => {
         const currentUrl = window.location.pathname + window.location.search
@@ -68,9 +70,9 @@ function ResumePage() {
     const handleDownload = async () => {
         if (isDownloading) return
 
-        // Check if user is premium for download
+        // Check if user is premium for download or redirect to payment
         if (!user || !isPremium) {
-            alert('Download feature is only available for premium users. Please upgrade your account to download your resume.')
+            setShowPaymentCard(true)
             return
         }
 
@@ -269,6 +271,16 @@ function ResumePage() {
         }
     }
 
+    const handlePaymentSuccess = async () => {
+        // Refresh the premium status after successful payment
+        await refreshStatus()
+        setShowPaymentCard(false)
+        // Optionally trigger download immediately after payment
+        setTimeout(() => {
+            handleDownload()
+        }, 1000)
+    }
+
     const copyShareUrl = async () => {
         if (shareUrl) {
             try {
@@ -381,13 +393,13 @@ function ResumePage() {
                             </button>
                             <button
                                 onClick={handleDownload}
-                                disabled={isDownloading || (!user || !isPremium)}
+                                disabled={isDownloading}
                                 className="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md hover:shadow-lg"
                                 title={(!user || !isPremium) ? 'Premium feature - Upgrade to download' : ''}
                             >
                                 <Download className="w-4 h-4" />
                                 <span className="hidden sm:inline">
-                                    {isDownloading ? 'Downloading...' : (!user || !isPremium) ? 'Premium' : 'Download PDF'}
+                                    {isDownloading ? 'Downloading...' : (!user || !isPremium) ? 'Get Premium' : 'Download PDF'}
                                 </span>
                             </button>
                         </div>
@@ -401,6 +413,14 @@ function ResumePage() {
                     <ResumePreview />
                 </div>
             </div>
+
+            {/* Payment Card Modal */}
+            <PaymentCard
+                isOpen={showPaymentCard}
+                onClose={() => setShowPaymentCard(false)}
+                onSuccess={handlePaymentSuccess}
+                redirectAfterLogin={true}
+            />
         </div>
     )
 }

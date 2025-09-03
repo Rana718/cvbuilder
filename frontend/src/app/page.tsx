@@ -4,16 +4,41 @@ import { motion } from "framer-motion";
 import { FileText, Sparkles, Download, ArrowRight, User, Star, Clock, Shield, Zap, CheckCircle } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import PaymentCard from "@/components/PaymentCard";
 import { useAuth } from "@/components/AuthContext";
-import { useEffect } from "react";
+import { usePremiumStatus } from "@/hooks/usePremiumStatus";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function Home() {
   const { user } = useAuth();
+  const { isPremium, refreshStatus } = usePremiumStatus();
   const router = useRouter();
+  const [showPaymentCard, setShowPaymentCard] = useState(false);
   useEffect(() => {
     console.log("Current user:", user);
   }, [user])
+
+  const handlePremiumUpgrade = () => {
+    if (!user) {
+      router.push('/sign-in');
+      return;
+    }
+
+    if (isPremium) {
+      // User is already premium, maybe show subscription management
+      alert('You are already a premium user!');
+      return;
+    }
+
+    setShowPaymentCard(true);
+  };
+
+  const handlePaymentSuccess = async () => {
+    await refreshStatus();
+    setShowPaymentCard(false);
+    alert('Welcome to Premium! You now have access to all premium features.');
+  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -399,8 +424,11 @@ export default function Home() {
                 </div>
               </div>
 
-              <button className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white py-3 rounded-lg font-semibold transition-all transform hover:-translate-y-1 shadow-lg mt-auto">
-                Upgrade to Premium
+              <button 
+                onClick={handlePremiumUpgrade}
+                className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white py-3 rounded-lg font-semibold transition-all transform hover:-translate-y-1 shadow-lg mt-auto"
+              >
+                {isPremium ? 'Already Premium ✓' : 'Upgrade to Premium'}
               </button>
             </motion.div>
           </div>
@@ -607,6 +635,13 @@ export default function Home() {
         </div>
       </section>
       <Footer />
+
+      {/* Payment Card Modal */}
+      <PaymentCard
+        isOpen={showPaymentCard}
+        onClose={() => setShowPaymentCard(false)}
+        onSuccess={handlePaymentSuccess}
+      />
     </div>
   );
 }

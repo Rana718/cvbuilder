@@ -17,6 +17,7 @@ import {
 import "./globals.css";
 import AuthContext from "@/components/AuthContext";
 import { Toaster } from "sonner";
+import Script from "next/script";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -100,11 +101,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <Script
+        src="https://checkout.razorpay.com/v1/checkout.js"
+        strategy="afterInteractive"
+      />
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${playfairDisplay.variable} ${sourceSans3.variable} ${poppins.variable} ${openSans.variable} ${jetbrainsMono.variable} ${roboto.variable} ${merriweather.variable} ${lato.variable} ${nunito.variable} ${nunitoSans.variable} antialiased`}
       >
         <AuthContext>{children}</AuthContext>
-        <Toaster/>
+        <Toaster />
       </body>
     </html>
   );
