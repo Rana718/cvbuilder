@@ -41,5 +41,6 @@ jobs:
           username: ${{ vars.VPS_USER }}
           password: ${{ vars.VPS_PASS }}
           script: |
+            cd /home/aydrana/deployment/cvbuilder/deployment
             echo "ayd*rana" | sudo -S ./deploy.sh
             echo "Deployment script executed successfully."
