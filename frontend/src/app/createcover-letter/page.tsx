@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, Suspense } from 'react';
 import { useParams, useSearchParams, useRouter } from 'next/navigation';
 import { useCoverLetterStore } from '@/store/coverLetterStore';
 import SimpleRichTextEditor from '@/components/ui/SimpleRichTextEditor';
@@ -185,7 +185,7 @@ const CreateCoverLetterPage: React.FC = () => {
         setFormData,
         clearForNew
     } = useCoverLetterStore();
-    
+
     const [showAIPopup, setShowAIPopup] = useState<boolean>(false);
     const [isLoadingAI, setIsLoadingAI] = useState<boolean>(false);
 
@@ -467,4 +467,14 @@ const CreateCoverLetterPage: React.FC = () => {
     );
 };
 
-export default CreateCoverLetterPage;
+const CreateCoverLetterPageWrapper: React.FC = () => {
+    return (
+        <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-500 border-t-transparent"></div>
+        </div>}>
+            <CreateCoverLetterPage />
+        </Suspense>
+    );
+};
+
+export default CreateCoverLetterPageWrapper;

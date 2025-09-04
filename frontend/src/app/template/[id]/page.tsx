@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect } from 'react'
+import React, { useEffect, Suspense } from 'react'
 import { useParams, useSearchParams } from 'next/navigation'
 import { useResumeStore } from '@/store/resumeStore'
 import MobileFrom from '@/components/from/MobileFrom'
@@ -54,4 +54,16 @@ function TemplatePage() {
     )
 }
 
-export default TemplatePage
+const TemplatePageWrapper = () => {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-500 border-t-transparent"></div>
+            </div>
+        }>
+            <TemplatePage />
+        </Suspense>
+    )
+}
+
+export default TemplatePageWrapper

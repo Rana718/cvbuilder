@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useParams, useSearchParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/components/AuthContext';
 import { useCoverLetterStore } from '@/store/coverLetterStore';
@@ -408,4 +408,16 @@ function CoverLetterPage() {
     );
 }
 
-export default CoverLetterPage;
+const CoverLetterPageWrapper = () => {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-500 border-t-transparent"></div>
+            </div>
+        }>
+            <CoverLetterPage />
+        </Suspense>
+    );
+}
+
+export default CoverLetterPageWrapper;

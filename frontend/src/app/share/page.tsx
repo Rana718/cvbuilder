@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import axiosInstance from '@/lib/axios'
 import ResumePreview from '@/components/ui/ResumePreview'
@@ -118,4 +118,16 @@ function SharePage() {
     )
 }
 
-export default SharePage
+const SharePageWrapper = () => {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-500 border-t-transparent"></div>
+            </div>
+        }>
+            <SharePage />
+        </Suspense>
+    )
+}
+
+export default SharePageWrapper
