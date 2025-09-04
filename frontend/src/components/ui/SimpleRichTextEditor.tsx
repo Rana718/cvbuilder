@@ -139,7 +139,7 @@ function RichTextEditor({ value, onChange, placeholder = "Enter description...",
                 onFocus={handleFocus}
                 onBlur={handleBlur}
                 onInput={handleInput}
-                className="p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset"
+                className="p-3 focus:outline-none"
                 style={{ minHeight: height }}
                 suppressContentEditableWarning={true}
             />

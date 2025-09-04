@@ -116,13 +116,15 @@ export const useCoverLetterStore = create<CoverLetterStore>()((set, get) => ({
         try {
             set({ isLoading: true })
 
-            if (state.documentId && typeof state.documentId === 'number') {
-                // Update existing cover letter
-                const response = await axiosInstance.put(`/api/cover-letters/${state.documentId}`, coverLetterData)
-                set({ documentId: response.data.id })
-            } else {
+            const isNewCoverLetter = !state.documentId || typeof state.documentId !== 'number'
+            
+            if (isNewCoverLetter) {
                 // Create new cover letter
                 const response = await axiosInstance.post('/api/cover-letters/', coverLetterData)
+                set({ documentId: response.data.id })
+            } else {
+                // Update existing cover letter - don't reset store
+                const response = await axiosInstance.put(`/api/cover-letters/${state.documentId}`, coverLetterData)
                 set({ documentId: response.data.id })
             }
         } catch (error) {

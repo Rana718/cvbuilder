@@ -1,33 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
-import {
-    CreditCard,
-    Search,
-    Filter,
-    Download,
-    Eye,
-    RefreshCw,
-    CheckCircle,
-    XCircle,
-    Clock,
-    DollarSign,
-    TrendingUp,
-    Users,
-} from "lucide-react";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import {
     Select,
     SelectContent,
@@ -36,192 +13,320 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import {
-    PieChart,
-    Pie,
-    Cell,
-    Tooltip,
-    ResponsiveContainer,
-} from "recharts";
-
-const paymentStats = [
-    {
-        title: "Total Revenue",
-        value: "₹2,45,680",
-        change: "+12.5%",
-        icon: DollarSign,
-        color: "text-green-600",
-        bgColor: "bg-green-50",
-    },
-    {
-        title: "This Month",
-        value: "₹80,280",
-        change: "+8.2%",
-        icon: TrendingUp,
-        color: "text-blue-600",
-        bgColor: "bg-blue-50",
-    },
-    {
-        title: "Active Subscriptions",
-        value: "892",
-        change: "+15.3%",
-        icon: Users,
-        color: "text-purple-600",
-        bgColor: "bg-purple-50",
-    },
-    {
-        title: "Success Rate",
-        value: "98.5%",
-        change: "+0.8%",
-        icon: CheckCircle,
-        color: "text-emerald-600",
-        bgColor: "bg-emerald-50",
-    },
-];
-
-const paymentsData = [
-    {
-        id: "PAY001",
-        user: { name: "John Doe", email: "john@example.com" },
-        amount: "₹90",
-        status: "Success",
-        method: "UPI",
-        date: "2024-09-01 14:30",
-        transactionId: "TXN123456789",
-        plan: "Premium Monthly",
-    },
-    {
-        id: "PAY002",
-        user: { name: "Sarah Wilson", email: "sarah@example.com" },
-        amount: "₹90",
-        status: "Success",
-        method: "Credit Card",
-        date: "2024-09-01 12:15",
-        transactionId: "TXN123456788",
-        plan: "Premium Monthly",
-    },
-    {
-        id: "PAY003",
-        user: { name: "Mike Johnson", email: "mike@example.com" },
-        amount: "₹90",
-        status: "Failed",
-        method: "Debit Card",
-        date: "2024-08-31 18:45",
-        transactionId: "TXN123456787",
-        plan: "Premium Monthly",
-    },
-    {
-        id: "PAY004",
-        user: { name: "Emily Chen", email: "emily@example.com" },
-        amount: "₹90",
-        status: "Pending",
-        method: "Net Banking",
-        date: "2024-08-31 16:20",
-        transactionId: "TXN123456786",
-        plan: "Premium Monthly",
-    },
-    {
-        id: "PAY005",
-        user: { name: "David Brown", email: "david@example.com" },
-        amount: "₹90",
-        status: "Success",
-        method: "UPI",
-        date: "2024-08-30 10:30",
-        transactionId: "TXN123456785",
-        plan: "Premium Monthly",
-    },
-];
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+    DollarSign,
+    TrendingUp,
+    Users,
+    CheckCircle,
+    Clock,
+    X,
+    Search,
+    RefreshCw,
+    AlertTriangle,
+} from "lucide-react";
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
+import { usePaymentManagement } from "@/hooks/usePaymentManagement";
 
 export default function PaymentManagement() {
     const [searchTerm, setSearchTerm] = useState("");
     const [statusFilter, setStatusFilter] = useState("all");
+    const { data, loading, error, refetch } = usePaymentManagement();
+
+    // Format currency values
+    const formatCurrency = (amount: number) => {
+        return new Intl.NumberFormat('en-IN', {
+            style: 'currency',
+            currency: 'INR',
+            minimumFractionDigits: 0,
+        }).format(amount / 100); // Convert paise to rupees
+    };
+
+    // Format percentage
+    const formatPercentage = (percentage: number) => {
+        const sign = percentage >= 0 ? '+' : '';
+        return `${sign}${percentage.toFixed(1)}%`;
+    };
+
+    // Prepare stats data
+    const paymentStats = data ? [
+        {
+            title: "Total Revenue",
+            value: formatCurrency(data.revenue_metrics.total_revenue),
+            change: formatPercentage(data.revenue_metrics.revenue_growth_percentage),
+            icon: DollarSign,
+            color: "text-green-600",
+            bgColor: "bg-green-50",
+        },
+        {
+            title: "This Month",
+            value: formatCurrency(data.revenue_metrics.current_month_revenue),
+            change: formatPercentage(data.revenue_metrics.revenue_growth_percentage),
+            icon: TrendingUp,
+            color: "text-blue-600",
+            bgColor: "bg-blue-50",
+        },
+        {
+            title: "Active Subscriptions",
+            value: data.subscription_metrics.active_subscriptions.toString(),
+            change: formatPercentage(data.subscription_metrics.subscription_growth_percentage),
+            icon: Users,
+            color: "text-purple-600",
+            bgColor: "bg-purple-50",
+        },
+        {
+            title: "Success Rate",
+            value: `${data.success_rate_metrics.current_success_rate.toFixed(1)}%`,
+            change: formatPercentage(data.success_rate_metrics.success_rate_change),
+            icon: CheckCircle,
+            color: "text-emerald-600",
+            bgColor: "bg-emerald-50",
+        },
+    ] : [];
 
     const getStatusBadge = (status: string) => {
-        switch (status) {
-            case "Success":
-                return <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
-                    <CheckCircle className="h-3 w-3 mr-1" />
-                    Success
-                </Badge>;
-            case "Failed":
-                return <Badge className="bg-red-100 text-red-800 hover:bg-red-100">
-                    <XCircle className="h-3 w-3 mr-1" />
-                    Failed
-                </Badge>;
-            case "Pending":
-                return <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100">
-                    <Clock className="h-3 w-3 mr-1" />
-                    Pending
-                </Badge>;
+        const normalizedStatus = status.toLowerCase();
+        switch (normalizedStatus) {
+            case "captured":
+            case "success":
+            case "completed":
+                return (
+                    <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
+                        <CheckCircle className="h-3 w-3 mr-1" />
+                        Success
+                    </Badge>
+                );
+            case "failed":
+            case "error":
+                return (
+                    <Badge className="bg-red-100 text-red-800 hover:bg-red-100">
+                        <X className="h-3 w-3 mr-1" />
+                        Failed
+                    </Badge>
+                );
+            case "pending":
+            case "processing":
+                return (
+                    <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100">
+                        <Clock className="h-3 w-3 mr-1" />
+                        Pending
+                    </Badge>
+                );
             default:
                 return <Badge variant="secondary">{status}</Badge>;
         }
     };
 
-    const filteredPayments = paymentsData.filter((payment) => {
+    const filteredPayments = data?.payment_transactions.filter((payment) => {
         const matchesSearch =
-            payment.user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            payment.user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            payment.transactionId.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesStatus = statusFilter === "all" || payment.status.toLowerCase() === statusFilter;
+            payment.user_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            payment.user_email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            payment.transaction_id.toLowerCase().includes(searchTerm.toLowerCase());
+
+        const normalizedStatus = payment.status.toLowerCase();
+        let matchesStatus = false;
+
+        if (statusFilter === "all") {
+            matchesStatus = true;
+        } else if (statusFilter === "success") {
+            matchesStatus = normalizedStatus === "captured" || normalizedStatus === "success" || normalizedStatus === "completed";
+        } else if (statusFilter === "failed") {
+            matchesStatus = normalizedStatus === "failed" || normalizedStatus === "error";
+        } else if (statusFilter === "pending") {
+            matchesStatus = normalizedStatus === "pending" || normalizedStatus === "processing";
+        }
+
         return matchesSearch && matchesStatus;
-    });
+    }) || [];
+
+    // Prepare chart data for payment methods
+    const chartData = data?.payment_method_distribution.map((method, index) => ({
+        name: method.method || "Unknown",
+        value: method.count,
+        percentage: method.percentage,
+        fill: `hsl(${(index * 137.5) % 360}, 70%, 50%)`, // Generate distinct colors
+    })) || [];
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center min-h-[400px]">
+                <div className="flex items-center space-x-2">
+                    <RefreshCw className="h-6 w-6 animate-spin" />
+                    <span>Loading payment data...</span>
+                </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="p-4 lg:p-8">
+                <Alert variant="destructive">
+                    <AlertTriangle className="h-4 w-4" />
+                    <AlertDescription>
+                        Failed to load payment data. Please try again.
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={refetch}
+                            className="ml-4"
+                        >
+                            <RefreshCw className="h-4 w-4 mr-2" />
+                            Retry
+                        </Button>
+                    </AlertDescription>
+                </Alert>
+            </div>
+        );
+    }
 
     return (
         <div className="p-4 lg:p-8 space-y-8">
             {/* Header */}
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900">Payment Management</h1>
-                    <p className="text-gray-600">Monitor and manage all payment transactions</p>
+                    <h1 className="text-3xl font-bold tracking-tight">Payment Management</h1>
+                    <p className="text-muted-foreground">Monitor and manage payment transactions and revenue</p>
                 </div>
-                <div className="flex items-center space-x-3">
-                    <Button variant="outline" size="sm">
-                        <Download className="h-4 w-4 mr-2" />
-                        Export Payments
-                    </Button>
-                    <Button size="sm">
-                        <RefreshCw className="h-4 w-4 mr-2" />
-                        Refresh
-                    </Button>
-                </div>
+                <Button onClick={refetch} variant="outline">
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                    Refresh Data
+                </Button>
             </div>
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {paymentStats.map((stat, index) => (
-                    <Card key={index} className="hover:shadow-lg transition-shadow">
-                        <CardContent className="p-6">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-sm font-medium text-gray-600">{stat.title}</p>
-                                    <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
-                                    <p className="text-sm text-green-600 mt-1">{stat.change} from last month</p>
+                {paymentStats.map((stat, index) => {
+                    const Icon = stat.icon;
+                    const isPositive = !stat.change.includes('-');
+                    return (
+                        <Card key={index}>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
+                                <div className={`p-2 rounded-lg ${stat.bgColor}`}>
+                                    <Icon className={`h-4 w-4 ${stat.color}`} />
                                 </div>
-                                <div className={`${stat.bgColor} p-3 rounded-lg`}>
-                                    <stat.icon className={`h-6 w-6 ${stat.color}`} />
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-                ))}
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold">{stat.value}</div>
+                                <p className={`text-xs ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
+                                    {stat.change} from last month
+                                </p>
+                            </CardContent>
+                        </Card>
+                    );
+                })}
             </div>
+
+            {/* Payment Method Distribution */}
+            {data && data.payment_method_distribution.length > 0 && (
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Payment Method Distribution</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="flex flex-col lg:flex-row items-center space-y-4 lg:space-y-0 lg:space-x-8">
+                            <div className="w-full lg:w-1/2 h-64">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <PieChart>
+                                        <Pie
+                                            data={chartData}
+                                            cx="50%"
+                                            cy="50%"
+                                            innerRadius={60}
+                                            outerRadius={100}
+                                            paddingAngle={5}
+                                            dataKey="value"
+                                        >
+                                            {chartData.map((entry, index) => (
+                                                <Cell key={`cell-${index}`} fill={entry.fill} />
+                                            ))}
+                                        </Pie>
+                                        <Tooltip
+                                            formatter={(value, name) => [`${value} transactions`, name]}
+                                        />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                            </div>
+                            <div className="w-full lg:w-1/2 space-y-3">
+                                {data.payment_method_distribution.map((method, index) => (
+                                    <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                        <div className="flex items-center space-x-3">
+                                            <div
+                                                className="w-4 h-4 rounded-full"
+                                                style={{ backgroundColor: chartData[index]?.fill }}
+                                            />
+                                            <span className="font-medium">{method.method || "Unknown"}</span>
+                                        </div>
+                                        <div className="text-right">
+                                            <div className="font-semibold">{method.count} transactions</div>
+                                            <div className="text-sm text-gray-600">{method.percentage.toFixed(1)}%</div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+            )}
+
+            {/* Recent Failed Payments */}
+            {data && data.recent_failed_payments.length > 0 && (
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="text-red-600">Recent Failed Payments</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="space-y-3">
+                            {data.recent_failed_payments.slice(0, 5).map((payment, index) => (
+                                <div key={index} className="flex items-center justify-between p-3 bg-red-50 rounded-lg border border-red-200">
+                                    <div className="flex items-center space-x-3">
+                                        <Avatar className="h-8 w-8">
+                                            <AvatarFallback className="bg-red-100 text-red-600">
+                                                {payment.user_name.charAt(0).toUpperCase()}
+                                            </AvatarFallback>
+                                        </Avatar>
+                                        <div>
+                                            <p className="font-medium">{payment.user_name}</p>
+                                            <p className="text-sm text-gray-600">{payment.user_email}</p>
+                                        </div>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="font-semibold text-red-600">{formatCurrency(payment.amount)}</p>
+                                        <p className="text-sm text-gray-600">{payment.date}</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </CardContent>
+                </Card>
+            )}
 
             {/* Filters */}
             <Card>
-                <CardContent className="p-6">
-                    <div className="flex flex-col lg:flex-row space-y-4 lg:space-y-0 lg:space-x-4">
+                <CardHeader>
+                    <CardTitle>Payment Transactions</CardTitle>
+                    <div className="flex flex-col sm:flex-row gap-4">
                         <div className="relative flex-1">
                             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                             <Input
-                                placeholder="Search by user, email, or transaction ID..."
+                                placeholder="Search by name, email, or transaction ID..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 className="pl-10"
                             />
                         </div>
                         <Select value={statusFilter} onValueChange={setStatusFilter}>
-                            <SelectTrigger className="w-full lg:w-40">
-                                <SelectValue placeholder="Status" />
+                            <SelectTrigger className="w-full sm:w-48">
+                                <SelectValue placeholder="Filter by status" />
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="all">All Status</SelectItem>
@@ -231,124 +336,65 @@ export default function PaymentManagement() {
                             </SelectContent>
                         </Select>
                     </div>
-                </CardContent>
-            </Card>
-
-            {/* Payments Table */}
-            <Card>
-                <CardHeader>
-                    <CardTitle>Payment Transactions</CardTitle>
                 </CardHeader>
-                <CardContent className="p-0">
-                    <div className="overflow-x-auto">
+                <CardContent>
+                    <div className="rounded-md border">
                         <Table>
                             <TableHeader>
-                                <TableRow className="bg-gray-50">
+                                <TableRow>
                                     <TableHead>User</TableHead>
                                     <TableHead>Transaction ID</TableHead>
                                     <TableHead>Amount</TableHead>
-                                    <TableHead>Status</TableHead>
                                     <TableHead>Method</TableHead>
-                                    <TableHead>Plan</TableHead>
+                                    <TableHead>Status</TableHead>
                                     <TableHead>Date</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {filteredPayments.map((payment) => (
-                                    <TableRow key={payment.id} className="hover:bg-gray-50">
-                                        <TableCell>
-                                            <div className="flex items-center space-x-3">
-                                                <Avatar>
-                                                    <AvatarFallback className="bg-blue-100 text-blue-700">
-                                                        {payment.user.name.split(" ").map((n) => n[0]).join("")}
-                                                    </AvatarFallback>
-                                                </Avatar>
-                                                <div>
-                                                    <div className="font-medium text-gray-900">{payment.user.name}</div>
-                                                    <div className="text-sm text-gray-500">{payment.user.email}</div>
-                                                </div>
-                                            </div>
+                                {filteredPayments.length === 0 ? (
+                                    <TableRow>
+                                        <TableCell colSpan={6} className="text-center py-8 text-gray-500">
+                                            No payments found matching your criteria
                                         </TableCell>
-                                        <TableCell>
-                                            <div className="font-mono text-sm">{payment.transactionId}</div>
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className="font-medium text-green-600">{payment.amount}</div>
-                                        </TableCell>
-                                        <TableCell>{getStatusBadge(payment.status)}</TableCell>
-                                        <TableCell>
-                                            <Badge variant="outline">{payment.method}</Badge>
-                                        </TableCell>
-                                        <TableCell>{payment.plan}</TableCell>
-                                        <TableCell>{payment.date}</TableCell>
                                     </TableRow>
-                                ))}
+                                ) : (
+                                    filteredPayments.map((payment, index) => (
+                                        <TableRow key={index}>
+                                            <TableCell>
+                                                <div className="flex items-center space-x-3">
+                                                    <Avatar className="h-8 w-8">
+                                                        <AvatarImage src={payment.user_image || undefined} />
+                                                        <AvatarFallback>
+                                                            {payment.user_name.charAt(0).toUpperCase()}
+                                                        </AvatarFallback>
+                                                    </Avatar>
+                                                    <div>
+                                                        <p className="font-medium">{payment.user_name}</p>
+                                                        <p className="text-sm text-gray-600">{payment.user_email}</p>
+                                                    </div>
+                                                </div>
+                                            </TableCell>
+                                            <TableCell className="font-mono text-sm">{payment.transaction_id}</TableCell>
+                                            <TableCell className="font-semibold">{formatCurrency(payment.amount)}</TableCell>
+                                            <TableCell>{payment.method || "N/A"}</TableCell>
+                                            <TableCell>{getStatusBadge(payment.status)}</TableCell>
+                                            <TableCell>{payment.purchase_date}</TableCell>
+                                        </TableRow>
+                                    ))
+                                )}
                             </TableBody>
                         </Table>
                     </div>
+
+                    {filteredPayments.length > 0 && (
+                        <div className="flex items-center justify-between pt-4">
+                            <p className="text-sm text-gray-600">
+                                Showing {filteredPayments.length} of {data?.payment_transactions.length || 0} transactions
+                            </p>
+                        </div>
+                    )}
                 </CardContent>
             </Card>
-
-            {/* Payment Methods Summary */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Payment Methods</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <ResponsiveContainer width="100%" height={300}>
-                            <PieChart>
-                                <Pie
-                                    data={[
-                                        { method: "UPI", count: 450, percentage: 45, color: "#3B82F6" },
-                                        { method: "Credit Card", count: 300, percentage: 30, color: "#10B981" },
-                                        { method: "Debit Card", count: 150, percentage: 15, color: "#F59E0B" },
-                                        { method: "Net Banking", count: 100, percentage: 10, color: "#8B5CF6" },
-                                    ]}
-                                    cx="50%"
-                                    cy="50%"
-                                    outerRadius={80}
-                                    fill="#8884d8"
-                                    dataKey="percentage"
-                                    label={({ method, percentage }) => `${method}: ${percentage}%`}
-                                >
-                                    {[
-                                        { method: "UPI", count: 450, percentage: 45, color: "#3B82F6" },
-                                        { method: "Credit Card", count: 300, percentage: 30, color: "#10B981" },
-                                        { method: "Debit Card", count: 150, percentage: 15, color: "#F59E0B" },
-                                        { method: "Net Banking", count: 100, percentage: 10, color: "#8B5CF6" },
-                                    ].map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={entry.color} />
-                                    ))}
-                                </Pie>
-                                <Tooltip />
-                            </PieChart>
-                        </ResponsiveContainer>
-                    </CardContent>
-                </Card>
-
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Recent Failed Payments</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="space-y-3">
-                            {paymentsData.filter(p => p.status === "Failed").map((payment, index) => (
-                                <div key={index} className="flex items-center justify-between p-3 bg-red-50 rounded-lg border border-red-100">
-                                    <div>
-                                        <p className="font-medium text-gray-900">{payment.user.name}</p>
-                                        <p className="text-sm text-gray-500">{payment.transactionId}</p>
-                                    </div>
-                                    <div className="text-right">
-                                        <p className="font-medium text-red-600">{payment.amount}</p>
-                                        <p className="text-xs text-gray-500">{payment.date}</p>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </CardContent>
-                </Card>
-            </div>
         </div>
     );
 }

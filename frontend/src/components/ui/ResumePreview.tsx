@@ -94,7 +94,7 @@ function ResumePreview({ mode = 'default', pass}: ResumePreviewProps) {
 
     return (
         <div 
-            className={`bg-white overflow-hidden relative ${isLiveMode ? 'border border-gray-300' : 'shadow-2xl border border-gray-300'}`}
+            className={`bg-white overflow-hidden relative ${isLiveMode ? 'border border-black rounded-[4px]' : 'shadow-2xl border border-gray-300'}`}
             style={{
                 aspectRatio: '210/297', // A4 ratio
                 width: isLiveMode ? '100%' : '210mm',

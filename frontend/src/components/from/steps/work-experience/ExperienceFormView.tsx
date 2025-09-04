@@ -40,7 +40,6 @@ function MonthYearPicker({
     fromYear = 1950,
     toYear = new Date().getFullYear() + 10,
     placeholder = 'Select month',
-    isStart = false,
     disabled = false
 }: {
     label: string
@@ -49,7 +48,6 @@ function MonthYearPicker({
     fromYear?: number
     toYear?: number
     placeholder?: string
-    isStart?: boolean
     disabled?: boolean
 }) {
     const [open, setOpen] = useState(false)
@@ -63,12 +61,12 @@ function MonthYearPicker({
                     <Button
                         variant="outline"
                         disabled={disabled}
-                        className={`w-full justify-start text-left font-normal border-gray-300 hover:bg-blue-50 hover:border-blue-400 ${disabled
+                        className={`w-full justify-start text-left font-normal border-gray-300 rounded-sm hover:bg-gray-50 hover:border-gray-400 ${disabled
                                 ? 'bg-gray-100 text-gray-400 cursor-not-allowed opacity-60'
                                 : 'bg-white'
                             } ${!selected && !disabled && 'text-gray-500'}`}
                     >
-                        <Calendar className={`mr-2 h-4 w-4 ${disabled ? 'text-gray-400' : 'text-blue-500'}`} />
+                        <Calendar className={`mr-2 h-4 w-4 ${disabled ? 'text-gray-400' : 'text-gray-600'}`} />
                         {disabled && !selected
                             ? 'Currently working'
                             : selected
@@ -102,7 +100,6 @@ function ExperienceFormView({ formData, onFormDataChange, onNext, onCancel, isEd
     const [isLoading, setIsLoading] = useState(false)
 
     const handleInputChange = (field: keyof Omit<WorkExperience, 'id'>, value: string | boolean) => {
-        // If toggling remote work, clear location when remote is enabled
         if (field === 'isRemote' && value === true) {
             onFormDataChange({ [field]: value, location: '' })
         } else {
@@ -119,7 +116,6 @@ function ExperienceFormView({ formData, onFormDataChange, onNext, onCancel, isEd
 
     const handleNext = async () => {
         setIsLoading(true)
-        // Simulate API call delay
         await new Promise(resolve => setTimeout(resolve, 1000))
         onNext()
         setIsLoading(false)
@@ -140,18 +136,21 @@ function ExperienceFormView({ formData, onFormDataChange, onNext, onCancel, isEd
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
-                className="text-center"
+                className="text-left"
             >
-                <div className="flex items-center justify-center mb-4">
-                    <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full shadow-lg">
-                        <Briefcase className="w-8 h-8 text-white" />
+                <div className="flex items-start mb-4">
+                    <div className="p-2 md:p-3 bg-blue-100 rounded-full mr-3 md:mr-2">
+                        <Briefcase className="w-6 h-6 md:w-8 md:h-8 text-blue-600" />
+                    </div>
+                    <div className="flex-1">
+                        <h3 className="text-2xl md:text-3xl font-bold text-gray-900">
+                            {isEditing ? 'Edit Work Experience' : 'Add Work Experience'}
+                        </h3>
+                        <p className="text-base md:text-lg text-gray-600">
+                            {isEditing ? 'Update your role and responsibilities' : 'Tell us about your role and responsibilities'}
+                        </p>
                     </div>
                 </div>
-                <h3 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">
-                    {isEditing ? 'Edit Work Experience' : 'Add Work Experience'}
-                </h3>
-                <p className="text-lg text-gray-600">{isEditing ? 'Update your role and responsibilities' : 'Tell us about your role and responsibilities'}</p>
-                <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full mx-auto mt-4"></div>
             </motion.div>
 
             {/* Form */}
@@ -159,21 +158,21 @@ function ExperienceFormView({ formData, onFormDataChange, onNext, onCancel, isEd
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="bg-white rounded-2xl border border-gray-200 shadow-xl p-4 md:p-8 space-y-6"
+                className="bg-white p-2 md:p-4 space-y-4"
             >
                 {/* Job Title, Company, and Role */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
                     <div>
                         <label className="block text-sm font-semibold text-gray-700 mb-2">
                             Job Title <span className="text-red-500">*</span>
                         </label>
                         <div className="relative">
-                            <Building2 className="absolute left-3 top-3 h-5 w-5 text-blue-500" />
+                            <Building2 className="absolute left-3 top-2.5 h-4 w-4 text-gray-600" />
                             <input
                                 type="text"
                                 value={formData.jobTitle}
                                 onChange={(e) => handleInputChange('jobTitle', e.target.value)}
-                                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-sm bg-white"
+                                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white"
                                 placeholder="Software Engineer"
                             />
                         </div>
@@ -184,12 +183,12 @@ function ExperienceFormView({ formData, onFormDataChange, onNext, onCancel, isEd
                             Company <span className="text-red-500">*</span>
                         </label>
                         <div className="relative">
-                            <Building2 className="absolute left-3 top-3 h-5 w-5 text-blue-500" />
+                            <Building2 className="absolute left-3 top-2.5 h-4 w-4 text-gray-600" />
                             <input
                                 type="text"
                                 value={formData.employer}
                                 onChange={(e) => handleInputChange('employer', e.target.value)}
-                                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-sm bg-white"
+                                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white"
                                 placeholder="Company Name"
                             />
                         </div>
@@ -200,12 +199,12 @@ function ExperienceFormView({ formData, onFormDataChange, onNext, onCancel, isEd
                             Role <span className="text-gray-400 text-xs">(optional)</span>
                         </label>
                         <div className="relative">
-                            <User className="absolute left-3 top-3 h-5 w-5 text-blue-500" />
+                            <User className="absolute left-3 top-2.5 h-4 w-4 text-gray-600" />
                             <input
                                 type="text"
                                 value={formData.role || ''}
                                 onChange={(e) => handleInputChange('role', e.target.value)}
-                                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-sm bg-white"
+                                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white"
                                 placeholder="Senior, Lead, etc."
                             />
                         </div>
@@ -213,19 +212,19 @@ function ExperienceFormView({ formData, onFormDataChange, onNext, onCancel, isEd
                 </div>
 
                 {/* Location and Remote Work */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
                     <div>
                         <label className="block text-sm font-semibold text-gray-700 mb-2">
                             Location
                         </label>
                         <div className="relative">
-                            <MapPin className="absolute left-3 top-3 h-5 w-5 text-blue-500" />
+                            <MapPin className="absolute left-3 top-2.5 h-4 w-4 text-gray-600" />
                             <input
                                 type="text"
                                 value={formData.location}
                                 onChange={(e) => handleInputChange('location', e.target.value)}
                                 disabled={formData.isRemote}
-                                className={`w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-sm ${formData.isRemote
+                                className={`w-full pl-10 pr-3 py-2 border border-gray-300 rounded-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all ${formData.isRemote
                                     ? 'bg-gray-100 text-gray-500 cursor-not-allowed'
                                     : 'bg-white'
                                     }`}
@@ -239,11 +238,11 @@ function ExperienceFormView({ formData, onFormDataChange, onNext, onCancel, isEd
                             <label className="block text-sm font-semibold text-gray-700 mb-2">
                                 Work Type
                             </label>
-                            <div className="flex items-center space-x-3 bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-xl border border-blue-200">
+                            <div className="flex items-center space-x-3 bg-white p-3 border border-gray-300 rounded-sm">
                                 <Switch
                                     checked={formData.isRemote}
                                     onCheckedChange={(checked) => handleInputChange('isRemote', checked)}
-                                    className="data-[state=checked]:bg-blue-600"
+                                    className="data-[state=checked]:bg-blue-600 data-[state=unchecked]:bg-gray-300 border border-gray-300"
                                 />
                                 <span className="text-sm font-medium text-gray-700">
                                     {formData.isRemote ? 'Remote Work' : 'On-site Work'}
@@ -259,14 +258,12 @@ function ExperienceFormView({ formData, onFormDataChange, onNext, onCancel, isEd
                         label="Start Date *"
                         value={formData.startDate}
                         onChange={(v) => handleInputChange('startDate', v)}
-                        isStart={true}
                     />
 
                     <MonthYearPicker
                         label={`End Date ${!formData.isCurrentlyWorking ? '*' : ''}`}
                         value={formData.endDate}
                         onChange={(v) => handleInputChange('endDate', v)}
-                        isStart={false}
                         disabled={formData.isCurrentlyWorking}
                     />
 
@@ -275,11 +272,11 @@ function ExperienceFormView({ formData, onFormDataChange, onNext, onCancel, isEd
                             <label className="block text-sm font-semibold text-gray-700 mb-2">
                                 Employment Status
                             </label>
-                            <div className="flex items-center space-x-3 bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-xl border border-blue-200">
+                            <div className="flex items-center space-x-3 bg-white p-3 border border-gray-300 rounded-sm">
                                 <Switch
                                     checked={formData.isCurrentlyWorking}
                                     onCheckedChange={handleCurrentlyWorkingChange}
-                                    className="data-[state=checked]:bg-blue-600"
+                                    className="data-[state=checked]:bg-blue-600 data-[state=unchecked]:bg-gray-300 border border-gray-300"
                                 />
                                 <span className="text-sm font-medium text-gray-700">
                                     Currently Working
@@ -290,15 +287,15 @@ function ExperienceFormView({ formData, onFormDataChange, onNext, onCancel, isEd
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex justify-between pt-6 border-t border-gray-200">
+                <div className="flex justify-between pt-4 border-t border-gray-300">
                     <motion.button
                         whileHover={{ scale: 1.02, x: -5 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={onCancel}
-                        className="flex items-center space-x-2 px-6 py-3 text-gray-600 hover:text-gray-800 font-medium transition-colors"
+                        className="flex items-center space-x-2 px-4 py-2 text-gray-600 hover:text-gray-800 font-medium transition-colors"
                     >
                         <ChevronLeft className="w-4 h-4" />
-                        <span></span>
+                        <span>Cancel</span>
                     </motion.button>
 
                     <motion.button
@@ -306,7 +303,7 @@ function ExperienceFormView({ formData, onFormDataChange, onNext, onCancel, isEd
                         whileTap={{ scale: 0.98 }}
                         onClick={handleNext}
                         disabled={!isFormValid || isLoading}
-                        className="flex items-center space-x-2 px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold shadow-lg hover:shadow-xl transition-all"
+                        className="flex items-center space-x-2 px-6 py-2 bg-blue-500 text-white rounded-sm hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed font-semibold transition-all"
                     >
                         {isLoading ? (
                             <>

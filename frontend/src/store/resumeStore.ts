@@ -138,6 +138,9 @@ interface ResumeStore extends ResumeState {
 
     // Reset
     resetStore: () => void
+    
+    // Clear store for new resume creation only
+    clearForNewResume: () => void
 }
 
 const generateId = () => Math.random().toString(36).substr(2, 9)
@@ -248,17 +251,19 @@ export const useResumeStore = create<ResumeStore>()((set, get) => ({
         }
 
         try {
-            if (state.documentId && typeof state.documentId === 'number') {
-                // Update existing resume
-                const response = await axiosInstance.put(`/api/resume-op/${state.documentId}`, resumeData)
-                set({ documentId: response.data.id })
-            } else {
+            const isNewResume = !state.documentId || typeof state.documentId !== 'number'
+            
+            if (isNewResume) {
                 // Create new resume
                 const response = await axiosInstance.post('/api/resume-op/save', resumeData)
                 set({ documentId: response.data.id })
+                // Only reset store for new resumes after a delay to allow navigation
+                setTimeout(() => set(initialState), 2000)
+            } else {
+                // Update existing resume - don't reset store
+                const response = await axiosInstance.put(`/api/resume-op/${state.documentId}`, resumeData)
+                set({ documentId: response.data.id })
             }
-            // Reset store after successful save
-            setTimeout(() => set(initialState), 1000)
         } catch (error) {
             console.error('Failed to save resume:', error)
             throw error
@@ -494,5 +499,10 @@ export const useResumeStore = create<ResumeStore>()((set, get) => ({
     // Reset
     resetStore: () => {
         set(initialState)
+    },
+
+    // Clear store for new resume creation only
+    clearForNewResume: () => {
+        set({ ...initialState, documentId: null, shareableUuid: null })
     }
 }))

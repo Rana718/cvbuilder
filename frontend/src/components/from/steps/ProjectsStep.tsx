@@ -72,16 +72,17 @@ function ProjectsStep({ onNext, onPrev }: ProjectsStepProps) {
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
-                className="text-center"
+                className="text-left"
             >
-                <div className="flex items-center justify-center mb-4">
-                    <div className="p-3 bg-blue-100 rounded-full">
-                        <FolderOpen className="w-8 h-8 text-blue-600" />
+                <div className="flex items-start mb-4">
+                    <div className="p-3 bg-blue-100 rounded-full mr-2">
+                        <FolderOpen className="md:w-8 md:h-8 w-5 h-5 text-blue-600" />
+                    </div>
+                    <div>
+                        <h2 className="md:text-3xl text-xl font-bold text-gray-900">Projects</h2>
+                        <p className="md:text-lg text-base text-gray-600">Showcase your key projects and achievements</p>
                     </div>
                 </div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">Projects</h2>
-                <p className="text-lg text-gray-600">Showcase your key projects and achievements</p>
-                <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full mx-auto mt-4"></div>
             </motion.div>
 
             {/* Projects List */}
@@ -94,7 +95,7 @@ function ProjectsStep({ onNext, onPrev }: ProjectsStepProps) {
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -20 }}
                             transition={{ delay: index * 0.1 }}
-                            className="bg-gradient-to-br from-white to-blue-50 rounded-2xl border border-blue-200 shadow-lg hover:shadow-xl transition-all p-4 md:p-6"
+                            className="bg-white border border-gray-300 rounded-sm p-3 md:p-4 hover:border-blue-600 transition-all"
                         >
                             {editingId === project.id ? (
                                 <div className="space-y-4">
@@ -107,7 +108,7 @@ function ProjectsStep({ onNext, onPrev }: ProjectsStepProps) {
                                             type="text"
                                             value={project.name}
                                             onChange={(e) => updateProject(project.id, { name: e.target.value })}
-                                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:ring-1 focus:ring-blue-600 focus:border-blue-600 transition-all"
                                             placeholder="E.g., E-commerce Platform"
                                             required
                                         />
@@ -121,7 +122,7 @@ function ProjectsStep({ onNext, onPrev }: ProjectsStepProps) {
                                         <textarea
                                             value={project.description}
                                             onChange={(e) => updateProject(project.id, { description: e.target.value })}
-                                            className="w-full h-32 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none transition-all"
+                                            className="w-full h-32 px-3 py-2 border border-gray-300 rounded-sm focus:ring-1 focus:ring-blue-600 focus:border-blue-600 resize-none transition-all"
                                             placeholder="Describe your project, technologies used, and key achievements..."
                                             required
                                         />
@@ -134,12 +135,12 @@ function ProjectsStep({ onNext, onPrev }: ProjectsStepProps) {
                                                 Live URL
                                             </label>
                                             <div className="relative">
-                                                <ExternalLink className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                                                <ExternalLink className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
                                                 <input
                                                     type="url"
                                                     value={project.url}
                                                     onChange={(e) => updateProject(project.id, { url: e.target.value })}
-                                                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                                    className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-sm focus:ring-1 focus:ring-blue-600 focus:border-blue-600 transition-all"
                                                     placeholder="https://yourproject.com"
                                                 />
                                             </div>
@@ -150,12 +151,12 @@ function ProjectsStep({ onNext, onPrev }: ProjectsStepProps) {
                                                 GitHub URL
                                             </label>
                                             <div className="relative">
-                                                <Github className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                                                <Github className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
                                                 <input
                                                     type="url"
                                                     value={project.github_url}
                                                     onChange={(e) => updateProject(project.id, { github_url: e.target.value })}
-                                                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                                    className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-sm focus:ring-1 focus:ring-blue-600 focus:border-blue-600 transition-all"
                                                     placeholder="https://github.com/username/repo"
                                                 />
                                             </div>
@@ -163,16 +164,16 @@ function ProjectsStep({ onNext, onPrev }: ProjectsStepProps) {
                                     </div>
 
                                     {/* Action Buttons */}
-                                    <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+                                    <div className="flex justify-end space-x-3 pt-4 border-t border-gray-300">
                                         <button
                                             onClick={handleCancel}
-                                            className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+                                            className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors border border-black bg-white rounded-sm"
                                         >
                                             Cancel
                                         </button>
                                         <button
                                             onClick={() => handleSaveProject(project.id)}
-                                            className="flex items-center space-x-2 px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                                            className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-sm hover:bg-blue-700 transition-colors"
                                         >
                                             <Save className="w-4 h-4" />
                                             <span>Save Project</span>
@@ -238,9 +239,9 @@ function ProjectsStep({ onNext, onPrev }: ProjectsStepProps) {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.3 }}
                         onClick={handleAddProject}
-                        className="w-full py-6 md:py-8 border-2 border-dashed border-blue-300 rounded-2xl text-blue-600 hover:border-blue-400 hover:bg-blue-50 transition-all flex flex-col items-center gap-3 group"
+                        className="w-full py-4 md:py-6 border-2 border-dashed border-gray-300 rounded-sm text-gray-600 hover:border-blue-600 hover:bg-blue-50 transition-all flex flex-col items-center gap-3 group"
                     >
-                        <div className="p-3 bg-blue-100 rounded-full group-hover:bg-blue-200 transition-colors">
+                        <div className="p-3 bg-white border border-gray-300 rounded-sm group-hover:border-blue-600 transition-colors">
                             <Plus className="h-6 w-6" />
                         </div>
                         <span className="font-medium">Add Project</span>
@@ -269,13 +270,13 @@ function ProjectsStep({ onNext, onPrev }: ProjectsStepProps) {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 }}
-                className="flex justify-between pt-6 border-t border-gray-200"
+                className="flex justify-between pt-4 border-t border-gray-300"
             >
                 <motion.button
                     whileHover={{ scale: 1.02, x: -5 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={onPrev}
-                    className="flex items-center space-x-2 px-6 py-3 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 transition-all font-medium"
+                    className="flex items-center space-x-2 px-4 py-2 border border-black rounded-sm text-gray-700 hover:bg-gray-50 transition-all font-medium bg-white"
                 >
                     <ChevronLeft className="w-5 h-5" />
                     <span>Previous</span>
@@ -284,7 +285,7 @@ function ProjectsStep({ onNext, onPrev }: ProjectsStepProps) {
                     whileHover={{ scale: 1.02, x: 5 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={onNext}
-                    className="flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all font-medium"
+                    className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-sm hover:bg-blue-700 transition-all font-medium"
                 >
                     <span>Next</span>
                     <ChevronRight className="w-5 h-5" />

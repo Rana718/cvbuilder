@@ -63,18 +63,19 @@ function DescriptionView({ formData, onFormDataChange, onSave, onBack, aiSuggest
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
-                className="text-center"
+                className="text-left"
             >
-                <div className="flex items-center justify-center mb-4">
-                    <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full shadow-lg">
-                        <Sparkles className="w-8 h-8 text-white" />
+                <div className="flex items-start mb-4">
+                    <div className="p-3 bg-blue-100 rounded-full mr-2">
+                        <Sparkles className="md:w-8 md:h-8 h-5 w-5 text-blue-600" />
+                    </div>
+                    <div>
+                        <h3 className="text-xl md:text-3xl font-bold text-gray-900">
+                            Job Description
+                        </h3>
+                        <p className="text-base md:text-lg text-gray-600">Add details about your role and achievements</p>
                     </div>
                 </div>
-                <h3 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">
-                    Job Description
-                </h3>
-                <p className="text-base md:text-lg text-gray-600">Add details about your role and achievements</p>
-                <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full mx-auto mt-4"></div>
             </motion.div>
 
             {/* Description Input - Moved to top */}
@@ -87,7 +88,7 @@ function DescriptionView({ formData, onFormDataChange, onSave, onBack, aiSuggest
                 <label className="block text-sm font-medium text-gray-700">
                     Job Description & Achievements
                 </label>
-                <div className="bg-white rounded-xl border border-gray-300 overflow-hidden shadow-sm">
+                <div className="bg-white overflow-hidden rounded-sm">
                     <SimpleRichTextEditor
                         value={formData.description}
                         onChange={handleDescriptionChange}
@@ -118,7 +119,7 @@ function DescriptionView({ formData, onFormDataChange, onSave, onBack, aiSuggest
                             Auto-generated
                         </span>
                     </div>
-                    
+
                     {isLoadingAI ? (
                         <div className="flex items-center justify-center py-8">
                             <div className="flex items-center space-x-3">
@@ -149,15 +150,15 @@ function DescriptionView({ formData, onFormDataChange, onSave, onBack, aiSuggest
                                             transition={{ delay: 0.1 * index }}
                                             onClick={() => addSuggestionToDescription(suggestion)}
                                             disabled={isSelected}
-                                            className={`text-left p-3 md:p-4 rounded-xl border transition-all ${isSelected
-                                                    ? 'bg-green-50 border-green-200 cursor-not-allowed'
-                                                    : 'bg-white border-gray-200 hover:border-blue-300 hover:bg-blue-50 cursor-pointer'
+                                            className={`text-left p-3 md:p-4 rounded-sm border transition-all ${isSelected
+                                                ? 'bg-green-50 border-green-200 cursor-not-allowed'
+                                                : 'bg-white border-gray-300 hover:border-blue-600 hover:bg-blue-50 cursor-pointer'
                                                 }`}
                                         >
                                             <div className="flex items-start space-x-3">
                                                 <div className={`mt-1 w-5 h-5 rounded-full border-2 flex items-center justify-center ${isSelected
-                                                        ? 'bg-green-500 border-green-500'
-                                                        : 'border-gray-300'
+                                                    ? 'bg-green-500 border-green-500'
+                                                    : 'border-gray-300'
                                                     }`}>
                                                     {isSelected && <Check className="w-3 h-3 text-white" />}
                                                 </div>
@@ -179,13 +180,13 @@ function DescriptionView({ formData, onFormDataChange, onSave, onBack, aiSuggest
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
-                className="flex justify-between pt-6 border-t border-gray-200"
+                className="flex justify-between pt-4 border-t border-gray-300"
             >
                 <motion.button
                     whileHover={{ scale: 1.02, x: -5 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={onBack}
-                    className="flex items-center space-x-2 px-6 py-3 text-gray-600 hover:text-gray-800 font-medium transition-colors"
+                    className="flex items-center space-x-2 px-4 py-2 text-gray-600 hover:text-gray-800 font-medium transition-colors border border-black bg-white rounded-sm"
                 >
                     <ChevronLeft className="w-4 h-4" />
                     <span>Back</span>
@@ -195,7 +196,7 @@ function DescriptionView({ formData, onFormDataChange, onSave, onBack, aiSuggest
                     whileHover={{ scale: 1.02, x: 5 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={onSave}
-                    className="flex items-center space-x-2 px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 font-semibold shadow-lg hover:shadow-xl transition-all"
+                    className="flex items-center space-x-2 px-6 py-2 bg-blue-600 text-white rounded-sm hover:bg-blue-700 font-semibold transition-all"
                 >
                     <Check className="w-5 h-5" />
                     <span>{isEditing ? 'Update Experience' : 'Add Experience'}</span>

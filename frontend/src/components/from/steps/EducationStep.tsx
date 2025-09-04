@@ -1,12 +1,11 @@
 "use client"
 
 import { useState } from "react"
-import { Plus, CalendarIcon, Edit, Trash, GraduationCap, ChevronLeft, ChevronRight } from "lucide-react"
+import { Plus, CalendarIcon, Edit, Trash, GraduationCap, ChevronLeft, ChevronRight, Calendar } from "lucide-react"
 import { useResumeStore, type Education } from "@/store/resumeStore"
 import { Button } from "@/components/ui/button"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Calendar } from "@/components/ui/calendar"
-import { cn } from "@/lib/utils"
+import { Calendar as CalendarComponent } from "@/components/ui/calendar"
 import { motion, AnimatePresence } from 'framer-motion'
 
 interface EducationStepProps {
@@ -36,7 +35,8 @@ function MonthYearPicker({
   onChange,
   fromYear = 1950,
   toYear = new Date().getFullYear() + 10,
-  placeholder = "Select month",
+  placeholder = 'Select month',
+  disabled = false
 }: {
   label: string
   value?: string
@@ -44,25 +44,35 @@ function MonthYearPicker({
   fromYear?: number
   toYear?: number
   placeholder?: string
+  disabled?: boolean
 }) {
   const [open, setOpen] = useState(false)
   const selected = parseMonthString(value)
 
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
-      <Popover open={open} onOpenChange={setOpen}>
+      <label className="block text-sm font-semibold text-gray-700 mb-2">{label}</label>
+      <Popover open={open && !disabled} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
             variant="outline"
-            className={cn("w-full justify-start text-left font-normal", !selected && "text-muted-foreground")}
+            disabled={disabled}
+            className={`w-full justify-start text-left font-normal border-gray-300 rounded-sm hover:bg-gray-50 hover:border-gray-400 ${disabled
+              ? 'bg-gray-100 text-gray-400 cursor-not-allowed opacity-60'
+              : 'bg-white'
+              } ${!selected && !disabled && 'text-gray-500'}`}
           >
-            <CalendarIcon className="mr-2 h-4 w-4" />
-            {selected ? displayMonth(value) : placeholder}
+            <Calendar className={`mr-2 h-4 w-4 ${disabled ? 'text-gray-400' : 'text-gray-600'}`} />
+            {disabled && !selected
+              ? 'Currently working'
+              : selected
+                ? displayMonth(value)
+                : placeholder
+            }
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
-          <Calendar
+          <CalendarComponent
             mode="single"
             captionLayout="dropdown"
             fromYear={fromYear}
@@ -142,16 +152,17 @@ export default function EducationStep({ onNext, onPrev }: EducationStepProps) {
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="text-center"
+        className="text-left"
       >
-        <div className="flex items-center justify-center mb-4">
-          <div className="p-3 bg-green-100 rounded-full">
-            <GraduationCap className="w-8 h-8 text-blue-600" />
+        <div className="flex items-start mb-4">
+          <div className="p-3 bg-blue-100 rounded-full mr-2">
+            <GraduationCap className="w-5 h-5 md:h-8 md:w-8 text-blue-600" />
+          </div>
+          <div>
+            <h2 className=" md:text-3xl text-xl font-bold text-gray-900">Education</h2>
+            <p className="md:text-lg text-base text-gray-600">Add your educational background</p>
           </div>
         </div>
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">Education</h2>
-        <p className="text-lg text-gray-600">Add your educational background</p>
-        <div className="w-24 h-1 bg-blue-600 rounded-full mx-auto mt-4"></div>
       </motion.div>
 
       <AnimatePresence>
@@ -172,40 +183,37 @@ export default function EducationStep({ onNext, onPrev }: EducationStepProps) {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.1 * index }}
-                className="group relative overflow-hidden border border-gray-200 rounded-xl p-4 md:p-6 bg-white hover:shadow-lg transition-all duration-300 hover:border-blue-300"
+                className="border border-gray-300 rounded-sm p-4 md:p-6 bg-white hover:border-black transition-all duration-300"
               >
-                <div className="absolute inset-0 bg-blue-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <div className="relative">
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1">
-                      <h4 className="font-bold text-lg text-gray-900">{edu.degree}</h4>
-                      <p className="text-blue-600 font-semibold text-lg">{edu.schoolName}</p>
-                      {edu.fieldOfStudy && <p className="text-gray-600 mt-1">Field of Study: {edu.fieldOfStudy}</p>}
-                      <div className="flex items-center text-sm text-gray-600 mt-2">
-                        <CalendarIcon className="w-4 h-4 mr-1" />
-                        <span className="bg-gray-100 px-3 py-1 rounded-full">
-                          {displayMonth(edu.startDate)} - {displayMonth(edu.endDate)}
-                        </span>
-                      </div>
+                <div className="flex justify-between items-start">
+                  <div className="flex-1">
+                    <h4 className="font-bold text-lg text-gray-900">{edu.degree}</h4>
+                    <p className="text-blue-600 font-semibold text-lg">{edu.schoolName}</p>
+                    {edu.fieldOfStudy && <p className="text-gray-600 mt-1">Field of Study: {edu.fieldOfStudy}</p>}
+                    <div className="flex items-center text-sm text-gray-600 mt-2">
+                      <CalendarIcon className="w-4 h-4 mr-1" />
+                      <span className="bg-gray-100 px-3 py-1 rounded-sm border border-gray-300">
+                        {displayMonth(edu.startDate)} - {displayMonth(edu.endDate)}
+                      </span>
                     </div>
-                    <div className="flex space-x-2 ml-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={() => handleEdit(edu)}
-                        className="p-1.5 md:p-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
-                      >
-                        <Edit className="w-3 h-3 md:w-4 md:h-4" />
-                      </motion.button>
-                      <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={() => removeEducation(edu.id)}
-                        className="p-1.5 md:p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
-                      >
-                        <Trash className="w-3 h-3 md:w-4 md:h-4" />
-                      </motion.button>
-                    </div>
+                  </div>
+                  <div className="flex space-x-2 ml-4">
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => handleEdit(edu)}
+                      className="p-1.5 md:p-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-sm transition-colors"
+                    >
+                      <Edit className="w-3 h-3 md:w-4 md:h-4" />
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => removeEducation(edu.id)}
+                      className="p-1.5 md:p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-sm transition-colors"
+                    >
+                      <Trash className="w-3 h-3 md:w-4 md:h-4" />
+                    </motion.button>
                   </div>
                 </div>
               </motion.div>
@@ -225,7 +233,7 @@ export default function EducationStep({ onNext, onPrev }: EducationStepProps) {
             whileHover={{ scale: 1.02, y: -2 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => setShowAddForm(true)}
-            className="flex items-center space-x-3 px-8 py-4 bg-blue-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl hover:bg-blue-700 transition-all duration-300"
+            className="flex items-center space-x-3 px-8 py-3 bg-blue-600 text-white rounded-sm font-semibold hover:bg-blue-700 transition-all duration-300 border border-black"
           >
             <Plus className="w-5 h-5" />
             <span>Add Education</span>
@@ -253,7 +261,7 @@ export default function EducationStep({ onNext, onPrev }: EducationStepProps) {
                   type="text"
                   value={formData.schoolName}
                   onChange={(e) => setFormData({ ...formData, schoolName: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-sm focus:ring-2 focus:ring-blue-500 focus:border-black transition-all duration-200"
                   placeholder="Harvard University"
                 />
               </div>
@@ -264,7 +272,7 @@ export default function EducationStep({ onNext, onPrev }: EducationStepProps) {
                   type="text"
                   value={formData.degree}
                   onChange={(e) => setFormData({ ...formData, degree: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-sm focus:ring-2 focus:ring-blue-500 focus:border-black transition-all duration-200"
                   placeholder="Bachelor of Science"
                 />
               </div>
@@ -275,7 +283,7 @@ export default function EducationStep({ onNext, onPrev }: EducationStepProps) {
                   type="text"
                   value={formData.fieldOfStudy}
                   onChange={(e) => setFormData({ ...formData, fieldOfStudy: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-sm focus:ring-2 focus:ring-blue-500 focus:border-black transition-all duration-200"
                   placeholder="Computer Science"
                 />
               </div>
@@ -331,10 +339,10 @@ export default function EducationStep({ onNext, onPrev }: EducationStepProps) {
           whileHover={{ scale: 1.02, x: -5 }}
           whileTap={{ scale: 0.98 }}
           onClick={onPrev}
-          className="flex items-center space-x-2 px-8 py-3 text-gray-700 bg-gray-100 rounded-xl hover:bg-gray-200 transition-all duration-200 font-medium"
+          className="flex items-center space-x-1 md:space-x-2 px-4 md:px-6 py-3 text-gray-700 bg-white border border-black rounded-sm hover:bg-gray-50 transition-all duration-200 font-medium"
         >
-          <ChevronLeft className="w-5 h-5" />
-          <span>Previous</span>
+          <ChevronLeft className="w-4 h-4 md:w-5 md:h-5" />
+          <span className="text-sm md:text-base">Previous</span>
         </motion.button>
 
         <motion.button
@@ -342,10 +350,10 @@ export default function EducationStep({ onNext, onPrev }: EducationStepProps) {
           whileTap={{ scale: 0.98 }}
           onClick={onNext}
           disabled={education.length === 0}
-          className="flex items-center space-x-2 px-8 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium shadow-lg"
+          className="flex items-center space-x-1 md:space-x-2 px-6 md:px-8 py-3 bg-blue-600 text-white rounded-sm hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium border border-black"
         >
-          <span>Next: Skills</span>
-          <ChevronRight className="w-5 h-5" />
+          <span className="text-sm md:text-base">Next</span>
+          <ChevronRight className="w-4 h-4 md:w-5 md:h-5" />
         </motion.button>
       </motion.div>
     </motion.div>

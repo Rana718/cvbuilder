@@ -24,7 +24,7 @@ function AddExperienceView({ onAddExperience, onEditExperience }: AddExperienceV
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
-            className="space-y-4 md:space-y-6 px-2 md:px-0"
+            className="space-y-4 md:space-y-6 px-1 md:px-0"
         >
             {/* Header */}
             <motion.div
@@ -34,13 +34,13 @@ function AddExperienceView({ onAddExperience, onEditExperience }: AddExperienceV
                 className="text-center"
             >
                 <div className="flex items-center justify-center mb-4">
-                    <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full shadow-lg">
-                        <Briefcase className="w-8 h-8 text-white" />
+                    <div className="p-3 bg-blue-100 rounded-full mr-2">
+                        <Briefcase className="md:w-8 md:h-8 w-5 h-5 text-blue-600" />
                     </div>
                 </div>
-                <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">Work Experience</h2>
+                <h2 className="text-xl md:text-3xl font-bold text-black">Work Experience</h2>
                 <p className="text-base md:text-lg text-gray-600">Tell us about your professional journey</p>
-                <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full mx-auto mt-4"></div>
+                <div className="w-24 h-1 bg-blue-600 rounded-sm mx-auto mt-4"></div>
             </motion.div>
 
             {/* Existing Experiences */}

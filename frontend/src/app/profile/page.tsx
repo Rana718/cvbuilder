@@ -23,7 +23,11 @@ import {
     Award,
     BarChart3,
     Clock,
-    CreditCard
+    CreditCard,
+    Shield,
+    Settings,
+    Sparkles,
+    Zap
 } from 'lucide-react'
 import axiosInstance from '@/lib/axios'
 
@@ -101,6 +105,7 @@ interface UserProfile {
     email: string
     full_name?: string
     created_at: string
+    phone?: string
 }
 
 interface ProfileStats {
@@ -118,6 +123,8 @@ function ProfilePage() {
     const [error, setError] = useState('')
     const [isEditing, setIsEditing] = useState(false)
     const [showPaymentHistory, setShowPaymentHistory] = useState(false)
+    const [isAdmin, setIsAdmin] = useState(false)
+    const [isSuperAdmin, setIsSuperAdmin] = useState(false)
     const [editForm, setEditForm] = useState({
         full_name: ''
     })
@@ -132,7 +139,24 @@ function ProfilePage() {
 
         fetchProfile()
         fetchStats()
+        checkAdminStatus()
     }, [user, authLoading, router])
+
+    const checkAdminStatus = async () => {
+        if (!user) return
+
+        try {
+            const tokenResult = await user.getIdTokenResult(true)
+            const claims = tokenResult.claims
+
+            setIsAdmin(claims.admin === true || claims.admin === "true")
+            setIsSuperAdmin(claims.superAdmin === true || claims.superAdmin === "true")
+        } catch (error) {
+            console.error('Failed to check admin status:', error)
+            setIsAdmin(false)
+            setIsSuperAdmin(false)
+        }
+    }
 
     const fetchProfile = async () => {
         try {
@@ -141,6 +165,7 @@ function ProfilePage() {
                 id: response.data.id,
                 email: response.data.email,
                 full_name: response.data.full_name,
+                phone: response.data.phone,
                 created_at: user?.metadata?.creationTime || new Date().toISOString()
             })
             setEditForm({
@@ -230,7 +255,7 @@ function ProfilePage() {
 
     if (authLoading || loading || premiumLoading) {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+            <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
                 <div className="text-center">
                     <div className="animate-spin rounded-full h-12 w-12 border-3 border-blue-500 border-t-transparent mx-auto"></div>
                     <p className="mt-4 text-gray-600 font-medium">Loading your profile...</p>
@@ -241,7 +266,7 @@ function ProfilePage() {
 
     if (!profile) {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+            <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
                 <div className="text-center">
                     <p className="text-gray-600">Failed to load profile</p>
                 </div>
@@ -250,45 +275,45 @@ function ProfilePage() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
             {/* Header */}
-            <div className="bg-white border-b border-gray-200">
+            <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200/50 sticky top-0 z-10">
                 <div className="max-w-6xl mx-auto px-4 py-4">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-4">
                             <Link
                                 href="/resusme"
-                                className="flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-colors"
+                                className="flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-colors group"
                             >
-                                <ArrowLeft className="w-5 h-5" />
+                                <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
                                 <span className="font-medium">Back</span>
                             </Link>
                             <div className="h-6 w-px bg-gray-300" />
-                            <h1 className="text-xl font-bold text-gray-900">My Profile</h1>
+                            <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-blue-600 bg-clip-text text-transparent">My Profile</h1>
                         </div>
                     </div>
                 </div>
             </div>
 
             {/* Content */}
-            <div className="max-w-6xl mx-auto px-4 py-6">
+            <div className="max-w-6xl mx-auto px-4 py-8">
                 {error && (
-                    <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+                    <div className="mb-6 bg-red-50/80 backdrop-blur-sm border border-red-200 text-red-700 px-4 py-3 rounded-xl">
                         {error}
                     </div>
                 )}
 
-                <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
                     {/* Main Profile Section */}
                     <div className="xl:col-span-3 space-y-6">
                         {/* Profile Header */}
-                        <div className="bg-white border border-gray-200 rounded-lg p-6">
-                            <div className="flex items-center justify-between mb-6">
-                                <h2 className="text-lg font-semibold text-gray-900">Profile Information</h2>
+                        <div className="bg-white/80 backdrop-blur-sm border border-gray-200/50 rounded-2xl p-8 shadow-sm">
+                            <div className="flex items-start justify-between mb-8">
+                                <h2 className="text-xl font-semibold text-gray-900">Profile Information</h2>
                                 {!isEditing ? (
                                     <button
                                         onClick={() => setIsEditing(true)}
-                                        className="flex items-center space-x-2 px-4 py-2 text-blue-600 hover:bg-blue-50 rounded-lg border border-blue-200"
+                                        className="flex items-center space-x-2 px-6 py-3 text-blue-600 hover:text-white hover:bg-blue-600 transition-all duration-200 font-medium"
                                     >
                                         <Edit className="w-4 h-4" />
                                         <span>Edit Profile</span>
@@ -297,14 +322,14 @@ function ProfilePage() {
                                     <div className="flex items-center space-x-3">
                                         <button
                                             onClick={handleSaveProfile}
-                                            className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-lg"
+                                            className="flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white hover:bg-blue-700 transition-all duration-200 font-medium"
                                         >
                                             <Save className="w-4 h-4" />
                                             <span>Save</span>
                                         </button>
                                         <button
                                             onClick={handleCancelEdit}
-                                            className="flex items-center space-x-2 px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg border border-gray-200"
+                                            className="flex items-center space-x-2 px-6 py-3 text-gray-600 hover:text-gray-800 hover:bg-gray-100 transition-all duration-200 font-medium"
                                         >
                                             <X className="w-4 h-4" />
                                             <span>Cancel</span>
@@ -314,52 +339,52 @@ function ProfilePage() {
                             </div>
 
                             {/* Avatar and Basic Info */}
-                            <div className="flex items-start space-x-6 mb-6">
+                            <div className="flex items-start space-x-6 mb-8">
                                 <div className="relative">
                                     {user?.photoURL ? (
                                         <img
                                             src={user.photoURL}
                                             alt="Profile"
-                                            className="w-20 h-20 rounded-lg object-cover border-2 border-gray-200"
+                                            className="w-24 h-24 object-cover"
                                         />
                                     ) : (
-                                        <div className="w-20 h-20 bg-blue-100 rounded-lg flex items-center justify-center">
-                                            <User className="w-10 h-10 text-blue-600" />
+                                        <div className="w-24 h-24 bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center">
+                                            <User className="w-12 h-12 text-blue-600" />
                                         </div>
                                     )}
                                     {isPremium && (
-                                        <div className="absolute -top-1 -right-1 w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center">
-                                            <Crown className="w-3 h-3 text-white" />
+                                        <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-r from-yellow-400 to-yellow-500 flex items-center justify-center">
+                                            <Crown className="w-4 h-4 text-white" />
                                         </div>
                                     )}
                                 </div>
                                 <div className="flex-1">
-                                    <div className="flex items-center space-x-3 mb-2">
-                                        <h3 className="text-xl font-bold text-gray-900">
+                                    <div className="flex items-center space-x-3 mb-3">
+                                        <h3 className="text-2xl font-bold text-gray-900">
                                             {profile.full_name || 'User'}
                                         </h3>
                                         {isPremium && (
-                                            <div className="flex items-center space-x-1 bg-yellow-500 text-white px-2 py-1 rounded-full text-xs font-medium">
-                                                <Award className="w-3 h-3" />
+                                            <div className="flex items-center space-x-2 bg-gradient-to-r from-yellow-400 to-yellow-500 text-white px-3 py-1 rounded-full text-sm font-medium shadow-sm">
+                                                <Award className="w-4 h-4" />
                                                 <span>Premium</span>
                                             </div>
                                         )}
                                     </div>
                                     <p className="text-gray-600 flex items-center mb-2">
-                                        <Mail className="w-4 h-4 mr-2 text-blue-500" />
+                                        <Mail className="w-5 h-5 mr-3 text-blue-500" />
                                         {profile.email}
                                     </p>
                                     <p className="text-gray-500 flex items-center">
-                                        <Calendar className="w-4 h-4 mr-2 text-blue-500" />
+                                        <Calendar className="w-5 h-5 mr-3 text-blue-500" />
                                         Member since {formatDate(profile.created_at)}
                                     </p>
                                 </div>
                             </div>
 
                             {/* Form Fields */}
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    <label className="block text-sm font-semibold text-gray-700 mb-3">
                                         Full Name
                                     </label>
                                     {isEditing ? (
@@ -367,38 +392,54 @@ function ProfilePage() {
                                             type="text"
                                             value={editForm.full_name}
                                             onChange={(e) => setEditForm({ ...editForm, full_name: e.target.value })}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                                             placeholder="Enter your full name"
                                         />
                                     ) : (
-                                        <div className="px-3 py-2 bg-gray-50 rounded-lg border border-gray-200">
-                                            <p className="text-gray-900">{profile.full_name || 'Not provided'}</p>
+                                        <div className="px-4 py-3 bg-gray-50/50 rounded-xl border border-gray-200">
+                                            <p className="text-gray-900 font-medium">{profile.full_name || 'Not provided'}</p>
                                         </div>
                                     )}
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    <label className="block text-sm font-semibold text-gray-700 mb-3">
                                         Email Address
                                     </label>
-                                    <div className="px-3 py-2 bg-gray-50 rounded-lg border border-gray-200">
-                                        <p className="text-gray-900">{profile.email}</p>
+                                    <div className="px-4 py-3 bg-gray-50/50 rounded-xl border border-gray-200">
+                                        <p className="text-gray-900 font-medium">{profile.email}</p>
                                     </div>
                                 </div>
                             </div>
 
                             {/* LinkedIn Integration Mini */}
-                            <div className="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            <div className="mb-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200">
                                 <LinkedInMini />
                             </div>
 
+                            {/* Admin Panel Access */}
+                            {(isAdmin || isSuperAdmin) && (
+                                <div className="mb-8">
+                                    <Link
+                                        href="/admin"
+                                        className="flex items-center space-x-3 px-6 py-4 text-purple-600 hover:text-white hover:bg-gradient-to-r from-purple-600 to-purple-700 rounded-xl border border-purple-200 hover:border-purple-600 transition-all duration-200 font-medium group"
+                                    >
+                                        <Shield className="w-5 h-5" />
+                                        <span>Admin Panel</span>
+                                        {isSuperAdmin && (
+                                            <Crown className="w-5 h-5 ml-auto group-hover:rotate-12 transition-transform" />
+                                        )}
+                                    </Link>
+                                </div>
+                            )}
+
                             {/* Sign Out Button */}
-                            <div className="mt-6 pt-6 border-t border-gray-200">
+                            <div className="pt-8 border-t border-gray-200">
                                 <button
                                     onClick={handleSignOut}
-                                    className="flex items-center space-x-2 px-4 py-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg border border-red-200 hover:border-red-300 transition-colors"
+                                    className="flex items-center space-x-3 px-6 py-3 text-red-600 hover:text-white hover:bg-red-600 rounded-xl border border-red-200 hover:border-red-600 transition-all duration-200 font-medium"
                                 >
-                                    <LogOut className="w-4 h-4" />
+                                    <LogOut className="w-5 h-5" />
                                     <span>Sign Out</span>
                                 </button>
                             </div>
@@ -406,16 +447,16 @@ function ProfilePage() {
 
                         {/* Payment History */}
                         {isPremium && (
-                            <div className="bg-white border border-gray-200 rounded-lg">
+                            <div className="bg-white/80 backdrop-blur-sm border border-gray-200/50 rounded-2xl shadow-sm">
                                 <div className="p-6 border-b border-gray-200">
                                     <div className="flex items-center justify-between">
-                                        <h2 className="text-lg font-semibold text-gray-900 flex items-center">
-                                            <CreditCard className="w-5 h-5 mr-2 text-blue-500" />
+                                        <h2 className="text-xl font-semibold text-gray-900 flex items-center">
+                                            <CreditCard className="w-6 h-6 mr-3 text-blue-500" />
                                             Billing & Payments
                                         </h2>
                                         <button
                                             onClick={() => setShowPaymentHistory(!showPaymentHistory)}
-                                            className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                                            className="text-blue-600 hover:text-blue-700 font-medium px-4 py-2 rounded-lg hover:bg-blue-50 transition-all duration-200"
                                         >
                                             {showPaymentHistory ? 'Hide' : 'Show'} Details
                                         </button>
@@ -433,50 +474,60 @@ function ProfilePage() {
                     {/* Sidebar */}
                     <div className="space-y-6">
                         {/* Account Status */}
-                        <div className="bg-white border border-gray-200 rounded-lg p-4">
-                            <h3 className="text-sm font-semibold text-gray-900 mb-3">Account Status</h3>
-                            <div className="text-center">
-                                <div className={`inline-flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium ${isPremium
-                                        ? 'bg-yellow-500 text-white'
-                                        : 'bg-blue-50 text-blue-700 border border-blue-200'
-                                    }`}>
-                                    {isPremium ? <Crown className="w-4 h-4" /> : <User className="w-4 h-4" />}
-                                    <span>{isPremium ? 'Premium' : 'Free'}</span>
-                                </div>
-                                {subscriptionStatus?.current_period_end && (
-                                    <p className="text-xs text-gray-600 mt-2">
-                                        Valid until {formatDate(subscriptionStatus.current_period_end)}
-                                    </p>
-                                )}
-                                {!isPremium && (
-                                    <Link
-                                        href="/pricing"
-                                        className="inline-block mt-2 px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-xs font-medium"
-                                    >
-                                        Upgrade
-                                    </Link>
+                        <div className="bg-white/80 backdrop-blur-sm border border-gray-200/50 rounded-2xl p-6 shadow-sm">
+                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Account Status</h3>
+                            <div className="space-y-4">
+                                {isPremium ? (
+                                    <div className="bg-gradient-to-r from-yellow-400 to-yellow-500 text-white p-4 rounded-xl">
+                                        <div className="flex items-center space-x-3 mb-2">
+                                            <Crown className="w-6 h-6" />
+                                            <span className="text-lg font-bold">Premium Member</span>
+                                        </div>
+                                        {subscriptionStatus?.current_period_end && (
+                                            <p className="text-yellow-100 text-sm">
+                                                Valid until {formatDate(subscriptionStatus.current_period_end)}
+                                            </p>
+                                        )}
+                                    </div>
+                                ) : (
+                                    <div className="space-y-4">
+                                        <div className="p-4 bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl border border-gray-200">
+                                            <div className="flex items-center space-x-3 mb-3">
+                                                <User className="w-5 h-5 text-gray-600" />
+                                                <span className="text-gray-700 font-medium">Free Account</span>
+                                            </div>
+                                            <p className="text-sm text-gray-600 mb-4">Unlock premium features to supercharge your resume building experience</p>
+                                            <Link
+                                                href="/pricing"
+                                                className="flex items-center justify-center space-x-2 w-full px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-200 font-semibold shadow-sm hover:shadow-md"
+                                            >
+                                                <Sparkles className="w-5 h-5" />
+                                                <span>Upgrade to Premium</span>
+                                            </Link>
+                                        </div>
+                                    </div>
                                 )}
                             </div>
                         </div>
 
                         {/* Resume Stats */}
-                        <div className="bg-white border border-gray-200 rounded-lg p-4">
-                            <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center">
-                                <BarChart3 className="w-4 h-4 mr-2 text-blue-500" />
+                        <div className="bg-white/80 backdrop-blur-sm border border-gray-200/50 rounded-2xl p-6 shadow-sm">
+                            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                                <BarChart3 className="w-6 h-6 mr-3 text-blue-500" />
                                 Statistics
                             </h3>
-                            <div className="space-y-3">
-                                <div className="text-center p-3 bg-blue-50 rounded-lg border border-blue-200">
-                                    <div className="text-2xl font-bold text-blue-600 mb-1">{stats.totalResumes}</div>
-                                    <div className="text-xs text-gray-600">Total Resumes</div>
+                            <div className="space-y-4">
+                                <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200">
+                                    <div className="text-3xl font-bold text-blue-600 mb-1">{stats.totalResumes}</div>
+                                    <div className="text-sm text-blue-700 font-medium">Total Resumes Created</div>
                                 </div>
                                 {stats.lastResumeCreated && (
-                                    <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
-                                        <div className="flex items-center text-xs text-gray-600 mb-1">
-                                            <Clock className="w-3 h-3 mr-1" />
-                                            Last Resume
+                                    <div className="p-4 bg-gradient-to-r from-gray-50 to-slate-50 rounded-xl border border-gray-200">
+                                        <div className="flex items-center text-sm text-gray-600 mb-2">
+                                            <Clock className="w-4 h-4 mr-2" />
+                                            <span className="font-medium">Last Resume</span>
                                         </div>
-                                        <div className="text-xs font-medium text-gray-900">
+                                        <div className="text-sm font-semibold text-gray-900">
                                             {formatDate(stats.lastResumeCreated)}
                                         </div>
                                     </div>
@@ -485,32 +536,43 @@ function ProfilePage() {
                         </div>
 
                         {/* Quick Actions */}
-                                                {/* Quick Actions */}
-                        <div className="bg-white border border-gray-200 rounded-lg p-4">
-                            <h3 className="text-sm font-semibold text-gray-900 mb-3">Quick Actions</h3>
-                            <div className="space-y-2">
+                        <div className="bg-white/80 backdrop-blur-sm border border-gray-200/50 rounded-2xl p-6 shadow-sm">
+                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+                            <div className="space-y-3">
                                 <Link
                                     href="/template"
-                                    className="flex items-center space-x-2 w-full px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors text-sm"
+                                    className="flex items-center space-x-3 w-full px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-200 font-medium border border-gray-200 hover:border-blue-300 group"
                                 >
-                                    <Plus className="w-4 h-4" />
-                                    <span>Create Resume</span>
+                                    <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
+                                    <span>Create New Resume</span>
                                 </Link>
                                 <Link
                                     href="/resusme"
-                                    className="flex items-center space-x-2 w-full px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors text-sm"
+                                    className="flex items-center space-x-3 w-full px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-200 font-medium border border-gray-200 hover:border-blue-300"
                                 >
-                                    <FileText className="w-4 h-4" />
+                                    <FileText className="w-5 h-5" />
                                     <span>My Resumes</span>
                                 </Link>
                                 {isPremium && (
                                     <button
                                         onClick={() => setShowPaymentHistory(!showPaymentHistory)}
-                                        className="flex items-center space-x-2 w-full px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors text-sm"
+                                        className="flex items-center space-x-3 w-full px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-200 font-medium border border-gray-200 hover:border-blue-300"
                                     >
-                                        <CreditCard className="w-4 h-4" />
+                                        <CreditCard className="w-5 h-5" />
                                         <span>Billing & Payments</span>
                                     </button>
+                                )}
+                                {(isAdmin || isSuperAdmin) && (
+                                    <Link
+                                        href="/admin"
+                                        className="flex items-center space-x-3 w-full px-4 py-3 text-purple-700 hover:text-purple-600 hover:bg-purple-50 rounded-xl transition-all duration-200 font-medium border border-purple-200 hover:border-purple-300 group"
+                                    >
+                                        <Shield className="w-5 h-5" />
+                                        <span>Admin Panel</span>
+                                        {isSuperAdmin && (
+                                            <Crown className="w-4 h-4 ml-auto group-hover:rotate-12 transition-transform" />
+                                        )}
+                                    </Link>
                                 )}
                             </div>
                         </div>

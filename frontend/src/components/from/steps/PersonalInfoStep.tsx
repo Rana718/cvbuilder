@@ -35,6 +35,13 @@ function PersonalInfoStep({ onNext }: PersonalInfoStepProps) {
     }
   }
 
+  const getWebsiteIcon = (label: string) => {
+    const lowerLabel = label.toLowerCase()
+    if (lowerLabel.includes('linkedin')) return Linkedin
+    if (lowerLabel.includes('github')) return Github
+    return Globe
+  }
+
   const isFormValid = personalInfo.firstName && personalInfo.lastName && personalInfo.email && personalInfo.profession
 
   return (
@@ -43,39 +50,39 @@ function PersonalInfoStep({ onNext }: PersonalInfoStepProps) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.3 }}
-      className="max-w-4xl mx-auto space-y-8"
+      className="max-w-4xl mx-auto space-y-4"
     >
-      {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="text-center"
+        className="text-left"
       >
-        <div className="flex items-center justify-center mb-4">
-          <div className="p-3 bg-blue-100 rounded-full">
-            <User className="w-8 h-8 text-blue-600" />
+        <div className="flex items-start mb-4">
+          <div className="p-2 md:p-3 bg-blue-100 rounded-full mr-3 md:mr-2">
+            <User className="w-6 h-6 md:w-8 md:h-8 text-blue-600" />
+          </div>
+          <div className="flex-1">
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900">Personal Information</h2>
+            <p className="text-base md:text-lg text-gray-600">Let's start with your basic details</p>
           </div>
         </div>
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">Personal Information</h2>
-        <p className="text-lg text-gray-600">Let's start with your basic details</p>
-        <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full mx-auto mt-4"></div>
       </motion.div>
 
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.2 }}
-        className="bg-gradient-to-br from-white to-blue-50 rounded-2xl border-2 border-blue-200 p-4 shadow-lg"
+        className="bg-white p-2"
       >
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-semibold text-gray-800 mb-2">First Name *</label>
             <input
               type="text"
               value={personalInfo.firstName}
               onChange={(e) => handleInputChange('firstName', e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+              className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all"
               placeholder="John"
             />
           </div>
@@ -86,7 +93,7 @@ function PersonalInfoStep({ onNext }: PersonalInfoStepProps) {
               type="text"
               value={personalInfo.lastName}
               onChange={(e) => handleInputChange('lastName', e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+              className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all"
               placeholder="Doe"
             />
           </div>
@@ -97,7 +104,7 @@ function PersonalInfoStep({ onNext }: PersonalInfoStepProps) {
               type="text"
               value={personalInfo.profession}
               onChange={(e) => handleInputChange('profession', e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+              className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all"
               placeholder="Software Engineer"
             />
           </div>
@@ -114,7 +121,7 @@ function PersonalInfoStep({ onNext }: PersonalInfoStepProps) {
               type="email"
               value={personalInfo.email}
               onChange={(e) => handleInputChange('email', e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+              className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all"
               placeholder="john.doe@example.com"
             />
           </div>
@@ -125,7 +132,7 @@ function PersonalInfoStep({ onNext }: PersonalInfoStepProps) {
               type="tel"
               value={personalInfo.phone}
               onChange={(e) => handleInputChange('phone', e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+              className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all"
               placeholder="+1 (555) 123-4567"
             />
           </div>
@@ -136,7 +143,7 @@ function PersonalInfoStep({ onNext }: PersonalInfoStepProps) {
               type="text"
               value={personalInfo.city}
               onChange={(e) => handleInputChange('city', e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+              className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all"
               placeholder="New York"
             />
           </div>
@@ -147,7 +154,7 @@ function PersonalInfoStep({ onNext }: PersonalInfoStepProps) {
               type="text"
               value={personalInfo.country}
               onChange={(e) => handleInputChange('country', e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+              className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all"
               placeholder="United States"
             />
           </div>
@@ -161,26 +168,33 @@ function PersonalInfoStep({ onNext }: PersonalInfoStepProps) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ delay: 0.3 }}
-            className="bg-white rounded-xl border border-gray-200 p-8 shadow-sm"
+            className="bg-white p-4"
           >
-          <h3 className="text-xl font-bold text-gray-900 mb-6">Professional Links</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {personalInfo.websites.map((website) => (
-              <div key={website.id} className="flex items-center justify-between p-4 bg-blue-50 rounded-xl border border-blue-100">
-                <div>
-                  <div className="font-semibold text-gray-900">{website.label}</div>
-                  <div className="text-sm text-blue-600 truncate">{website.url}</div>
-                </div>
-                <button
-                  onClick={() => removeWebsite(website.id)}
-                  className="text-blue-500 hover:text-blue-700 p-2 hover:bg-blue-50 rounded-lg transition-all"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-            ))}
-          </div>
-        </motion.div>
+            <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-4">Professional Links</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {personalInfo.websites.map((website) => {
+                const IconComponent = getWebsiteIcon(website.label)
+
+                return (
+                  <div key={website.id} className="flex items-center justify-between p-3 bg-white border border-gray-300 rounded-sm">
+                    <div className="flex items-center space-x-3">
+                      <IconComponent className="w-5 h-5 text-blue-600" />
+                      <div>
+                        <div className="font-semibold text-gray-900">{website.label}</div>
+                        <div className="text-sm text-gray-600 truncate">{website.url}</div>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => removeWebsite(website.id)}
+                      className="text-gray-600 hover:text-red-600 p-2 hover:bg-gray-50 rounded-sm transition-all"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                )
+              })}
+            </div>
+          </motion.div>
         )}
       </AnimatePresence>
 
@@ -188,22 +202,22 @@ function PersonalInfoStep({ onNext }: PersonalInfoStepProps) {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
-        className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm"
+        className="bg-white p-3"
       >
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-xl font-bold text-gray-900">Add Website</h3>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg md:text-xl font-bold text-gray-900">Add Website</h3>
         </div>
 
         {!showAddWebsite ? (
           <button
             onClick={() => setShowAddWebsite(true)}
-            className="w-full p-4 border-2 border-dashed border-gray-300 rounded-xl hover:border-blue-400 hover:bg-blue-50 transition-all text-gray-600 hover:text-blue-600"
+            className="w-full p-3 border border-gray-300 border-dashed rounded-sm hover:bg-gray-50 hover:border-gray-400 transition-all text-gray-600 hover:text-gray-800"
           >
             <Plus className="w-6 h-6 mx-auto mb-2" />
             <span className="font-medium">Add Professional Website</span>
           </button>
         ) : (
-          <div className="space-y-6">
+          <div className="space-y-4">
             <div className="grid grid-cols-3 gap-3">
               {websiteOptions.map((option) => {
                 const Icon = option.icon
@@ -211,9 +225,9 @@ function PersonalInfoStep({ onNext }: PersonalInfoStepProps) {
                   <button
                     key={option.label}
                     onClick={() => setNewWebsite({ label: option.label, url: option.placeholder })}
-                    className="flex flex-col items-center p-4 border border-gray-200 rounded-xl hover:bg-blue-50 hover:border-blue-300 transition-all"
+                    className="flex flex-col items-center p-3 border border-gray-300 rounded-sm hover:bg-gray-50 hover:border-gray-400 transition-all"
                   >
-                    <Icon className="w-6 h-6 text-blue-600 mb-2" />
+                    <Icon className="w-6 h-6 text-gray-600 mb-2" />
                     <span className="text-sm font-medium text-gray-700">{option.label}</span>
                   </button>
                 )
@@ -227,7 +241,7 @@ function PersonalInfoStep({ onNext }: PersonalInfoStepProps) {
                   type="text"
                   value={newWebsite.label}
                   onChange={(e) => setNewWebsite({ ...newWebsite, label: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all"
                   placeholder="LinkedIn, GitHub, Portfolio"
                 />
               </div>
@@ -238,7 +252,7 @@ function PersonalInfoStep({ onNext }: PersonalInfoStepProps) {
                   type="url"
                   value={newWebsite.url}
                   onChange={(e) => setNewWebsite({ ...newWebsite, url: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all"
                   placeholder="https://yourwebsite.com"
                 />
               </div>
@@ -250,14 +264,14 @@ function PersonalInfoStep({ onNext }: PersonalInfoStepProps) {
                   setShowAddWebsite(false)
                   setNewWebsite({ label: '', url: '' })
                 }}
-                className="px-6 py-2 text-gray-600 hover:text-gray-800 font-medium"
+                className="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium"
               >
                 Cancel
               </button>
               <button
                 onClick={handleAddWebsite}
                 disabled={!newWebsite.label || !newWebsite.url}
-                className="px-6 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 font-medium transition-all"
+                className="px-4 py-2 bg-blue-600 text-white rounded-sm hover:bg-blue-700 disabled:opacity-50 font-medium transition-all"
               >
                 Add Website
               </button>
@@ -270,14 +284,14 @@ function PersonalInfoStep({ onNext }: PersonalInfoStepProps) {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
-        className="flex justify-end pt-6 border-t border-gray-200"
+        className="flex justify-end pt-4 border-t border-gray-300"
       >
         <motion.button
           whileHover={{ scale: 1.02, x: 5 }}
           whileTap={{ scale: 0.98 }}
           onClick={onNext}
           disabled={!isFormValid}
-          className="flex items-center space-x-2 px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold shadow-lg hover:shadow-xl transition-all"
+          className="flex items-center space-x-2 px-8 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-sm hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold shadow-lg hover:shadow-xl transition-all"
         >
           <span>Continue</span>
           <ChevronRight className="w-5 h-5" />

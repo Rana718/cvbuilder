@@ -48,7 +48,7 @@ function DesktopFrom() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+        <div className="min-h-screen bg-white">
             {/* Mobile Step Indicator - shown on small/medium screens */}
             <div className="lg:hidden">
                 <StepIndicator currentStep={currentStep} totalSteps={6} />
@@ -62,10 +62,10 @@ function DesktopFrom() {
             {/* Main Content - responsive layout */}
             <div className="lg:ml-16 flex flex-col lg:flex-row min-h-screen">
                 {/* Form Section */}
-                <div className="flex-1 p-3 md:p-6">
+                <div className="flex-1 p-1 md:p-3">
                     <div className="max-w-4xl mx-auto">
-                        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-                            <div className="p-4 md:p-8">
+                        <div className="bg-white">
+                            <div className="p-2 md:p-4">
                                 {renderCurrentStep()}
                             </div>
                         </div>
@@ -73,17 +73,14 @@ function DesktopFrom() {
                 </div>
 
                 {/* Right Preview Section - Hidden on mobile/tablet, shown on large screens */}
-                <div className="hidden xl:block w-96 border-l">
-                    <div className="sticky top-0 h-screen flex flex-col">
-                        <div className="flex-1 p-6 overflow-hidden">
-                            <div className="scale-75 origin-top h-full overflow-hidden">
-                                <div className="h-full">
-                                    <ResumePreview mode="live" />
-                                </div>
-                            </div>
+                <div className="hidden xl:block w-80">
+                    <div className="sticky top-0 h-screen flex items-center justify-center">
+                        <div className="w-full pr-6">
+                            <ResumePreview mode="live" />
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
     )

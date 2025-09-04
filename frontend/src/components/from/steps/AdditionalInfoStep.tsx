@@ -83,7 +83,9 @@ function AdditionalInfoStep({ onPrev }: AdditionalInfoStepProps) {
     workExperience,
     education,
     skills,
-    summary
+    summary,
+    saveResume,
+    documentId
   } = useResumeStore()
   
   const [showSectionPicker, setShowSectionPicker] = useState(false)
@@ -127,25 +129,25 @@ function AdditionalInfoStep({ onPrev }: AdditionalInfoStepProps) {
     })
   }
 
-  const handleFinish = () => {
-    // Log all resume data
-    const resumeData = {
-      templateId,
-      personalInfo,
-      workExperience,
-      education,
-      skills,
-      summary,
-      additionalSections
+  const handleFinish = async () => {
+    try {
+      // Save the resume first
+      await saveResume()
+      
+      // Get the resume ID after saving
+      const resumeId = documentId
+      
+      if (resumeId && templateId) {
+        // Redirect to the resume preview page
+        router.push(`/resusme/${resumeId}?template=${templateId}`)
+      } else {
+        console.error('Missing resume ID or template ID after save')
+        alert('Resume saved successfully!')
+      }
+    } catch (error) {
+      console.error('Failed to save resume:', error)
+      alert('Failed to save resume. Please try again.')
     }
-    
-    console.log('Resume Data:', resumeData)
-    
-    // Generate a unique resume ID (in real app, this would come from API)
-    const resumeId = Math.random().toString(36).substr(2, 9)
-    
-    // Redirect to resume page
-    router.push(`/resusme/${resumeId}?template=${templateId}`)
   }
 
   const isFormValid = formData.title && formData.content

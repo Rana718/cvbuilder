@@ -10,70 +10,117 @@ import {
     DollarSign,
     Eye,
     Download,
+    RefreshCw,
+    AlertCircle
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useDashboardData } from "@/hooks/useDashboardData";
 
-const dashboardStats = [
-    {
-        title: "Total Users",
-        value: "2,847",
-        change: "+12.5%",
-        icon: Users,
-        color: "text-blue-600",
-        bgColor: "bg-blue-50",
-    },
-    {
-        title: "Active Subscriptions",
-        value: "892",
-        change: "+8.2%",
-        icon: CreditCard,
-        color: "text-green-600",
-        bgColor: "bg-green-50",
-    },
-    {
-        title: "Total Resumes",
-        value: "15,439",
-        change: "+24.1%",
-        icon: FileText,
-        color: "text-purple-600",
-        bgColor: "bg-purple-50",
-    },
-    {
-        title: "Monthly Revenue",
-        value: "₹80,280",
-        change: "+15.3%",
-        icon: DollarSign,
-        color: "text-orange-600",
-        bgColor: "bg-orange-50",
-    },
-];
+const LoadingCard = () => (
+    <Card className="animate-pulse">
+        <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+                <div className="space-y-2">
+                    <div className="h-4 bg-gray-200 rounded w-24"></div>
+                    <div className="h-8 bg-gray-200 rounded w-16"></div>
+                    <div className="h-3 bg-gray-200 rounded w-20"></div>
+                </div>
+                <div className="w-12 h-12 bg-gray-200 rounded-lg"></div>
+            </div>
+        </CardContent>
+    </Card>
+);
 
-const recentUsers = [
-    { name: "John Doe", email: "john@example.com", status: "Premium", joinDate: "2024-09-01" },
-    { name: "Sarah Wilson", email: "sarah@example.com", status: "Free", joinDate: "2024-09-01" },
-    { name: "Mike Johnson", email: "mike@example.com", status: "Premium", joinDate: "2024-08-31" },
-    { name: "Emily Chen", email: "emily@example.com", status: "Free", joinDate: "2024-08-31" },
-];
+const ErrorMessage = ({ error, onRetry }: { error: string; onRetry: () => void }) => (
+    <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center justify-between">
+        <div className="flex items-center space-x-3">
+            <AlertCircle className="h-5 w-5 text-red-500" />
+            <span className="text-red-700">{error}</span>
+        </div>
+        <Button variant="outline" size="sm" onClick={onRetry}>
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Retry
+        </Button>
+    </div>
+);
 
-const recentPayments = [
-    { user: "John Doe", amount: "₹90", status: "Success", date: "2024-09-01" },
-    { user: "Sarah Wilson", amount: "₹90", status: "Success", date: "2024-08-31" },
-    { user: "Mike Johnson", amount: "₹90", status: "Failed", date: "2024-08-30" },
-    { user: "Emily Chen", amount: "₹90", status: "Success", date: "2024-08-29" },
-];
 
-const resumeStats = [
-    { template: "Modern Professional", count: 2847, percentage: 35 },
-    { template: "Creative Designer", count: 1923, percentage: 24 },
-    { template: "Executive Elite", count: 1654, percentage: 20 },
-    { template: "Minimalist", count: 1234, percentage: 15 },
-    { template: "Others", count: 481, percentage: 6 },
-];
 
 export default function AdminDashboard() {
+    const { data, loading, error, refetch } = useDashboardData();
+
+    const formatCurrency = (amount: number) => {
+        return new Intl.NumberFormat('en-IN', {
+            style: 'currency',
+            currency: 'INR',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
+        }).format(amount);
+    };
+
+    const formatDate = (dateString: string) => {
+        return new Date(dateString).toLocaleDateString('en-IN', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+        });
+    };
+
+    const formatGrowthPercentage = (percentage: number) => {
+        const sign = percentage >= 0 ? '+' : '';
+        return `${sign}${percentage}%`;
+    };
+
+    if (error) {
+        return (
+            <div className="p-4 lg:p-8">
+                <ErrorMessage error={error} onRetry={refetch} />
+            </div>
+        );
+    }
+
+    const dashboardStats = data ? [
+        {
+            title: "Total Users",
+            value: data.total_users.toLocaleString(),
+            change: formatGrowthPercentage(data.user_growth_percentage),
+            icon: Users,
+            color: "text-blue-600",
+            bgColor: "bg-blue-50",
+            isPositive: data.user_growth_percentage >= 0
+        },
+        {
+            title: "Active Subscriptions",
+            value: data.total_active_subscriptions.toLocaleString(),
+            change: "Active",
+            icon: CreditCard,
+            color: "text-green-600",
+            bgColor: "bg-green-50",
+            isPositive: true
+        },
+        {
+            title: "Total Resumes",
+            value: data.total_resumes.toLocaleString(),
+            change: formatGrowthPercentage(data.resume_growth_percentage),
+            icon: FileText,
+            color: "text-purple-600",
+            bgColor: "bg-purple-50",
+            isPositive: data.resume_growth_percentage >= 0
+        },
+        {
+            title: "Monthly Revenue",
+            value: formatCurrency(data.current_month_revenue),
+            change: formatGrowthPercentage(data.revenue_growth_percentage),
+            icon: DollarSign,
+            color: "text-orange-600",
+            bgColor: "bg-orange-50",
+            isPositive: data.revenue_growth_percentage >= 0
+        },
+    ] : [];
+
     return (
         <div className="p-4 lg:p-8 space-y-8">
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
@@ -82,6 +129,10 @@ export default function AdminDashboard() {
                     <p className="text-gray-600">Welcome back! Here's your platform overview.</p>
                 </div>
                 <div className="flex items-center space-x-3">
+                    <Button variant="outline" size="sm" onClick={refetch} disabled={loading}>
+                        <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+                        Refresh
+                    </Button>
                     <Button variant="outline" size="sm">
                         <Download className="h-4 w-4 mr-2" />
                         Export Report
@@ -91,22 +142,31 @@ export default function AdminDashboard() {
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {dashboardStats.map((stat, index) => (
-                    <Card key={index} className="hover:shadow-lg transition-shadow">
-                        <CardContent className="p-6">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-sm font-medium text-gray-600">{stat.title}</p>
-                                    <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
-                                    <p className="text-sm text-green-600 mt-1">{stat.change} from last month</p>
+                {loading ? (
+                    Array.from({ length: 4 }).map((_, index) => (
+                        <LoadingCard key={index} />
+                    ))
+                ) : (
+                    dashboardStats.map((stat, index) => (
+                        <Card key={index} className="hover:shadow-lg transition-shadow">
+                            <CardContent className="p-6">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-sm font-medium text-gray-600">{stat.title}</p>
+                                        <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+                                        <p className={`text-sm mt-1 ${stat.isPositive ? 'text-green-600' : 'text-red-600'
+                                            }`}>
+                                            {stat.change} {stat.title === "Active Subscriptions" ? "" : "from last month"}
+                                        </p>
+                                    </div>
+                                    <div className={`${stat.bgColor} p-3 rounded-lg`}>
+                                        <stat.icon className={`h-6 w-6 ${stat.color}`} />
+                                    </div>
                                 </div>
-                                <div className={`${stat.bgColor} p-3 rounded-lg`}>
-                                    <stat.icon className={`h-6 w-6 ${stat.color}`} />
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-                ))}
+                            </CardContent>
+                        </Card>
+                    ))
+                )}
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -119,29 +179,49 @@ export default function AdminDashboard() {
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="space-y-4">
-                            {recentUsers.map((user, index) => (
-                                <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                    <div className="flex items-center space-x-3">
-                                        <Avatar>
-                                            <AvatarFallback className="bg-blue-100 text-blue-700">
-                                                {user.name.split(" ").map((n) => n[0]).join("")}
-                                            </AvatarFallback>
-                                        </Avatar>
-                                        <div>
-                                            <p className="font-medium text-gray-900">{user.name}</p>
-                                            <p className="text-sm text-gray-500">{user.email}</p>
+                        {loading ? (
+                            <div className="space-y-4">
+                                {Array.from({ length: 4 }).map((_, index) => (
+                                    <div key={index} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg animate-pulse">
+                                        <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
+                                        <div className="flex-1 space-y-2">
+                                            <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                                            <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                                        </div>
+                                        <div className="h-6 bg-gray-200 rounded w-16"></div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="space-y-4">
+                                {data?.recent_users?.map((user, index) => (
+                                    <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                        <div className="flex items-center space-x-3">
+                                            <Avatar>
+                                                <AvatarImage src={user.image_url} />
+                                                <AvatarFallback className="bg-blue-100 text-blue-700">
+                                                    {user.name.split(" ").map((n) => n[0]).join("")}
+                                                </AvatarFallback>
+                                            </Avatar>
+                                            <div>
+                                                <p className="font-medium text-gray-900">{user.name}</p>
+                                                <p className="text-sm text-gray-500">{user.email}</p>
+                                            </div>
+                                        </div>
+                                        <div className="text-right">
+                                            <Badge variant={user.is_premium ? "default" : "secondary"}>
+                                                {user.is_premium ? "Premium" : "Free"}
+                                            </Badge>
+                                            <p className="text-xs text-gray-500 mt-1">
+                                                {formatDate(user.registered_date)}
+                                            </p>
                                         </div>
                                     </div>
-                                    <div className="text-right">
-                                        <Badge variant={user.status === "Premium" ? "default" : "secondary"}>
-                                            {user.status}
-                                        </Badge>
-                                        <p className="text-xs text-gray-500 mt-1">{user.joinDate}</p>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
+                                )) || (
+                                        <p className="text-gray-500 text-center py-4">No recent users found</p>
+                                    )}
+                            </div>
+                        )}
                         <Button variant="outline" className="w-full mt-4">
                             <Eye className="h-4 w-4 mr-2" />
                             View All Users
@@ -158,81 +238,51 @@ export default function AdminDashboard() {
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="space-y-4">
-                            {recentPayments.map((payment, index) => (
-                                <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                    <div>
-                                        <p className="font-medium text-gray-900">{payment.user}</p>
-                                        <p className="text-sm text-gray-500">{payment.date}</p>
+                        {loading ? (
+                            <div className="space-y-4">
+                                {Array.from({ length: 4 }).map((_, index) => (
+                                    <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg animate-pulse">
+                                        <div className="space-y-2">
+                                            <div className="h-4 bg-gray-200 rounded w-24"></div>
+                                            <div className="h-3 bg-gray-200 rounded w-16"></div>
+                                        </div>
+                                        <div className="text-right space-y-2">
+                                            <div className="h-4 bg-gray-200 rounded w-16"></div>
+                                            <div className="h-6 bg-gray-200 rounded w-20"></div>
+                                        </div>
                                     </div>
-                                    <div className="text-right">
-                                        <p className="font-medium text-gray-900">{payment.amount}</p>
-                                        <Badge variant={payment.status === "Success" ? "default" : "destructive"}>
-                                            {payment.status}
-                                        </Badge>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="space-y-4">
+                                {data?.recent_payments?.map((payment, index) => (
+                                    <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                        <div>
+                                            <p className="font-medium text-gray-900">{payment.user_name}</p>
+                                            <p className="text-sm text-gray-500">
+                                                {payment.payment_date ? formatDate(payment.payment_date) : 'N/A'}
+                                            </p>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="font-medium text-gray-900">
+                                                {formatCurrency(payment.amount)}
+                                            </p>
+                                            <Badge variant={payment.status === "captured" ? "default" : "destructive"}>
+                                                {payment.status === "captured" ? "Success" : payment.status}
+                                            </Badge>
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
-                        </div>
+                                )) || (
+                                        <p className="text-gray-500 text-center py-4">No recent payments found</p>
+                                    )}
+                            </div>
+                        )}
                         <Button variant="outline" className="w-full mt-4">
                             <Eye className="h-4 w-4 mr-2" />
                             View All Payments
                         </Button>
                     </CardContent>
                 </Card>
-            </div>
-
-            {/* Resume Analytics */}
-            <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center space-x-2">
-                        <FileText className="h-5 w-5" />
-                        <span>Resume Template Analytics</span>
-                    </CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <div className="space-y-4">
-                        {resumeStats.map((stat, index) => (
-                            <div key={index} className="flex items-center justify-between">
-                                <div className="flex-1">
-                                    <div className="flex items-center justify-between mb-2">
-                                        <span className="text-sm font-medium text-gray-900">{stat.template}</span>
-                                        <span className="text-sm text-gray-500">{stat.count} resumes</span>
-                                    </div>
-                                    <div className="w-full bg-gray-200 rounded-full h-2">
-                                        <div
-                                            className="bg-blue-600 h-2 rounded-full"
-                                            style={{ width: `${stat.percentage}%` }}
-                                        ></div>
-                                    </div>
-                                </div>
-                                <div className="ml-4 text-sm font-medium text-gray-900">
-                                    {stat.percentage}%
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </CardContent>
-            </Card>
-
-            {/* Quick Actions */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <Button className="h-20 flex-col space-y-2" variant="outline">
-                    <Users className="h-6 w-6" />
-                    <span>Manage Users</span>
-                </Button>
-                <Button className="h-20 flex-col space-y-2" variant="outline">
-                    <CreditCard className="h-6 w-6" />
-                    <span>View Payments</span>
-                </Button>
-                <Button className="h-20 flex-col space-y-2" variant="outline">
-                    <Bell className="h-6 w-6" />
-                    <span>Send Notification</span>
-                </Button>
-                <Button className="h-20 flex-col space-y-2" variant="outline">
-                    <FileText className="h-6 w-6" />
-                    <span>Edit Templates</span>
-                </Button>
             </div>
         </div>
     );

@@ -14,6 +14,7 @@ interface SummaryStepProps {
 function SummaryStep({ onNext, onPrev }: SummaryStepProps) {
     const router = useRouter()
     const searchParams = useSearchParams()
+    const resumeStore = useResumeStore()
     const { 
         summary, 
         setSummary,  
@@ -24,7 +25,7 @@ function SummaryStep({ onNext, onPrev }: SummaryStepProps) {
         saveResume,
         documentId,
         templateId
-    } = useResumeStore()
+    } = resumeStore
     
     const [aiSuggestions, setAiSuggestions] = useState<string[]>([])
     const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false)
@@ -37,22 +38,31 @@ function SummaryStep({ onNext, onPrev }: SummaryStepProps) {
         
         setIsSaving(true)
         try {
-            // Save the resume first
-            await saveResume()
-            
             // Get the resume ID from either documentId or URL params
             const resumeId = documentId || searchParams.get('resumeId')
             const currentTemplateId = templateId || searchParams.get('template')
             
             if (resumeId && currentTemplateId) {
-                // Add a small delay to ensure state is properly saved
-                setTimeout(() => {
-                    // Redirect to the resume preview page
-                    router.push(`/resusme/${resumeId}?template=${currentTemplateId}`)
-                }, 100)
+                // If we have a resume ID, this is either editing existing or continuing creation
+                // Only save if it's a new resume (no documentId set yet)
+                if (!documentId) {
+                    await saveResume()
+                }
+                
+                // Redirect to the resume preview page
+                router.push(`/resusme/${resumeId}?template=${currentTemplateId}`)
             } else {
-                alert('Resume saved successfully!')
-                onNext() // Fallback to original behavior
+                // This is a completely new resume - save it first
+                await saveResume()
+                
+                // Get the new document ID after saving
+                const newResumeId = resumeStore.documentId
+                if (newResumeId && currentTemplateId) {
+                    router.push(`/resusme/${newResumeId}?template=${currentTemplateId}`)
+                } else {
+                    alert('Resume saved successfully!')
+                    onNext() // Fallback to original behavior
+                }
             }
         } catch (error) {
             console.error('Failed to save resume:', error)
@@ -120,21 +130,21 @@ function SummaryStep({ onNext, onPrev }: SummaryStepProps) {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
-                className="text-center"
+                className="text-left"
             >
-                <motion.div
-                    animate={{ rotate: [0, 5, -5, 0] }}
-                    transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
-                    className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg"
-                >
-                    <Target className="w-8 h-8 text-white" />
-                </motion.div>
-                <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-3">
-                    Professional Summary
-                </h2>
-                <p className="text-gray-600 text-lg">
-                    Create a compelling summary that highlights your experience and career objectives
-                </p>
+                <div className="flex items-start mb-4">
+                    <div className="p-3 bg-blue-100 rounded-full mr-2">
+                        <Target className="w-8 h-8 text-blue-600" />
+                    </div>
+                    <div>
+                        <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                            Professional Summary
+                        </h2>
+                        <p className="text-lg text-gray-600">
+                            Create a compelling summary that highlights your experience and career objectives
+                        </p>
+                    </div>
+                </div>
             </motion.div>
 
             {/* Professional Summary Section */}
@@ -210,7 +220,7 @@ function SummaryStep({ onNext, onPrev }: SummaryStepProps) {
                                 <motion.div
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
-                                    className="text-center py-8 bg-gray-50 rounded-xl border border-gray-200"
+                                    className="text-center py-8 bg-white rounded-sm border border-gray-300"
                                 >
                                     <User className="w-12 h-12 mx-auto mb-3 text-gray-400" />
                                     <p className="text-sm text-gray-500">
@@ -224,7 +234,7 @@ function SummaryStep({ onNext, onPrev }: SummaryStepProps) {
                                     initial={{ opacity: 0, y: 10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: -10 }}
-                                    className="flex items-center justify-center py-12 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200"
+                                    className="flex items-center justify-center py-12 bg-white rounded-sm border border-blue-500"
                                 >
                                     <div className="text-center">
                                         <motion.div
@@ -290,7 +300,7 @@ function SummaryStep({ onNext, onPrev }: SummaryStepProps) {
                     whileHover={{ scale: 1.02, x: -5 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={onPrev}
-                    className="flex items-center space-x-2 px-6 py-3 text-gray-600 hover:text-gray-800 font-medium transition-colors"
+                    className="flex items-center space-x-2 px-6 py-3 text-gray-700 bg-white border border-black rounded-sm hover:bg-gray-50 font-medium transition-colors"
                 >
                     <ChevronLeft className="w-4 h-4" />
                     <span>Previous</span>
@@ -300,7 +310,7 @@ function SummaryStep({ onNext, onPrev }: SummaryStepProps) {
                     whileTap={{ scale: 0.98 }}
                     onClick={handleFinish}
                     disabled={!isStepValid || isSaving}
-                    className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:from-blue-600 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium shadow-md transition-all"
+                    className="flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-sm hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium border border-black transition-all"
                 >
                     <span>{isSaving ? 'Saving & Redirecting...' : 'Finish & Preview Resume'}</span>
                     <ChevronRight className="w-4 h-4" />

@@ -157,16 +157,16 @@ function WorkExperienceStep({ onNext, onPrev }: WorkExperienceStepProps) {
       {renderCurrentView()}
 
       {showNavigation && (
-        <div className="flex justify-between pt-6 border-t border-gray-200">
+        <div className="flex justify-between pt-4 border-t border-black">
           <button
             onClick={onPrev}
-            className="px-6 py-3 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors font-medium"
+            className="px-4 py-2 border border-black rounded-sm text-gray-700 hover:bg-gray-50 transition-colors font-medium"
           >
             Previous
           </button>
           <button
             onClick={onNext}
-            className="px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 font-semibold shadow-lg hover:shadow-xl transition-all"
+            className="px-8 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-sm hover:from-blue-700 hover:to-indigo-700 font-semibold shadow-lg hover:shadow-xl transition-all"
           >
             Next
           </button>

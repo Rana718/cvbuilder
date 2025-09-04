@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
+import Navbar from '@/components/Navbar';
 
 interface AIGenerationPopupProps {
     isOpen: boolean;
@@ -28,6 +29,26 @@ interface AIGenerationPopupProps {
     jobTitle: string;
     companyName: string;
 }
+
+const FloatingIcon = ({ icon: Icon, delay, duration = 6 }: { icon: any, delay: number, duration?: number }) => (
+    <motion.div
+        className="absolute opacity-10 text-blue-200"
+        initial={{ y: 0, x: 0, rotate: 0 }}
+        animate={{
+            y: [-20, 20, -20],
+            x: [-10, 10, -10],
+            rotate: [0, 10, -10, 0]
+        }}
+        transition={{
+            duration,
+            delay,
+            repeat: Infinity,
+            ease: "easeInOut"
+        }}
+    >
+        <Icon className="w-8 h-8" />
+    </motion.div>
+);
 
 const AIGenerationPopup: React.FC<AIGenerationPopupProps> = ({
     isOpen,
@@ -66,19 +87,31 @@ const AIGenerationPopup: React.FC<AIGenerationPopupProps> = ({
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="fixed inset-0 bg-white bg-opacity-90 backdrop-blur-sm flex items-center justify-center z-[999] p-4"
+                    className="fixed inset-0 border border-gray-100 shadow-2xl backdrop-blur-sm scrollbar-none flex items-center justify-center z-[999] p-4"
                     onClick={onClose}
                 >
+                    {/* Floating Background Elements */}
+                    <FloatingIcon icon={Sparkles} delay={0} />
+                    <FloatingIcon icon={FileText} delay={1} />
+                    <FloatingIcon icon={Wand2} delay={2} />
+
                     <motion.div
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.95 }}
-                        className="bg-white rounded-lg p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-blue-200"
+                        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                        className="bg-white rounded-lg p-8 max-w-2xl w-full max-h-[85vh] relative shadow-2xl"
                         onClick={(e: React.MouseEvent) => e.stopPropagation()}
+                        style={{ overflowY: 'hidden' }}
                     >
                         <div className="flex justify-between items-center mb-8">
                             <div className="flex items-center">
-                                <Wand2 className="w-6 h-6 text-blue-600 mr-3" />
+                                <motion.div
+                                    className="p-2 bg-blue-100 rounded-full mr-3"
+                                    animate={{ rotate: [0, 10, -10, 0] }}
+                                    transition={{ duration: 4, repeat: Infinity }}
+                                >
+                                    <Wand2 className="w-6 h-6 text-blue-600" />
+                                </motion.div>
                                 <h3 className="text-xl font-semibold text-gray-900">AI Cover Letter Generation</h3>
                             </div>
                             <button
@@ -89,7 +122,7 @@ const AIGenerationPopup: React.FC<AIGenerationPopupProps> = ({
                             </button>
                         </div>
 
-                        <div className="space-y-6">
+                        <div className="space-y-6" style={{ maxHeight: 'calc(85vh - 160px)', overflowY: 'auto', paddingRight: '8px' }}>
                             <div className="bg-blue-50 rounded-lg p-4 border border-blue-100">
                                 <h4 className="font-medium text-gray-900 mb-2">Job Details</h4>
                                 <div className="text-sm text-gray-700">
@@ -99,12 +132,12 @@ const AIGenerationPopup: React.FC<AIGenerationPopupProps> = ({
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                <label className="block text-sm font-semibold text-gray-800 mb-2">
                                     Upload Resume (PDF) *
                                 </label>
                                 <div
                                     onClick={() => fileInputRef.current?.click()}
-                                    className="border-2 border-dashed border-blue-300 rounded-lg p-6 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-all"
+                                    className="border-2 border-dashed border-blue-300 rounded-sm p-6 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-all"
                                 >
                                     <Upload className="w-8 h-8 text-blue-400 mx-auto mb-2" />
                                     <p className="text-sm text-gray-600">
@@ -121,14 +154,14 @@ const AIGenerationPopup: React.FC<AIGenerationPopupProps> = ({
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                <label className="block text-sm font-semibold text-gray-800 mb-2">
                                     Job Description (Optional)
                                 </label>
                                 <textarea
                                     value={jobDescription}
                                     onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setJobDescription(e.target.value)}
                                     rows={6}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 resize-none transition-all"
                                     placeholder="Paste the job description here for better AI generation..."
                                 />
                             </div>
@@ -137,14 +170,16 @@ const AIGenerationPopup: React.FC<AIGenerationPopupProps> = ({
                                 <button
                                     onClick={onClose}
                                     disabled={isLoading}
-                                    className="px-6 py-2 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                                    className="px-6 py-2 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-sm hover:bg-gray-50 transition-colors"
                                 >
                                     Cancel
                                 </button>
-                                <button
+                                <motion.button
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.98 }}
                                     onClick={handleGenerate}
                                     disabled={isLoading || !resumeFile}
-                                    className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center"
+                                    className="px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-sm hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center shadow-lg"
                                 >
                                     {isLoading ? (
                                         <>
@@ -157,7 +192,7 @@ const AIGenerationPopup: React.FC<AIGenerationPopupProps> = ({
                                             Generate Cover Letter
                                         </>
                                     )}
-                                </button>
+                                </motion.button>
                             </div>
                         </div>
                     </motion.div>
@@ -168,7 +203,6 @@ const AIGenerationPopup: React.FC<AIGenerationPopupProps> = ({
 };
 
 const CreateCoverLetterPage: React.FC = () => {
-    const params = useParams();
     const searchParams = useSearchParams();
     const router = useRouter();
 
@@ -264,40 +298,95 @@ const CreateCoverLetterPage: React.FC = () => {
     const isFormValid: boolean = !!(name && email && recipient_title && recipient_company && body);
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="min-h-screen bg-gray-50 relative overflow-hidden">
+            <Navbar/>
+            <div className="fixed inset-0 pointer-events-none">
                 <motion.div
-                    initial={{ opacity: 0, y: 20 }}
+                    className="absolute top-20 left-10 opacity-5 text-blue-200"
+                    animate={{
+                        y: [-20, 20, -20],
+                        rotate: [0, 5, -5, 0]
+                    }}
+                    transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+                >
+                    <FileText className="w-16 h-16" />
+                </motion.div>
+
+                <motion.div
+                    className="absolute top-40 right-20 opacity-5 text-blue-200"
+                    animate={{
+                        y: [20, -20, 20],
+                        x: [-10, 10, -10],
+                        rotate: [0, -10, 10, 0]
+                    }}
+                    transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+                >
+                    <User className="w-12 h-12" />
+                </motion.div>
+
+                <motion.div
+                    className="absolute bottom-40 left-20 opacity-5 text-blue-200"
+                    animate={{
+                        y: [-15, 15, -15],
+                        x: [10, -10, 10],
+                        rotate: [0, 15, -15, 0]
+                    }}
+                    transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+                >
+                    <Briefcase className="w-14 h-14" />
+                </motion.div>
+
+                <motion.div
+                    className="absolute bottom-20 right-10 opacity-5 text-blue-200"
+                    animate={{
+                        y: [10, -10, 10],
+                        rotate: [0, 20, -20, 0]
+                    }}
+                    transition={{ duration: 9, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+                >
+                    <Type className="w-10 h-10" />
+                </motion.div>
+            </div>
+
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
+                <motion.div
+                    initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 }}
                     className="max-w-4xl mx-auto"
                 >
-                    <div className="text-center mb-12">
-                        <div className="w-16 h-16 mx-auto mb-6 bg-blue-600 rounded-full flex items-center justify-center">
-                            <FileText className="w-8 h-8 text-white" />
+                    {/* Header */}
+                    <div className="text-left mb-8">
+                        <div className="flex items-start mb-4">
+                            <div className="p-2 md:p-3 bg-blue-100 rounded-full mr-3 md:mr-2">
+                                <FileText className="w-6 h-6 md:w-8 md:h-8 text-blue-600" />
+                            </div>
+                            <div className="flex-1">
+                                <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+                                    {edit ? 'Edit Cover Letter' : 'Create Professional Cover Letter'}
+                                </h1>
+                                <p className="text-base md:text-lg text-gray-600">
+                                    Build a compelling cover letter that showcases your qualifications and helps you stand out to employers.
+                                </p>
+                            </div>
                         </div>
-                        <h1 className="text-3xl font-bold text-gray-900 mb-4">
-                            {edit ? 'Edit Cover Letter' : 'Create Professional Cover Letter'}
-                        </h1>
-                        <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-                            Build a compelling cover letter that showcases your qualifications and helps you stand out to employers.
-                        </p>
                     </div>
 
-                    <div className="space-y-10">
+                    <div className="space-y-4">
                         <motion.section
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.1 }}
-                            className="bg-white border-l-4 border-blue-500 p-8"
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ delay: 0.2 }}
+                            className="bg-white p-3 rounded-xl border border-gray-200"
                         >
                             <div className="flex items-center mb-6">
-                                <User className="w-6 h-6 text-blue-600 mr-3" />
-                                <h2 className="text-xl font-semibold text-gray-900">Personal Information</h2>
+                                <User className="w-4 md:w-6 md:h-6 text-blue-600 mr-3" />
+                                <h2 className="text-base md:text-xl font-semibold text-gray-900">Personal Information</h2>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                                    <label htmlFor="name" className="block text-sm font-semibold text-gray-800 mb-2">
                                         Full Name *
                                     </label>
                                     <input
@@ -305,13 +394,13 @@ const CreateCoverLetterPage: React.FC = () => {
                                         type="text"
                                         value={name}
                                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('name', e.target.value)}
-                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all"
                                         placeholder="Your full name"
                                         required
                                     />
                                 </div>
                                 <div>
-                                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                                    <label htmlFor="email" className="block text-sm font-semibold text-gray-800 mb-2">
                                         Email Address *
                                     </label>
                                     <input
@@ -319,13 +408,13 @@ const CreateCoverLetterPage: React.FC = () => {
                                         type="email"
                                         value={email}
                                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('email', e.target.value)}
-                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all"
                                         placeholder="your.email@example.com"
                                         required
                                     />
                                 </div>
                                 <div>
-                                    <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
+                                    <label htmlFor="phone" className="block text-sm font-semibold text-gray-800 mb-2">
                                         Phone Number
                                     </label>
                                     <input
@@ -333,12 +422,12 @@ const CreateCoverLetterPage: React.FC = () => {
                                         type="tel"
                                         value={phone || ''}
                                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('phone', e.target.value)}
-                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all"
                                         placeholder="Your phone number"
                                     />
                                 </div>
                                 <div>
-                                    <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-2">
+                                    <label htmlFor="address" className="block text-sm font-semibold text-gray-800 mb-2">
                                         Address
                                     </label>
                                     <input
@@ -346,7 +435,7 @@ const CreateCoverLetterPage: React.FC = () => {
                                         type="text"
                                         value={address || ''}
                                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('address', e.target.value)}
-                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all"
                                         placeholder="Your address"
                                     />
                                 </div>
@@ -356,17 +445,17 @@ const CreateCoverLetterPage: React.FC = () => {
                         <motion.section
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.2 }}
-                            className="bg-white border-l-4 border-blue-500 p-8"
+                            transition={{ delay: 0.3 }}
+                            className="bg-white p-3 rounded-xl border border-gray-200"
                         >
                             <div className="flex items-center mb-6">
-                                <Briefcase className="w-6 h-6 text-blue-600 mr-3" />
-                                <h2 className="text-xl font-semibold text-gray-900">Position Details</h2>
+                                <Briefcase className="w-4 md:w-6 md:h-6 text-blue-600 mr-3" />
+                                <h2 className="text-base md:text-xl font-semibold text-gray-900">Position Details</h2>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label htmlFor="jobTitle" className="block text-sm font-medium text-gray-700 mb-2">
+                                    <label htmlFor="jobTitle" className="block text-sm font-semibold text-gray-800 mb-2">
                                         Job Title *
                                     </label>
                                     <input
@@ -374,13 +463,13 @@ const CreateCoverLetterPage: React.FC = () => {
                                         type="text"
                                         value={recipient_title || ''}
                                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('recipient_title', e.target.value)}
-                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all"
                                         placeholder="e.g., Software Engineer"
                                         required
                                     />
                                 </div>
                                 <div>
-                                    <label htmlFor="company" className="block text-sm font-medium text-gray-700 mb-2">
+                                    <label htmlFor="company" className="block text-sm font-semibold text-gray-800 mb-2">
                                         Company Name *
                                     </label>
                                     <input
@@ -388,7 +477,7 @@ const CreateCoverLetterPage: React.FC = () => {
                                         type="text"
                                         value={recipient_company || ''}
                                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('recipient_company', e.target.value)}
-                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all"
                                         placeholder="e.g., Google Inc."
                                         required
                                     />
@@ -399,18 +488,20 @@ const CreateCoverLetterPage: React.FC = () => {
                         <motion.section
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.3 }}
-                            className="bg-white border-l-4 border-blue-500 p-8"
+                            transition={{ delay: 0.4 }}
+                            className="bg-white p-3 rounded-xl border border-gray-200"
                         >
                             <div className="flex items-center justify-between mb-6">
                                 <div className="flex items-center">
-                                    <Type className="w-6 h-6 text-blue-600 mr-3" />
-                                    <h2 className="text-xl font-semibold text-gray-900">Cover Letter Content *</h2>
+                                    <Type className="w-4 md:w-6 md:h-6 text-blue-600 mr-3" />
+                                    <h2 className="text-base md:text-xl font-semibold text-gray-900">Cover Letter Content *</h2>
                                 </div>
-                                <button
+                                <motion.button
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
                                     onClick={() => setShowAIPopup(true)}
                                     disabled={isLoadingAI}
-                                    className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                                    className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-sm hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                                 >
                                     {isLoadingAI ? (
                                         <>
@@ -423,7 +514,7 @@ const CreateCoverLetterPage: React.FC = () => {
                                             <span>AI Generate</span>
                                         </>
                                     )}
-                                </button>
+                                </motion.button>
                             </div>
 
                             <SimpleRichTextEditor
@@ -437,18 +528,18 @@ const CreateCoverLetterPage: React.FC = () => {
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.4 }}
-                            className="flex justify-end pt-8"
+                            transition={{ delay: 0.5 }}
+                            className="flex justify-end pt-4 border-t border-gray-300"
                         >
                             <motion.button
-                                whileHover={{ scale: 1.02 }}
+                                whileHover={{ scale: 1.02, x: 5 }}
                                 whileTap={{ scale: 0.98 }}
                                 onClick={handleNext}
                                 disabled={!isFormValid}
-                                className="flex items-center space-x-2 px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-all"
+                                className="flex items-center space-x-2 px-8 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-sm hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold shadow-lg hover:shadow-xl transition-all"
                             >
                                 <span>Preview Cover Letter</span>
-                                <ChevronRight className="w-4 h-4" />
+                                <ChevronRight className="w-5 h-5" />
                             </motion.button>
                         </motion.div>
                     </div>

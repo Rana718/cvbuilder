@@ -6,7 +6,6 @@ import { useResumeStore } from '@/store/resumeStore'
 import MobileFrom from '@/components/from/MobileFrom'
 import DesktopFrom from '@/components/from/DesktopFrom'
 import axiosInstance from '@/lib/axios'
-import Navbar from '@/components/Navbar'
 
 function TemplatePage() {
     const params = useParams()
@@ -47,7 +46,6 @@ function TemplatePage() {
 
             {/* Mobile Version */}
             <div className="lg:hidden">
-                <Navbar/>
                 <MobileFrom />
             </div>
         </>

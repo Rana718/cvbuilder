@@ -80,9 +80,9 @@ export default function ResumeFeedbackPage() {
     };
 
     const getRatingBg = (rating: number) => {
-        if (rating >= 8) return 'bg-green-50 border-green-200';
-        if (rating >= 6) return 'bg-orange-50 border-orange-200';
-        return 'bg-red-50 border-red-200';
+        if (rating >= 8) return 'bg-green-50 border-green-300';
+        if (rating >= 6) return 'bg-orange-50 border-orange-300';
+        return 'bg-red-50 border-red-300';
     };
 
     const renderStars = (rating: number) => {
@@ -91,14 +91,14 @@ export default function ResumeFeedbackPage() {
         const hasHalfStar = rating % 1 >= 0.5;
 
         for (let i = 0; i < fullStars; i++) {
-            stars.push(<Star key={i} className="h-4 w-4 fill-current text-orange-400" />);
+            stars.push(<Star key={i} className="h-3 w-3 md:h-4 md:w-4 fill-current text-orange-400" />);
         }
         if (hasHalfStar) {
-            stars.push(<Star key="half" className="h-4 w-4 fill-current text-orange-400 opacity-50" />);
+            stars.push(<Star key="half" className="h-3 w-3 md:h-4 md:w-4 fill-current text-orange-400 opacity-50" />);
         }
         const remainingStars = 10 - Math.ceil(rating);
         for (let i = 0; i < remainingStars; i++) {
-            stars.push(<Star key={`empty-${i}`} className="h-4 w-4 text-gray-300" />);
+            stars.push(<Star key={`empty-${i}`} className="h-3 w-3 md:h-4 md:w-4 text-gray-300" />);
         }
 
         return stars;
@@ -108,39 +108,41 @@ export default function ResumeFeedbackPage() {
         <>
             <Navbar />
             <div className="min-h-screen bg-gray-50">
-                <div className="max-w-6xl mx-auto px-4 py-6">
+                <div className="max-w-4xl mx-auto px-4 py-6">
                     {/* Header */}
                     <motion.div
-                        initial={{ opacity: 0, y: 20 }}
+                        initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="text-center mb-8"
+                        transition={{ delay: 0.1 }}
+                        className="text-left mb-8"
                     >
-                        <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-600 rounded-lg mb-4">
-                            <TrendingUp className="h-6 w-6 text-white" />
+                        <div className="flex items-start mb-4">
+                            <div className="p-2 md:p-3 bg-blue-100 rounded-full mr-3 md:mr-2">
+                                <TrendingUp className="w-6 h-6 md:w-8 md:h-8 text-blue-600" />
+                            </div>
+                            <div className="flex-1">
+                                <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Resume Analysis</h1>
+                                <p className="text-base md:text-lg text-gray-600">Get AI-powered feedback and recommendations to improve your resume</p>
+                            </div>
                         </div>
-                        <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                            Resume Analysis
-                        </h1>
-                        <p className="text-gray-600 max-w-xl mx-auto">
-                            Get AI-powered feedback and recommendations to improve your resume
-                        </p>
                     </motion.div>
 
                     {!result ? (
-                        <div className="space-y-6">
+                        <div className="space-y-4">
                             {/* Upload Section */}
                             <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                className="bg-white rounded-lg shadow-sm border p-6"
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ delay: 0.2 }}
+                                className="p-2"
                             >
                                 <div className="flex items-center space-x-3 mb-4">
-                                    <Upload className="h-5 w-5 text-blue-600" />
-                                    <h2 className="text-lg font-semibold text-gray-900">Upload Resume</h2>
+                                    <Upload className="h-4 w-4 md:h-5 md:w-5 text-blue-600" />
+                                    <h2 className="text-base md:text-lg font-semibold text-gray-900">Upload Resume</h2>
                                 </div>
 
                                 <div
-                                    className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${file
+                                    className={`border-2 border-dashed rounded-sm p-6 md:p-8 text-center transition-colors ${file
                                             ? 'border-green-300 bg-green-50'
                                             : 'border-gray-300 hover:border-blue-400 hover:bg-blue-50'
                                         }`}
@@ -155,19 +157,19 @@ export default function ResumeFeedbackPage() {
                                     <label htmlFor="resume-upload" className="cursor-pointer">
                                         {file ? (
                                             <div className="space-y-2">
-                                                <CheckCircle className="h-8 w-8 text-green-600 mx-auto" />
-                                                <p className="text-green-700 font-medium">{file.name}</p>
-                                                <p className="text-green-600 text-sm">
+                                                <CheckCircle className="h-6 w-6 md:h-8 md:w-8 text-green-600 mx-auto" />
+                                                <p className="text-green-700 font-medium text-sm md:text-base">{file.name}</p>
+                                                <p className="text-green-600 text-xs md:text-sm">
                                                     {(file.size / 1024 / 1024).toFixed(2)} MB • Click to change
                                                 </p>
                                             </div>
                                         ) : (
                                             <div className="space-y-2">
-                                                <FileText className="h-8 w-8 text-gray-400 mx-auto" />
-                                                <p className="text-gray-700 font-medium">
+                                                <FileText className="h-6 w-6 md:h-8 md:w-8 text-gray-400 mx-auto" />
+                                                <p className="text-gray-700 font-medium text-sm md:text-base">
                                                     Drop your resume here or click to browse
                                                 </p>
-                                                <p className="text-gray-500 text-sm">
+                                                <p className="text-gray-500 text-xs md:text-sm">
                                                     PDF files only • Maximum 10MB
                                                 </p>
                                             </div>
@@ -179,7 +181,7 @@ export default function ResumeFeedbackPage() {
                                     <motion.div
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: 1 }}
-                                        className="bg-red-50 border border-red-200 rounded-lg p-3 mt-4"
+                                        className="bg-red-50 border border-red-300 rounded-sm p-3 mt-4"
                                     >
                                         <div className="flex items-center space-x-2">
                                             <AlertCircle className="h-4 w-4 text-red-600" />
@@ -193,39 +195,39 @@ export default function ResumeFeedbackPage() {
                             <motion.div
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.1 }}
-                                className="bg-white rounded-lg shadow-sm border p-6"
+                                transition={{ delay: 0.3 }}
+                                className="p-2"
                             >
                                 <div className="flex items-center space-x-3 mb-4">
-                                    <Target className="h-5 w-5 text-blue-600" />
+                                    <Target className="h-4 w-4 md:h-5 md:w-5 text-blue-600" />
                                     <div>
-                                        <h2 className="text-lg font-semibold text-gray-900">Job Details</h2>
-                                        <p className="text-gray-500 text-sm">Optional - for targeted feedback</p>
+                                        <h2 className="text-base md:text-lg font-semibold text-gray-900">Job Details</h2>
+                                        <p className="text-gray-500 text-xs md:text-sm">Optional - for targeted feedback</p>
                                     </div>
                                 </div>
 
                                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <label className="block text-sm font-semibold text-gray-800 mb-2">
                                             Job Title
                                         </label>
                                         <input
                                             type="text"
                                             value={jobTitle}
                                             onChange={(e) => setJobTitle(e.target.value)}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all"
                                             placeholder="e.g., Senior Software Engineer"
                                         />
                                     </div>
 
                                     <div className="lg:col-span-2">
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <label className="block text-sm font-semibold text-gray-800 mb-2">
                                             Job Description
                                         </label>
                                         <textarea
                                             value={jobDescription}
                                             onChange={(e) => setJobDescription(e.target.value)}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all resize-none"
                                             rows={4}
                                             placeholder="Paste the job description for personalized recommendations..."
                                         />
@@ -237,13 +239,15 @@ export default function ResumeFeedbackPage() {
                             <motion.div
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.2 }}
-                                className="text-center"
+                                transition={{ delay: 0.4 }}
+                                className="flex justify-end pt-4 border-t border-gray-300"
                             >
-                                <button
+                                <motion.button
+                                    whileHover={{ scale: 1.02, x: 5 }}
+                                    whileTap={{ scale: 0.98 }}
                                     onClick={handleAnalyze}
                                     disabled={!file || isAnalyzing}
-                                    className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 mx-auto font-medium shadow-sm"
+                                    className="flex items-center space-x-2 px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-sm hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold shadow-lg hover:shadow-xl transition-all"
                                 >
                                     {isAnalyzing ? (
                                         <>
@@ -256,25 +260,25 @@ export default function ResumeFeedbackPage() {
                                             <span>Analyze Resume</span>
                                         </>
                                     )}
-                                </button>
+                                </motion.button>
                             </motion.div>
                         </div>
                     ) : (
-                        <div className="space-y-6">
+                        <div className="space-y-4">
                             {/* Results Header */}
                             <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                className="bg-white rounded-lg shadow-sm border p-6"
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                className="bg-white p-2 rounded-sm border border-gray-200"
                             >
-                                <div className="flex items-center justify-between">
+                                <div className="flex flex-col md:flex-row md:items-center justify-between space-y-4 md:space-y-0">
                                     <div>
-                                        <h2 className="text-xl font-bold text-gray-900">Analysis Complete</h2>
-                                        <p className="text-gray-600">Your comprehensive resume feedback</p>
+                                        <h2 className="text-lg md:text-xl font-bold text-gray-900">Analysis Complete</h2>
+                                        <p className="text-gray-600 text-sm md:text-base">Your comprehensive resume feedback</p>
                                     </div>
                                     <button
                                         onClick={handleReset}
-                                        className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 flex items-center space-x-2 text-sm"
+                                        className="bg-gray-600 text-white px-4 py-2 rounded-sm hover:bg-gray-700 flex items-center space-x-2 text-sm w-fit"
                                     >
                                         <RotateCcw className="h-4 w-4" />
                                         <span>Analyze Another</span>
@@ -284,18 +288,18 @@ export default function ResumeFeedbackPage() {
 
                             {/* Overall Rating */}
                             <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
                                 transition={{ delay: 0.1 }}
-                                className="bg-white rounded-lg shadow-sm border p-6"
+                                className="bg-white p-3 rounded-xl border border-gray-200"
                             >
-                                <h3 className="text-lg font-semibold text-gray-900 mb-4">Overall Rating</h3>
-                                <div className="flex items-center space-x-6">
-                                    <div className={`flex items-center px-4 py-3 rounded-lg border ${getRatingBg(result.overall_rating)}`}>
-                                        <span className={`text-3xl font-bold ${getRatingColor(result.overall_rating)}`}>
+                                <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-4">Overall Rating</h3>
+                                <div className="flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-6">
+                                    <div className={`flex items-center px-3 md:px-4 py-2 md:py-3 rounded-sm border ${getRatingBg(result.overall_rating)}`}>
+                                        <span className={`text-2xl md:text-3xl font-bold ${getRatingColor(result.overall_rating)}`}>
                                             {result.overall_rating.toFixed(1)}
                                         </span>
-                                        <span className="text-gray-600 ml-1">/ 10</span>
+                                        <span className="text-gray-600 ml-1 text-sm md:text-base">/ 10</span>
                                     </div>
                                     <div className="flex items-center space-x-1">
                                         {renderStars(result.overall_rating)}
@@ -305,26 +309,26 @@ export default function ResumeFeedbackPage() {
 
                             {/* Detailed Feedback */}
                             <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
                                 transition={{ delay: 0.2 }}
-                                className="bg-white rounded-lg shadow-sm border p-6"
+                                className="bg-white p-3 rounded-xl border border-gray-200"
                             >
-                                <h3 className="text-lg font-semibold text-gray-900 mb-4">Analysis Details</h3>
-                                <p className="text-gray-700 leading-relaxed">{result.feedback}</p>
+                                <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-4">Analysis Details</h3>
+                                <p className="text-gray-700 leading-relaxed text-sm md:text-base">{result.feedback}</p>
                             </motion.div>
 
                             {/* Strengths and Areas for Improvement */}
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                                 <motion.div
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
+                                    initial={{ opacity: 0, x: -20 }}
+                                    animate={{ opacity: 1, x: 0 }}
                                     transition={{ delay: 0.3 }}
-                                    className="bg-white rounded-lg shadow-sm border p-6"
+                                    className="bg-white p-3 rounded-xl border border-gray-200"
                                 >
                                     <div className="flex items-center space-x-2 mb-4">
-                                        <CheckCircle className="h-5 w-5 text-green-600" />
-                                        <h3 className="text-lg font-semibold text-gray-900">Strengths</h3>
+                                        <CheckCircle className="h-4 w-4 md:h-5 md:w-5 text-green-600" />
+                                        <h3 className="text-base md:text-lg font-semibold text-gray-900">Strengths</h3>
                                     </div>
                                     <ul className="space-y-3">
                                         {result.strengths.map((strength, index) => (
@@ -337,14 +341,14 @@ export default function ResumeFeedbackPage() {
                                 </motion.div>
 
                                 <motion.div
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
+                                    initial={{ opacity: 0, x: -20 }}
+                                    animate={{ opacity: 1, x: 0 }}
                                     transition={{ delay: 0.4 }}
-                                    className="bg-white rounded-lg shadow-sm border p-6"
+                                    className="bg-white p-3 rounded-xl border border-gray-200"
                                 >
                                     <div className="flex items-center space-x-2 mb-4">
-                                        <AlertCircle className="h-5 w-5 text-orange-600" />
-                                        <h3 className="text-lg font-semibold text-gray-900">Areas to Improve</h3>
+                                        <AlertCircle className="h-4 w-4 md:h-5 md:w-5 text-orange-600" />
+                                        <h3 className="text-base md:text-lg font-semibold text-gray-900">Areas to Improve</h3>
                                     </div>
                                     <ul className="space-y-3">
                                         {result.areas_for_improvement.map((area, index) => (
@@ -359,19 +363,19 @@ export default function ResumeFeedbackPage() {
 
                             {/* Recommendations */}
                             <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
                                 transition={{ delay: 0.5 }}
-                                className="bg-white rounded-lg shadow-sm border p-6"
+                                className="bg-white p-3 rounded-xl border border-gray-200"
                             >
                                 <div className="flex items-center space-x-2 mb-6">
-                                    <ArrowRight className="h-5 w-5 text-blue-600" />
-                                    <h3 className="text-lg font-semibold text-gray-900">Recommendations</h3>
+                                    <ArrowRight className="h-4 w-4 md:h-5 md:w-5 text-blue-600" />
+                                    <h3 className="text-base md:text-lg font-semibold text-gray-900">Recommendations</h3>
                                 </div>
                                 <div className="space-y-4">
                                     {result.recommendations.map((rec, index) => (
-                                        <div key={index} className="flex items-start space-x-3 p-3 bg-blue-50 rounded-lg border border-blue-100">
-                                            <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+                                        <div key={index} className="flex items-start space-x-3 p-3 bg-blue-50 rounded-sm border border-blue-200">
+                                            <div className="w-5 h-5 md:w-6 md:h-6 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
                                                 <span className="text-white font-medium text-xs">{index + 1}</span>
                                             </div>
                                             <span className="text-gray-700 text-sm font-medium">{rec}</span>
