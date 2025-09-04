@@ -5,6 +5,8 @@ from db.scheme import User
 from config.firebase import set_custom_user_claims
 from db.db import get_db
 from models.auth_models import AddUserProfileRequest
+from datetime import datetime
+from utils.activity_logger import log_user_activity
 
 class AuthController:
     
@@ -39,9 +41,16 @@ class AuthController:
                         existing_user.google_id = userdata.google_id
                         updated = True
                     
+                    # Update last login
+                    existing_user.last_login = datetime.utcnow()
+                    updated = True
+                    
                     if updated:
                         await db.commit()
                         await db.refresh(existing_user)
+                    
+                    # Log login activity
+                    await log_user_activity(db, existing_user.id, "User Login", f"User {existing_user.email} logged in")
                     
                     # Set custom claims with the correct UID
                     set_custom_user_claims(userdata.firebase_uid, {"dbUser": "true"})

@@ -19,6 +19,7 @@ class User(Base):
     
     # Profile Info
     full_name = Column(String(255), nullable=False)
+    last_login = Column(DateTime(timezone=True))
     
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
@@ -160,6 +161,57 @@ class Subscription(Base):
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
     user = relationship("User", back_populates="subscription")
+    payment_history = relationship("PaymentHistory", back_populates="subscription", cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"<Subscription(id={self.id}, user_id={self.user_id}, plan='{self.plan}', status='{self.status}')>"
+
+
+class PaymentHistory(Base):
+    __tablename__ = "payment_history"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    subscription_id = Column(Integer, ForeignKey("subscriptions.id", ondelete="CASCADE"), nullable=False)
+    razorpay_payment_id = Column(String(255), nullable=False)
+    razorpay_order_id = Column(String(255))
+    amount = Column(Integer, nullable=False)  # Amount in paise (smallest currency unit)
+    currency = Column(String(10), default="INR", nullable=False)
+    status = Column(String(50), nullable=False)  # captured, failed, refunded, etc.
+    method = Column(String(50))  # card, netbanking, wallet, etc.
+    description = Column(String(500))
+    receipt = Column(String(255))
+    
+    # Additional payment details
+    card_last4 = Column(String(4))  # Last 4 digits of card
+    card_network = Column(String(50))  # Visa, Mastercard, etc.
+    bank = Column(String(100))  # Bank name for netbanking
+    
+    # Metadata
+    payment_date = Column(DateTime(timezone=True))
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+    user = relationship("User")
+    subscription = relationship("Subscription", back_populates="payment_history")
+
+    def __repr__(self):
+        return f"<PaymentHistory(id={self.id}, payment_id='{self.razorpay_payment_id}', amount={self.amount}, status='{self.status}')>"
+
+
+class ActivityLog(Base):
+    __tablename__ = "activity_logs"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    action = Column(String(255), nullable=False)
+    details = Column(Text)
+    ip_address = Column(String(45))
+    user_agent = Column(String(500))
+    
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    user = relationship("User")
+
+    def __repr__(self):
+        return f"<ActivityLog(id={self.id}, user_id={self.user_id}, action='{self.action}')>"

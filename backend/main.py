@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from routes import mainrouter
 from middleware.auth import JWTAuthMiddleware 
 from middleware.retelimter import RateLimitMiddleware
+from middleware.activity_tracker import ActivityTrackerMiddleware
 from config.redis import init_redis
 from callback import callbackrouter
 
@@ -24,6 +25,7 @@ app.add_middleware(
 
 app.add_middleware(RateLimitMiddleware)
 app.add_middleware(JWTAuthMiddleware)
+app.add_middleware(ActivityTrackerMiddleware)
 
 app.include_router(mainrouter, prefix="/api")
 app.include_router(callbackrouter, prefix="/webhook")

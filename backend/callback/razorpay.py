@@ -7,8 +7,9 @@ import hashlib
 import os
 from datetime import datetime, timedelta
 from db.db import get_db
-from db.scheme import User, Subscription
+from db.scheme import User, Subscription, PaymentHistory
 from config.firebase import set_custom_user_claims
+from utils.activity_logger import log_user_activity
 import logging
 
 logger = logging.getLogger(__name__)
@@ -146,8 +147,27 @@ async def handle_subscription_charged(db: AsyncSession, subscription_data: dict,
             user.is_premium = True
             user.updated_at = datetime.utcnow()
             
+            # Store payment history
+            payment_history = PaymentHistory(
+                user_id=user.id,
+                subscription_id=subscription.id,
+                razorpay_payment_id=payment_data.get("id", ""),
+                razorpay_order_id=payment_data.get("order_id", ""),
+                amount=payment_data.get("amount", 0),
+                currency=payment_data.get("currency", "INR"),
+                status=payment_data.get("status", "captured"),
+                method=payment_data.get("method", ""),
+                description=f"Subscription payment for {subscription.plan} plan",
+                receipt=payment_data.get("receipt", ""),
+                card_last4=payment_data.get("card", {}).get("last4", "") if payment_data.get("card") else "",
+                card_network=payment_data.get("card", {}).get("network", "") if payment_data.get("card") else "",
+                bank=payment_data.get("bank", "") if payment_data.get("bank") else "",
+                payment_date=datetime.fromtimestamp(payment_data.get("created_at", 0)) if payment_data.get("created_at") else datetime.utcnow()
+            )
+            
+            db.add(payment_history)
             await db.commit()
-            logger.info(f"Updated subscription for user {user.id}")
+            logger.info(f"Updated subscription and stored payment history for user {user.id}")
     
     except Exception as e:
         logger.error(f"Error handling subscription charged: {str(e)}")

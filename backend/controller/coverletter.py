@@ -14,6 +14,7 @@ from models.coverletter_models import (
     CoverLetterGenerateResponse,
 )
 from utils.pdftotext import extract_text_from_pdf
+from utils.activity_logger import log_user_activity
 
 
 class CoverLetterController:

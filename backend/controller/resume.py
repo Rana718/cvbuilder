@@ -11,6 +11,7 @@ import json
 
 from config.openai import client, DEFAULT_MODEL
 from utils.pdftotext import extract_text_from_pdf
+from utils.activity_logger import log_user_activity
 
 
 
@@ -48,6 +49,67 @@ class ResumeController:
             user_id=user_id,
             **resume_data.dict()
         )
+    
+    @staticmethod
+    async def create_resume(resume_data: ResumeCreate, firebase_uid: str, db: AsyncSession) -> ResumeResponse:
+        user = await ResumeController._get_user_by_firebase_uid(firebase_uid, db)
+        
+        resume = ResumeController._create_resume_from_data(resume_data, user.id)
+        resume.shareable_uuid = str(uuid.uuid4())
+        
+        db.add(resume)
+        await db.commit()
+        await db.refresh(resume)
+        
+        # Log activity
+        await log_user_activity(db, user.id, "Resume Created", f"Created resume: {resume.name}")
+        
+        return ResumeResponse.from_orm(resume)
+    
+    @staticmethod
+    async def get_user_resumes(firebase_uid: str, db: AsyncSession) -> List[ResumeResponse]:
+        user = await ResumeController._get_user_by_firebase_uid(firebase_uid, db)
+        
+        query = select(Resume).where(Resume.user_id == user.id)
+        result = await db.execute(query)
+        resumes = result.scalars().all()
+        
+        return [ResumeResponse.from_orm(resume) for resume in resumes]
+    
+    @staticmethod
+    async def get_resume_by_id(resume_id: int, firebase_uid: str, db: AsyncSession) -> ResumeResponse:
+        resume = await ResumeController._get_resume_by_id_and_firebase_uid(resume_id, firebase_uid, db)
+        return ResumeResponse.from_orm(resume)
+    
+    @staticmethod
+    async def update_resume(resume_id: int, resume_data: ResumeUpdate, firebase_uid: str, db: AsyncSession) -> ResumeResponse:
+        resume = await ResumeController._get_resume_by_id_and_firebase_uid(resume_id, firebase_uid, db)
+        user = await ResumeController._get_user_by_firebase_uid(firebase_uid, db)
+        
+        for field, value in resume_data.dict(exclude_unset=True).items():
+            setattr(resume, field, value)
+        
+        await db.commit()
+        await db.refresh(resume)
+        
+        # Log activity
+        await log_user_activity(db, user.id, "Resume Updated", f"Updated resume: {resume.name}")
+        
+        return ResumeResponse.from_orm(resume)
+    
+    @staticmethod
+    async def delete_resume(resume_id: int, firebase_uid: str, db: AsyncSession) -> Dict[str, str]:
+        resume = await ResumeController._get_resume_by_id_and_firebase_uid(resume_id, firebase_uid, db)
+        user = await ResumeController._get_user_by_firebase_uid(firebase_uid, db)
+        
+        resume_name = resume.name
+        await db.delete(resume)
+        await db.commit()
+        
+        # Log activity
+        await log_user_activity(db, user.id, "Resume Deleted", f"Deleted resume: {resume_name}")
+        
+        return {"message": "Resume deleted successfully"}
     
     @staticmethod
     async def create_resume(resume_data: ResumeCreate, firebase_uid: str, db: AsyncSession) -> ResumeResponse:
