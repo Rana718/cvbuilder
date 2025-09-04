@@ -1,96 +1,188 @@
-'use client'
+'use client';
 
-import React, { useState, useEffect } from 'react'
-import { useAuth } from '@/components/AuthContext'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
-import { Plus, Edit, Trash2, Calendar, User, Search, Grid, List } from 'lucide-react'
-import axiosInstance from '@/lib/axios'
-import TemplateRenderer from '@/components/templates/TemplateRenderer'
+import React, { useState, useEffect, useRef } from 'react';
+import { useAuth } from '@/components/AuthContext';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { Plus, Edit, Trash2, Search, MoreHorizontal, Share2, Calendar, User, Briefcase } from 'lucide-react';
+import axiosInstance from '@/lib/axios';
+import TemplateRenderer from '@/components/templates/TemplateRenderer';
+import Navbar from '@/components/Navbar';
 
 interface Resume {
-    id: number
-    name: string
-    job_title: string
-    template_id: number
-    theme_color: string
-    created_at: string
-    updated_at: string
-    // Add other resume data fields
-    email?: string
-    phone?: string
-    city?: string
-    country?: string
-    summary?: string
-    skills?: any
-    experience?: any
-    education?: any
-    projects?: any
+    id: number;
+    name: string;
+    job_title: string;
+    template_id: number;
+    theme_color: string;
+    created_at: string;
+    updated_at: string;
+    email?: string;
+    phone?: string;
+    city?: string;
+    country?: string;
+    summary?: string;
+    skills?: any;
+    experience?: any;
+    education?: any;
+    projects?: any;
 }
 
-function ResumePage() {
-    const { user, loading: status } = useAuth();
-    const router = useRouter()
-    const [resumes, setResumes] = useState<Resume[]>([])
-    const [loading, setLoading] = useState(true)
-    const [error, setError] = useState('')
-    const [searchTerm, setSearchTerm] = useState('')
-    const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
+interface DropdownMenuProps {
+    resumeId: number;
+    templateId: number;
+    onEdit: () => void;
+    onDelete: () => void;
+    onShare: () => void;
+}
+
+const DropdownMenu: React.FC<DropdownMenuProps> = ({ resumeId, templateId, onEdit, onDelete, onShare }) => {
+    const [isOpen, setIsOpen] = useState<boolean>(false);
+    const dropdownRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        if (status) return // Still loading auth
+        const handleClickOutside = (event: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setIsOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    const handleAction = (action: () => void) => {
+        action();
+        setIsOpen(false);
+    };
+
+    return (
+        <div className="relative" ref={dropdownRef}>
+            <button
+                onClick={(e: React.MouseEvent) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setIsOpen(!isOpen);
+                }}
+                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-white rounded-lg transition-all shadow-sm"
+            >
+                <MoreHorizontal className="w-4 h-4" />
+            </button>
+
+            {isOpen && (
+                <div className="absolute right-0 top-full mt-1 w-40 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10">
+                    <button
+                        onClick={(e: React.MouseEvent) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleAction(onShare);
+                        }}
+                        className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                    >
+                        <Share2 className="w-4 h-4 mr-3" />
+                        Share
+                    </button>
+                    <button
+                        onClick={(e: React.MouseEvent) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleAction(onEdit);
+                        }}
+                        className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600 transition-colors"
+                    >
+                        <Edit className="w-4 h-4 mr-3" />
+                        Edit
+                    </button>
+                    <button
+                        onClick={(e: React.MouseEvent) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleAction(onDelete);
+                        }}
+                        className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors"
+                    >
+                        <Trash2 className="w-4 h-4 mr-3" />
+                        Delete
+                    </button>
+                </div>
+            )}
+        </div>
+    );
+};
+
+const ResumePage: React.FC = () => {
+    const { user, loading: status } = useAuth();
+    const router = useRouter();
+    const [resumes, setResumes] = useState<Resume[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string>('');
+    const [searchTerm, setSearchTerm] = useState<string>('');
+
+    useEffect(() => {
+        if (status) return;
 
         if (!user) {
-            router.push('/sign-in?callbackUrl=' + encodeURIComponent('/resusme'))
-            return
+            router.push('/sign-in?callbackUrl=' + encodeURIComponent('/resume'));
+            return;
         }
 
-        fetchResumes()
-    }, [user, status, router])
+        fetchResumes();
+    }, [user, status, router]);
 
-    const fetchResumes = async () => {
+    const fetchResumes = async (): Promise<void> => {
         try {
-            setLoading(true)
-            const response = await axiosInstance.get('/api/resume-op/all')
-            setResumes(response.data)
+            setLoading(true);
+            const response = await axiosInstance.get('/api/resume-op/all');
+            setResumes(response.data);
         } catch (error: any) {
-            console.error('Failed to fetch resumes:', error)
+            console.error('Failed to fetch resumes:', error);
             if (error.response?.status === 401) {
-                router.push('/sign-in?callbackUrl=' + encodeURIComponent('/resusme'))
+                router.push('/sign-in?callbackUrl=' + encodeURIComponent('/resume'));
             } else {
-                setError('Failed to load resumes. Please try again.')
+                setError('Failed to load resumes. Please try again.');
             }
         } finally {
-            setLoading(false)
+            setLoading(false);
         }
-    }
+    };
 
-    const handleDeleteResume = async (resumeId: number) => {
-        if (!confirm('Are you sure you want to delete this resume?')) return
+    const handleDeleteResume = async (resumeId: number): Promise<void> => {
+        if (!confirm('Are you sure you want to delete this resume?')) return;
 
         try {
-            await axiosInstance.delete(`/api/resume-op/${resumeId}`)
-            setResumes(resumes.filter(resume => resume.id !== resumeId))
+            await axiosInstance.delete(`/api/resume-op/${resumeId}`);
+            setResumes(resumes.filter(resume => resume.id !== resumeId));
         } catch (error: any) {
-            console.error('Failed to delete resume:', error)
-            alert('Failed to delete resume. Please try again.')
+            console.error('Failed to delete resume:', error);
+            alert('Failed to delete resume. Please try again.');
         }
-    }
+    };
 
-    const formatDate = (dateString: string) => {
+    const handleShareResume = (resumeId: number, templateId: number): void => {
+        const shareUrl = `${window.location.origin}/resume/${resumeId}?template=${templateId}`;
+        if (navigator.share) {
+            navigator.share({
+                title: 'Resume',
+                text: 'Check out my resume',
+                url: shareUrl,
+            }).catch(console.error);
+        } else {
+            navigator.clipboard.writeText(shareUrl).then(() => {
+                alert('Link copied to clipboard!');
+            }).catch(() => {
+                alert(`Share this link: ${shareUrl}`);
+            });
+        }
+    };
+
+    const formatDate = (dateString: string): string => {
         return new Date(dateString).toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'short',
             day: 'numeric'
-        })
-    }
+        });
+    };
 
-    const filteredResumes = resumes.filter(resume =>
-        resume.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        resume.job_title?.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-
-    // Convert resume data to UserData format for template rendering
     const convertToUserData = (resume: Resume) => ({
         name: resume.name || 'Your Name',
         email: resume.email || 'your.email@example.com',
@@ -122,102 +214,65 @@ function ResumePage() {
         linkedin_url: '',
         github_url: '',
         portfolio_url: ''
-    })
+    });
 
-    // Show loading while auth is loading or resumes are loading
+    const filteredResumes = resumes.filter(resume =>
+        resume.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        resume.job_title?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
     if (status || (user && loading)) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
                 <div className="text-center">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                    <p className="mt-6 text-gray-700 font-medium">
+                    <p className="text-gray-700 font-medium">
                         {status ? 'Checking authentication...' : 'Loading your resumes...'}
                     </p>
                 </div>
             </div>
-        )
+        );
     }
 
-    // If auth is done and no user, redirect will happen in useEffect
     if (!status && !user) {
-        return null
+        return null;
     }
 
     return (
-        <div className="min-h-screen bg-gray-50/50">
-            {/* Header */}
-            <div className="bg-white/95 backdrop-blur-sm border-b border-gray-200/50 sticky top-0 z-10 shadow-sm">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex items-center justify-between h-16">
-                        <div className="flex items-center space-x-2 sm:space-x-4">
-                            <h1 className="text-lg sm:text-xl font-semibold text-gray-900">My Resumes</h1>
-                            <span className="text-xs sm:text-sm text-gray-500">
-                                ({filteredResumes.length} of {resumes.length})
-                            </span>
-                        </div>
+        <div className="min-h-screen bg-gray-50">
+            <Navbar />
 
-                        <div className="flex items-center space-x-2 sm:space-x-4">
-                            <div className="relative hidden sm:block">
-                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                                <input
-                                    type="text"
-                                    placeholder="Search resumes..."
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="pl-10 pr-4 py-2 w-48 lg:w-64 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                />
-                            </div>
-
-                            <div className="flex items-center bg-gray-100 rounded-lg p-1">
-                                <button
-                                    onClick={() => setViewMode('grid')}
-                                    className={`p-2 rounded transition-all ${viewMode === 'grid' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
-                                >
-                                    <Grid className="w-4 h-4" />
-                                </button>
-                                <button
-                                    onClick={() => setViewMode('list')}
-                                    className={`p-2 rounded transition-all ${viewMode === 'list' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
-                                >
-                                    <List className="w-4 h-4" />
-                                </button>
-                            </div>
-
-                            <Link
-                                href="/profile"
-                                className="hidden sm:flex items-center space-x-2 px-4 py-2 text-gray-700 hover:text-blue-600 border border-gray-300 rounded-lg hover:border-blue-300 transition-all"
-                            >
-                                <User className="w-4 h-4" />
-                                <span>Profile</span>
-                            </Link>
-                            <Link
-                                href="/template"
-                                className="flex items-center space-x-2 px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all"
-                            >
-                                <Plus className="w-4 h-4" />
-                                <span className="hidden sm:inline">Create New</span>
-                                <span className="sm:hidden">New</span>
-                            </Link>
-                        </div>
+            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
+                    <div className="mb-4 sm:mb-0">
+                        <h1 className="text-2xl font-bold text-gray-900">Resumes</h1>
+                        <p className="text-gray-600 mt-1">
+                            Create and manage your professional resumes with our templates
+                        </p>
                     </div>
-                    
-                    {/* Mobile Search */}
-                    <div className="sm:hidden pb-4">
+
+                    <div className="flex items-center space-x-4">
                         <div className="relative">
                             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                             <input
                                 type="text"
                                 placeholder="Search resumes..."
                                 value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
+                                className="pl-10 pr-4 py-2 w-64 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                             />
                         </div>
+
+                        <Link
+                            href="/template"
+                            className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all shadow-sm"
+                        >
+                            <Plus className="w-4 h-4" />
+                            <span>Create New</span>
+                        </Link>
                     </div>
                 </div>
-            </div>
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12">
                 {error && (
                     <div className="mb-8 bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg">
                         {error}
@@ -226,7 +281,9 @@ function ResumePage() {
 
                 {filteredResumes.length === 0 && searchTerm ? (
                     <div className="text-center py-16">
-                        <Search className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                        <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <Search className="w-8 h-8 text-gray-400" />
+                        </div>
                         <h3 className="text-lg font-medium text-gray-900 mb-2">No matching resumes</h3>
                         <p className="text-gray-600 mb-4">Try adjusting your search terms or create a new resume</p>
                         <button
@@ -238,136 +295,94 @@ function ResumePage() {
                     </div>
                 ) : resumes.length === 0 ? (
                     <div className="text-center py-20">
-                        <div className="bg-blue-100 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6">
-                            <Plus className="w-12 h-12 text-blue-600" />
+                        <div className="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <User className="w-12 h-12 text-blue-600" />
                         </div>
                         <h3 className="text-xl font-semibold text-gray-900 mb-3">Welcome to your resume dashboard</h3>
                         <p className="text-gray-600 mb-6 max-w-md mx-auto">
-                            Start building your professional resume with our templates
+                            Start building your professional resume with our beautiful templates and AI-powered tools
                         </p>
                         <Link
                             href="/template"
-                            className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+                            className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium shadow-sm"
                         >
                             <Plus className="w-5 h-5 mr-2" />
                             Create Your First Resume
                         </Link>
                     </div>
                 ) : (
-                    <div className={viewMode === 'grid' ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6' : 'space-y-1 divide-y divide-gray-100'}>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         {filteredResumes.map((resume) => (
-                            <div key={resume.id} className={viewMode === 'grid' ? 'group' : 'py-3'}>
-                                {viewMode === 'grid' ? (
-                                    <div className="space-y-3">
-                                        {/* Action Buttons */}
-                                        <div className="flex items-center justify-between">
-                                            <span className="text-xs sm:text-sm text-gray-500">
-                                                {formatDate(resume.updated_at)}
-                                            </span>
-                                            <div className="flex items-center space-x-1">
-                                                <Link
-                                                    href={`/template/${resume.template_id}?resumeId=${resume.id}`}
-                                                    className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-md transition-all"
-                                                    title="Edit Resume"
-                                                >
-                                                    <Edit className="w-4 h-4" />
-                                                </Link>
-                                                <button
-                                                    onClick={() => handleDeleteResume(resume.id)}
-                                                    className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-all"
-                                                    title="Delete Resume"
-                                                >
-                                                    <Trash2 className="w-4 h-4" />
-                                                </button>
+                            <div key={resume.id} className="group relative">
+                                <Link href={`/resume/${resume.id}?template=${resume.template_id}`} className="block">
+                                    <div className="bg-white rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-lg transition-all duration-200 overflow-hidden">
+                                        <div className="aspect-[3/4] bg-gray-50 border-b border-gray-100 p-3 relative">
+                                            <div className="absolute top-3 right-3 z-10">
+                                                <DropdownMenu
+                                                    resumeId={resume.id}
+                                                    templateId={resume.template_id}
+                                                    onEdit={() => router.push(`/template/${resume.template_id}?resumeId=${resume.id}`)}
+                                                    onDelete={() => handleDeleteResume(resume.id)}
+                                                    onShare={() => handleShareResume(resume.id, resume.template_id)}
+                                                />
+                                            </div>
+
+                                            <div className="h-full flex flex-col">
+                                                <div className="flex items-start justify-between mb-3">
+                                                    <div className="flex-1 pr-8">
+                                                        <h4 className="font-semibold text-gray-900 text-sm mb-1 line-clamp-1">
+                                                            {resume.name || 'Untitled Resume'}
+                                                        </h4>
+                                                        <p className="text-xs text-gray-500 line-clamp-1">
+                                                            {resume.job_title || 'Position not specified'}
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+                                                <div className="flex-1 overflow-hidden rounded border border-gray-200 bg-white">
+                                                    <TemplateRenderer
+                                                        templateId={resume.template_id}
+                                                        userData={convertToUserData(resume)}
+                                                        size="small"
+                                                    />
+                                                </div>
+
+                                                <div className="flex items-center justify-between mt-3">
+                                                    <div className="flex items-center text-xs text-gray-500">
+                                                        <Briefcase className="w-3 h-3 mr-1" />
+                                                        <span className="line-clamp-1">
+                                                            Template {resume.template_id}
+                                                        </span>
+                                                    </div>
+                                                    <div
+                                                        className="w-3 h-3 rounded-full border border-gray-200"
+                                                        style={{ backgroundColor: resume.theme_color || '#3B82F6' }}
+                                                        title="Theme Color"
+                                                    />
+                                                </div>
                                             </div>
                                         </div>
 
-                                        {/* Resume Preview - Clickable */}
-                                        <Link href={`/resusme/${resume.id}?template=${resume.template_id}`}>
-                                            <div className="aspect-[1/1.414] bg-white shadow-sm hover:shadow-md transition-shadow border border-gray-100 rounded-sm overflow-hidden cursor-pointer">
-                                                <TemplateRenderer
-                                                    templateId={resume.template_id}
-                                                    userData={convertToUserData(resume)}
-                                                    size="small"
-                                                />
-                                            </div>
-                                        </Link>
-
-                                        {/* Resume Info */}
-                                        <div className="space-y-1">
-                                            <p className="font-medium text-gray-900 text-sm truncate">
-                                                {resume.job_title || 'No position specified'}
-                                            </p>
+                                        <div className="p-4 bg-white">
                                             <div className="flex items-center justify-between">
-                                                <span className="text-xs text-gray-400">
-                                                    Template #{resume.template_id}
+                                                <div className="flex items-center text-xs text-gray-500">
+                                                    <Calendar className="w-3 h-3 mr-1" />
+                                                    {formatDate(resume.updated_at)}
+                                                </div>
+                                                <span className="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded">
+                                                    {resume.job_title ? resume.job_title.split(' ').slice(0, 2).join(' ') : 'Resume'}
                                                 </span>
-                                                <div
-                                                    className="w-2 h-2 rounded-full"
-                                                    style={{ backgroundColor: resume.theme_color || '#3B82F6' }}
-                                                />
                                             </div>
                                         </div>
                                     </div>
-                                ) : (
-                                    <div className="flex items-center space-x-4 py-3 hover:bg-gray-50 -mx-6 px-6 transition-colors">
-                                        {/* Small Resume Preview - Clickable */}
-                                        <Link href={`/resusme/${resume.id}?template=${resume.template_id}`} className="flex-shrink-0">
-                                            <div className="w-12 h-16 overflow-hidden rounded border border-gray-200 bg-white shadow-sm cursor-pointer hover:shadow-md transition-shadow">
-                                                <TemplateRenderer
-                                                    templateId={resume.template_id}
-                                                    userData={convertToUserData(resume)}
-                                                    size="small"
-                                                />
-                                            </div>
-                                        </Link>
-
-                                        {/* Resume Info - Clickable */}
-                                        <Link href={`/resusme/${resume.id}?template=${resume.template_id}`} className="flex-1 min-w-0">
-                                            <div className="flex items-center space-x-2 mb-1">
-                                                <div
-                                                    className="w-2 h-2 rounded-full flex-shrink-0"
-                                                    style={{ backgroundColor: resume.theme_color || '#3B82F6' }}
-                                                />
-                                                <h3 className="font-medium text-gray-900 truncate">
-                                                    {resume.job_title || 'No position specified'}
-                                                </h3>
-                                                <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded flex-shrink-0 hidden sm:inline">
-                                                    #{resume.template_id}
-                                                </span>
-                                            </div>
-                                            <div className="flex items-center text-sm text-gray-500">
-                                                <Calendar className="w-3 h-3 mr-1" />
-                                                <span className="text-xs sm:text-sm">{formatDate(resume.updated_at)}</span>
-                                            </div>
-                                        </Link>
-
-                                        {/* Action Buttons */}
-                                        <div className="flex items-center space-x-1 flex-shrink-0">
-                                            <Link
-                                                href={`/template/${resume.template_id}?resumeId=${resume.id}`}
-                                                className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-md transition-all"
-                                                title="Edit Resume"
-                                            >
-                                                <Edit className="w-4 h-4" />
-                                            </Link>
-                                            <button
-                                                onClick={() => handleDeleteResume(resume.id)}
-                                                className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-all"
-                                                title="Delete Resume"
-                                            >
-                                                <Trash2 className="w-4 h-4" />
-                                            </button>
-                                        </div>
-                                    </div>
-                                )}
+                                </Link>
                             </div>
                         ))}
                     </div>
                 )}
-            </div>
+            </main>
         </div>
-    )
-}
+    );
+};
 
-export default ResumePage
+export default ResumePage;

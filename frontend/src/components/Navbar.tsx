@@ -1,54 +1,118 @@
 "use client";
-
 import { motion } from 'framer-motion';
-import { FileText, User, X, Menu, LogOut, Settings, FolderOpen, LayoutPanelTop, Mail, TrendingUp } from 'lucide-react';
-import { signOut } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+import { FileText, User, X, Menu, FolderOpen, LayoutPanelTop, Mail, TrendingUp } from 'lucide-react';
 import { useAuth } from './AuthContext';
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
+const navLinks = [
+    { href: '/template', icon: LayoutPanelTop, label: 'Templates', requiresAuth: false },
+    { href: '/resusme', icon: FolderOpen, label: 'My Resumes', requiresAuth: true },
+    { href: '/cover-letter', icon: Mail, label: 'Cover Letters', requiresAuth: true },
+    { href: '/rateing', icon: TrendingUp, label: 'Resume Feedback', requiresAuth: true },
+];
+
 function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [isProfileOpen, setIsProfileOpen] = useState(false);
     const { user, loading } = useAuth();
-    const profileRef = useRef<HTMLDivElement>(null);
     const pathname = usePathname();
 
-    // Function to check if link is active
-    const isActiveLink = (href: string) => {
-        return pathname === href;
-    };
+    const isActiveLink = useCallback((href: string) => pathname === href, [pathname]);
 
-    // Close profile dropdown when clicking outside
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
-                setIsProfileOpen(false);
-            }
-        };
+    const closeMenu = useCallback(() => setIsMenuOpen(false), []);
 
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, []);
+    const toggleMenu = useCallback(() => setIsMenuOpen(prev => !prev), []);
 
-    const handleSignOut = async () => {
-        try {
-            await signOut(auth);
-            setIsProfileOpen(false);
-        } catch (error) {
-            console.error('Sign out error:', error);
+    const renderNavLink = useCallback((link: typeof navLinks[0], isMobile = false) => {
+        const { href, icon: Icon, label, requiresAuth } = link;
+
+        if (requiresAuth && !user) return null;
+
+        const isActive = isActiveLink(href);
+        const baseClasses = `transition-colors flex items-center space-x-${isMobile ? '2' : '1'} ${isActive ? 'text-blue-600 font-medium' : 'text-gray-700 hover:text-blue-600'
+            }`;
+
+        return (
+            <Link
+                key={href}
+                href={href}
+                className={baseClasses}
+                onClick={isMobile ? closeMenu : undefined}
+            >
+                <Icon className="h-4 w-4" />
+                <span>{label}</span>
+            </Link>
+        );
+    }, [user, isActiveLink, closeMenu]);
+
+    const renderAuthSection = useCallback((isMobile = false) => {
+        if (loading) {
+            return <div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse" />;
         }
-    };
+
+        if (user) {
+            const profileSection = (
+                <Link
+                    href="/profile"
+                    className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition-colors"
+                    onClick={isMobile ? closeMenu : undefined}
+                >
+                    <div className={`${isMobile ? 'w-6 h-6' : 'w-8 h-8'} bg-blue-100 rounded-full flex items-center justify-center`}>
+                        <User className="h-4 w-4 text-blue-600" />
+                    </div>
+                    <span className={isMobile ? '' : 'text-sm font-medium'}>
+                        {user.displayName || user.email}
+                    </span>
+                </Link>
+            );
+
+            return isMobile ? (
+                <div className="flex flex-col space-y-2 pt-4 border-t border-gray-200">
+                    {profileSection}
+                </div>
+            ) : (
+                <div className="flex items-center space-x-4">
+                    {profileSection}
+                </div>
+            );
+        }
+
+        const authLinks = (
+            <>
+                <Link
+                    href="/sign-in"
+                    className="text-gray-700 hover:text-blue-600 transition-colors"
+                    onClick={isMobile ? closeMenu : undefined}
+                >
+                    Sign In
+                </Link>
+                <Link
+                    href="/sign-up"
+                    className={`bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors ${isMobile ? 'text-center' : ''
+                        }`}
+                    onClick={isMobile ? closeMenu : undefined}
+                >
+                    Sign Up
+                </Link>
+            </>
+        );
+
+        return isMobile ? (
+            <div className="flex flex-col space-y-2 pt-4 border-t border-gray-200">
+                {authLinks}
+            </div>
+        ) : (
+            <div className="flex items-center space-x-4">
+                {authLinks}
+            </div>
+        );
+    }, [loading, user, closeMenu]);
 
     return (
         <nav className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center h-16">
-                    {/* Logo */}
                     <Link href="/" className="flex items-center space-x-2">
                         <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                             <FileText className="h-5 w-5 text-white" />
@@ -56,147 +120,17 @@ function Navbar() {
                         <span className="text-xl font-bold text-gray-900">AI Resume Builder</span>
                     </Link>
 
-                    {/* Desktop Navigation */}
                     <div className="hidden md:flex items-center space-x-8">
-                        <Link 
-                            href="/template" 
-                            className={`transition-colors flex items-center space-x-1 ${
-                                isActiveLink('/template') 
-                                    ? 'text-blue-600 font-medium' 
-                                    : 'text-gray-700 hover:text-blue-600'
-                            }`}
-                        >
-                            <LayoutPanelTop className="h-4 w-4" />
-                            <span>Templates</span>
-                        </Link>
-                        
-                        {user && (
-                            <>
-                                <Link 
-                                    href="/resusme" 
-                                    className={`transition-colors flex items-center space-x-1 ${
-                                        isActiveLink('/resusme') 
-                                            ? 'text-blue-600 font-medium' 
-                                            : 'text-gray-700 hover:text-blue-600'
-                                    }`}
-                                >
-                                    <FolderOpen className="h-4 w-4" />
-                                    <span>My Resumes</span>
-                                </Link>
-                                <Link 
-                                    href="/cover-letter" 
-                                    className={`transition-colors flex items-center space-x-1 ${
-                                        isActiveLink('/cover-letter') 
-                                            ? 'text-blue-600 font-medium' 
-                                            : 'text-gray-700 hover:text-blue-600'
-                                    }`}
-                                >
-                                    <Mail className="h-4 w-4" />
-                                    <span>Cover Letters</span>
-                                </Link>
-                                <Link 
-                                    href="/rateing" 
-                                    className={`transition-colors flex items-center space-x-1 ${
-                                        isActiveLink('/rateing') 
-                                            ? 'text-blue-600 font-medium' 
-                                            : 'text-gray-700 hover:text-blue-600'
-                                    }`}
-                                >
-                                    <TrendingUp className="h-4 w-4" />
-                                    <span>Resume Feedback</span>
-                                </Link>
-                            </>
-                        )}
+                        {navLinks.map(link => renderNavLink(link))}
                     </div>
 
-                    {/* Auth Section */}
                     <div className="hidden md:flex items-center space-x-4">
-                        {loading ? (
-                            <div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse"></div>
-                        ) : user ? (
-                            <div className="relative" ref={profileRef}>
-                                <button
-                                    onClick={() => setIsProfileOpen(!isProfileOpen)}
-                                    className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition-colors"
-                                >
-                                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                                        <User className="h-4 w-4 text-blue-600" />
-                                    </div>
-                                    <span className="text-sm font-medium">{user.displayName || user.email}</span>
-                                </button>
-
-                                {isProfileOpen && (
-                                    <motion.div
-                                        initial={{ opacity: 0, y: -10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        exit={{ opacity: 0, y: -10 }}
-                                        className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1"
-                                    >
-                                        <Link
-                                            href="/profile"
-                                            className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                                            onClick={() => setIsProfileOpen(false)}
-                                        >
-                                            <Settings className="h-4 w-4" />
-                                            <span>Profile Settings</span>
-                                        </Link>
-                                        <Link
-                                            href="/resusme"
-                                            className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                                            onClick={() => setIsProfileOpen(false)}
-                                        >
-                                            <FolderOpen className="h-4 w-4" />
-                                            <span>My Resumes</span>
-                                        </Link>
-                                        <Link
-                                            href="/cover-letter"
-                                            className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                                            onClick={() => setIsProfileOpen(false)}
-                                        >
-                                            <Mail className="h-4 w-4" />
-                                            <span>Cover Letters</span>
-                                        </Link>
-                                        <Link
-                                            href="/rateing"
-                                            className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                                            onClick={() => setIsProfileOpen(false)}
-                                        >
-                                            <TrendingUp className="h-4 w-4" />
-                                            <span>Resume Feedback</span>
-                                        </Link>
-                                        <hr className="my-1" />
-                                        <button
-                                            onClick={handleSignOut}
-                                            className="flex items-center space-x-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 w-full text-left"
-                                        >
-                                            <LogOut className="h-4 w-4" />
-                                            <span>Sign Out</span>
-                                        </button>
-                                    </motion.div>
-                                )}
-                            </div>
-                        ) : (
-                            <div className="flex items-center space-x-4">
-                                <Link
-                                    href="/sign-in"
-                                    className="text-gray-700 hover:text-blue-600 transition-colors"
-                                >
-                                    Sign In
-                                </Link>
-                                <Link
-                                    href="/sign-up"
-                                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-                                >
-                                    Sign Up
-                                </Link>
-                            </div>
-                        )}
+                        {renderAuthSection()}
                     </div>
 
-                    {/* Mobile menu button */}
                     <div className="md:hidden">
                         <button
-                            onClick={() => setIsMenuOpen(!isMenuOpen)}
+                            onClick={toggleMenu}
                             className="text-gray-700 hover:text-blue-600 transition-colors"
                         >
                             {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -204,7 +138,6 @@ function Navbar() {
                     </div>
                 </div>
 
-                {/* Mobile Navigation */}
                 {isMenuOpen && (
                     <motion.div
                         initial={{ opacity: 0, height: 0 }}
@@ -213,103 +146,8 @@ function Navbar() {
                         className="md:hidden border-t border-gray-200 py-4"
                     >
                         <div className="flex flex-col space-y-4">
-                            <Link
-                                href="/template"
-                                className={`transition-colors flex items-center space-x-2 ${
-                                    isActiveLink('/template') 
-                                        ? 'text-blue-600 font-medium' 
-                                        : 'text-gray-700 hover:text-blue-600'
-                                }`}
-                                onClick={() => setIsMenuOpen(false)}
-                            >
-                                <LayoutPanelTop className="h-4 w-4" />
-                                <span>Templates</span>
-                            </Link>
-                            
-                            {user && (
-                                <>
-                                    <Link
-                                        href="/resusme"
-                                        className={`transition-colors flex items-center space-x-2 ${
-                                            isActiveLink('/resusme') 
-                                                ? 'text-blue-600 font-medium' 
-                                                : 'text-gray-700 hover:text-blue-600'
-                                        }`}
-                                        onClick={() => setIsMenuOpen(false)}
-                                    >
-                                        <FolderOpen className="h-4 w-4" />
-                                        <span>My Resumes</span>
-                                    </Link>
-                                    <Link
-                                        href="/cover-letter"
-                                        className={`transition-colors flex items-center space-x-2 ${
-                                            isActiveLink('/cover-letter') 
-                                                ? 'text-blue-600 font-medium' 
-                                                : 'text-gray-700 hover:text-blue-600'
-                                        }`}
-                                        onClick={() => setIsMenuOpen(false)}
-                                    >
-                                        <Mail className="h-4 w-4" />
-                                        <span>Cover Letters</span>
-                                    </Link>
-                                    <Link
-                                        href="/rateing"
-                                        className={`transition-colors flex items-center space-x-2 ${
-                                            isActiveLink('/rateing') 
-                                                ? 'text-blue-600 font-medium' 
-                                                : 'text-gray-700 hover:text-blue-600'
-                                        }`}
-                                        onClick={() => setIsMenuOpen(false)}
-                                    >
-                                        <FileText className="h-4 w-4" />
-                                        <span>Resume Feedback</span>
-                                    </Link>
-                                </>
-                            )}
-
-                            {user ? (
-                                <div className="flex flex-col space-y-2 pt-4 border-t border-gray-200">
-                                    <div className="flex items-center space-x-2 text-gray-700">
-                                        <User className="h-4 w-4" />
-                                        <span className="text-sm">{user.displayName || user.email}</span>
-                                    </div>
-                                    <Link
-                                        href="/profile"
-                                        className="text-gray-700 hover:text-blue-600 transition-colors flex items-center space-x-2"
-                                        onClick={() => setIsMenuOpen(false)}
-                                    >
-                                        <Settings className="h-4 w-4" />
-                                        <span>Profile Settings</span>
-                                    </Link>
-                                    <button
-                                        onClick={() => {
-                                            handleSignOut();
-                                            setIsMenuOpen(false);
-                                        }}
-                                        className="text-red-600 hover:text-red-700 transition-colors flex items-center space-x-2 text-left"
-                                    >
-                                        <LogOut className="h-4 w-4" />
-                                        <span>Sign Out</span>
-                                    </button>
-                                </div>
-                            ) : (
-                                <div className="flex flex-col space-y-2 pt-4 border-t border-gray-200">
-                                    <Link
-                                        href="/sign-in"
-                                        className="text-gray-700 hover:text-blue-600 transition-colors"
-                                        onClick={() => setIsMenuOpen(false)}
-                                    >
-                                        Sign In
-                                    </Link>
-                                    <Link
-                                        href="/sign-up"
-                                        className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-center"
-                                        onClick={() => setIsMenuOpen(false)}
-                                    >
-                                        Sign Up
-                                    </Link>
-                                </div>
-                            )}
+                            {navLinks.map(link => renderNavLink(link, true))}
+                            {renderAuthSection(true)}
                         </div>
                     </motion.div>
                 )}

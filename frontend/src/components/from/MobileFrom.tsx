@@ -48,14 +48,12 @@ function MobileFrom() {
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
             {/* Step Indicator */}
-            <div className="bg-white shadow-sm">
-                <StepIndicator currentStep={currentStep} totalSteps={6} />
-            </div>
+            <StepIndicator currentStep={currentStep} totalSteps={6} />
 
             {/* Main Content */}
-            <div className="p-4">
+            <div className="p-0 sm:p-4 pt-2">
                 <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-                    <div className="p-6">
+                    <div className="p-2 sm:p-6">
                         {renderCurrentStep()}
                     </div>
                 </div>

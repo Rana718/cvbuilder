@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/components/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Plus, Edit, Trash2, Calendar, User, Search, Grid, List, FileText, Building, Eye } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, FileText, MoreHorizontal, Share2, Calendar, Building2 } from 'lucide-react';
 import axiosInstance from '@/lib/axios';
+import Navbar from '@/components/Navbar';
 
 interface CoverLetter {
     id: number;
@@ -19,17 +20,97 @@ interface CoverLetter {
     updated_at: string;
 }
 
-function CoverLetterPage() {
+interface DropdownMenuProps {
+    coverId: number;
+    onEdit: () => void;
+    onDelete: () => void;
+    onShare: () => void;
+}
+
+const DropdownMenu: React.FC<DropdownMenuProps> = ({ coverId, onEdit, onDelete, onShare }) => {
+    const [isOpen, setIsOpen] = useState<boolean>(false);
+    const dropdownRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setIsOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    const handleAction = (action: () => void) => {
+        action();
+        setIsOpen(false);
+    };
+
+    return (
+        <div className="relative" ref={dropdownRef}>
+            <button
+                onClick={(e: React.MouseEvent) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setIsOpen(!isOpen);
+                }}
+                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-white rounded-lg transition-all shadow-sm"
+            >
+                <MoreHorizontal className="w-4 h-4" />
+            </button>
+
+            {isOpen && (
+                <div className="absolute right-0 top-full mt-1 w-40 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10">
+                    <button
+                        onClick={(e: React.MouseEvent) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleAction(onShare);
+                        }}
+                        className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                    >
+                        <Share2 className="w-4 h-4 mr-3" />
+                        Share
+                    </button>
+                    <button
+                        onClick={(e: React.MouseEvent) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleAction(onEdit);
+                        }}
+                        className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600 transition-colors"
+                    >
+                        <Edit className="w-4 h-4 mr-3" />
+                        Edit
+                    </button>
+                    <button
+                        onClick={(e: React.MouseEvent) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleAction(onDelete);
+                        }}
+                        className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors"
+                    >
+                        <Trash2 className="w-4 h-4 mr-3" />
+                        Delete
+                    </button>
+                </div>
+            )}
+        </div>
+    );
+};
+
+const CoverLetterPage: React.FC = () => {
     const { user, loading: status } = useAuth();
     const router = useRouter();
     const [coverLetters, setCoverLetters] = useState<CoverLetter[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
-    const [searchTerm, setSearchTerm] = useState('');
-    const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string>('');
+    const [searchTerm, setSearchTerm] = useState<string>('');
 
     useEffect(() => {
-        if (status) return; // Still loading auth
+        if (status) return;
 
         if (!user) {
             router.push('/sign-in?callbackUrl=' + encodeURIComponent('/cover-letter'));
@@ -39,7 +120,7 @@ function CoverLetterPage() {
         fetchCoverLetters();
     }, [user, status, router]);
 
-    const fetchCoverLetters = async () => {
+    const fetchCoverLetters = async (): Promise<void> => {
         try {
             setLoading(true);
             const response = await axiosInstance.get('/api/cover-letters/all');
@@ -56,7 +137,7 @@ function CoverLetterPage() {
         }
     };
 
-    const handleDeleteCoverLetter = async (coverLetterId: number) => {
+    const handleDeleteCoverLetter = async (coverLetterId: number): Promise<void> => {
         if (!confirm('Are you sure you want to delete this cover letter?')) return;
 
         try {
@@ -68,7 +149,24 @@ function CoverLetterPage() {
         }
     };
 
-    const formatDate = (dateString: string) => {
+    const handleShareCoverLetter = (coverLetterId: number): void => {
+        const shareUrl = `${window.location.origin}/cover-letter/${coverLetterId}`;
+        if (navigator.share) {
+            navigator.share({
+                title: 'Cover Letter',
+                text: 'Check out my cover letter',
+                url: shareUrl,
+            }).catch(console.error);
+        } else {
+            navigator.clipboard.writeText(shareUrl).then(() => {
+                alert('Link copied to clipboard!');
+            }).catch(() => {
+                alert(`Share this link: ${shareUrl}`);
+            });
+        }
+    };
+
+    const formatDate = (dateString: string): string => {
         return new Date(dateString).toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'short',
@@ -78,103 +176,62 @@ function CoverLetterPage() {
 
     const filteredCoverLetters = coverLetters.filter(letter =>
         letter.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        letter.recipient_company?.toLowerCase().includes(searchTerm.toLowerCase())
+        letter.recipient_company?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        letter.recipient_title?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    // Show loading while auth is loading or cover letters are loading
     if (status || (user && loading)) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
                 <div className="text-center">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                    <p className="mt-6 text-gray-700 font-medium">
+                    <p className="text-gray-700 font-medium">
                         {status ? 'Checking authentication...' : 'Loading your cover letters...'}
                     </p>
                 </div>
             </div>
         );
-    };
+    }
 
-    // If auth is done and no user, redirect will happen in useEffect
     if (!status && !user) {
         return null;
     }
 
     return (
-        <div className="min-h-screen bg-gray-50/50">
-            
-            <div className="bg-white/95 backdrop-blur-sm border-b border-gray-200/50 sticky top-0 z-10 shadow-sm">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex items-center justify-between h-16">
-                        <div className="flex items-center space-x-2 sm:space-x-4">
-                            <h1 className="text-lg sm:text-xl font-semibold text-gray-900">My Cover Letters</h1>
-                            <span className="text-xs sm:text-sm text-gray-500">
-                                ({filteredCoverLetters.length} of {coverLetters.length})
-                            </span>
-                        </div>
+        <div className="min-h-screen bg-gray-50">
+            <Navbar />
 
-                        <div className="flex items-center space-x-2 sm:space-x-4">
-                            <div className="relative hidden sm:block">
-                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                                <input
-                                    type="text"
-                                    placeholder="Search cover letters..."
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="pl-10 pr-4 py-2 w-48 lg:w-64 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                />
-                            </div>
-
-                            <div className="flex items-center bg-gray-100 rounded-lg p-1">
-                                <button
-                                    onClick={() => setViewMode('grid')}
-                                    className={`p-2 rounded transition-all ${viewMode === 'grid' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
-                                >
-                                    <Grid className="w-4 h-4" />
-                                </button>
-                                <button
-                                    onClick={() => setViewMode('list')}
-                                    className={`p-2 rounded transition-all ${viewMode === 'list' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
-                                >
-                                    <List className="w-4 h-4" />
-                                </button>
-                            </div>
-
-                            <Link
-                                href="/profile"
-                                className="hidden sm:flex items-center space-x-2 px-4 py-2 text-gray-700 hover:text-blue-600 border border-gray-300 rounded-lg hover:border-blue-300 transition-all"
-                            >
-                                <User className="w-4 h-4" />
-                                <span>Profile</span>
-                            </Link>
-                            <Link
-                                href="/createcover-letter"
-                                className="flex items-center space-x-2 px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all"
-                            >
-                                <Plus className="w-4 h-4" />
-                                <span className="hidden sm:inline">Create New</span>
-                                <span className="sm:hidden">New</span>
-                            </Link>
-                        </div>
+            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
+                    <div className="mb-4 sm:mb-0">
+                        <h1 className="text-2xl font-bold text-gray-900">Cover Letters</h1>
+                        <p className="text-gray-600 mt-1">
+                            Manage and organize your professional cover letters
+                        </p>
                     </div>
 
-                    {/* Mobile Search */}
-                    <div className="sm:hidden pb-4">
+                    <div className="flex items-center space-x-4">
                         <div className="relative">
                             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                             <input
                                 type="text"
                                 placeholder="Search cover letters..."
                                 value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
+                                className="pl-10 pr-4 py-2 w-64 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                             />
                         </div>
+
+                        <Link
+                            href="/createcover-letter"
+                            className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all shadow-sm"
+                        >
+                            <Plus className="w-4 h-4" />
+                            <span>Create New</span>
+                        </Link>
                     </div>
                 </div>
-            </div>
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12">
                 {error && (
                     <div className="mb-8 bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg">
                         {error}
@@ -183,7 +240,9 @@ function CoverLetterPage() {
 
                 {filteredCoverLetters.length === 0 && searchTerm ? (
                     <div className="text-center py-16">
-                        <Search className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                        <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <Search className="w-8 h-8 text-gray-400" />
+                        </div>
                         <h3 className="text-lg font-medium text-gray-900 mb-2">No matching cover letters</h3>
                         <p className="text-gray-600 mb-4">Try adjusting your search terms or create a new cover letter</p>
                         <button
@@ -195,151 +254,82 @@ function CoverLetterPage() {
                     </div>
                 ) : coverLetters.length === 0 ? (
                     <div className="text-center py-20">
-                        <div className="bg-blue-100 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6">
-                            <Plus className="w-12 h-12 text-blue-600" />
+                        <div className="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <FileText className="w-12 h-12 text-blue-600" />
                         </div>
                         <h3 className="text-xl font-semibold text-gray-900 mb-3">Welcome to your cover letter dashboard</h3>
                         <p className="text-gray-600 mb-6 max-w-md mx-auto">
-                            Start building your professional cover letters with our AI-powered tools
+                            Start building your professional cover letters with our AI-powered tools and templates
                         </p>
                         <Link
                             href="/createcover-letter"
-                            className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+                            className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium shadow-sm"
                         >
                             <Plus className="w-5 h-5 mr-2" />
                             Create Your First Cover Letter
                         </Link>
                     </div>
                 ) : (
-                    <div className={viewMode === 'grid' ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6' : 'space-y-1 divide-y divide-gray-100'}>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         {filteredCoverLetters.map((letter) => (
-                            <div key={letter.id} className={viewMode === 'grid' ? 'group' : 'py-3'}>
-                                {viewMode === 'grid' ? (
-                                    <div className="space-y-3">
-                                        {/* Action Buttons */}
-                                        <div className="flex items-center justify-between">
-                                            <span className="text-xs sm:text-sm text-gray-500">
-                                                {formatDate(letter.updated_at)}
-                                            </span>
-                                            <div className="flex items-center space-x-1">
-                                                <Link
-                                                    href={`/createcover-letter?coverLetterId=${letter.id}&edit=true`}
-                                                    className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-md transition-all"
-                                                    title="Edit Cover Letter"
-                                                >
-                                                    <Edit className="w-4 h-4" />
-                                                </Link>
-                                                <button
-                                                    onClick={() => handleDeleteCoverLetter(letter.id)}
-                                                    className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-all"
-                                                    title="Delete Cover Letter"
-                                                >
-                                                    <Trash2 className="w-4 h-4" />
-                                                </button>
+                            <div key={letter.id} className="group relative">
+                                <Link href={`/cover-letter/${letter.id}`} className="block">
+                                    <div className="bg-white rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-lg transition-all duration-200 overflow-hidden">
+                                        <div className="aspect-[3/4] bg-gray-50 border-b border-gray-100 p-4 relative">
+                                            <div className="absolute top-3 right-3 z-10">
+                                                <DropdownMenu
+                                                    coverId={letter.id}
+                                                    onEdit={() => router.push(`/createcover-letter?coverLetterId=${letter.id}&edit=true`)}
+                                                    onDelete={() => handleDeleteCoverLetter(letter.id)}
+                                                    onShare={() => handleShareCoverLetter(letter.id)}
+                                                />
+                                            </div>
+
+                                            <div className="h-full flex flex-col">
+                                                <div className="flex items-start justify-between mb-3">
+                                                    <div className="flex-1 pr-8">
+                                                        <h4 className="font-semibold text-gray-900 text-sm mb-1 line-clamp-1">
+                                                            {letter.name || 'Untitled Cover Letter'}
+                                                        </h4>
+                                                        <p className="text-xs text-gray-500 line-clamp-1">
+                                                            {letter.recipient_title || 'Position not specified'}
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+                                                <div className="flex-1 text-xs text-gray-600 line-clamp-8 mb-3">
+                                                    {letter.body.replace(/<[^>]*>/g, '').substring(0, 300)}...
+                                                </div>
+
+                                                <div className="flex items-center text-xs text-gray-400">
+                                                    <Building2 className="w-3 h-3 mr-1" />
+                                                    <span className="line-clamp-1">
+                                                        {letter.recipient_company || 'Company not specified'}
+                                                    </span>
+                                                </div>
                                             </div>
                                         </div>
 
-                                        {/* Cover Letter Preview - Clickable */}
-                                        <Link href={`/cover-letter/${letter.id}`}>
-                                            <div className="aspect-[1/1.414] bg-white shadow-sm hover:shadow-md transition-shadow border border-gray-100 rounded-sm overflow-hidden cursor-pointer p-4">
-                                                <div className="h-full flex flex-col">
-                                                    <div className="text-xs font-medium text-gray-900 mb-2 truncate">
-                                                        {letter.name}
-                                                    </div>
-                                                    <div className="text-xs text-gray-600 mb-2 truncate">
-                                                        {letter.recipient_company || 'No company specified'}
-                                                    </div>
-                                                    <div className="flex-1 text-xs text-gray-500 line-clamp-6 overflow-hidden">
-                                                        {letter.body.replace(/<[^>]*>/g, '').substring(0, 200)}...
-                                                    </div>
-                                                    <div className="mt-2 flex items-center justify-between">
-                                                        <span className="text-xs text-gray-400">
-                                                            Template #{letter.template_id}
-                                                        </span>
-                                                        <FileText className="w-3 h-3 text-gray-400" />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </Link>
-
-                                        {/* Cover Letter Info */}
-                                        <div className="space-y-1">
-                                            <p className="font-medium text-gray-900 text-sm truncate">
-                                                {letter.recipient_company || 'No company specified'}
-                                            </p>
+                                        <div className="p-4 bg-white">
                                             <div className="flex items-center justify-between">
-                                                <span className="text-xs text-gray-400">
-                                                    Template #{letter.template_id}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div className="flex items-center space-x-4 py-3 hover:bg-gray-50 -mx-6 px-6 transition-colors">
-                                        {/* Small Cover Letter Preview - Clickable */}
-                                        <Link href={`/cover-letter/${letter.id}`} className="flex-shrink-0">
-                                            <div className="w-12 h-16 overflow-hidden rounded border border-gray-200 bg-white shadow-sm cursor-pointer hover:shadow-md transition-shadow p-2">
-                                                <div className="text-xs text-gray-600 line-clamp-3">
-                                                    {letter.body.replace(/<[^>]*>/g, '').substring(0, 50)}...
+                                                <div className="flex items-center text-xs text-gray-500">
+                                                    <Calendar className="w-3 h-3 mr-1" />
+                                                    {formatDate(letter.updated_at)}
                                                 </div>
-                                            </div>
-                                        </Link>
-
-                                        {/* Cover Letter Info - Clickable */}
-                                        <Link href={`/cover-letter/${letter.id}`} className="flex-1 min-w-0">
-                                            <div className="flex items-center space-x-2 mb-1">
-                                                <h3 className="font-medium text-gray-900 truncate">
-                                                    {letter.name}
-                                                </h3>
-                                                <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded flex-shrink-0 hidden sm:inline">
-                                                    #{letter.template_id}
+                                                <span className="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded">
+                                                    Template {letter.template_id}
                                                 </span>
                                             </div>
-                                            <div className="flex items-center text-sm text-gray-500 mb-1">
-                                                <Building className="w-3 h-3 mr-1" />
-                                                <span className="text-xs sm:text-sm truncate">
-                                                    {letter.recipient_company || 'No company specified'}
-                                                </span>
-                                            </div>
-                                            <div className="flex items-center text-sm text-gray-500">
-                                                <Calendar className="w-3 h-3 mr-1" />
-                                                <span className="text-xs sm:text-sm">{formatDate(letter.updated_at)}</span>
-                                            </div>
-                                        </Link>
-
-                                        {/* Action Buttons */}
-                                        <div className="flex items-center space-x-1 flex-shrink-0">
-                                            <Link
-                                                href={`/cover-letter/${letter.id}`}
-                                                className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-all"
-                                                title="View Cover Letter"
-                                            >
-                                                <Eye className="w-4 h-4" />
-                                            </Link>
-                                            <Link
-                                                href={`/createcover-letter?coverLetterId=${letter.id}&edit=true`}
-                                                className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-md transition-all"
-                                                title="Edit Cover Letter"
-                                            >
-                                                <Edit className="w-4 h-4" />
-                                            </Link>
-                                            <button
-                                                onClick={() => handleDeleteCoverLetter(letter.id)}
-                                                className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-all"
-                                                title="Delete Cover Letter"
-                                            >
-                                                <Trash2 className="w-4 h-4" />
-                                            </button>
                                         </div>
                                     </div>
-                                )}
+                                </Link>
                             </div>
                         ))}
                     </div>
                 )}
-            </div>
+            </main>
         </div>
     );
-}
+};
 
 export default CoverLetterPage;

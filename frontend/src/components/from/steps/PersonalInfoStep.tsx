@@ -66,7 +66,7 @@ function PersonalInfoStep({ onNext }: PersonalInfoStepProps) {
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.2 }}
-        className="bg-gradient-to-br from-white to-blue-50 rounded-2xl border-2 border-blue-200 p-8 shadow-lg"
+        className="bg-gradient-to-br from-white to-blue-50 rounded-2xl border-2 border-blue-200 p-4 shadow-lg"
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
@@ -188,7 +188,7 @@ function PersonalInfoStep({ onNext }: PersonalInfoStepProps) {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
-        className="bg-white rounded-xl border border-gray-200 p-8 shadow-sm"
+        className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm"
       >
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-xl font-bold text-gray-900">Add Website</h3>

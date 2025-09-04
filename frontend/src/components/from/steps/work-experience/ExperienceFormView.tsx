@@ -298,7 +298,7 @@ function ExperienceFormView({ formData, onFormDataChange, onNext, onCancel, isEd
                         className="flex items-center space-x-2 px-6 py-3 text-gray-600 hover:text-gray-800 font-medium transition-colors"
                     >
                         <ChevronLeft className="w-4 h-4" />
-                        <span>Cancel</span>
+                        <span></span>
                     </motion.button>
 
                     <motion.button
@@ -315,7 +315,7 @@ function ExperienceFormView({ formData, onFormDataChange, onNext, onCancel, isEd
                             </>
                         ) : (
                             <>
-                                <span>Next: Description</span>
+                                <span>Next</span>
                                 <ArrowRight className="w-4 h-4" />
                             </>
                         )}

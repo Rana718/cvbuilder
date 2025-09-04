@@ -17,7 +17,7 @@ const stepLabels = [
 
 function StepIndicator({ currentStep, totalSteps }: StepIndicatorProps) {
   return (
-    <div className="w-full bg-white border-b border-gray-200 px-4 py-4">
+    <div className="w-full  px-4 py-4">
       <div className="flex items-center justify-between">
         {Array.from({ length: totalSteps }, (_, index) => {
           const step = index + 1
@@ -60,15 +60,6 @@ function StepIndicator({ currentStep, totalSteps }: StepIndicatorProps) {
         })}
       </div>
       
-      {/* Show current step label on smaller screens */}
-      <div className="text-center mt-2 sm:hidden">
-        <span className="text-sm font-medium text-gray-800">
-          {stepLabels[currentStep - 1]}
-        </span>
-        <span className="text-xs text-gray-500 ml-2">
-          {currentStep} of {totalSteps}
-        </span>
-      </div>
     </div>
   )
 }
