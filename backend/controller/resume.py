@@ -11,7 +11,6 @@ import json
 
 from config.openai import client, DEFAULT_MODEL
 from utils.pdftotext import extract_text_from_pdf
-from utils.activity_logger import log_user_activity
 
 
 
@@ -61,8 +60,6 @@ class ResumeController:
         await db.commit()
         await db.refresh(resume)
         
-        # Log activity
-        await log_user_activity(db, user.id, "Resume Created", f"Created resume: {resume.name}")
         
         return ResumeResponse.from_orm(resume)
     
@@ -92,8 +89,6 @@ class ResumeController:
         await db.commit()
         await db.refresh(resume)
         
-        # Log activity
-        await log_user_activity(db, user.id, "Resume Updated", f"Updated resume: {resume.name}")
         
         return ResumeResponse.from_orm(resume)
     
@@ -107,8 +102,6 @@ class ResumeController:
         await db.commit()
         
         # Log activity
-        await log_user_activity(db, user.id, "Resume Deleted", f"Deleted resume: {resume_name}")
-        
         return {"message": "Resume deleted successfully"}
     
     @staticmethod

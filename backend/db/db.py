@@ -9,7 +9,7 @@ load_dotenv()
 DATABASE_URL = os.getenv("DB_URL", "mysql+pymysql://myuser:mypassword@localhost:3306/mydb")
 
 if DATABASE_URL.startswith("mysql+pymysql://"):
-    ASYNC_DATABASE_URL = DATABASE_URL.replace("mysql+pymysql://", "mysql+aiomysql://", 1)
+    ASYNC_DATABASE_URL = DATABASE_URL.replace("mysql+pymysql://", "mysql+asyncmy://", 1)
 else:
     raise ValueError("Invalid DB_URL format. Must start with mysql+pymysql://")
 

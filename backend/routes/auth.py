@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from db.db import get_db
 from controller.authcontroller import AuthController
 from models.auth_models import AddUserProfileRequest
+from models.admin_models import SuperAdminRequest
 
 router = APIRouter()
 
@@ -31,3 +32,29 @@ async def get_profile(request: Request, db: Session = Depends(get_db)):
         )
     
     return result["user"]
+
+@router.post("/create-super-admin")
+async def create_super_admin(
+    request: SuperAdminRequest,
+    db: Session = Depends(get_db)
+):
+    """
+    Create super admin using secret key
+    Authenticated users can become super admin with the correct secret key
+    """
+    
+    result = await AuthController.create_super_admin(
+        email=request.email,
+        secret_key=request.secret_key,
+        db=db
+    )
+    
+    if not result["success"]:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=result["error"]
+        )
+    
+    return result
+
+

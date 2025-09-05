@@ -16,6 +16,11 @@ class User(Base):
     firebase_uid = Column(String(255), unique=True, index=True)  
     image_url = Column(String(500))
     is_premium = Column(Boolean, default=False)
+    phone = Column(String(20))
+    status = Column(String(50), default="active") 
+
+    isSuperAdmin = Column(Boolean, default=False)
+    isAdmin = Column(Boolean, default=False)
     
     # Profile Info
     full_name = Column(String(255), nullable=False)
@@ -198,20 +203,3 @@ class PaymentHistory(Base):
     def __repr__(self):
         return f"<PaymentHistory(id={self.id}, payment_id='{self.razorpay_payment_id}', amount={self.amount}, status='{self.status}')>"
 
-
-class ActivityLog(Base):
-    __tablename__ = "activity_logs"
-
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
-    action = Column(String(255), nullable=False)
-    details = Column(Text)
-    ip_address = Column(String(45))
-    user_agent = Column(String(500))
-    
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-
-    user = relationship("User")
-
-    def __repr__(self):
-        return f"<ActivityLog(id={self.id}, user_id={self.user_id}, action='{self.action}')>"

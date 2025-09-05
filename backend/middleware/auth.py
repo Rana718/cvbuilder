@@ -29,7 +29,8 @@ class JWTAuthMiddleware(BaseHTTPMiddleware):
             "/api/auth/profile", 
             "/api/cover-letters", 
             "/api/linkedin", 
-            "/api/payment"
+            "/api/payment",
+            "/api/admin"  # Protect all admin routes
         ]
 
     async def dispatch(self, request: Request, call_next):

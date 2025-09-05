@@ -197,6 +197,117 @@ async def cancel_subscription(
         raise HTTPException(status_code=500, detail="Failed to cancel subscription")
 
 
+@router.post("/verify-payment")
+async def verify_payment(
+    payment_data: dict,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Verify payment and update user premium status immediately"""
+    try:
+        razorpay_payment_id = payment_data.get("razorpay_payment_id")
+        razorpay_order_id = payment_data.get("razorpay_order_id")
+        razorpay_signature = payment_data.get("razorpay_signature")
+        
+        if not all([razorpay_payment_id, razorpay_order_id, razorpay_signature]):
+            raise HTTPException(status_code=400, detail="Missing payment verification data")
+        
+        # Verify payment signature
+        import hmac
+        import hashlib
+        
+        key_secret = os.getenv("RAZORPAY_KEY_SECRET")
+        message = f"{razorpay_order_id}|{razorpay_payment_id}"
+        signature = hmac.new(
+            key_secret.encode(),
+            message.encode(),
+            hashlib.sha256
+        ).hexdigest()
+        
+        if not hmac.compare_digest(signature, razorpay_signature):
+            raise HTTPException(status_code=400, detail="Invalid payment signature")
+        
+        # Fetch payment details from Razorpay
+        try:
+            payment_details = razorpay_client.payment.fetch(razorpay_payment_id)
+        except Exception as e:
+            logger.error(f"Failed to fetch payment details: {str(e)}")
+            raise HTTPException(status_code=500, detail="Failed to verify payment")
+        
+        if payment_details.get("status") != "captured":
+            raise HTTPException(status_code=400, detail="Payment not captured")
+        
+        # Update user to premium
+        current_user.is_premium = True
+        current_user.updated_at = datetime.utcnow()
+        
+        # Find or create subscription
+        result = await db.execute(
+            select(Subscription).where(Subscription.user_id == current_user.id)
+        )
+        subscription = result.scalar_one_or_none()
+        
+        if not subscription:
+            # Create new subscription record
+            subscription = Subscription(
+                user_id=current_user.id,
+                razorpay_customer_id=payment_details.get("customer_id", f"cust_{current_user.id}"),
+                subscription_id=f"sub_{uuid.uuid4()}",
+                plan="premium",
+                status="active",
+                current_period_end=datetime.utcnow() + timedelta(days=30)
+            )
+            db.add(subscription)
+            await db.flush()  # Get subscription ID
+        else:
+            # Update existing subscription
+            subscription.status = "active"
+            subscription.current_period_end = datetime.utcnow() + timedelta(days=30)
+            subscription.updated_at = datetime.utcnow()
+        
+        # Add payment history
+        payment_history = PaymentHistory(
+            user_id=current_user.id,
+            subscription_id=subscription.id,
+            razorpay_payment_id=razorpay_payment_id,
+            razorpay_order_id=razorpay_order_id,
+            amount=payment_details.get("amount", 0),
+            currency=payment_details.get("currency", "INR"),
+            status=payment_details.get("status", "captured"),
+            method=payment_details.get("method", ""),
+            description=f"Premium subscription payment",
+            receipt=payment_details.get("receipt", ""),
+            card_last4=payment_details.get("card", {}).get("last4", "") if payment_details.get("card") else "",
+            card_network=payment_details.get("card", {}).get("network", "") if payment_details.get("card") else "",
+            bank=payment_details.get("bank", "") if payment_details.get("bank") else "",
+            payment_date=datetime.fromtimestamp(payment_details.get("created_at", 0)) if payment_details.get("created_at") else datetime.utcnow()
+        )
+        db.add(payment_history)
+        
+        await db.commit()
+        
+        # Try to update Firebase claims (don't fail if this fails)
+        try:
+            from config.firebase import set_custom_user_claims
+            set_custom_user_claims(current_user.firebase_uid, {"premium": "true", "dbUser": "true"})
+        except Exception as e:
+            logger.warning(f"Failed to update Firebase claims: {str(e)}")
+        
+        return {
+            "success": True,
+            "message": "Payment verified and premium status updated",
+            "is_premium": True,
+            "subscription_status": "active"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        await db.rollback()
+        logger.error(f"Payment verification error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Payment verification failed")
+
+
 @router.get("/payment-history")
 async def get_payment_history(
     current_user: User = Depends(get_current_user),
