@@ -234,7 +234,7 @@ Rules:
         else:
             if not cv_data.experience:
                 overall_seniority = "fresher"
-            elif any("intern" in (exp.title or "").lower() or "intern" in (exp.role or "").lower() for exp in cv_data.experience):
+            elif any("intern" in (exp.title or "").lower() or "intern" in (exp.company or "").lower() for exp in cv_data.experience):
                 overall_seniority = "intern"
             else:
                 total_months = 0
