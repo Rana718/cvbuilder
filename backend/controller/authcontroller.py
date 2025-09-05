@@ -139,8 +139,12 @@ class AuthController:
             await db.commit()
             await db.refresh(user)
             
-            # Try to update Firebase custom claims - but don't fail if it doesn't work
-            claims = {"admin": True, "superAdmin": True}
+            # Update Firebase custom claims with correct keys
+            claims = {
+                "isAdmin": True, 
+                "isSuperAdmin": True,
+                "dbUser": "true"
+            }
             firebase_success = set_custom_user_claims(user.firebase_uid, claims)
             
             response_message = "Super admin created successfully"
