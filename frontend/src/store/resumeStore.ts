@@ -98,6 +98,8 @@ interface ResumeStore extends ResumeState {
     loadResume: (resumeId: number) => Promise<void>
     hasData: () => boolean
     uploadImage: (file: File) => Promise<void>
+    generatePreviewId: () => string
+    isPreviewId: (id: string) => boolean
 
     // Populate from API data
     populateFromResumeData: (data: any) => void
@@ -313,6 +315,16 @@ export const useResumeStore = create<ResumeStore>()((set, get) => ({
             state.education.length > 0 ||
             state.projects.length > 0
         )
+    },
+
+    // Generate temporary preview ID for unsaved resumes
+    generatePreviewId: () => {
+        return 'preview-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9)
+    },
+
+    // Check if a resume ID is a preview ID (for local/unsaved resumes)
+    isPreviewId: (id: string) => {
+        return !!(id && id.startsWith('preview-'))
     },
 
     // Populate from API data

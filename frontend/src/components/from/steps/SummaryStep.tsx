@@ -24,7 +24,8 @@ function SummaryStep({ onNext, onPrev }: SummaryStepProps) {
         skills,
         saveResume,
         documentId,
-        templateId
+        templateId,
+        generatePreviewId
     } = resumeStore
     
     const [aiSuggestions, setAiSuggestions] = useState<string[]>([])
@@ -33,43 +34,28 @@ function SummaryStep({ onNext, onPrev }: SummaryStepProps) {
     
     const hasCalledAPI = useRef(false)
 
-    const handleFinish = async () => {
+    const handleFinish = () => {
         if (isSaving) return
         
         setIsSaving(true)
-        try {
-            // Get the resume ID from either documentId or URL params
-            const resumeId = documentId || searchParams.get('resumeId')
-            const currentTemplateId = templateId || searchParams.get('template')
-            
-            if (resumeId && currentTemplateId) {
-                // If we have a resume ID, this is either editing existing or continuing creation
-                // Only save if it's a new resume (no documentId set yet)
-                if (!documentId) {
-                    await saveResume()
-                }
-                
-                // Redirect to the resume preview page
-                router.push(`/resusme/${resumeId}?template=${currentTemplateId}`)
-            } else {
-                // This is a completely new resume - save it first
-                await saveResume()
-                
-                // Get the new document ID after saving
-                const newResumeId = resumeStore.documentId
-                if (newResumeId && currentTemplateId) {
-                    router.push(`/resusme/${newResumeId}?template=${currentTemplateId}`)
-                } else {
-                    alert('Resume saved successfully!')
-                    onNext() // Fallback to original behavior
-                }
-            }
-        } catch (error) {
-            console.error('Failed to save resume:', error)
-            alert('Failed to save resume. Please try again.')
+        
+        // Get the resume ID from either documentId or URL params
+        const resumeId = documentId || searchParams.get('resumeId')
+        const currentTemplateId = templateId || searchParams.get('template')
+        
+        if (resumeId && currentTemplateId) {
+            // Redirect to existing resume preview page
+            router.push(`/resusme/${resumeId}?template=${currentTemplateId}`)
+        } else if (currentTemplateId) {
+            // For new resume, generate a temporary ID for preview
+            // The data will be stored locally in the store until user saves
+            const tempResumeId = generatePreviewId()
+            router.push(`/resusme/${tempResumeId}?template=${currentTemplateId}`)
+        } else {
+            // Fallback if no template is selected
+            alert('Please select a template first.')
             setIsSaving(false)
         }
-        // Don't set isSaving to false here - let the navigation handle it
     }
 
     const buildCvData = () => {
@@ -312,7 +298,7 @@ function SummaryStep({ onNext, onPrev }: SummaryStepProps) {
                     disabled={!isStepValid || isSaving}
                     className="flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-sm hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium border border-black transition-all"
                 >
-                    <span>{isSaving ? 'Saving & Redirecting...' : 'Finish & Preview Resume'}</span>
+                    <span>{isSaving ? 'Loading Preview...' : 'Preview Resume'}</span>
                     <ChevronRight className="w-4 h-4" />
                 </motion.button>
             </motion.div>

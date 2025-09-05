@@ -12,7 +12,8 @@ import {
   Home,
   LogOut,
   Crown,
-  Shield
+  Shield,
+  HomeIcon
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -31,9 +32,10 @@ const sidebarItems = [
   { icon: Home, label: "Dashboard", href: "/admin" },
   { icon: Users, label: "User Management", href: "/admin/users" },
   { icon: CreditCard, label: "Payment Management", href: "/admin/payments" },
-  { icon: FileText, label: "Resume Analytics", href: "/admin/analytics" },
-  { icon: Bell, label: "Notifications", href: "/admin/notifications" },
-  { icon: Edit3, label: "Template Editor", href: "/admin/templates" },
+  { icon: HomeIcon, label: "Home Page", href: "/" },
+  // { icon: FileText, label: "Resume Analytics", href: "/admin/analytics" },
+  // { icon: Bell, label: "Notifications", href: "/admin/notifications" },
+  // { icon: Edit3, label: "Template Editor", href: "/admin/templates" },
 ];
 
 function SidebarContent() {

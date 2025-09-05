@@ -3,22 +3,21 @@
 import React, { useState } from "react";
 import {
     Search,
-    Filter,
     Download,
     Plus,
     MoreHorizontal,
-    Eye,
-    Edit,
     Trash2,
     Crown,
     Mail,
     Phone,
-    Calendar,
-    MapPin,
-    Ban,
-    CheckCircle,
+    Users,
+    Settings,
+    UserX,
+    Edit,
+    RefreshCw,
+    AlertCircle,
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -35,7 +34,6 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
-    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -51,145 +49,166 @@ import {
     DialogDescription,
     DialogHeader,
     DialogTitle,
-    DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+    Tabs,
+    TabsContent,
+    TabsList,
+    TabsTrigger,
+} from "@/components/ui/tabs";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { useUserManagement } from "@/hooks/useUserManagement";
 
-// Extended user data
-const usersData = [
-    {
-        id: 1,
-        name: "John Doe",
-        email: "john@example.com",
-        phone: "+91 9876543210",
-        avatar: "",
-        status: "Active",
-        subscription: "Premium",
-        resumes: 5,
-        joinDate: "2024-01-15",
-        lastLogin: "2024-09-01",
-        location: "Mumbai, India",
-        totalSpent: "₹270",
-        loginCount: 45,
-    },
-    {
-        id: 2,
-        name: "Sarah Wilson",
-        email: "sarah@example.com",
-        phone: "+91 8765432109",
-        avatar: "",
-        status: "Active",
-        subscription: "Free",
-        resumes: 1,
-        joinDate: "2024-02-20",
-        lastLogin: "2024-08-30",
-        location: "Delhi, India",
-        totalSpent: "₹0",
-        loginCount: 12,
-    },
-    {
-        id: 3,
-        name: "Mike Johnson",
-        email: "mike@example.com",
-        phone: "+91 7654321098",
-        avatar: "",
-        status: "Suspended",
-        subscription: "Premium",
-        resumes: 8,
-        joinDate: "2024-01-08",
-        lastLogin: "2024-08-25",
-        location: "Bangalore, India",
-        totalSpent: "₹450",
-        loginCount: 89,
-    },
-    {
-        id: 4,
-        name: "Emily Chen",
-        email: "emily@example.com",
-        phone: "+91 6543210987",
-        avatar: "",
-        status: "Active",
-        subscription: "Free",
-        resumes: 1,
-        joinDate: "2024-03-10",
-        lastLogin: "2024-09-01",
-        location: "Chennai, India",
-        totalSpent: "₹0",
-        loginCount: 8,
-    },
-    {
-        id: 5,
-        name: "David Brown",
-        email: "david@example.com",
-        phone: "+91 5432109876",
-        avatar: "",
-        status: "Active",
-        subscription: "Premium",
-        resumes: 12,
-        joinDate: "2024-01-25",
-        lastLogin: "2024-08-31",
-        location: "Pune, India",
-        totalSpent: "₹360",
-        loginCount: 156,
-    },
-    {
-        id: 6,
-        name: "Lisa Rodriguez",
-        email: "lisa@example.com",
-        phone: "+91 4321098765",
-        avatar: "",
-        status: "Inactive",
-        subscription: "Free",
-        resumes: 0,
-        joinDate: "2024-04-05",
-        lastLogin: "2024-07-15",
-        location: "Hyderabad, India",
-        totalSpent: "₹0",
-        loginCount: 3,
-    },
-];
+const LoadingTable = () => (
+    <div className="space-y-4">
+        {Array.from({ length: 5 }).map((_, index) => (
+            <div key={index} className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg animate-pulse">
+                <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
+                <div className="flex-1 space-y-2">
+                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                    <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                </div>
+                <div className="h-6 bg-gray-200 rounded w-16"></div>
+                <div className="h-6 bg-gray-200 rounded w-20"></div>
+                <div className="h-8 bg-gray-200 rounded w-8"></div>
+            </div>
+        ))}
+    </div>
+);
+
+const ErrorMessage = ({ error, onRetry }: { error: string; onRetry: () => void }) => (
+    <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center justify-between">
+        <div className="flex items-center space-x-3">
+            <AlertCircle className="h-5 w-5 text-red-500" />
+            <span className="text-red-700">{error}</span>
+        </div>
+        <Button variant="outline" size="sm" onClick={onRetry}>
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Retry
+        </Button>
+    </div>
+);
 
 export default function UsersPage() {
+    const {
+        usersData,
+        adminUsers,
+        loading,
+        error,
+        currentUser,
+        addingAdmin,
+        updatingAdminRole,
+        deleteUser,
+        updateAdminRole,
+        addAdmin,
+        removeAdminAccess,
+        refetch,
+        refreshAdminStatus
+    } = useUserManagement();
+
+    const [activeTab, setActiveTab] = useState("regular");
     const [searchTerm, setSearchTerm] = useState("");
     const [statusFilter, setStatusFilter] = useState("all");
     const [subscriptionFilter, setSubscriptionFilter] = useState("all");
-    const [selectedUser, setSelectedUser] = useState<any>(null);
+    const [showAddAdminDialog, setShowAddAdminDialog] = useState(false);
+    const [showEditAdminDialog, setShowEditAdminDialog] = useState(false);
+    const [selectedAdminUser, setSelectedAdminUser] = useState<any>(null);
+    const [addAdminForm, setAddAdminForm] = useState({
+        user_email: "",
+        make_admin: true,
+        make_super_admin: false,
+    });
 
     const getStatusBadge = (status: string) => {
-        switch (status) {
-            case "Active":
+        switch (status.toLowerCase()) {
+            case "active":
                 return <Badge className="bg-green-100 text-green-800 hover:bg-green-100">Active</Badge>;
-            case "Inactive":
+            case "inactive":
                 return <Badge className="bg-gray-100 text-gray-800 hover:bg-gray-100">Inactive</Badge>;
-            case "Suspended":
+            case "suspended":
                 return <Badge className="bg-red-100 text-red-800 hover:bg-red-100">Suspended</Badge>;
             default:
                 return <Badge variant="secondary">{status}</Badge>;
         }
     };
 
-    const getSubscriptionBadge = (subscription: string) => {
-        switch (subscription) {
-            case "Premium":
-                return <Badge className="bg-purple-100 text-purple-800 hover:bg-purple-100">
-                    <Crown className="h-3 w-3 mr-1" />
-                    Premium
-                </Badge>;
-            case "Free":
-                return <Badge className="bg-gray-100 text-gray-800 hover:bg-gray-100">Free</Badge>;
-            default:
-                return <Badge variant="secondary">{subscription}</Badge>;
+    const getSubscriptionBadge = (isPremium: boolean) => {
+        return isPremium ? (
+            <Badge className="bg-purple-100 text-purple-800 hover:bg-purple-100">
+                <Crown className="h-3 w-3 mr-1" />
+                Premium
+            </Badge>
+        ) : (
+            <Badge className="bg-gray-100 text-gray-800 hover:bg-gray-100">Free</Badge>
+        );
+    };
+
+    const handleDeleteUser = async (userId: number) => {
+        if (window.confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+            await deleteUser(userId);
         }
     };
 
-    const filteredUsers = usersData.filter((user) => {
+    const handleUpdateAdminRole = async () => {
+        if (selectedAdminUser && !updatingAdminRole) {
+            await updateAdminRole(
+                selectedAdminUser.id,
+                selectedAdminUser.is_admin,
+                selectedAdminUser.is_super_admin
+            );
+            setShowEditAdminDialog(false);
+            setSelectedAdminUser(null);
+        }
+    };
+
+    const handleAddAdmin = async () => {
+        if (!addingAdmin) {
+            await addAdmin(
+                addAdminForm.user_email,
+                addAdminForm.make_admin,
+                addAdminForm.make_super_admin
+            );
+            setShowAddAdminDialog(false);
+            setAddAdminForm({
+                user_email: "",
+                make_admin: true,
+                make_super_admin: false,
+            });
+        }
+    };
+
+    const handleRemoveAdminAccess = async (userId: number) => {
+        if (window.confirm('Are you sure you want to remove admin access for this user?')) {
+            await removeAdminAccess(userId);
+        }
+    };
+
+    const filteredUsers = usersData?.users?.filter((user) => {
         const matchesSearch =
-            user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
             user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
             user.phone.includes(searchTerm);
         const matchesStatus = statusFilter === "all" || user.status.toLowerCase() === statusFilter;
-        const matchesSubscription = subscriptionFilter === "all" || user.subscription.toLowerCase() === subscriptionFilter;
+        const matchesSubscription = subscriptionFilter === "all" || 
+            (subscriptionFilter === "premium" && user.is_premium) ||
+            (subscriptionFilter === "free" && !user.is_premium);
         return matchesSearch && matchesStatus && matchesSubscription;
+    }) || [];
+
+    const filteredAdminUsers = adminUsers.filter((user) => {
+        return user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+               user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+               user.phone.includes(searchTerm);
     });
+
+    if (error) {
+        return (
+            <div className="p-4 lg:p-8">
+                <ErrorMessage error={error} onRetry={refetch} />
+            </div>
+        );
+    }
 
     return (
         <div className="p-4 lg:p-8 space-y-6">
@@ -200,288 +219,477 @@ export default function UsersPage() {
                     <p className="text-gray-600">Manage and monitor all platform users</p>
                 </div>
                 <div className="flex items-center space-x-3">
-                    <Button variant="outline" size="sm">
-                        <Download className="h-4 w-4 mr-2" />
-                        Export Users
+                    <Button variant="outline" size="sm" onClick={refetch} disabled={loading}>
+                        <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+                        Refresh Data
                     </Button>
-                    <Button size="sm">
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add User
+                    <Button variant="outline" size="sm" onClick={refreshAdminStatus}>
+                        <RefreshCw className="h-4 w-4 mr-2" />
+                        Refresh Permissions
                     </Button>
+                    {(currentUser.isSuperAdmin || currentUser.isAdmin) && (
+                        <Button size="sm" onClick={() => setShowAddAdminDialog(true)}>
+                            <Plus className="h-4 w-4 mr-2" />
+                            Add Admin
+                        </Button>
+                    )}
                 </div>
             </div>
 
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <Card>
-                    <CardContent className="p-4">
-                        <div className="text-2xl font-bold text-blue-600">{usersData.length}</div>
-                        <p className="text-sm text-gray-600">Total Users</p>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardContent className="p-4">
-                        <div className="text-2xl font-bold text-green-600">
-                            {usersData.filter(u => u.status === "Active").length}
-                        </div>
-                        <p className="text-sm text-gray-600">Active Users</p>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardContent className="p-4">
-                        <div className="text-2xl font-bold text-purple-600">
-                            {usersData.filter(u => u.subscription === "Premium").length}
-                        </div>
-                        <p className="text-sm text-gray-600">Premium Users</p>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardContent className="p-4">
-                        <div className="text-2xl font-bold text-orange-600">
-                            {usersData.reduce((sum, u) => sum + u.resumes, 0)}
-                        </div>
-                        <p className="text-sm text-gray-600">Total Resumes</p>
-                    </CardContent>
-                </Card>
-            </div>
+            {usersData?.stats && (
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <Card>
+                        <CardContent className="p-4">
+                            <div className="text-2xl font-bold text-blue-600">{usersData.stats.total_users}</div>
+                            <p className="text-sm text-gray-600">Total Users</p>
+                        </CardContent>
+                    </Card>
+                    <Card>
+                        <CardContent className="p-4">
+                            <div className="text-2xl font-bold text-green-600">{usersData.stats.active_users}</div>
+                            <p className="text-sm text-gray-600">Active Users</p>
+                        </CardContent>
+                    </Card>
+                    <Card>
+                        <CardContent className="p-4">
+                            <div className="text-2xl font-bold text-purple-600">{usersData.stats.premium_users}</div>
+                            <p className="text-sm text-gray-600">Premium Users</p>
+                        </CardContent>
+                    </Card>
+                    <Card>
+                        <CardContent className="p-4">
+                            <div className="text-2xl font-bold text-orange-600">{usersData.stats.total_resumes}</div>
+                            <p className="text-sm text-gray-600">Total Resumes</p>
+                        </CardContent>
+                    </Card>
+                </div>
+            )}
 
-            {/* Filters */}
-            <Card>
-                <CardContent className="p-6">
-                    <div className="flex flex-col lg:flex-row space-y-4 lg:space-y-0 lg:space-x-4">
-                        <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            {/* Tabs */}
+            <Tabs value={activeTab} onValueChange={setActiveTab}>
+                <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="regular" className="flex items-center space-x-2">
+                        <Users className="h-4 w-4" />
+                        <span>Regular Users</span>
+                    </TabsTrigger>
+                    <TabsTrigger value="admin" className="flex items-center space-x-2">
+                        <Settings className="h-4 w-4" />
+                        <span>Admin Users</span>
+                    </TabsTrigger>
+                </TabsList>
+
+                {/* Filters */}
+                <Card className="mt-4">
+                    <CardContent className="p-6">
+                        <div className="flex flex-col lg:flex-row space-y-4 lg:space-y-0 lg:space-x-4">
+                            <div className="relative flex-1">
+                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                                <Input
+                                    placeholder="Search by name, email, or phone..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    className="pl-10"
+                                />
+                            </div>
+                            {activeTab === "regular" && (
+                                <>
+                                    <Select value={statusFilter} onValueChange={setStatusFilter}>
+                                        <SelectTrigger className="w-full lg:w-40">
+                                            <SelectValue placeholder="Status" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="all">All Status</SelectItem>
+                                            <SelectItem value="active">Active</SelectItem>
+                                            <SelectItem value="inactive">Inactive</SelectItem>
+                                            <SelectItem value="suspended">Suspended</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <Select value={subscriptionFilter} onValueChange={setSubscriptionFilter}>
+                                        <SelectTrigger className="w-full lg:w-40">
+                                            <SelectValue placeholder="Subscription" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="all">All Plans</SelectItem>
+                                            <SelectItem value="free">Free</SelectItem>
+                                            <SelectItem value="premium">Premium</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </>
+                            )}
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* Regular Users Tab */}
+                <TabsContent value="regular">
+                    <Card>
+                        <CardContent className="p-0">
+                            {loading ? (
+                                <div className="p-6">
+                                    <LoadingTable />
+                                </div>
+                            ) : (
+                                <div className="overflow-x-auto">
+                                    <Table>
+                                        <TableHeader>
+                                            <TableRow className="bg-gray-50">
+                                                <TableHead>User</TableHead>
+                                                <TableHead>Contact</TableHead>
+                                                <TableHead>Status</TableHead>
+                                                <TableHead>Subscription</TableHead>
+                                                <TableHead>Resumes</TableHead>
+                                                <TableHead>Total Spent</TableHead>
+                                                {currentUser.isSuperAdmin && (
+                                                    <TableHead className="text-right">Actions</TableHead>
+                                                )}
+                                            </TableRow>
+                                        </TableHeader>
+                                        <TableBody>
+                                            {filteredUsers.length === 0 ? (
+                                                <TableRow>
+                                                    <TableCell colSpan={7} className="text-center py-8 text-gray-500">
+                                                        No users found
+                                                    </TableCell>
+                                                </TableRow>
+                                            ) : (
+                                                filteredUsers.map((user) => (
+                                                    <TableRow key={user.id} className="hover:bg-gray-50">
+                                                        <TableCell>
+                                                            <div className="flex items-center space-x-3">
+                                                                <Avatar>
+                                                                    <AvatarImage src={user.image_url} />
+                                                                    <AvatarFallback className="bg-blue-100 text-blue-700">
+                                                                        {user.username.split(" ").map((n) => n[0]).join("")}
+                                                                    </AvatarFallback>
+                                                                </Avatar>
+                                                                <div>
+                                                                    <div className="font-medium text-gray-900">{user.username}</div>
+                                                                    <div className="text-sm text-gray-500">ID: {user.id}</div>
+                                                                </div>
+                                                            </div>
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <div className="space-y-1">
+                                                                <div className="flex items-center text-sm text-gray-600">
+                                                                    <Mail className="h-3 w-3 mr-2" />
+                                                                    {user.email}
+                                                                </div>
+                                                                <div className="flex items-center text-sm text-gray-600">
+                                                                    <Phone className="h-3 w-3 mr-2" />
+                                                                    {user.phone}
+                                                                </div>
+                                                            </div>
+                                                        </TableCell>
+                                                        <TableCell>{getStatusBadge(user.status)}</TableCell>
+                                                        <TableCell>{getSubscriptionBadge(user.is_premium)}</TableCell>
+                                                        <TableCell>
+                                                            <div className="font-medium">{user.total_resumes}</div>
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <div className="font-medium text-green-600">₹{user.total_spent}</div>
+                                                        </TableCell>
+                                                        <TableCell className="text-right">
+                                                            {(currentUser.isSuperAdmin) && (
+                                                                <DropdownMenu>
+                                                                    <DropdownMenuTrigger asChild>
+                                                                        <Button variant="ghost" size="sm">
+                                                                            <MoreHorizontal className="h-4 w-4" />
+                                                                        </Button>
+                                                                    </DropdownMenuTrigger>
+                                                                    <DropdownMenuContent align="end">
+                                                                        {currentUser.isSuperAdmin && (
+                                                                            <DropdownMenuItem 
+                                                                                className="text-red-600"
+                                                                                onClick={() => handleDeleteUser(user.id)}
+                                                                            >
+                                                                                <Trash2 className="h-4 w-4 mr-2" />
+                                                                                Delete User
+                                                                            </DropdownMenuItem>
+                                                                        )}
+                                                                    </DropdownMenuContent>
+                                                                </DropdownMenu>
+                                                            )}
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ))
+                                            )}
+                                        </TableBody>
+                                    </Table>
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
+                </TabsContent>
+
+                {/* Admin Users Tab */}
+                <TabsContent value="admin">
+                    <Card>
+                        <CardContent className="p-0">
+                            {loading ? (
+                                <div className="p-6">
+                                    <LoadingTable />
+                                </div>
+                            ) : (
+                                <div className="overflow-x-auto">
+                                    <Table>
+                                        <TableHeader>
+                                            <TableRow className="bg-gray-50">
+                                                <TableHead>Admin User</TableHead>
+                                                <TableHead>Contact</TableHead>
+                                                <TableHead>Role</TableHead>
+                                                <TableHead className="text-right">Actions</TableHead>
+                                            </TableRow>
+                                        </TableHeader>
+                                        <TableBody>
+                                            {filteredAdminUsers.length === 0 ? (
+                                                <TableRow>
+                                                    <TableCell colSpan={4} className="text-center py-8 text-gray-500">
+                                                        No admin users found
+                                                    </TableCell>
+                                                </TableRow>
+                                            ) : (
+                                                filteredAdminUsers.map((user) => (
+                                                    <TableRow key={user.id} className="hover:bg-gray-50">
+                                                        <TableCell>
+                                                            <div className="flex items-center space-x-3">
+                                                                <Avatar>
+                                                                    <AvatarImage src={user.image_url} />
+                                                                    <AvatarFallback className="bg-red-100 text-red-700">
+                                                                        {user.name.split(" ").map((n) => n[0]).join("")}
+                                                                    </AvatarFallback>
+                                                                </Avatar>
+                                                                <div>
+                                                                    <div className="font-medium text-gray-900">{user.name}</div>
+                                                                    <div className="text-sm text-gray-500">ID: {user.id}</div>
+                                                                </div>
+                                                            </div>
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <div className="space-y-1">
+                                                                <div className="flex items-center text-sm text-gray-600">
+                                                                    <Mail className="h-3 w-3 mr-2" />
+                                                                    {user.email}
+                                                                </div>
+                                                                <div className="flex items-center text-sm text-gray-600">
+                                                                    <Phone className="h-3 w-3 mr-2" />
+                                                                    {user.phone}
+                                                                </div>
+                                                            </div>
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <div className="space-y-1">
+                                                                {user.is_super_admin && (
+                                                                    <Badge className="bg-red-100 text-red-800 hover:bg-red-100">
+                                                                        <Crown className="h-3 w-3 mr-1" />
+                                                                        Super Admin
+                                                                    </Badge>
+                                                                )}
+                                                                {user.is_admin && !user.is_super_admin && (
+                                                                    <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100">
+                                                                        <Settings className="h-3 w-3 mr-1" />
+                                                                        Admin
+                                                                    </Badge>
+                                                                )}
+                                                            </div>
+                                                        </TableCell>
+                                                        <TableCell className="text-right">
+                                                            {currentUser.isSuperAdmin && (
+                                                                <DropdownMenu>
+                                                                    <DropdownMenuTrigger asChild>
+                                                                        <Button variant="ghost" size="sm">
+                                                                            <MoreHorizontal className="h-4 w-4" />
+                                                                        </Button>
+                                                                    </DropdownMenuTrigger>
+                                                                    <DropdownMenuContent align="end">
+                                                                        <DropdownMenuItem 
+                                                                            onClick={() => {
+                                                                                setSelectedAdminUser(user);
+                                                                                setShowEditAdminDialog(true);
+                                                                            }}
+                                                                        >
+                                                                            <Edit className="h-4 w-4 mr-2" />
+                                                                            Edit Admin Access
+                                                                        </DropdownMenuItem>
+                                                                        <DropdownMenuItem 
+                                                                            className="text-orange-600"
+                                                                            onClick={() => handleRemoveAdminAccess(user.id)}
+                                                                        >
+                                                                            <UserX className="h-4 w-4 mr-2" />
+                                                                            Remove Admin Access
+                                                                        </DropdownMenuItem>
+                                                                    </DropdownMenuContent>
+                                                                </DropdownMenu>
+                                                            )}
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ))
+                                            )}
+                                        </TableBody>
+                                    </Table>
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
+                </TabsContent>
+            </Tabs>
+
+            {/* Add Admin Dialog */}
+            <Dialog 
+                open={showAddAdminDialog} 
+                onOpenChange={(open) => {
+                    if (!addingAdmin) {
+                        setShowAddAdminDialog(open);
+                    }
+                }}
+            >
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Add New Admin</DialogTitle>
+                        <DialogDescription>
+                            Add admin or super admin privileges to an existing user
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                        <div>
+                            <Label htmlFor="email">User Email</Label>
                             <Input
-                                placeholder="Search by name, email, or phone..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="pl-10 border border-black"
+                                id="email"
+                                placeholder="Enter user email"
+                                value={addAdminForm.user_email}
+                                onChange={(e) => setAddAdminForm({
+                                    ...addAdminForm,
+                                    user_email: e.target.value
+                                })}
+                                disabled={addingAdmin}
                             />
                         </div>
-                        <Select value={statusFilter} onValueChange={setStatusFilter}>
-                            <SelectTrigger className="w-full lg:w-40 border border-black">
-                                <SelectValue placeholder="Status" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="all">All Status</SelectItem>
-                                <SelectItem value="active">Active</SelectItem>
-                                <SelectItem value="inactive">Inactive</SelectItem>
-                                <SelectItem value="suspended">Suspended</SelectItem>
-                            </SelectContent>
-                        </Select>
-                        <Select value={subscriptionFilter} onValueChange={setSubscriptionFilter}>
-                            <SelectTrigger className="w-full lg:w-40 border border-black">
-                                <SelectValue placeholder="Subscription" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="all">All Plans</SelectItem>
-                                <SelectItem value="free">Free</SelectItem>
-                                <SelectItem value="premium">Premium</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-                </CardContent>
-            </Card>
-
-            {/* Users Table */}
-            <Card>
-                <CardContent className="p-0">
-                    <div className="overflow-x-auto">
-                        <Table>
-                            <TableHeader>
-                                <TableRow className="bg-gray-50">
-                                    <TableHead>User</TableHead>
-                                    <TableHead>Contact</TableHead>
-                                    <TableHead>Status</TableHead>
-                                    <TableHead>Subscription</TableHead>
-                                    <TableHead>Resumes</TableHead>
-                                    <TableHead>Total Spent</TableHead>
-                                    <TableHead>Last Login</TableHead>
-                                    <TableHead className="text-right">Actions</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {filteredUsers.map((user) => (
-                                    <TableRow key={user.id} className="hover:bg-gray-50">
-                                        <TableCell>
-                                            <div className="flex items-center space-x-3">
-                                                <Avatar>
-                                                    <AvatarImage src={user.avatar} />
-                                                    <AvatarFallback className="bg-blue-100 text-blue-700">
-                                                        {user.name.split(" ").map((n) => n[0]).join("")}
-                                                    </AvatarFallback>
-                                                </Avatar>
-                                                <div>
-                                                    <div className="font-medium text-gray-900">{user.name}</div>
-                                                    <div className="text-sm text-gray-500">ID: {user.id}</div>
-                                                </div>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className="space-y-1">
-                                                <div className="flex items-center text-sm text-gray-600">
-                                                    <Mail className="h-3 w-3 mr-2" />
-                                                    {user.email}
-                                                </div>
-                                                <div className="flex items-center text-sm text-gray-600">
-                                                    <Phone className="h-3 w-3 mr-2" />
-                                                    {user.phone}
-                                                </div>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>{getStatusBadge(user.status)}</TableCell>
-                                        <TableCell>{getSubscriptionBadge(user.subscription)}</TableCell>
-                                        <TableCell>
-                                            <div className="font-medium">{user.resumes}</div>
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className="font-medium text-green-600">{user.totalSpent}</div>
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className="text-sm">{user.lastLogin}</div>
-                                        </TableCell>
-                                        <TableCell className="text-right">
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" size="sm">
-                                                        <MoreHorizontal className="h-4 w-4" />
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end">
-                                                    <Dialog>
-                                                        <DialogTrigger asChild>
-                                                            <DropdownMenuItem onSelect={(e) => {
-                                                                e.preventDefault();
-                                                                setSelectedUser(user);
-                                                            }}>
-                                                                <Eye className="h-4 w-4 mr-2" />
-                                                                View Details
-                                                            </DropdownMenuItem>
-                                                        </DialogTrigger>
-                                                    </Dialog>
-                                                    <DropdownMenuItem>
-                                                        <Edit className="h-4 w-4 mr-2" />
-                                                        Edit User
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuSeparator />
-                                                    {user.status === "Active" ? (
-                                                        <DropdownMenuItem className="text-orange-600">
-                                                            <Ban className="h-4 w-4 mr-2" />
-                                                            Suspend User
-                                                        </DropdownMenuItem>
-                                                    ) : (
-                                                        <DropdownMenuItem className="text-green-600">
-                                                            <CheckCircle className="h-4 w-4 mr-2" />
-                                                            Activate User
-                                                        </DropdownMenuItem>
-                                                    )}
-                                                    <DropdownMenuItem className="text-red-600">
-                                                        <Trash2 className="h-4 w-4 mr-2" />
-                                                        Delete User
-                                                    </DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </div>
-                </CardContent>
-            </Card>
-
-            {/* User Details Dialog */}
-            {selectedUser && (
-                <Dialog open={!!selectedUser} onOpenChange={() => setSelectedUser(null)}>
-                    <DialogContent className="max-w-2xl">
-                        <DialogHeader>
-                            <DialogTitle>User Details</DialogTitle>
-                            <DialogDescription>
-                                Complete information about {selectedUser.name}
-                            </DialogDescription>
-                        </DialogHeader>
-                        <div className="space-y-6">
-                            {/* Profile Section */}
-                            <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
-                                <Avatar className="h-16 w-16">
-                                    <AvatarImage src={selectedUser.avatar} />
-                                    <AvatarFallback className="bg-blue-100 text-blue-700 text-lg">
-                                        {selectedUser.name.split(" ").map((n: string) => n[0]).join("")}
-                                    </AvatarFallback>
-                                </Avatar>
-                                <div className="flex-1">
-                                    <h3 className="text-xl font-semibold text-gray-900">{selectedUser.name}</h3>
-                                    <div className="flex items-center space-x-4 mt-1">
-                                        {getStatusBadge(selectedUser.status)}
-                                        {getSubscriptionBadge(selectedUser.subscription)}
-                                    </div>
-                                </div>
+                        <div className="space-y-2">
+                            <div className="flex items-center space-x-2">
+                                <Checkbox
+                                    id="admin"
+                                    checked={addAdminForm.make_admin}
+                                    onCheckedChange={(checked) => setAddAdminForm({
+                                        ...addAdminForm,
+                                        make_admin: !!checked
+                                    })}
+                                    disabled={addingAdmin}
+                                />
+                                <Label htmlFor="admin">Admin Access</Label>
                             </div>
-
-                            {/* Details Grid */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div className="space-y-3">
-                                    <div className="flex items-center space-x-3">
-                                        <Mail className="h-4 w-4 text-gray-400" />
-                                        <span className="text-sm text-gray-600">Email</span>
-                                    </div>
-                                    <p className="text-sm font-medium ml-7">{selectedUser.email}</p>
-
-                                    <div className="flex items-center space-x-3">
-                                        <Phone className="h-4 w-4 text-gray-400" />
-                                        <span className="text-sm text-gray-600">Phone</span>
-                                    </div>
-                                    <p className="text-sm font-medium ml-7">{selectedUser.phone}</p>
-
-                                    <div className="flex items-center space-x-3">
-                                        <MapPin className="h-4 w-4 text-gray-400" />
-                                        <span className="text-sm text-gray-600">Location</span>
-                                    </div>
-                                    <p className="text-sm font-medium ml-7">{selectedUser.location}</p>
-                                </div>
-
-                                <div className="space-y-3">
-                                    <div className="flex items-center space-x-3">
-                                        <Calendar className="h-4 w-4 text-gray-400" />
-                                        <span className="text-sm text-gray-600">Join Date</span>
-                                    </div>
-                                    <p className="text-sm font-medium ml-7">{selectedUser.joinDate}</p>
-
-                                    <div className="flex items-center space-x-3">
-                                        <CheckCircle className="h-4 w-4 text-gray-400" />
-                                        <span className="text-sm text-gray-600">Last Login</span>
-                                    </div>
-                                    <p className="text-sm font-medium ml-7">{selectedUser.lastLogin}</p>
-
-                                    <div className="flex items-center space-x-3">
-                                        <Crown className="h-4 w-4 text-gray-400" />
-                                        <span className="text-sm text-gray-600">Total Spent</span>
-                                    </div>
-                                    <p className="text-sm font-medium ml-7 text-green-600">{selectedUser.totalSpent}</p>
-                                </div>
-                            </div>
-
-                            {/* Stats */}
-                            <div className="grid grid-cols-3 gap-4 pt-4 border-t">
-                                <div className="text-center">
-                                    <div className="text-2xl font-bold text-blue-600">{selectedUser.resumes}</div>
-                                    <p className="text-sm text-gray-600">Resumes Created</p>
-                                </div>
-                                <div className="text-center">
-                                    <div className="text-2xl font-bold text-green-600">{selectedUser.loginCount}</div>
-                                    <p className="text-sm text-gray-600">Total Logins</p>
-                                </div>
-                                <div className="text-center">
-                                    <div className="text-2xl font-bold text-purple-600">
-                                        {Math.floor((new Date().getTime() - new Date(selectedUser.joinDate).getTime()) / (1000 * 60 * 60 * 24))}
-                                    </div>
-                                    <p className="text-sm text-gray-600">Days Active</p>
-                                </div>
+                            <div className="flex items-center space-x-2">
+                                <Checkbox
+                                    id="super-admin"
+                                    checked={addAdminForm.make_super_admin}
+                                    onCheckedChange={(checked) => setAddAdminForm({
+                                        ...addAdminForm,
+                                        make_super_admin: !!checked,
+                                        make_admin: !!checked || addAdminForm.make_admin
+                                    })}
+                                    disabled={addingAdmin}
+                                />
+                                <Label htmlFor="super-admin">Super Admin Access</Label>
                             </div>
                         </div>
-                    </DialogContent>
-                </Dialog>
-            )}
+                        <div className="flex justify-end space-x-2">
+                            <Button 
+                                variant="outline" 
+                                onClick={() => {
+                                    if (!addingAdmin) {
+                                        setShowAddAdminDialog(false);
+                                    }
+                                }}
+                                disabled={addingAdmin}
+                            >
+                                Cancel
+                            </Button>
+                            <Button 
+                                onClick={handleAddAdmin}
+                                disabled={addingAdmin || !addAdminForm.user_email.trim()}
+                            >
+                                {addingAdmin && <RefreshCw className="h-4 w-4 mr-2 animate-spin" />}
+                                {addingAdmin ? 'Adding...' : 'Add Admin'}
+                            </Button>
+                        </div>
+                    </div>
+                </DialogContent>
+            </Dialog>
+
+            {/* Edit Admin Dialog */}
+            <Dialog 
+                open={showEditAdminDialog} 
+                onOpenChange={(open) => {
+                    if (!updatingAdminRole) {
+                        setShowEditAdminDialog(open);
+                    }
+                }}
+            >
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Edit Admin Access</DialogTitle>
+                        <DialogDescription>
+                            Modify admin privileges for {selectedAdminUser?.name}
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                        <div className="space-y-2">
+                            <div className="flex items-center space-x-2">
+                                <Checkbox
+                                    id="edit-admin"
+                                    checked={selectedAdminUser?.is_admin || false}
+                                    onCheckedChange={(checked) => {
+                                        if (selectedAdminUser) {
+                                            setSelectedAdminUser({
+                                                ...selectedAdminUser,
+                                                is_admin: !!checked
+                                            });
+                                        }
+                                    }}
+                                    disabled={updatingAdminRole}
+                                />
+                                <Label htmlFor="edit-admin">Admin Access</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <Checkbox
+                                    id="edit-super-admin"
+                                    checked={selectedAdminUser?.is_super_admin || false}
+                                    onCheckedChange={(checked) => {
+                                        if (selectedAdminUser) {
+                                            setSelectedAdminUser({
+                                                ...selectedAdminUser,
+                                                is_super_admin: !!checked,
+                                                is_admin: !!checked || selectedAdminUser.is_admin
+                                            });
+                                        }
+                                    }}
+                                    disabled={updatingAdminRole}
+                                />
+                                <Label htmlFor="edit-super-admin">Super Admin Access</Label>
+                            </div>
+                        </div>
+                        <div className="flex justify-end space-x-2">
+                            <Button 
+                                variant="outline" 
+                                onClick={() => {
+                                    if (!updatingAdminRole) {
+                                        setShowEditAdminDialog(false);
+                                    }
+                                }}
+                                disabled={updatingAdminRole}
+                            >
+                                Cancel
+                            </Button>
+                            <Button 
+                                onClick={handleUpdateAdminRole}
+                                disabled={updatingAdminRole}
+                            >
+                                {updatingAdminRole && <RefreshCw className="h-4 w-4 mr-2 animate-spin" />}
+                                {updatingAdminRole ? 'Updating...' : 'Update Access'}
+                            </Button>
+                        </div>
+                    </div>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }
