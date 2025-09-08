@@ -1,6 +1,6 @@
 "use client";
 
-import { Mail, Phone, MapPin, Linkedin, Github, Globe } from 'lucide-react'
+import { Mail, Phone, MapPin, Linkedin, Github, Globe, Award, Calendar, Briefcase } from 'lucide-react'
 
 interface UserData {
   name: string;
@@ -39,143 +39,243 @@ interface CreativeDesignerProps {
 
 export default function CreativeDesigner({ userData, colors, size = 'normal', mode = 'default' }: CreativeDesignerProps) {
   const theme = colors || {
-    primary: '#7c3aed',
-    secondary: '#a855f7',
+    primary: '#6366f1',
+    secondary: '#8b5cf6',
     accent: '#ec4899',
-    text: '#374151',
-    background: '#fafafa'
+    text: '#1f2937',
+    background: '#ffffff'
   };
 
   const isSmall = size === 'small';
 
-  // Size-based styling
+  // A4 optimized sizing with better typography
   const styles = {
     container: {
-      fontSize: isSmall ? '0.35rem' : '0.875rem',
-      lineHeight: isSmall ? '1.1' : '1.4'
+      fontSize: isSmall ? '6px' : '11px',
+      lineHeight: isSmall ? 1.2 : 1.4,
+      fontFamily: "'Inter', sans-serif"
     },
-    heading: {
-      fontSize: isSmall ? '0.5rem' : '1.25rem',
-      marginBottom: isSmall ? '0.125rem' : '0.5rem'
+    name: {
+      fontSize: isSmall ? '14px' : '28px',
+      fontWeight: '700',
+      letterSpacing: '-0.5px'
     },
-    subheading: {
-      fontSize: isSmall ? '0.4rem' : '1rem',
-      marginBottom: isSmall ? '0.125rem' : '0.375rem'
+    jobTitle: {
+      fontSize: isSmall ? '8px' : '14px',
+      fontWeight: '500',
+      opacity: 0.9
     },
     sectionTitle: {
-      fontSize: isSmall ? '0.4rem' : '0.875rem',
-      marginBottom: isSmall ? '0.125rem' : '0.25rem'
+      fontSize: isSmall ? '8px' : '13px',
+      fontWeight: '700',
+      letterSpacing: '0.5px',
+      textTransform: 'uppercase' as const
     },
     text: {
-      fontSize: isSmall ? '0.35rem' : '0.75rem',
-      marginBottom: isSmall ? '0.125rem' : '0.25rem'
+      fontSize: isSmall ? '6px' : '10px',
+      lineHeight: isSmall ? 1.3 : 1.5
+    },
+    subtext: {
+      fontSize: isSmall ? '5px' : '9px',
+      lineHeight: isSmall ? 1.2 : 1.4
+    },
+    contact: {
+      fontSize: isSmall ? '5px' : '9px'
     },
     spacing: {
-      section: isSmall ? '0.25rem' : '1rem',
-      item: isSmall ? '0.125rem' : '0.5rem'
+      section: isSmall ? '8px' : '16px',
+      item: isSmall ? '4px' : '8px',
+      micro: isSmall ? '2px' : '4px'
     },
     padding: {
-      container: isSmall ? '0.25rem' : '1rem',
-      section: isSmall ? '0.125rem' : '0.5rem'
+      container: isSmall ? '8px' : '20px',
+      section: isSmall ? '6px' : '12px'
     }
+  };
+
+  // Helper function to check if section has content
+  const hasContent = (data: any) => {
+    if (Array.isArray(data)) return data && data.length > 0;
+    return data && data.trim && data.trim().length > 0;
   };
 
   return (
     <div
-      className="w-full h-full"
+      className="w-full h-full bg-white"
       style={{
-        fontFamily: 'Poppins, sans-serif',
-        backgroundColor: theme.background,
-        color: theme.text,
+        fontFamily: styles.container.fontFamily,
         fontSize: styles.container.fontSize,
-        lineHeight: styles.container.lineHeight
+        lineHeight: styles.container.lineHeight,
+        color: theme.text,
+        backgroundColor: theme.background,
+        minHeight: isSmall ? 'auto' : '297mm', // A4 height
+        width: isSmall ? 'auto' : '210mm', // A4 width
+        margin: '0 auto',
+        boxShadow: isSmall ? 'none' : '0 0 20px rgba(0,0,0,0.1)'
       }}
     >
-      {/* Header */}
+      {/* Modern Header with Gradient */}
       <div 
-        className="relative"
+        className="relative overflow-hidden"
         style={{ 
-          background: `linear-gradient(135deg, ${theme.primary}, ${theme.secondary})`, 
-          color: 'white',
-          padding: styles.padding.container
+          background: `linear-gradient(135deg, ${theme.primary} 0%, ${theme.secondary} 50%, ${theme.accent} 100%)`,
+          padding: styles.padding.container,
+          borderRadius: isSmall ? '0' : '0 0 30px 30px'
         }}
       >
-        <div className="flex items-center gap-3">
-          <div 
-            className="bg-white/20 rounded-full flex-shrink-0"
-            style={{ 
-              width: isSmall ? '2rem' : '3rem', 
-              height: isSmall ? '2rem' : '3rem' 
-            }}
-          />
-          <div className="flex-1">
-            <h1 className="font-bold" style={{ ...styles.heading }}>
+        {/* Decorative elements */}
+        <div className="absolute top-0 right-0 w-32 h-32 rounded-full opacity-10 bg-white transform translate-x-16 -translate-y-16" />
+        <div className="absolute bottom-0 left-0 w-24 h-24 rounded-full opacity-10 bg-white transform -translate-x-12 translate-y-12" />
+        
+        <div className="relative z-10">
+          {/* Name and Title */}
+          <div className="text-white mb-4">
+            <h1 
+              className="font-bold mb-1 text-white"
+              style={{ 
+                fontSize: styles.name.fontSize,
+                fontWeight: styles.name.fontWeight,
+                letterSpacing: styles.name.letterSpacing
+              }}
+            >
               {userData.name || "Your Name"}
             </h1>
-            {userData.job_title && (
-              <p style={{ fontSize: styles.subheading.fontSize, opacity: 0.9 }}>
+            {hasContent(userData.job_title) && (
+              <p 
+                className="font-medium"
+                style={{ 
+                  fontSize: styles.jobTitle.fontSize,
+                  fontWeight: styles.jobTitle.fontWeight,
+                  opacity: styles.jobTitle.opacity
+                }}
+              >
                 {userData.job_title}
               </p>
             )}
           </div>
-        </div>
-        
-        {/* Contact Info */}
-        <div className="flex flex-wrap gap-2 mt-2" style={{ fontSize: styles.text.fontSize }}>
-          {userData.email && (
-            <div className="flex items-center gap-1">
-              <Mail className="h-2 w-2" />
-              <span>{userData.email}</span>
-            </div>
-          )}
-          {userData.phone && (
-            <div className="flex items-center gap-1">
-              <Phone className="h-2 w-2" />
-              <span>{userData.phone}</span>
-            </div>
-          )}
-          {userData.address && (
-            <div className="flex items-center gap-1">
-              <MapPin className="h-2 w-2" />
-              <span>{userData.address}</span>
-            </div>
-          )}
+          
+          {/* Contact Info in Pills */}
+          <div className="flex flex-wrap gap-2">
+            {hasContent(userData.email) && (
+              <div 
+                className="flex items-center gap-1 px-3 py-1 bg-white/20 rounded-full backdrop-blur-sm"
+                style={{ fontSize: styles.contact.fontSize }}
+              >
+                <Mail style={{ width: isSmall ? '8px' : '12px', height: isSmall ? '8px' : '12px' }} />
+                <span className="text-white">{userData.email}</span>
+              </div>
+            )}
+            {hasContent(userData.phone) && (
+              <div 
+                className="flex items-center gap-1 px-3 py-1 bg-white/20 rounded-full backdrop-blur-sm"
+                style={{ fontSize: styles.contact.fontSize }}
+              >
+                <Phone style={{ width: isSmall ? '8px' : '12px', height: isSmall ? '8px' : '12px' }} />
+                <span className="text-white">{userData.phone}</span>
+              </div>
+            )}
+            {hasContent(userData.address) && (
+              <div 
+                className="flex items-center gap-1 px-3 py-1 bg-white/20 rounded-full backdrop-blur-sm"
+                style={{ fontSize: styles.contact.fontSize }}
+              >
+                <MapPin style={{ width: isSmall ? '8px' : '12px', height: isSmall ? '8px' : '12px' }} />
+                <span className="text-white">{userData.address}</span>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Content Grid */}
-      <div className="flex h-full">
-        {/* Left Column */}
-        <div className="w-2/5 bg-white" style={{ padding: styles.padding.section }}>
-          {/* Summary */}
-          {userData.summary && (
+      {/* Main Content Area */}
+      <div className="flex" style={{ padding: styles.padding.container }}>
+        {/* Left Sidebar */}
+        <div 
+          className="w-2/5 bg-gray-50 rounded-lg mr-4"
+          style={{ padding: styles.padding.section }}
+        >
+          {/* Professional Summary */}
+          {hasContent(userData.summary) && (
             <div style={{ marginBottom: styles.spacing.section }}>
-              <h3 className="font-bold" style={{ ...styles.sectionTitle, color: theme.primary, marginBottom: styles.spacing.item }}>
-                ABOUT ME
-              </h3>
-              <p style={{ fontSize: styles.text.fontSize, lineHeight: '1.5' }}>
+              <div className="flex items-center gap-2 mb-2">
+                <div 
+                  className="w-1 h-6 rounded"
+                  style={{ backgroundColor: theme.primary }}
+                />
+                <h3 
+                  className="font-bold"
+                  style={{ 
+                    fontSize: styles.sectionTitle.fontSize,
+                    color: theme.primary,
+                    fontWeight: styles.sectionTitle.fontWeight,
+                    letterSpacing: styles.sectionTitle.letterSpacing
+                  }}
+                >
+                  About Me
+                </h3>
+              </div>
+              <p 
+                style={{ 
+                  fontSize: styles.text.fontSize,
+                  lineHeight: styles.text.lineHeight,
+                  color: theme.text
+                }}
+              >
                 {userData.summary}
               </p>
             </div>
           )}
 
-          {/* Skills */}
-          {userData.skills && userData.skills.length > 0 && (
+          {/* Skills with Modern Progress Bars */}
+          {hasContent(userData.skills) && (
             <div style={{ marginBottom: styles.spacing.section }}>
-              <h3 className="font-bold" style={{ ...styles.sectionTitle, color: theme.primary, marginBottom: styles.spacing.item }}>
-                SKILLS
-              </h3>
+              <div className="flex items-center gap-2 mb-2">
+                <div 
+                  className="w-1 h-6 rounded"
+                  style={{ backgroundColor: theme.secondary }}
+                />
+                <h3 
+                  className="font-bold"
+                  style={{ 
+                    fontSize: styles.sectionTitle.fontSize,
+                    color: theme.primary,
+                    fontWeight: styles.sectionTitle.fontWeight,
+                    letterSpacing: styles.sectionTitle.letterSpacing
+                  }}
+                >
+                  Skills
+                </h3>
+              </div>
               <div>
-                {userData.skills.slice(0, isSmall ? 4 : 6).map((skill, i) => (
-                  <div key={i} className="flex items-center justify-between" style={{ marginBottom: styles.spacing.item }}>
-                    <span style={{ fontSize: styles.text.fontSize }}>{skill.name}</span>
-                    <div className="flex gap-0.5">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <div
-                          key={star}
-                          className={`w-1 h-1 rounded-full ${star <= skill.rating ? 'bg-purple-500' : 'bg-gray-300'}`}
-                        />
-                      ))}
+                {(userData.skills || []).slice(0, isSmall ? 6 : 10).map((skill, i) => (
+                  <div key={i} style={{ marginBottom: styles.spacing.item }}>
+                    <div className="flex justify-between items-center mb-1">
+                      <span 
+                        className="font-medium"
+                        style={{ fontSize: styles.text.fontSize }}
+                      >
+                        {skill.name}
+                      </span>
+                      <span 
+                        style={{ 
+                          fontSize: styles.subtext.fontSize,
+                          color: theme.secondary 
+                        }}
+                      >
+                        {skill.rating}/5
+                      </span>
+                    </div>
+                    <div 
+                      className="w-full bg-gray-200 rounded-full overflow-hidden"
+                      style={{ height: isSmall ? '3px' : '4px' }}
+                    >
+                      <div
+                        className="h-full rounded-full transition-all duration-300"
+                        style={{
+                          width: `${(skill.rating / 5) * 100}%`,
+                          background: `linear-gradient(90deg, ${theme.primary}, ${theme.secondary})`
+                        }}
+                      />
                     </div>
                   </div>
                 ))}
@@ -184,61 +284,62 @@ export default function CreativeDesigner({ userData, colors, size = 'normal', mo
           )}
 
           {/* Education */}
-          {userData.education && userData.education.length > 0 && (
-            <div>
-              <h3 className="font-bold" style={{ ...styles.sectionTitle, color: theme.primary, marginBottom: styles.spacing.item }}>
-                EDUCATION
-              </h3>
-              <div>
-                {userData.education.slice(0, isSmall ? 1 : 2).map((edu, i) => (
-                  <div key={i} style={{ marginBottom: styles.spacing.section }}>
-                    <p className="font-medium" style={{ fontSize: styles.text.fontSize }}>
-                      {edu.degree || edu.institution}
-                    </p>
-                    <p style={{ fontSize: styles.text.fontSize, color: '#6b7280' }}>
-                      {edu.institution || edu.degree}
-                    </p>
-                    <p style={{ fontSize: styles.text.fontSize, color: '#9ca3af' }}>
-                      {edu.year}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Right Column */}
-        <div className="flex-1" style={{ padding: styles.padding.section }}>
-          {/* Experience */}
-          {userData.experience && userData.experience.length > 0 && (
+          {hasContent(userData.education) && (
             <div style={{ marginBottom: styles.spacing.section }}>
-              <h3 className="font-bold" style={{ ...styles.sectionTitle, color: theme.primary, marginBottom: styles.spacing.item }}>
-                EXPERIENCE
-              </h3>
+              <div className="flex items-center gap-2 mb-2">
+                <div 
+                  className="w-1 h-6 rounded"
+                  style={{ backgroundColor: theme.accent }}
+                />
+                <h3 
+                  className="font-bold"
+                  style={{ 
+                    fontSize: styles.sectionTitle.fontSize,
+                    color: theme.primary,
+                    fontWeight: styles.sectionTitle.fontWeight,
+                    letterSpacing: styles.sectionTitle.letterSpacing
+                  }}
+                >
+                  Education
+                </h3>
+              </div>
               <div>
-                {userData.experience.slice(0, isSmall ? 2 : 3).map((exp, i) => (
-                  <div key={i} className="relative pl-3" style={{ marginBottom: styles.spacing.section }}>
-                    <div 
-                      className="absolute left-0 top-1 w-1.5 h-1.5 rounded-full"
-                      style={{ backgroundColor: theme.accent }}
-                    />
-                    <div className="flex justify-between items-start">
-                      <h4 className="font-bold" style={{ fontSize: styles.text.fontSize }}>
-                        {exp.title || exp.jobTitle || 'Position'}
-                      </h4>
-                      <span style={{ fontSize: styles.text.fontSize, color: '#6b7280' }}>
-                        {exp.duration || `${exp.start_date || ''} - ${exp.end_date || 'Present'}`}
-                      </span>
-                    </div>
-                    <p className="font-medium" style={{ fontSize: styles.text.fontSize, color: theme.secondary }}>
-                      {exp.company || exp.employer || 'Company'}
+                {(userData.education || []).slice(0, isSmall ? 2 : 4).map((edu, i) => (
+                  <div 
+                    key={i} 
+                    style={{ 
+                      marginBottom: styles.spacing.item,
+                      paddingBottom: styles.spacing.micro,
+                      borderLeft: `2px solid ${theme.accent}`,
+                      paddingLeft: styles.spacing.item
+                    }}
+                  >
+                    <p 
+                      className="font-bold"
+                      style={{ 
+                        fontSize: styles.text.fontSize,
+                        color: theme.text
+                      }}
+                    >
+                      {edu.degree || 'Degree'}
                     </p>
-                    {exp.description && (
-                      <p style={{ fontSize: styles.text.fontSize, marginTop: styles.spacing.item, lineHeight: '1.4' }}>
-                        {isSmall && exp.description.length > 100 
-                          ? exp.description.substring(0, 100) + '...' 
-                          : exp.description}
+                    <p 
+                      className="font-medium"
+                      style={{ 
+                        fontSize: styles.subtext.fontSize,
+                        color: theme.secondary
+                      }}
+                    >
+                      {edu.institution || edu.school || 'Institution'}
+                    </p>
+                    {edu.year && (
+                      <p 
+                        style={{ 
+                          fontSize: styles.subtext.fontSize,
+                          color: '#6b7280'
+                        }}
+                      >
+                        {edu.year}
                       </p>
                     )}
                   </div>
@@ -247,22 +348,197 @@ export default function CreativeDesigner({ userData, colors, size = 'normal', mo
             </div>
           )}
 
-          {/* Projects */}
-          {userData.projects && userData.projects.length > 0 && (
+          {/* Languages */}
+          {hasContent(userData.languages) && (
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <div 
+                  className="w-1 h-6 rounded"
+                  style={{ backgroundColor: theme.primary }}
+                />
+                <h3 
+                  className="font-bold"
+                  style={{ 
+                    fontSize: styles.sectionTitle.fontSize,
+                    color: theme.primary,
+                    fontWeight: styles.sectionTitle.fontWeight,
+                    letterSpacing: styles.sectionTitle.letterSpacing
+                  }}
+                >
+                  Languages
+                </h3>
+              </div>
+              <div className="flex flex-wrap gap-1">
+                {(userData.languages || []).slice(0, isSmall ? 4 : 6).map((lang, i) => (
+                  <span 
+                    key={i}
+                    className="px-2 py-1 rounded-full text-white"
+                    style={{ 
+                      fontSize: styles.subtext.fontSize,
+                      backgroundColor: theme.secondary
+                    }}
+                  >
+                    {typeof lang === 'string' ? lang : lang.name || 'Language'}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Right Content */}
+        <div className="flex-1">
+          {/* Professional Experience */}
+          {hasContent(userData.experience) && (
             <div style={{ marginBottom: styles.spacing.section }}>
-              <h3 className="font-bold" style={{ ...styles.sectionTitle, color: theme.primary, marginBottom: styles.spacing.item }}>
-                PROJECTS
-              </h3>
+              <div className="flex items-center gap-2 mb-3">
+                <Briefcase 
+                  style={{ 
+                    width: isSmall ? '12px' : '16px', 
+                    height: isSmall ? '12px' : '16px',
+                    color: theme.primary
+                  }} 
+                />
+                <h3 
+                  className="font-bold"
+                  style={{ 
+                    fontSize: styles.sectionTitle.fontSize,
+                    color: theme.primary,
+                    fontWeight: styles.sectionTitle.fontWeight,
+                    letterSpacing: styles.sectionTitle.letterSpacing
+                  }}
+                >
+                  Professional Experience
+                </h3>
+              </div>
+              <div className="relative">
+                {/* Timeline line */}
+                <div 
+                  className="absolute left-0 top-0 bottom-0 w-0.5 bg-gray-300"
+                  style={{ display: isSmall ? 'none' : 'block' }}
+                />
+                
+                {(userData.experience || []).slice(0, isSmall ? 3 : 5).map((exp, i) => (
+                  <div 
+                    key={i} 
+                    className="relative mb-4"
+                    style={{ 
+                      paddingLeft: isSmall ? '0' : '1rem',
+                      marginBottom: styles.spacing.item
+                    }}
+                  >
+                    {/* Timeline dot */}
+                    {!isSmall && (
+                      <div 
+                        className="absolute left-0 w-2 h-2 rounded-full"
+                        style={{ 
+                          backgroundColor: theme.primary,
+                          top: '2px'
+                        }}
+                      />
+                    )}
+                    
+                    <div style={{ paddingBottom: styles.spacing.micro }}>
+                      <div className="flex justify-between items-start mb-1">
+                        <h4 
+                          className="font-bold"
+                          style={{ 
+                            fontSize: styles.text.fontSize,
+                            color: theme.text
+                          }}
+                        >
+                          {exp.title || exp.jobTitle || 'Position'}
+                        </h4>
+                        <span 
+                          style={{ 
+                            fontSize: styles.subtext.fontSize,
+                            color: theme.primary,
+                            fontWeight: '500'
+                          }}
+                        >
+                          {exp.duration || `${exp.start_date || ''} - ${exp.end_date || 'Present'}`}
+                        </span>
+                      </div>
+                      <p 
+                        className="font-medium mb-1"
+                        style={{ 
+                          fontSize: styles.subtext.fontSize,
+                          color: theme.secondary
+                        }}
+                      >
+                        {exp.company || exp.employer || 'Company'}
+                      </p>
+                      {exp.description && (
+                        <p 
+                          style={{ 
+                            fontSize: styles.text.fontSize,
+                            lineHeight: styles.text.lineHeight,
+                            color: '#4b5563',
+                            marginTop: styles.spacing.micro
+                          }}
+                        >
+                          {isSmall && exp.description.length > 120 
+                            ? exp.description.substring(0, 120) + '...' 
+                            : exp.description}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Projects */}
+          {hasContent(userData.projects) && (
+            <div style={{ marginBottom: styles.spacing.section }}>
+              <div className="flex items-center gap-2 mb-3">
+                <div 
+                  className="w-4 h-4 rounded border-2"
+                  style={{ borderColor: theme.accent }}
+                />
+                <h3 
+                  className="font-bold"
+                  style={{ 
+                    fontSize: styles.sectionTitle.fontSize,
+                    color: theme.primary,
+                    fontWeight: styles.sectionTitle.fontWeight,
+                    letterSpacing: styles.sectionTitle.letterSpacing
+                  }}
+                >
+                  Key Projects
+                </h3>
+              </div>
               <div>
-                {userData.projects.slice(0, isSmall ? 1 : 2).map((project, i) => (
-                  <div key={i} style={{ marginBottom: styles.spacing.section }}>
-                    <h4 className="font-bold" style={{ fontSize: styles.text.fontSize }}>
+                {(userData.projects || []).slice(0, isSmall ? 2 : 4).map((project, i) => (
+                  <div 
+                    key={i} 
+                    style={{ 
+                      marginBottom: styles.spacing.item,
+                      paddingBottom: styles.spacing.micro,
+                      borderLeft: `2px solid ${theme.accent}`,
+                      paddingLeft: styles.spacing.item
+                    }}
+                  >
+                    <h4 
+                      className="font-bold mb-1"
+                      style={{ 
+                        fontSize: styles.text.fontSize,
+                        color: theme.text
+                      }}
+                    >
                       {project.name || 'Project Name'}
                     </h4>
                     {project.description && (
-                      <p style={{ fontSize: styles.text.fontSize, marginTop: styles.spacing.item, lineHeight: '1.4' }}>
-                        {isSmall && project.description.length > 80 
-                          ? project.description.substring(0, 80) + '...' 
+                      <p 
+                        style={{ 
+                          fontSize: styles.text.fontSize,
+                          lineHeight: styles.text.lineHeight,
+                          color: '#4b5563'
+                        }}
+                      >
+                        {isSmall && project.description.length > 100 
+                          ? project.description.substring(0, 100) + '...' 
                           : project.description}
                       </p>
                     )}
@@ -272,41 +548,132 @@ export default function CreativeDesigner({ userData, colors, size = 'normal', mo
             </div>
           )}
 
-          {/* Links */}
-          <div>
-            <h3 className="font-bold" style={{ ...styles.sectionTitle, color: theme.primary, marginBottom: styles.spacing.item }}>
-              PORTFOLIO
-            </h3>
-            <div className="flex gap-2" style={{ fontSize: styles.text.fontSize }}>
-              {userData.linkedin_url && (
-                <div 
-                  className="flex items-center gap-1 px-2 py-1 rounded" 
-                  style={{ backgroundColor: theme.primary, color: 'white' }}
+          {/* Certifications */}
+          {hasContent(userData.certifications) && (
+            <div style={{ marginBottom: styles.spacing.section }}>
+              <div className="flex items-center gap-2 mb-3">
+                <Award 
+                  style={{ 
+                    width: isSmall ? '12px' : '16px', 
+                    height: isSmall ? '12px' : '16px',
+                    color: theme.accent
+                  }} 
+                />
+                <h3 
+                  className="font-bold"
+                  style={{ 
+                    fontSize: styles.sectionTitle.fontSize,
+                    color: theme.primary,
+                    fontWeight: styles.sectionTitle.fontWeight,
+                    letterSpacing: styles.sectionTitle.letterSpacing
+                  }}
                 >
-                  <Linkedin className="h-2 w-2" />
-                  <span>LinkedIn</span>
-                </div>
-              )}
-              {userData.github_url && (
-                <div 
-                  className="flex items-center gap-1 px-2 py-1 rounded" 
-                  style={{ backgroundColor: theme.secondary, color: 'white' }}
-                >
-                  <Github className="h-2 w-2" />
-                  <span>GitHub</span>
-                </div>
-              )}
-              {userData.portfolio_url && (
-                <div 
-                  className="flex items-center gap-1 px-2 py-1 rounded" 
-                  style={{ backgroundColor: theme.accent, color: 'white' }}
-                >
-                  <Globe className="h-2 w-2" />
-                  <span>Portfolio</span>
-                </div>
-              )}
+                  Certifications
+                </h3>
+              </div>
+              <div>
+                {(userData.certifications || []).slice(0, isSmall ? 3 : 5).map((cert, i) => (
+                  <div 
+                    key={i} 
+                    className="flex items-start gap-2 mb-2"
+                  >
+                    <div 
+                      className="w-1.5 h-1.5 rounded-full flex-shrink-0 mt-1"
+                      style={{ backgroundColor: theme.accent }}
+                    />
+                    <div>
+                      <p 
+                        className="font-medium"
+                        style={{ 
+                          fontSize: styles.text.fontSize,
+                          color: theme.text
+                        }}
+                      >
+                        {cert.name || cert.title || 'Certification'}
+                      </p>
+                      {(cert.issuer || cert.year) && (
+                        <p 
+                          style={{ 
+                            fontSize: styles.subtext.fontSize,
+                            color: '#6b7280'
+                          }}
+                        >
+                          {cert.issuer && cert.year ? `${cert.issuer} • ${cert.year}` : cert.issuer || cert.year}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
+
+          {/* Professional Links */}
+          {(hasContent(userData.linkedin_url) || hasContent(userData.github_url) || hasContent(userData.portfolio_url)) && (
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <Globe 
+                  style={{ 
+                    width: isSmall ? '12px' : '16px', 
+                    height: isSmall ? '12px' : '16px',
+                    color: theme.primary
+                  }} 
+                />
+                <h3 
+                  className="font-bold"
+                  style={{ 
+                    fontSize: styles.sectionTitle.fontSize,
+                    color: theme.primary,
+                    fontWeight: styles.sectionTitle.fontWeight,
+                    letterSpacing: styles.sectionTitle.letterSpacing
+                  }}
+                >
+                  Professional Links
+                </h3>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                {hasContent(userData.linkedin_url) && (
+                  <a
+                    href={userData.linkedin_url}
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg text-white font-medium transition-all hover:scale-105"
+                    style={{ 
+                      backgroundColor: theme.primary,
+                      fontSize: styles.text.fontSize
+                    }}
+                  >
+                    <Linkedin style={{ width: isSmall ? '10px' : '14px', height: isSmall ? '10px' : '14px' }} />
+                    LinkedIn
+                  </a>
+                )}
+                {hasContent(userData.github_url) && (
+                  <a
+                    href={userData.github_url}
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg text-white font-medium transition-all hover:scale-105"
+                    style={{ 
+                      backgroundColor: theme.secondary,
+                      fontSize: styles.text.fontSize
+                    }}
+                  >
+                    <Github style={{ width: isSmall ? '10px' : '14px', height: isSmall ? '10px' : '14px' }} />
+                    GitHub
+                  </a>
+                )}
+                {hasContent(userData.portfolio_url) && (
+                  <a
+                    href={userData.portfolio_url}
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg text-white font-medium transition-all hover:scale-105"
+                    style={{ 
+                      backgroundColor: theme.accent,
+                      fontSize: styles.text.fontSize
+                    }}
+                  >
+                    <Globe style={{ width: isSmall ? '10px' : '14px', height: isSmall ? '10px' : '14px' }} />
+                    Portfolio
+                  </a>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

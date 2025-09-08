@@ -60,121 +60,31 @@ function ResumePage() {
     }
 
     const generatePDF = async (element: HTMLElement) => {
-        const [{ default: html2canvas }, { default: jsPDF }] = await Promise.all([
-            import('html2canvas'),
-            import('jspdf')
-        ])
+        try {
+            const response = await fetch("/api", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    html: element.outerHTML, // send HTML for Puppeteer
+                }),
+            });
 
-        const clonedElement = element.cloneNode(true) as HTMLElement
-        const tempContainer = document.createElement('div')
+            if (!response.ok) {
+                throw new Error(`PDF generation failed: ${response.statusText}`);
+            }
 
-        Object.assign(tempContainer.style, {
-            position: 'absolute',
-            left: '-9999px',
-            top: '0',
-            width: '794px',
-            height: '1123px',
-            backgroundColor: '#ffffff'
-        })
-
-        tempContainer.appendChild(clonedElement)
-        document.body.appendChild(tempContainer)
-
-        Object.assign(clonedElement.style, {
-            width: '794px',
-            height: '1123px',
-            transform: 'scale(1)',
-            margin: '0',
-            padding: '20px',
-            boxSizing: 'border-box'
-        })
-
-        await new Promise(resolve => setTimeout(resolve, 100))
-
-        const canvas = await html2canvas(clonedElement, {
-            scale: 2,
-            useCORS: true,
-            allowTaint: true,
-            backgroundColor: '#ffffff',
-            width: 794,
-            height: 1123,
-            scrollX: 0,
-            scrollY: 0
-        })
-
-        document.body.removeChild(tempContainer)
-
-        const imgData = canvas.toDataURL('image/png', 1.0)
-        const pdf = new jsPDF({
-            orientation: 'portrait',
-            unit: 'mm',
-            format: 'a4'
-        })
-
-        pdf.addImage(imgData, 'PNG', 0, 0, 210, 297)
-        const filename = `${personalInfo.firstName || 'Resume'}_${personalInfo.lastName || 'Document'}.pdf`.replace(/\s+/g, '_')
-        pdf.save(filename)
-    }
-
-    const printFallback = (content: HTMLElement) => {
-        const printWindow = window.open('', '_blank')
-        if (!printWindow) throw new Error('Unable to open print dialog')
-
-        const styles = Array.from(document.styleSheets)
-            .map(styleSheet => {
-                try {
-                    return Array.from(styleSheet.cssRules)
-                        .map(rule => rule.cssText)
-                        .join('\n')
-                } catch (e) {
-                    return ''
-                }
-            })
-            .join('\n')
-
-        printWindow.document.write(`
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <title>Resume</title>
-                <style>
-                    ${styles}
-                    @media print {
-                        * { 
-                            -webkit-print-color-adjust: exact !important;
-                            color-adjust: exact !important;
-                            print-color-adjust: exact !important;
-                        }
-                        @page { 
-                            size: A4; 
-                            margin: 10mm; 
-                        }
-                        body { 
-                            margin: 0; 
-                            padding: 0; 
-                            font-family: system-ui, -apple-system, sans-serif;
-                        }
-                        [data-resume-content] {
-                            width: 100% !important;
-                            max-width: 100% !important;
-                            margin: 0 !important;
-                            box-shadow: none !important;
-                            border: none !important;
-                        }
-                    }
-                </style>
-            </head>
-            <body>
-                ${content.outerHTML}
-            </body>
-            </html>
-        `)
-
-        printWindow.document.close()
-        setTimeout(() => {
-            printWindow.print()
-            printWindow.close()
-        }, 500)
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            const filename = `${personalInfo.firstName || 'Resume'}_${personalInfo.lastName || 'Document'}.pdf`.replace(/\s+/g, '_');
+            link.download = filename;
+            link.click();
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error("PDF generation error:", error);
+            throw error;
+        }
     }
 
     const handleDownload = async () => {
@@ -187,23 +97,17 @@ function ResumePage() {
 
         setIsDownloading(true)
         try {
-            // Always try to get the desktop version first, then fallback to mobile
             let resumeContent = document.querySelector(".hidden.sm\\:block [data-resume-content]") as HTMLElement
             if (!resumeContent) {
                 resumeContent = document.querySelector("[data-resume-content]") as HTMLElement
             }
-            
+
             if (!resumeContent) {
                 alert('Resume content not found. Please refresh and try again.')
                 return
             }
 
-            try {
-                await generatePDF(resumeContent)
-            } catch (canvasError) {
-                console.warn('Canvas method failed, using print fallback:', canvasError)
-                printFallback(resumeContent)
-            }
+            await generatePDF(resumeContent)
         } catch (error: any) {
             console.error("Download error:", error)
             alert(`Download failed: ${error.message || 'Please try again.'}`)
@@ -231,7 +135,6 @@ function ResumePage() {
             return
         }
 
-        // If UUID already exists and shareUrl is set, just copy it
         if (shareableUuid && shareUrl) {
             copyShareUrl()
             return
@@ -309,82 +212,90 @@ function ResumePage() {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-100 via-gray-50 to-blue-50 overflow-x-hidden">
-            {/* Header */}
-            <div className="bg-white/95 backdrop-blur-sm border-b border-gray-200/50 print:hidden shadow-sm sticky top-0 z-20">
-                <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
-                    <div className="flex items-center justify-between h-12 sm:h-16">
-                        <div className="flex items-center space-x-1 sm:space-x-4 min-w-0 flex-1">
+            {/* Simplified Header */}
+            <div className="bg-white shadow-sm print:hidden sticky top-0 z-20 border-b">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="flex items-center justify-between h-16">
+                        <div className="flex items-center space-x-4">
                             <Link
                                 href="/resusme"
-                                className="flex items-center space-x-1 text-gray-600 hover:text-blue-600 transition-colors flex-shrink-0 p-1"
+                                className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors"
                             >
-                                <ArrowLeft className="w-4 h-4" />
-                                <span className="text-xs sm:text-sm hidden xs:inline">Back</span>
+                                <ArrowLeft className="w-5 h-5" />
+                                <span className="font-medium">Back to Dashboard</span>
                             </Link>
-                            <div className="h-3 w-px bg-gray-300 hidden sm:block" />
-                            <h1 className="text-xs sm:text-lg font-semibold text-gray-900 truncate">
-                                <span className="hidden lg:inline">{personalInfo.firstName} {personalInfo.lastName}'s Resume</span>
-                                <span className="lg:hidden">{personalInfo.firstName || 'Resume'}</span>
+                        </div>
+
+                        <div className="flex-1 text-center">
+                            <h1 className="text-xl font-semibold text-gray-900">
+                                {personalInfo.firstName} {personalInfo.lastName}'s Resume
                             </h1>
                         </div>
 
-                        <div className="flex items-center space-x-0.5 sm:space-x-2 flex-shrink-0">
-                            <Link
-                                href={`/template/${templateId}?resumeId=${resumeId}`}
-                                className="flex items-center space-x-0.5 sm:space-x-1 px-1.5 sm:px-3 py-1 sm:py-2 text-xs text-gray-700 hover:text-blue-600 border border-gray-300 rounded hover:bg-blue-50 hover:border-blue-300 transition-all"
-                            >
-                                <Edit className="w-3 h-3 sm:w-4 sm:h-4" />
-                                <span className="hidden sm:inline">Edit</span>
-                            </Link>
+                        <div className="w-32"></div> {/* Spacer for balance */}
+                    </div>
+                </div>
+            </div>
 
-                            <button
-                                onClick={handleSave}
-                                disabled={isSaving}
-                                className="flex items-center space-x-0.5 sm:space-x-1 px-1.5 sm:px-3 py-1 sm:py-2 text-xs text-green-700 hover:text-green-800 border border-green-300 rounded hover:bg-green-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                            >
-                                <Save className="w-3 h-3 sm:w-4 sm:h-4" />
-                                <span className="hidden sm:inline">{isSaving ? 'Saving...' : 'Save'}</span>
-                            </button>
+            {/* Action Buttons - Centered above PDF */}
+            <div className="print:hidden py-6">
+                <div className="max-w-4xl mx-auto px-4">
+                    <div className="flex justify-center items-center space-x-6">
+                        <Link
+                            href={`/template/${templateId}?resumeId=${resumeId}`}
+                            className="text-gray-700 hover:text-blue-600 font-medium transition-colors flex items-center space-x-2"
+                        >
+                            <Edit className="w-4 h-4" />
+                            <span>Edit Resume</span>
+                        </Link>
 
-                            <button
-                                onClick={handleShare}
-                                disabled={isSharing}
-                                className="flex items-center space-x-0.5 sm:space-x-1 px-1.5 sm:px-3 py-1 sm:py-2 text-xs text-purple-700 hover:text-purple-800 border border-purple-300 rounded hover:bg-purple-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                            >
-                                {showShareSuccess ? (
-                                    <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-600" />
-                                ) : (
-                                    <Share className="w-3 h-3 sm:w-4 sm:h-4" />
-                                )}
-                                <span className="hidden sm:inline">
-                                    {isSharing ? 'Sharing...' : showShareSuccess ? 'Copied!' : 'Share'}
-                                </span>
-                            </button>
+                        <button
+                            onClick={handleSave}
+                            disabled={isSaving}
+                            className="text-green-700 hover:text-green-800 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                        >
+                            <Save className="w-4 h-4" />
+                            <span>{isSaving ? 'Saving...' : 'Save Resume'}</span>
+                        </button>
 
-                            <button
-                                onClick={handleDownload}
-                                disabled={isDownloading}
-                                className="flex items-center space-x-0.5 sm:space-x-1 px-1.5 sm:px-3 py-1 sm:py-2 text-xs bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded hover:from-blue-600 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md hover:shadow-lg"
-                                title={(!user || !isPremium) ? 'Premium feature - Upgrade to download' : ''}
-                            >
-                                <Download className="w-3 h-3 sm:w-4 sm:h-4" />
-                                <span className="hidden sm:inline">
-                                    {isDownloading ? 'Downloading...' : (!user || !isPremium) ? 'Premium' : 'Download'}
-                                </span>
-                            </button>
-                        </div>
+                        <button
+                            onClick={handleShare}
+                            disabled={isSharing}
+                            className="text-purple-700 hover:text-purple-800 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                        >
+                            {showShareSuccess ? (
+                                <CheckCircle className="w-4 h-4 text-green-600" />
+                            ) : (
+                                <Share className="w-4 h-4" />
+                            )}
+                            <span>
+                                {isSharing ? 'Sharing...' : showShareSuccess ? 'Link Copied!' : 'Share Resume'}
+                            </span>
+                        </button>
+
+                        <button
+                            onClick={handleDownload}
+                            disabled={isDownloading}
+                            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 shadow-md"
+                            title={(!user || !isPremium) ? 'Premium feature - Upgrade to download' : ''}
+                        >
+                            <Download className="w-4 h-4" />
+                            <span>
+                                {isDownloading ? 'Downloading...' : (!user || !isPremium) ? 'Upgrade to Download' : 'Download PDF'}
+                            </span>
+                        </button>
                     </div>
                 </div>
             </div>
 
             {/* Resume Content */}
-            <div className="flex justify-center items-start min-h-[calc(100vh-3rem)] sm:min-h-[calc(100vh-4rem)] py-1 sm:py-4 px-1 sm:px-4">
+            <div className="flex justify-center items-start pb-8 px-4">
                 <div className="w-full mx-auto">
                     {/* Mobile view - smaller scale */}
                     <div className="block sm:hidden w-full">
-                        <div 
-                            className="mx-auto bg-white shadow-lg rounded-lg overflow-hidden"
-                            style={{ 
+                        <div
+                            className="mx-auto bg-white shadow-xl rounded-lg overflow-hidden border"
+                            style={{
                                 width: '95vw',
                                 maxWidth: '350px',
                                 minHeight: '480px',
@@ -398,13 +309,13 @@ function ResumePage() {
                             </div>
                         </div>
                     </div>
-                    
+
                     {/* Desktop view - A4 size */}
                     <div className="hidden sm:block max-w-4xl mx-auto">
-                        <div 
-                            className="mx-auto bg-white shadow-lg rounded-lg overflow-hidden"
-                            style={{ 
-                                maxWidth: '794px', 
+                        <div
+                            className="mx-auto bg-white shadow-xl rounded-lg overflow-hidden border"
+                            style={{
+                                maxWidth: '794px',
                                 minHeight: '1123px',
                                 width: '100%'
                             }}

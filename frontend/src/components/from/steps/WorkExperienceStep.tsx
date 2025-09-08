@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import { useResumeStore } from '@/store/resumeStore'
-import axiosInstance from '@/lib/axios'
+import { useStreamingWorkExperience } from '@/utils/cvStreamingApi'
 import type { WorkExperience } from '@/store/resumeStore'
 import AddExperienceView from './work-experience/AddExperienceView'
 import ExperienceFormView from './work-experience/ExperienceFormView'
@@ -17,10 +17,12 @@ type ViewState = 'list' | 'form' | 'description'
 
 function WorkExperienceStep({ onNext, onPrev }: WorkExperienceStepProps) {
   const { addWorkExperience, updateWorkExperience, workExperience } = useResumeStore()
+  const { generateWorkExperience } = useStreamingWorkExperience()
   const [currentView, setCurrentView] = useState<ViewState>('list')
   const [editingId, setEditingId] = useState<string | null>(null)
   const [aiSuggestions, setAiSuggestions] = useState<string[]>([])
   const [isLoadingAI, setIsLoadingAI] = useState(false)
+  const [streamingContent, setStreamingContent] = useState('')
   const [formData, setFormData] = useState<Omit<WorkExperience, 'id'>>({
     jobTitle: '',
     employer: '',
@@ -72,31 +74,40 @@ function WorkExperienceStep({ onNext, onPrev }: WorkExperienceStepProps) {
 
   const handleFormNext = async () => {
     setIsLoadingAI(true)
-    // Show description page after 1 second, don't wait for API completion
-    setTimeout(() => {
-      setCurrentView('description')
-    }, 1000)
+    setStreamingContent('')
+    setAiSuggestions([])
 
-    // Generate AI suggestions in background
-    try {
-      const response = await axiosInstance.post('/api/public/cv-gen/work-experience', {
-        job_title: formData.jobTitle,
+    // Show description page immediately
+    setCurrentView('description')
+
+    // Generate AI suggestions using streaming
+    await generateWorkExperience(
+      {
+        jobTitle: formData.jobTitle,
         company: formData.employer,
         location: formData.isRemote ? 'Remote' : (formData.location || 'Not specified'),
         role: formData.role || 'Not specified',
-        start_date: formData.startDate,
-        end_date: formData.isCurrentlyWorking ? 'Present' : formData.endDate,
-      })
-
-      if (response.data?.points && Array.isArray(response.data.points)) {
-        setAiSuggestions(response.data.points)
+        startDate: formData.startDate,
+        endDate: formData.isCurrentlyWorking ? 'Present' : formData.endDate,
+      },
+      // onChunk - update streaming content
+      (content: string) => {
+        setStreamingContent(prev => prev + content)
+      },
+      // onComplete - set final suggestions
+      (points: string[]) => {
+        setAiSuggestions(points)
+        setIsLoadingAI(false)
+        setStreamingContent('')
+      },
+      // onError
+      (error: string) => {
+        console.error('Failed to fetch AI suggestions:', error)
+        setAiSuggestions([])
+        setIsLoadingAI(false)
+        setStreamingContent('')
       }
-    } catch (error) {
-      console.error('Failed to fetch AI suggestions:', error)
-      setAiSuggestions([])
-    } finally {
-      setIsLoadingAI(false)
-    }
+    )
   }
 
   const handleSave = () => {
@@ -141,6 +152,7 @@ function WorkExperienceStep({ onNext, onPrev }: WorkExperienceStepProps) {
             onBack={() => setCurrentView('form')}
             aiSuggestions={aiSuggestions}
             isLoadingAI={isLoadingAI}
+            streamingContent={streamingContent}
             isEditing={!!editingId}
           />
         )

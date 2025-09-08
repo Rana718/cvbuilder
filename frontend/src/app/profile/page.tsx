@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { useAuth } from '@/components/AuthContext'
+import { useAdminAuth } from '@/hooks/useAdminAuth'
 import { signOut } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
 import { useRouter } from 'next/navigation'
@@ -115,6 +116,7 @@ interface ProfileStats {
 
 function ProfilePage() {
     const { user, loading: authLoading } = useAuth()
+    const { isAdmin, isSuperAdmin, loading: adminLoading } = useAdminAuth()
     const { isPremium, loading: premiumLoading, subscriptionStatus, refreshStatus } = usePremiumStatus()
     const router = useRouter()
     const [profile, setProfile] = useState<UserProfile | null>(null)
@@ -123,8 +125,6 @@ function ProfilePage() {
     const [error, setError] = useState('')
     const [isEditing, setIsEditing] = useState(false)
     const [showPaymentHistory, setShowPaymentHistory] = useState(false)
-    const [isAdmin, setIsAdmin] = useState(false)
-    const [isSuperAdmin, setIsSuperAdmin] = useState(false)
     const [editForm, setEditForm] = useState({
         full_name: ''
     })
@@ -139,24 +139,7 @@ function ProfilePage() {
 
         fetchProfile()
         fetchStats()
-        checkAdminStatus()
     }, [user, authLoading, router])
-
-    const checkAdminStatus = async () => {
-        if (!user) return
-
-        try {
-            const tokenResult = await user.getIdTokenResult(true)
-            const claims = tokenResult.claims
-
-            setIsAdmin(claims.admin === true || claims.admin === "true")
-            setIsSuperAdmin(claims.superAdmin === true || claims.superAdmin === "true")
-        } catch (error) {
-            console.error('Failed to check admin status:', error)
-            setIsAdmin(false)
-            setIsSuperAdmin(false)
-        }
-    }
 
     const fetchProfile = async () => {
         try {
@@ -253,7 +236,7 @@ function ProfilePage() {
         })
     }
 
-    if (authLoading || loading || premiumLoading) {
+    if (authLoading || loading || premiumLoading || adminLoading) {
         return (
             <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
                 <div className="text-center">

@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react'
 import { FileText, ChevronLeft, ChevronRight, Sparkles, Target, User } from 'lucide-react'
 import { useResumeStore } from '@/store/resumeStore'
 import SimpleRichTextEditor from '@/components/ui/SimpleRichTextEditor'
-import axiosInstance from '@/lib/axios'
+import { useStreamingSummary } from '@/utils/cvStreamingApi'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter, useSearchParams } from 'next/navigation'
 
@@ -15,6 +15,7 @@ function SummaryStep({ onNext, onPrev }: SummaryStepProps) {
     const router = useRouter()
     const searchParams = useSearchParams()
     const resumeStore = useResumeStore()
+    const { generateSummary } = useStreamingSummary()
     const { 
         summary, 
         setSummary,  
@@ -30,6 +31,7 @@ function SummaryStep({ onNext, onPrev }: SummaryStepProps) {
     
     const [aiSuggestions, setAiSuggestions] = useState<string[]>([])
     const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false)
+    const [streamingContent, setStreamingContent] = useState('')
     const [isSaving, setIsSaving] = useState(false)
     
     const hasCalledAPI = useRef(false)
@@ -77,22 +79,33 @@ function SummaryStep({ onNext, onPrev }: SummaryStepProps) {
         }
         
         setIsLoadingSuggestions(true)
+        setStreamingContent('')
+        setAiSuggestions([])
         hasCalledAPI.current = true
         
-        try {
-            const cvData = buildCvData()
-            const response = await axiosInstance.post('/api/public/cv-gen/summary', cvData)
-            
-            if (response.data?.suggestions && Array.isArray(response.data.suggestions)) {
-                setAiSuggestions(response.data.suggestions)
+        const cvData = buildCvData()
+        
+        await generateSummary(
+            { cvData },
+            // onChunk - update streaming content
+            (content: string) => {
+                setStreamingContent(prev => prev + content)
+            },
+            // onComplete - set final suggestions
+            (summary: string[]) => {
+                setAiSuggestions(summary)
+                setIsLoadingSuggestions(false)
+                setStreamingContent('')
+            },
+            // onError
+            (error: string) => {
+                console.error('Failed to fetch AI summary suggestions:', error)
+                setIsLoadingSuggestions(false)
+                setStreamingContent('')
+                // Reset the flag on error so user can retry
+                hasCalledAPI.current = false
             }
-        } catch (error) {
-            console.error('Failed to fetch AI summary suggestions:', error)
-            // Reset the flag on error so user can retry
-            hasCalledAPI.current = false
-        } finally {
-            setIsLoadingSuggestions(false)
-        }
+        )
     }
 
     // Removed automatic fetch; user triggers with button below
@@ -220,18 +233,34 @@ function SummaryStep({ onNext, onPrev }: SummaryStepProps) {
                                     initial={{ opacity: 0, y: 10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: -10 }}
-                                    className="flex items-center justify-center py-12 bg-white rounded-sm border border-blue-500"
+                                    className="space-y-4"
                                 >
-                                    <div className="text-center">
-                                        <motion.div
-                                            animate={{ rotate: 360 }}
-                                            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                                            className="w-8 h-8 border-3 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"
-                                        />
-                                        <p className="text-sm text-gray-600 font-medium">
-                                            AI is crafting personalized summary suggestions...
-                                        </p>
+                                    <div className="flex items-center justify-center py-8 bg-white rounded-sm border border-blue-500">
+                                        <div className="text-center">
+                                            <motion.div
+                                                animate={{ rotate: 360 }}
+                                                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                                                className="w-8 h-8 border-3 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"
+                                            />
+                                            <p className="text-sm text-gray-600 font-medium">
+                                                AI is crafting personalized summary suggestions...
+                                            </p>
+                                        </div>
                                     </div>
+                                    
+                                    {/* Show streaming content in real-time */}
+                                    {streamingContent && (
+                                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                            <div className="flex items-center space-x-2 mb-2">
+                                                <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                                                <span className="text-sm font-medium text-blue-700">Live Generation</span>
+                                            </div>
+                                            <div className="text-sm text-gray-700 font-mono bg-white p-3 rounded border">
+                                                {streamingContent}
+                                                <span className="animate-pulse">|</span>
+                                            </div>
+                                        </div>
+                                    )}
                                 </motion.div>
                             )}
                             

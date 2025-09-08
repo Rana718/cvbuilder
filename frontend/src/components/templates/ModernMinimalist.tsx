@@ -48,73 +48,111 @@ export default function ModernMinimalist({ userData, colors, size = 'normal', mo
 
   const isSmall = size === 'small';
   
-  // Size-based styling
+  // A4 optimized sizing
   const styles = {
     container: {
-      fontSize: isSmall ? '0.35rem' : '0.875rem',
-      lineHeight: isSmall ? '1.1' : '1.4',
-      padding: isSmall ? '0.25rem' : '1rem'
+      fontSize: isSmall ? '6px' : '11px',
+      lineHeight: isSmall ? 1.2 : 1.4,
+      fontFamily: "'Inter', sans-serif"
     },
-    heading: {
-      fontSize: isSmall ? '0.5rem' : '1.25rem',
-      marginBottom: isSmall ? '0.125rem' : '0.5rem'
+    name: {
+      fontSize: isSmall ? '14px' : '24px',
+      fontWeight: '700'
     },
-    subheading: {
-      fontSize: isSmall ? '0.4rem' : '1rem',
-      marginBottom: isSmall ? '0.125rem' : '0.375rem'
+    jobTitle: {
+      fontSize: isSmall ? '8px' : '14px',
+      fontWeight: '500'
     },
     sectionTitle: {
-      fontSize: isSmall ? '0.4rem' : '0.875rem',
-      marginBottom: isSmall ? '0.125rem' : '0.25rem'
+      fontSize: isSmall ? '7px' : '12px',
+      fontWeight: '700',
+      letterSpacing: '0.5px',
+      textTransform: 'uppercase' as const
     },
     text: {
-      fontSize: isSmall ? '0.35rem' : '0.75rem',
-      marginBottom: isSmall ? '0.125rem' : '0.25rem'
+      fontSize: isSmall ? '6px' : '10px',
+      lineHeight: isSmall ? 1.3 : 1.5
     },
     spacing: {
-      section: isSmall ? '0.25rem' : '1rem',
-      item: isSmall ? '0.125rem' : '0.5rem'
+      section: isSmall ? '8px' : '16px',
+      item: isSmall ? '4px' : '8px'
+    },
+    padding: {
+      container: isSmall ? '8px' : '20px',
+      section: isSmall ? '6px' : '12px'
     }
+  };
+
+  // Helper function to check if section has content
+  const hasContent = (data: any) => {
+    if (Array.isArray(data)) return data && data.length > 0;
+    return data && data.trim && data.trim().length > 0;
   };
 
   return (
     <div
       className="w-full h-full flex flex-col bg-white"
       style={{
-        fontFamily: 'Inter, sans-serif',
-        backgroundColor: theme.background,
-        color: theme.text,
+        fontFamily: styles.container.fontFamily,
         fontSize: styles.container.fontSize,
         lineHeight: styles.container.lineHeight,
-        padding: styles.container.padding
+        color: theme.text,
+        backgroundColor: theme.background,
+        minHeight: isSmall ? 'auto' : '297mm',
+        width: isSmall ? 'auto' : '210mm',
+        margin: '0 auto',
+        boxShadow: isSmall ? 'none' : '0 0 20px rgba(0,0,0,0.1)',
+        padding: styles.padding.container
       }}
     >
       {/* Header */}
-      <div className="text-center border-b border-gray-200" style={{ paddingBottom: styles.spacing.item, marginBottom: styles.spacing.section }}>
-        <h1 className="font-bold" style={{ ...styles.heading, color: theme.primary }}>
+      <div 
+        className="text-center border-b border-gray-200 pb-4 mb-6"
+        style={{ 
+          paddingBottom: styles.spacing.item, 
+          marginBottom: styles.spacing.section,
+          borderBottomWidth: '1px',
+          borderBottomColor: '#e5e7eb'
+        }}
+      >
+        <h1 
+          className="font-bold mb-1"
+          style={{ 
+            fontSize: styles.name.fontSize,
+            fontWeight: styles.name.fontWeight,
+            color: theme.primary
+          }}
+        >
           {userData.name || "Your Name"}
         </h1>
-        {userData.job_title && (
-          <p className="font-medium" style={{ ...styles.subheading, color: theme.secondary }}>
+        {hasContent(userData.job_title) && (
+          <p 
+            className="font-medium mb-2"
+            style={{ 
+              fontSize: styles.jobTitle.fontSize,
+              fontWeight: styles.jobTitle.fontWeight,
+              color: theme.secondary
+            }}
+          >
             {userData.job_title}
           </p>
         )}
-        <div className="flex flex-wrap justify-center gap-1" style={{ fontSize: styles.text.fontSize }}>
-          {userData.email && (
-            <div className="flex items-center gap-0.5">
-              <Mail className="h-2 w-2" />
+        <div className="flex flex-wrap justify-center gap-2" style={{ fontSize: styles.text.fontSize }}>
+          {hasContent(userData.email) && (
+            <div className="flex items-center gap-1">
+              <Mail style={{ width: isSmall ? '8px' : '12px', height: isSmall ? '8px' : '12px' }} />
               <span>{userData.email}</span>
             </div>
           )}
-          {userData.phone && (
-            <div className="flex items-center gap-0.5">
-              <Phone className="h-2 w-2" />
+          {hasContent(userData.phone) && (
+            <div className="flex items-center gap-1">
+              <Phone style={{ width: isSmall ? '8px' : '12px', height: isSmall ? '8px' : '12px' }} />
               <span>{userData.phone}</span>
             </div>
           )}
-          {userData.address && (
-            <div className="flex items-center gap-0.5">
-              <MapPin className="h-2 w-2" />
+          {hasContent(userData.address) && (
+            <div className="flex items-center gap-1">
+              <MapPin style={{ width: isSmall ? '8px' : '12px', height: isSmall ? '8px' : '12px' }} />
               <span>{userData.address}</span>
             </div>
           )}
@@ -122,28 +160,43 @@ export default function ModernMinimalist({ userData, colors, size = 'normal', mo
       </div>
 
       {/* Content */}
-      <div className="flex-1 flex">
+      <div className="flex-1 flex gap-4">
         {/* Left Column */}
-        <div className="w-1/3 bg-gray-50" style={{ padding: styles.spacing.item }}>
+        <div 
+          className="w-1/3 bg-gray-50 rounded-lg"
+          style={{ padding: styles.padding.section }}
+        >
           {/* Skills */}
-          {userData.skills && userData.skills.length > 0 && (
+          {hasContent(userData.skills) && (
             <div style={{ marginBottom: styles.spacing.section }}>
-              <h3 className="font-bold uppercase tracking-wide" style={{ ...styles.sectionTitle, color: theme.primary }}>
+              <h3 
+                className="font-bold uppercase tracking-wide mb-2"
+                style={{ 
+                  fontSize: styles.sectionTitle.fontSize,
+                  color: theme.primary,
+                  fontWeight: styles.sectionTitle.fontWeight,
+                  letterSpacing: styles.sectionTitle.letterSpacing
+                }}
+              >
                 Skills
               </h3>
               <div>
-                {userData.skills.slice(0, isSmall ? 8 : 12).map((skill, i) => (
+                {(userData.skills || []).slice(0, isSmall ? 8 : 12).map((skill, i) => (
                   <div key={i} style={{ marginBottom: styles.spacing.item }}>
-                    <div className="flex justify-between items-center">
-                      <span style={{ fontSize: styles.text.fontSize }}>{skill.name}</span>
-                      <div className="flex gap-0.5">
-                        {[1, 2, 3, 4, 5].map((star) => (
-                          <div
-                            key={star}
-                            className={`w-1 h-1 rounded-full ${star <= skill.rating ? 'bg-blue-500' : 'bg-gray-300'}`}
-                          />
-                        ))}
-                      </div>
+                    <div className="flex justify-between items-center mb-1">
+                      <span style={{ fontSize: styles.text.fontSize, fontWeight: '500' }}>{skill.name}</span>
+                      <span style={{ fontSize: styles.text.fontSize, color: theme.secondary }}>
+                        {skill.rating}/5
+                      </span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-1">
+                      <div
+                        className="h-full rounded-full"
+                        style={{
+                          width: `${(skill.rating / 5) * 100}%`,
+                          backgroundColor: theme.primary
+                        }}
+                      />
                     </div>
                   </div>
                 ))}
@@ -152,13 +205,21 @@ export default function ModernMinimalist({ userData, colors, size = 'normal', mo
           )}
 
           {/* Education */}
-          {userData.education && userData.education.length > 0 && (
+          {hasContent(userData.education) && (
             <div style={{ marginBottom: styles.spacing.section }}>
-              <h3 className="font-bold uppercase tracking-wide" style={{ ...styles.sectionTitle, color: theme.primary }}>
+              <h3 
+                className="font-bold uppercase tracking-wide mb-2"
+                style={{ 
+                  fontSize: styles.sectionTitle.fontSize,
+                  color: theme.primary,
+                  fontWeight: styles.sectionTitle.fontWeight,
+                  letterSpacing: styles.sectionTitle.letterSpacing
+                }}
+              >
                 Education
               </h3>
               <div>
-                {userData.education.slice(0, isSmall ? 2 : 4).map((edu, i) => (
+                {(userData.education || []).slice(0, isSmall ? 3 : 4).map((edu, i) => (
                   <div key={i} style={{ marginBottom: styles.spacing.item }}>
                     <p className="font-medium" style={{ fontSize: styles.text.fontSize }}>
                       {edu.degree || 'Degree'}
@@ -177,70 +238,145 @@ export default function ModernMinimalist({ userData, colors, size = 'normal', mo
             </div>
           )}
 
-          {/* Links */}
-          <div>
-            <h3 className="font-bold uppercase tracking-wide" style={{ ...styles.sectionTitle, color: theme.primary }}>
-              Links
-            </h3>
-            <div>
-              {userData.linkedin_url && (
-                <div className="flex items-center gap-0.5" style={{ marginBottom: styles.spacing.item }}>
-                  <Linkedin className="h-2 w-2" />
-                  <span style={{ fontSize: styles.text.fontSize }}>LinkedIn</span>
-                </div>
-              )}
-              {userData.github_url && (
-                <div className="flex items-center gap-0.5" style={{ marginBottom: styles.spacing.item }}>
-                  <Github className="h-2 w-2" />
-                  <span style={{ fontSize: styles.text.fontSize }}>GitHub</span>
-                </div>
-              )}
-              {userData.portfolio_url && (
-                <div className="flex items-center gap-0.5" style={{ marginBottom: styles.spacing.item }}>
-                  <Globe className="h-2 w-2" />
-                  <span style={{ fontSize: styles.text.fontSize }}>Portfolio</span>
-                </div>
-              )}
+          {/* Languages */}
+          {hasContent(userData.languages) && (
+            <div style={{ marginBottom: styles.spacing.section }}>
+              <h3 
+                className="font-bold uppercase tracking-wide mb-2"
+                style={{ 
+                  fontSize: styles.sectionTitle.fontSize,
+                  color: theme.primary,
+                  fontWeight: styles.sectionTitle.fontWeight,
+                  letterSpacing: styles.sectionTitle.letterSpacing
+                }}
+              >
+                Languages
+              </h3>
+              <div className="flex flex-wrap gap-1">
+                {(userData.languages || []).slice(0, isSmall ? 4 : 6).map((lang, i) => (
+                  <span 
+                    key={i}
+                    className="px-2 py-1 rounded text-white"
+                    style={{ 
+                      fontSize: styles.text.fontSize,
+                      backgroundColor: theme.secondary
+                    }}
+                  >
+                    {typeof lang === 'string' ? lang : lang.name || 'Language'}
+                  </span>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
+
+          {/* Professional Links */}
+          {(hasContent(userData.linkedin_url) || hasContent(userData.github_url) || hasContent(userData.portfolio_url)) && (
+            <div>
+              <h3 
+                className="font-bold uppercase tracking-wide mb-2"
+                style={{ 
+                  fontSize: styles.sectionTitle.fontSize,
+                  color: theme.primary,
+                  fontWeight: styles.sectionTitle.fontWeight,
+                  letterSpacing: styles.sectionTitle.letterSpacing
+                }}
+              >
+                Links
+              </h3>
+              <div>
+                {hasContent(userData.linkedin_url) && (
+                  <div className="flex items-center gap-1 mb-1">
+                    <Linkedin style={{ width: isSmall ? '8px' : '12px', height: isSmall ? '8px' : '12px' }} />
+                    <span style={{ fontSize: styles.text.fontSize }}>LinkedIn</span>
+                  </div>
+                )}
+                {hasContent(userData.github_url) && (
+                  <div className="flex items-center gap-1 mb-1">
+                    <Github style={{ width: isSmall ? '8px' : '12px', height: isSmall ? '8px' : '12px' }} />
+                    <span style={{ fontSize: styles.text.fontSize }}>GitHub</span>
+                  </div>
+                )}
+                {hasContent(userData.portfolio_url) && (
+                  <div className="flex items-center gap-1 mb-1">
+                    <Globe style={{ width: isSmall ? '8px' : '12px', height: isSmall ? '8px' : '12px' }} />
+                    <span style={{ fontSize: styles.text.fontSize }}>Portfolio</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Right Column */}
-        <div className="flex-1" style={{ padding: styles.spacing.item }}>
+        <div className="flex-1" style={{ padding: styles.padding.section }}>
           {/* Summary */}
-          {userData.summary && (
+          {hasContent(userData.summary) && (
             <div style={{ marginBottom: styles.spacing.section }}>
-              <h3 className="font-bold uppercase tracking-wide" style={{ ...styles.sectionTitle, color: theme.primary }}>
+              <h3 
+                className="font-bold uppercase tracking-wide mb-2"
+                style={{ 
+                  fontSize: styles.sectionTitle.fontSize,
+                  color: theme.primary,
+                  fontWeight: styles.sectionTitle.fontWeight,
+                  letterSpacing: styles.sectionTitle.letterSpacing
+                }}
+              >
                 Professional Summary
               </h3>
-              <p style={{ fontSize: styles.text.fontSize, lineHeight: '1.4' }}>
+              <p style={{ fontSize: styles.text.fontSize, lineHeight: styles.text.lineHeight }}>
                 {userData.summary}
               </p>
             </div>
           )}
 
           {/* Experience */}
-          {userData.experience && userData.experience.length > 0 && (
+          {hasContent(userData.experience) && (
             <div style={{ marginBottom: styles.spacing.section }}>
-              <h3 className="font-bold uppercase tracking-wide" style={{ ...styles.sectionTitle, color: theme.primary }}>
+              <h3 
+                className="font-bold uppercase tracking-wide mb-3"
+                style={{ 
+                  fontSize: styles.sectionTitle.fontSize,
+                  color: theme.primary,
+                  fontWeight: styles.sectionTitle.fontWeight,
+                  letterSpacing: styles.sectionTitle.letterSpacing
+                }}
+              >
                 Work Experience
               </h3>
               <div>
-                {userData.experience.slice(0, isSmall ? 2 : 4).map((exp, i) => (
+                {(userData.experience || []).slice(0, isSmall ? 3 : 4).map((exp, i) => (
                   <div key={i} style={{ marginBottom: styles.spacing.section }}>
-                    <div className="flex justify-between items-start">
+                    <div className="flex justify-between items-start mb-1">
                       <h4 className="font-bold" style={{ fontSize: styles.text.fontSize }}>
                         {exp.title || exp.jobTitle || 'Position'}
                       </h4>
-                      <span style={{ fontSize: styles.text.fontSize, color: theme.secondary }}>
+                      <span 
+                        style={{ 
+                          fontSize: styles.text.fontSize, 
+                          color: theme.accent,
+                          fontWeight: '500'
+                        }}
+                      >
                         {exp.duration || `${exp.start_date || ''} - ${exp.end_date || 'Present'}`}
                       </span>
                     </div>
-                    <p className="font-medium" style={{ fontSize: styles.text.fontSize, color: theme.secondary }}>
+                    <p 
+                      className="font-medium mb-1"
+                      style={{ 
+                        fontSize: styles.text.fontSize, 
+                        color: theme.secondary 
+                      }}
+                    >
                       {exp.company || exp.employer || 'Company'}
                     </p>
                     {exp.description && (
-                      <p style={{ fontSize: styles.text.fontSize, marginTop: styles.spacing.item }}>
+                      <p 
+                        style={{ 
+                          fontSize: styles.text.fontSize, 
+                          marginTop: styles.spacing.item,
+                          lineHeight: styles.text.lineHeight
+                        }}
+                      >
                         {isSmall && exp.description.length > 100 
                           ? exp.description.substring(0, 100) + '...' 
                           : exp.description}
@@ -253,24 +389,75 @@ export default function ModernMinimalist({ userData, colors, size = 'normal', mo
           )}
 
           {/* Projects */}
-          {userData.projects && userData.projects.length > 0 && (
-            <div>
-              <h3 className="font-bold uppercase tracking-wide" style={{ ...styles.sectionTitle, color: theme.primary }}>
+          {hasContent(userData.projects) && (
+            <div style={{ marginBottom: styles.spacing.section }}>
+              <h3 
+                className="font-bold uppercase tracking-wide mb-3"
+                style={{ 
+                  fontSize: styles.sectionTitle.fontSize,
+                  color: theme.primary,
+                  fontWeight: styles.sectionTitle.fontWeight,
+                  letterSpacing: styles.sectionTitle.letterSpacing
+                }}
+              >
                 Projects
               </h3>
               <div>
-                {userData.projects.slice(0, isSmall ? 2 : 3).map((project, i) => (
-                  <div key={i} style={{ marginBottom: styles.spacing.section }}>
+                {(userData.projects || []).slice(0, isSmall ? 2 : 3).map((project, i) => (
+                  <div key={i} style={{ marginBottom: styles.spacing.item }}>
                     <h4 className="font-bold" style={{ fontSize: styles.text.fontSize }}>
                       {project.name || 'Project Name'}
                     </h4>
                     {project.description && (
-                      <p style={{ fontSize: styles.text.fontSize, marginTop: styles.spacing.item }}>
+                      <p 
+                        style={{ 
+                          fontSize: styles.text.fontSize, 
+                          marginTop: styles.spacing.item,
+                          lineHeight: styles.text.lineHeight
+                        }}
+                      >
                         {isSmall && project.description.length > 80 
                           ? project.description.substring(0, 80) + '...' 
                           : project.description}
                       </p>
                     )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Certifications */}
+          {hasContent(userData.certifications) && (
+            <div>
+              <h3 
+                className="font-bold uppercase tracking-wide mb-3"
+                style={{ 
+                  fontSize: styles.sectionTitle.fontSize,
+                  color: theme.primary,
+                  fontWeight: styles.sectionTitle.fontWeight,
+                  letterSpacing: styles.sectionTitle.letterSpacing
+                }}
+              >
+                Certifications
+              </h3>
+              <div>
+                {(userData.certifications || []).slice(0, isSmall ? 3 : 5).map((cert, i) => (
+                  <div key={i} className="flex items-start gap-2 mb-1">
+                    <div 
+                      className="w-1 h-1 rounded-full flex-shrink-0 mt-1"
+                      style={{ backgroundColor: theme.accent }}
+                    />
+                    <div>
+                      <p className="font-medium" style={{ fontSize: styles.text.fontSize }}>
+                        {cert.name || cert.title || 'Certification'}
+                      </p>
+                      {(cert.issuer || cert.year) && (
+                        <p style={{ fontSize: styles.text.fontSize, color: '#6b7280' }}>
+                          {cert.issuer && cert.year ? `${cert.issuer} • ${cert.year}` : cert.issuer || cert.year}
+                        </p>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>

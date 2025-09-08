@@ -4,6 +4,16 @@ import { getTemplateById } from '@/constants/templates';
 import ExecutiveElite from './ExecutiveElite';
 import ModernMinimalist from './ModernMinimalist';
 import CreativeDesigner from './CreativeDesigner';
+import MinimalistProfessional from './MinimalistProfessional';
+import CorporateClassic from './CorporateClassic';
+import ModernTech from './ModernTech';
+import CreativePortfolio from './CreativePortfolio';
+import AcademicExcellence from './AcademicExcellence';
+import ClassicTraditional from './ClassicTraditional';
+import CleanSimple from './CleanSimple';
+import BusinessFormal from './BusinessFormal';
+import ClassicElegant from './ClassicElegant';
+import ProfessionalClean from './ProfessionalClean';
 
 interface UserData {
   name: string;
@@ -66,6 +76,36 @@ export default function TemplateRenderer({ templateId, userData, colors, size = 
 
     case 3: // creative-designer
       return <CreativeDesigner userData={userData} colors={themeColors} size={size} mode={mode} />;
+
+    case 4: // minimalist-professional
+      return <MinimalistProfessional userData={userData} colors={themeColors} size={size} mode={mode} />;
+
+    case 5: // corporate-classic
+      return <CorporateClassic userData={userData} colors={themeColors} size={size} mode={mode} />;
+
+    case 6: // modern-tech
+      return <ModernTech userData={userData} colors={themeColors} size={size} mode={mode} />;
+
+    case 7: // creative-portfolio
+      return <CreativePortfolio userData={userData} colors={themeColors} size={size} mode={mode} />;
+
+    case 8: // academic-excellence
+      return <AcademicExcellence userData={userData} colors={themeColors} size={size} mode={mode} />;
+
+    case 9: // classic-traditional
+      return <ClassicTraditional userData={userData} colors={themeColors} size={size} mode={mode} />;
+
+    case 10: // clean-simple
+      return <CleanSimple userData={userData} colors={themeColors} size={size} mode={mode} />;
+
+    case 11: // business-formal
+      return <BusinessFormal userData={userData} colors={themeColors} size={size} mode={mode} />;
+
+    case 12: // classic-elegant
+      return <ClassicElegant userData={userData} colors={themeColors} size={size} mode={mode} />;
+
+    case 13: // professional-clean
+      return <ProfessionalClean userData={userData} colors={themeColors} size={size} mode={mode} />;
 
     default:
       return <ModernMinimalist userData={userData} colors={themeColors} size={size} mode={mode} />;

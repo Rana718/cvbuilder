@@ -86,74 +86,32 @@ export const CV_TEMPLATES: Template[] = [
   },
   {
     id: 4,
-    name: 'Tech Specialist',
-    category: 'Technology',
-    description: 'Developer-focused template with clean code-like aesthetics',
-    preview: '/templates/tech-specialist.jpg',
+    name: 'Minimalist Professional',
+    category: 'Professional',
+    description: 'Ultra-clean black and white design with Helvetica typography',
+    preview: '/templates/minimalist-professional.jpg',
     isPremium: false,
     hasPhoto: false,
     colors: {
-      primary: '#059669',
-      secondary: '#047857',
-      accent: '#10b981',
-      text: '#1f2937',
+      primary: '#000000',
+      secondary: '#333333',
+      accent: '#666666',
+      text: '#000000',
       background: '#ffffff'
     },
     fonts: {
-      heading: 'JetBrains Mono',
-      body: 'Roboto'
-    },
-    layout: 'sidebar'
-  },
-  {
-    id: 5,
-    name: 'Healthcare Professional',
-    category: 'Healthcare',
-    description: 'Trustworthy and professional design for medical professionals',
-    preview: '/templates/healthcare-professional.jpg',
-    isPremium: true,
-    hasPhoto: true,
-    colors: {
-      primary: '#dc2626',
-      secondary: '#991b1b',
-      accent: '#f87171',
-      text: '#374151',
-      background: '#ffffff'
-    },
-    fonts: {
-      heading: 'Merriweather',
-      body: 'Lato'
+      heading: 'Helvetica',
+      body: 'Helvetica'
     },
     layout: 'two-column'
   },
   {
-    id: 6,
-    name: 'Fresh Graduate',
-    category: 'Entry Level',
-    description: 'Energetic and modern design perfect for new graduates',
-    preview: '/templates/fresh-graduate.jpg',
+    id: 5,
+    name: 'Corporate Classic',
+    category: 'Corporate',
+    description: 'Traditional corporate design with blue theme and Times New Roman',
+    preview: '/templates/corporate-classic.jpg',
     isPremium: false,
-    hasPhoto: false,
-    colors: {
-      primary: '#f59e0b',
-      secondary: '#d97706',
-      accent: '#fbbf24',
-      text: '#374151',
-      background: '#ffffff'
-    },
-    fonts: {
-      heading: 'Nunito',
-      body: 'Nunito Sans'
-    },
-    layout: 'single-column'
-  },
-  {
-    id: 7,
-    name: 'Finance Expert',
-    category: 'Finance',
-    description: 'Conservative and professional layout for financial sector',
-    preview: '/templates/finance-expert.jpg',
-    isPremium: true,
     hasPhoto: true,
     colors: {
       primary: '#1e40af',
@@ -163,73 +121,178 @@ export const CV_TEMPLATES: Template[] = [
       background: '#ffffff'
     },
     fonts: {
-      heading: 'Crimson Text',
-      body: 'Source Sans Pro'
+      heading: 'Times New Roman',
+      body: 'Times New Roman'
+    },
+    layout: 'sidebar'
+  },
+  {
+    id: 6,
+    name: 'Modern Tech',
+    category: 'Technology',
+    description: 'Tech-focused design with monospace fonts and terminal styling',
+    preview: '/templates/modern-tech.jpg',
+    isPremium: true,
+    hasPhoto: false,
+    colors: {
+      primary: '#0ea5e9',
+      secondary: '#06b6d4',
+      accent: '#22d3ee',
+      text: '#0f172a',
+      background: '#f8fafc'
+    },
+    fonts: {
+      heading: 'JetBrains Mono',
+      body: 'Fira Code'
+    },
+    layout: 'two-column'
+  },
+  {
+    id: 7,
+    name: 'Creative Portfolio',
+    category: 'Creative',
+    description: 'Artistic design with gradients and creative layouts',
+    preview: '/templates/creative-portfolio.jpg',
+    isPremium: true,
+    hasPhoto: true,
+    colors: {
+      primary: '#8b5cf6',
+      secondary: '#ec4899',
+      accent: '#f59e0b',
+      text: '#1e293b',
+      background: '#fefce8'
+    },
+    fonts: {
+      heading: 'Poppins',
+      body: 'Inter'
     },
     layout: 'two-column'
   },
   {
     id: 8,
-    name: 'Marketing Maven',
-    category: 'Marketing',
-    description: 'Dynamic and engaging design for marketing professionals',
-    preview: '/templates/marketing-maven.jpg',
+    name: 'Academic Excellence',
+    category: 'Academic',
+    description: 'Formal academic design with serif fonts and scholarly appearance',
+    preview: '/templates/academic-excellence.jpg',
     isPremium: false,
     hasPhoto: false,
     colors: {
-      primary: '#e11d48',
-      secondary: '#be185d',
-      accent: '#f43f5e',
-      text: '#374151',
-      background: '#ffffff'
+      primary: '#1e40af',
+      secondary: '#064e3b',
+      accent: '#dc2626',
+      text: '#111827',
+      background: '#f9fafb'
     },
     fonts: {
-      heading: 'Montserrat',
-      body: 'Open Sans'
-    },
-    layout: 'modern-grid'
-  },
-  {
-    id: 9,
-    name: 'Academic Scholar',
-    category: 'Academic',
-    description: 'Traditional and scholarly design for academic professionals',
-    preview: '/templates/academic-scholar.jpg',
-    isPremium: true,
-    hasPhoto: true,
-    colors: {
-      primary: '#374151',
-      secondary: '#4b5563',
-      accent: '#6b7280',
-      text: '#1f2937',
-      background: '#ffffff'
-    },
-    fonts: {
-      heading: 'EB Garamond',
-      body: 'Crimson Text'
+      heading: 'Crimson Text',
+      body: 'Times New Roman'
     },
     layout: 'single-column'
   },
   {
-    id: 10,
-    name: 'Sales Champion',
-    category: 'Sales',
-    description: 'Results-driven design that highlights achievements and metrics',
-    preview: '/templates/sales-champion.jpg',
+    id: 9,
+    name: 'Classic Traditional',
+    category: 'Classic',
+    description: 'Timeless professional design with traditional serif fonts',
+    preview: '/templates/classic-traditional.jpg',
     isPremium: false,
     hasPhoto: false,
     colors: {
-      primary: '#059669',
-      secondary: '#047857',
-      accent: '#34d399',
-      text: '#374151',
+      primary: '#2c3e50',
+      secondary: '#34495e',
+      accent: '#3498db',
+      text: '#2c3e50',
       background: '#ffffff'
     },
     fonts: {
-      heading: 'Raleway',
-      body: 'Lato'
+      heading: 'Times New Roman',
+      body: 'Times New Roman'
     },
-    layout: 'sidebar'
+    layout: 'two-column'
+  },
+  {
+    id: 10,
+    name: 'Clean Simple',
+    category: 'Professional',
+    description: 'Straightforward and clean design perfect for any industry',
+    preview: '/templates/clean-simple.jpg',
+    isPremium: false,
+    hasPhoto: false,
+    colors: {
+      primary: '#4a5568',
+      secondary: '#718096',
+      accent: '#2d3748',
+      text: '#2d3748',
+      background: '#ffffff'
+    },
+    fonts: {
+      heading: 'Arial',
+      body: 'Arial'
+    },
+    layout: 'two-column'
+  },
+  {
+    id: 11,
+    name: 'Business Formal',
+    category: 'Professional',
+    description: 'Formal business design with centered layout and elegant styling',
+    preview: '/templates/business-formal.jpg',
+    isPremium: true,
+    hasPhoto: false,
+    colors: {
+      primary: '#1a202c',
+      secondary: '#2d3748',
+      accent: '#4a5568',
+      text: '#1a202c',
+      background: '#ffffff'
+    },
+    fonts: {
+      heading: 'Georgia',
+      body: 'Georgia'
+    },
+    layout: 'two-column'
+  },
+  {
+    id: 12,
+    name: 'Classic Elegant',
+    category: 'Classic',
+    description: 'Sophisticated classical design with decorative elements',
+    preview: '/templates/classic-elegant.jpg',
+    isPremium: true,
+    hasPhoto: false,
+    colors: {
+      primary: '#1a365d',
+      secondary: '#2c5282',
+      accent: '#3182ce',
+      text: '#2d3748',
+      background: '#ffffff'
+    },
+    fonts: {
+      heading: 'Libre Baskerville',
+      body: 'Times New Roman'
+    },
+    layout: 'two-column'
+  },
+  {
+    id: 13,
+    name: 'Professional Clean',
+    category: 'Professional',
+    description: 'Ultra-clean professional design with subtle elements',
+    preview: '/templates/professional-clean.jpg',
+    isPremium: false,
+    hasPhoto: false,
+    colors: {
+      primary: '#374151',
+      secondary: '#6b7280',
+      accent: '#9ca3af',
+      text: '#111827',
+      background: '#ffffff'
+    },
+    fonts: {
+      heading: 'Calibri',
+      body: 'Arial'
+    },
+    layout: 'two-column'
   }
 ];
 
@@ -254,10 +317,7 @@ export const TEMPLATE_CATEGORIES = [
   'Executive',
   'Creative',
   'Technology',
-  'Healthcare',
-  'Entry Level',
-  'Finance',
-  'Marketing',
+  'Corporate',
   'Academic',
-  'Sales'
+  'Classic'
 ];

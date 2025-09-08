@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react'
 import { Plus, Award, Star, ChevronLeft, ChevronRight, Sparkles, Trash } from 'lucide-react'
 import { useResumeStore, Skill } from '@/store/resumeStore'
-import axiosInstance from '@/lib/axios'
+import { useStreamingSkills } from '@/utils/cvStreamingApi'
 import { motion, AnimatePresence } from 'framer-motion'
 
 interface SkillsStepProps {
@@ -11,10 +11,12 @@ interface SkillsStepProps {
 
 function SkillsStep({ onNext, onPrev }: SkillsStepProps) {
   const { skills, addSkill, updateSkill, removeSkill, workExperience } = useResumeStore()
+  const { generateSkills } = useStreamingSkills()
   const [showAddForm, setShowAddForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [aiSuggestedSkills, setAiSuggestedSkills] = useState<string[]>([])
   const [isLoadingSkills, setIsLoadingSkills] = useState(false)
+  const [streamingContent, setStreamingContent] = useState('')
   const { documentId } = useResumeStore()
   const hasCalledAPI = useRef(false)
   const [formData, setFormData] = useState<Omit<Skill, 'id'>>({
@@ -34,21 +36,32 @@ function SkillsStep({ onNext, onPrev }: SkillsStepProps) {
     }))
 
     setIsLoadingSkills(true)
+    setStreamingContent('')
+    setAiSuggestedSkills([])
     hasCalledAPI.current = true
 
-    try {
-      const response = await axiosInstance.post('/api/public/cv-gen/skills', {
-        experience: experienceData
-      })
-
-      if (response.data?.skills && Array.isArray(response.data.skills)) {
-        setAiSuggestedSkills(response.data.skills)
+    await generateSkills(
+      {
+        workExperience: JSON.stringify(experienceData)
+      },
+      // onChunk - update streaming content
+      (content: string) => {
+        setStreamingContent(prev => prev + content)
+      },
+      // onComplete - set final skills
+      (skills: string[]) => {
+        setAiSuggestedSkills(skills)
+        setIsLoadingSkills(false)
+        setStreamingContent('')
+      },
+      // onError
+      (error: string) => {
+        console.error('Failed to fetch AI skills:', error)
+        setIsLoadingSkills(false)
+        setStreamingContent('')
+        hasCalledAPI.current = false
       }
-    } catch (error) {
-      console.error('Failed to fetch AI skills:', error)
-    } finally {
-      setIsLoadingSkills(false)
-    }
+    )
   }
 
   const resetForm = () => {
@@ -338,18 +351,34 @@ function SkillsStep({ onNext, onPrev }: SkillsStepProps) {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                className="flex items-center justify-center py-12 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-sm border border-blue-200"
+                className="space-y-4"
               >
-                <div className="text-center">
-                  <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                    className="w-8 h-8 border-3 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"
-                  />
-                  <p className="text-sm text-gray-600 font-medium">
-                    AI is analyzing your experience to suggest relevant skills...
-                  </p>
+                <div className="flex items-center justify-center py-8 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-sm border border-blue-200">
+                  <div className="text-center">
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                      className="w-8 h-8 border-3 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"
+                    />
+                    <p className="text-sm text-gray-600 font-medium">
+                      AI is analyzing your experience to suggest relevant skills...
+                    </p>
+                  </div>
                 </div>
+                
+                {/* Show streaming content in real-time */}
+                {streamingContent && (
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                      <span className="text-sm font-medium text-blue-700">Live Generation</span>
+                    </div>
+                    <div className="text-sm text-gray-700 font-mono bg-white p-3 rounded border">
+                      {streamingContent}
+                      <span className="animate-pulse">|</span>
+                    </div>
+                  </div>
+                )}
               </motion.div>
             )}
 
