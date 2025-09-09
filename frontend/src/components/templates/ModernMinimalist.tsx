@@ -18,9 +18,11 @@ interface UserData {
   projects?: any[];
   certifications?: any[];
   languages?: any[];
-  linkedin_url?: string;
-  github_url?: string;
-  portfolio_url?: string;
+  social_links?: Array<{
+    label: string;
+    url: string;
+    username?: string;
+  }>;
   image_url?: string;
 }
 
@@ -322,7 +324,7 @@ export default function ModernMinimalist({ userData, colors, size = 'normal', mo
           )}
 
           {/* Professional Links */}
-          {(hasContent(userData.linkedin_url) || hasContent(userData.github_url) || hasContent(userData.portfolio_url)) && (
+          {userData.social_links && userData.social_links.length > 0 && (
             <div>
               <h3 
                 className="font-bold uppercase tracking-wide mb-4"
@@ -336,45 +338,41 @@ export default function ModernMinimalist({ userData, colors, size = 'normal', mo
                 Links
               </h3>
               <div className="space-y-2">
-                {hasContent(userData.linkedin_url) && (
-                  <div className="flex items-center gap-2">
-                    <Linkedin style={{ 
-                      width: isSmall ? '10px' : '16px', 
-                      height: isSmall ? '10px' : '16px',
-                      color: theme.accent
-                    }} />
-                    <span style={{ 
-                      fontSize: styles.text.fontSize,
-                      fontWeight: '500'
-                    }}>LinkedIn</span>
-                  </div>
-                )}
-                {hasContent(userData.github_url) && (
-                  <div className="flex items-center gap-2">
-                    <Github style={{ 
-                      width: isSmall ? '10px' : '16px', 
-                      height: isSmall ? '10px' : '16px',
-                      color: theme.accent
-                    }} />
-                    <span style={{ 
-                      fontSize: styles.text.fontSize,
-                      fontWeight: '500'
-                    }}>GitHub</span>
-                  </div>
-                )}
-                {hasContent(userData.portfolio_url) && (
-                  <div className="flex items-center gap-2">
-                    <Globe style={{ 
-                      width: isSmall ? '10px' : '16px', 
-                      height: isSmall ? '10px' : '16px',
-                      color: theme.accent
-                    }} />
-                    <span style={{ 
-                      fontSize: styles.text.fontSize,
-                      fontWeight: '500'
-                    }}>Portfolio</span>
-                  </div>
-                )}
+                {userData.social_links.map((link, index) => {
+                  const getSocialIcon = (label: string) => {
+                    const lowerLabel = label.toLowerCase();
+                    if (lowerLabel.includes('linkedin')) return Linkedin;
+                    if (lowerLabel.includes('github')) return Github;
+                    return Globe;
+                  };
+                  
+                  const IconComponent = getSocialIcon(link.label);
+                  const displayText = link.username || link.url.replace(/^https?:\/\//, '').replace(/\/$/, '');
+                  
+                  return (
+                    <div key={index} className="flex items-center gap-2">
+                      <IconComponent style={{ 
+                        width: isSmall ? '10px' : '16px', 
+                        height: isSmall ? '10px' : '16px',
+                        color: theme.accent
+                      }} />
+                      <a
+                        href={link.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ 
+                          fontSize: styles.text.fontSize,
+                          fontWeight: '500',
+                          color: theme.text,
+                          textDecoration: 'none'
+                        }}
+                        className="hover:text-blue-600 transition-colors"
+                      >
+                        {displayText}
+                      </a>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}

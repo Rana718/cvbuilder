@@ -66,9 +66,7 @@ class Resume(Base):
     languages = Column(JSON)
     
     # Social Links
-    linkedin_url = Column(String(500))
-    github_url = Column(String(500))
-    portfolio_url = Column(String(500))
+    socail_links = Column(JSON)  # e.g., LinkedIn, GitHub, Portfolio 
 
     # CV Settings
     template_id = Column(Integer, nullable=False)

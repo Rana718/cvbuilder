@@ -32,12 +32,15 @@ function ResumePreview({ mode = 'default', pass}: ResumePreviewProps) {
         address: [personalInfo.city, personalInfo.country].filter(Boolean).join(', ') || undefined,
         job_title: personalInfo.profession || 'Professional Title',
         summary: summary ? summary.replace(/<[^>]*>/g, '').trim() : undefined,
-        linkedin_url: personalInfo.websites?.find(w => w.label.toLowerCase().includes('linkedin'))?.url || '',
-        github_url: personalInfo.websites?.find(w => w.label.toLowerCase().includes('github'))?.url || '',
-        portfolio_url: personalInfo.websites?.find(w => 
-            w.label.toLowerCase().includes('portfolio') || 
-            w.label.toLowerCase().includes('website')
-        )?.url || '',
+        social_links: personalInfo.websites?.map(website => ({
+            label: website.label,
+            url: website.url,
+            username: website.label.toLowerCase() === 'linkedin' 
+                ? website.url.split('/').pop() || '' 
+                : website.label.toLowerCase() === 'github'
+                ? website.url.split('/').pop() || ''
+                : website.url.replace(/^https?:\/\//, '').replace(/\/$/, '')
+        })) || [],
         image_url: personalInfo.image_url || '',
         skills: skills.map(skill => ({
             name: skill.name,

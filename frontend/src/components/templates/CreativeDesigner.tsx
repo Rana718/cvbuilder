@@ -18,9 +18,11 @@ interface UserData {
   projects?: any[];
   certifications?: any[];
   languages?: any[];
-  linkedin_url?: string;
-  github_url?: string;
-  portfolio_url?: string;
+  social_links?: Array<{
+    label: string;
+    url: string;
+    username?: string;
+  }>;
   image_url?: string;
 }
 
@@ -610,7 +612,7 @@ export default function CreativeDesigner({ userData, colors, size = 'normal', mo
           )}
 
           {/* Professional Links */}
-          {(hasContent(userData.linkedin_url) || hasContent(userData.github_url) || hasContent(userData.portfolio_url)) && (
+          {userData.social_links && userData.social_links.length > 0 && (
             <div>
               <div className="flex items-center gap-2 mb-3">
                 <Globe 
@@ -633,45 +635,42 @@ export default function CreativeDesigner({ userData, colors, size = 'normal', mo
                 </h3>
               </div>
               <div className="flex flex-wrap gap-3">
-                {hasContent(userData.linkedin_url) && (
-                  <a
-                    href={userData.linkedin_url}
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg text-white font-medium transition-all hover:scale-105"
-                    style={{ 
-                      backgroundColor: theme.primary,
-                      fontSize: styles.text.fontSize
-                    }}
-                  >
-                    <Linkedin style={{ width: isSmall ? '10px' : '14px', height: isSmall ? '10px' : '14px' }} />
-                    LinkedIn
-                  </a>
-                )}
-                {hasContent(userData.github_url) && (
-                  <a
-                    href={userData.github_url}
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg text-white font-medium transition-all hover:scale-105"
-                    style={{ 
-                      backgroundColor: theme.secondary,
-                      fontSize: styles.text.fontSize
-                    }}
-                  >
-                    <Github style={{ width: isSmall ? '10px' : '14px', height: isSmall ? '10px' : '14px' }} />
-                    GitHub
-                  </a>
-                )}
-                {hasContent(userData.portfolio_url) && (
-                  <a
-                    href={userData.portfolio_url}
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg text-white font-medium transition-all hover:scale-105"
-                    style={{ 
-                      backgroundColor: theme.accent,
-                      fontSize: styles.text.fontSize
-                    }}
-                  >
-                    <Globe style={{ width: isSmall ? '10px' : '14px', height: isSmall ? '10px' : '14px' }} />
-                    Portfolio
-                  </a>
-                )}
+                {userData.social_links.map((link, index) => {
+                  const getSocialIcon = (label: string) => {
+                    const lowerLabel = label.toLowerCase();
+                    if (lowerLabel.includes('linkedin')) return Linkedin;
+                    if (lowerLabel.includes('github')) return Github;
+                    return Globe;
+                  };
+                  
+                  const getSocialColor = (label: string) => {
+                    const lowerLabel = label.toLowerCase();
+                    if (lowerLabel.includes('linkedin')) return theme.primary;
+                    if (lowerLabel.includes('github')) return theme.secondary;
+                    return theme.accent;
+                  };
+                  
+                  const IconComponent = getSocialIcon(link.label);
+                  const bgColor = getSocialColor(link.label);
+                  const displayText = link.username || link.url.replace(/^https?:\/\//, '').replace(/\/$/, '');
+                  
+                  return (
+                    <a
+                      key={index}
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 px-4 py-2 rounded-lg text-white font-medium transition-all hover:scale-105"
+                      style={{ 
+                        backgroundColor: bgColor,
+                        fontSize: styles.text.fontSize
+                      }}
+                    >
+                      <IconComponent style={{ width: isSmall ? '10px' : '14px', height: isSmall ? '10px' : '14px' }} />
+                      {displayText}
+                    </a>
+                  );
+                })}
               </div>
             </div>
           )}

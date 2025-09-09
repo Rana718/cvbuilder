@@ -18,9 +18,11 @@ interface UserData {
   projects?: any[];
   certifications?: any[];
   languages?: any[];
-  linkedin_url?: string;
-  github_url?: string;
-  portfolio_url?: string;
+  social_links?: Array<{
+    label: string;
+    url: string;
+    username?: string;
+  }>;
   image_url?: string;
 }
 
@@ -611,7 +613,7 @@ export default function ModernTech({ userData, colors, size = 'normal', mode = '
           )}
 
           {/* Links as JSON */}
-          {(hasContent(userData.linkedin_url) || hasContent(userData.github_url) || hasContent(userData.portfolio_url)) && (
+          {userData.social_links && userData.social_links.length > 0 && (
             <div>
               <h2 
                 style={{ 
@@ -634,21 +636,28 @@ export default function ModernTech({ userData, colors, size = 'normal', mode = '
                   fontSize: styles.text.fontSize
                 }}
               >
-                {hasContent(userData.linkedin_url) && (
-                  <div style={{ marginBottom: '2px' }}>
-                    <span style={{ color: theme.secondary }}>linkedin:</span> <span style={{ color: theme.accent }}>"url"</span>
-                  </div>
-                )}
-                {hasContent(userData.github_url) && (
-                  <div style={{ marginBottom: '2px' }}>
-                    <span style={{ color: theme.secondary }}>github:</span> <span style={{ color: theme.accent }}>"url"</span>
-                  </div>
-                )}
-                {hasContent(userData.portfolio_url) && (
-                  <div style={{ marginBottom: '2px' }}>
-                    <span style={{ color: theme.secondary }}>portfolio:</span> <span style={{ color: theme.accent }}>"url"</span>
-                  </div>
-                )}
+                {userData.social_links.map((link, index) => {
+                  const linkKey = link.label.toLowerCase().replace(/\s+/g, '_');
+                  const displayValue = link.username || link.url;
+                  
+                  return (
+                    <div key={index} style={{ marginBottom: '2px' }}>
+                      <span style={{ color: theme.secondary }}>{linkKey}:</span>{' '}
+                      <a
+                        href={link.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ 
+                          color: theme.accent, 
+                          textDecoration: 'none' 
+                        }}
+                        className="hover:underline"
+                      >
+                        "{displayValue}"
+                      </a>
+                    </div>
+                  );
+                })}
               </div>
               <div style={{ fontSize: styles.sectionTitle.fontSize, color: theme.primary, fontFamily: 'monospace' }}>
                 &#125;

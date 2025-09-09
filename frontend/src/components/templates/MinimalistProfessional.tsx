@@ -18,9 +18,11 @@ interface UserData {
   projects?: any[];
   certifications?: any[];
   languages?: any[];
-  linkedin_url?: string;
-  github_url?: string;
-  portfolio_url?: string;
+  social_links?: Array<{
+    label: string;
+    url: string;
+    username?: string;
+  }>;
   image_url?: string;
 }
 
@@ -453,7 +455,7 @@ export default function MinimalistProfessional({ userData, colors, size = 'norma
           )}
 
           {/* Links */}
-          {(hasContent(userData.linkedin_url) || hasContent(userData.github_url) || hasContent(userData.portfolio_url)) && (
+          {userData.social_links && userData.social_links.length > 0 && (
             <div>
               <h2 
                 style={{ 
@@ -467,21 +469,28 @@ export default function MinimalistProfessional({ userData, colors, size = 'norma
                 Links
               </h2>
               <div>
-                {hasContent(userData.linkedin_url) && (
-                  <p style={{ fontSize: styles.text.fontSize, marginBottom: '2px' }}>
-                    LinkedIn
-                  </p>
-                )}
-                {hasContent(userData.github_url) && (
-                  <p style={{ fontSize: styles.text.fontSize, marginBottom: '2px' }}>
-                    GitHub
-                  </p>
-                )}
-                {hasContent(userData.portfolio_url) && (
-                  <p style={{ fontSize: styles.text.fontSize, marginBottom: '2px' }}>
-                    Portfolio
-                  </p>
-                )}
+                {userData.social_links.map((link, index) => {
+                  const displayText = link.username || link.url.replace(/^https?:\/\//, '').replace(/\/$/, '');
+                  
+                  return (
+                    <a
+                      key={index}
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ 
+                        fontSize: styles.text.fontSize, 
+                        marginBottom: '2px',
+                        color: theme.text,
+                        textDecoration: 'none',
+                        display: 'block'
+                      }}
+                      className="hover:text-blue-600 transition-colors"
+                    >
+                      {displayText}
+                    </a>
+                  );
+                })}
               </div>
             </div>
           )}

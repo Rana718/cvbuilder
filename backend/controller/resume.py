@@ -44,9 +44,18 @@ class ResumeController:
     
     @staticmethod
     def _create_resume_from_data(resume_data: ResumeCreate, user_id: int) -> Resume:
+        # Convert socail_links to the format expected by the database
+        social_links_json = None
+        if hasattr(resume_data, 'socail_links') and resume_data.socail_links:
+            social_links_json = [link.dict() for link in resume_data.socail_links]
+        
+        # Create resume data excluding socail_links and add socail_links instead
+        resume_dict = resume_data.dict(exclude={'socail_links'})
+        resume_dict['socail_links'] = social_links_json  # Note: using DB field name with typo
+        
         return Resume(
             user_id=user_id,
-            **resume_data.dict()
+            **resume_dict
         )
     
     @staticmethod
@@ -83,12 +92,20 @@ class ResumeController:
         resume = await ResumeController._get_resume_by_id_and_firebase_uid(resume_id, firebase_uid, db)
         user = await ResumeController._get_user_by_firebase_uid(firebase_uid, db)
         
-        for field, value in resume_data.dict(exclude_unset=True).items():
+        # Handle socail_links transformation
+        update_data = resume_data.dict(exclude_unset=True)
+        if 'socail_links' in update_data:
+            social_links = update_data.pop('socail_links')
+            if social_links:
+                update_data['socail_links'] = [link.dict() if hasattr(link, 'dict') else link for link in social_links]
+            else:
+                update_data['socail_links'] = None
+        
+        for field, value in update_data.items():
             setattr(resume, field, value)
         
         await db.commit()
         await db.refresh(resume)
-        
         
         return ResumeResponse.from_orm(resume)
     

@@ -69,14 +69,30 @@ function parseMonthsSimple(start?: string, end?: string): number | null {
 function inferSeniority(jobTitle: string, role: string, startDate: string, endDate: string, experienceCount: number = 0): string {
     const titleRole = `${jobTitle || ''} ${role || ''}`.toLowerCase()
 
+    // Check for intern/trainee roles first
     if (titleRole.includes('intern') || titleRole.includes('trainee')) {
         return 'intern'
     }
 
+    // Check for senior leadership positions
+    if (titleRole.includes('founder') || titleRole.includes('co-founder') || titleRole.includes('cofounder') ||
+        titleRole.includes('ceo') || titleRole.includes('cto') || titleRole.includes('director') ||
+        titleRole.includes('head of') || titleRole.includes('lead') || titleRole.includes('senior') ||
+        titleRole.includes('principal') || titleRole.includes('manager') || titleRole.includes('vp') ||
+        titleRole.includes('vice president')) {
+        return 'senior'
+    }
+
     const months = parseMonthsSimple(startDate, endDate)
 
+    // If we can't parse the dates, use experience count and title context
     if (months === null) {
-        return experienceCount >= 2 ? 'junior' : 'fresher'
+        // For titles that suggest leadership, default to senior
+        if (titleRole.includes('architect') || titleRole.includes('consultant') || 
+            titleRole.includes('specialist') || experienceCount >= 2) {
+            return 'senior'
+        }
+        return 'junior'
     }
 
     if (months < 3) return 'intern'
@@ -130,10 +146,6 @@ export async function POST(req: NextRequest) {
         let guidance: string
 
         switch (seniority) {
-            case 'fresher':
-                bulletRange = '6-10'
-                guidance = 'Focus on coursework, projects, tools used, and learning outcomes.'
-                break
             case 'intern':
                 bulletRange = '6-12'
                 guidance = "Emphasize contributions, collaboration, and learning; use verbs like 'assisted', 'contributed', 'supported'."
@@ -161,7 +173,7 @@ Rules (follow exactly):
 - Tone & scope must match inferred seniority: ${guidance}
 - DO NOT invent large percentages, impossible scope, or single-handed platform ownership for junior/interim roles.
 - Bullets: 8-18 words each, factual, concise, action-first.
-- If fresher: mention coursework, projects, libraries, and tools rather than claims of product impact.
+- Base content on the provided job title, company, and role information.
 - Output must be a single valid JSON array of strings and nothing else.
 `
 
@@ -193,24 +205,19 @@ Rules (follow exactly):
                     // Parse the final accumulated content
                     const points = safeParseJSON(accumulatedContent)
 
-                    // Filter and clean the points based on seniority
+                    // Filter and clean the points
                     const filtered = points.map(point => {
                         let cleaned = point.trim()
                         // Remove unrealistic percentages
                         cleaned = cleaned.replace(/\b\d{3,}%\b/g, '')
                         cleaned = cleaned.replace(/\b100%?\b/g, '')
 
-                        // Adjust language for fresher/intern roles
-                        if (seniority === 'fresher' || seniority === 'intern') {
-                            cleaned = cleaned.replace(/\b(owned|spearheaded|led|managed)\b/gi, 'contributed to')
-                        }
-
                         return cleaned.replace(/\s{2,}/g, ' ').trim()
                     }).filter(point => point)
 
                     // Send the final result
                     controller.enqueue(encoder.encode(`data: ${JSON.stringify({
-                        points: filtered.length > 0 ? filtered : getFallbackPoints(seniority),
+                        points: filtered,
                         type: 'complete',
                         success: true
                     })}\n\n`))
@@ -240,22 +247,5 @@ Rules (follow exactly):
             success: false,
             error: error instanceof Error ? error.message : 'Unknown error'
         }, { status: 500 })
-    }
-}
-
-function getFallbackPoints(seniority: string): string[] {
-    if (seniority === 'fresher' || seniority === 'intern') {
-        return [
-            'Assisted with small frontend tasks using React and Tailwind.',
-            'Learned team workflows and participated in code reviews.',
-            'Implemented minor bug fixes and wrote basic tests.',
-            'Worked with senior developers to integrate API endpoints.'
-        ]
-    } else {
-        return [
-            'Contributed to feature development and collaborated across teams.',
-            'Improved code quality through tests and code reviews.',
-            'Worked on API integration and frontend components.'
-        ]
     }
 }

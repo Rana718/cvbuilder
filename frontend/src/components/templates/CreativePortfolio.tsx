@@ -18,9 +18,11 @@ interface UserData {
   projects?: any[];
   certifications?: any[];
   languages?: any[];
-  linkedin_url?: string;
-  github_url?: string;
-  portfolio_url?: string;
+  social_links?: Array<{
+    label: string;
+    url: string;
+    username?: string;
+  }>;
   image_url?: string;
 }
 
@@ -755,7 +757,7 @@ export default function CreativePortfolio({ userData, colors, size = 'normal', m
           )}
 
           {/* Creative links */}
-          {(hasContent(userData.linkedin_url) || hasContent(userData.github_url) || hasContent(userData.portfolio_url)) && (
+          {userData.social_links && userData.social_links.length > 0 && (
             <div>
               <h2 
                 style={{ 
@@ -770,60 +772,52 @@ export default function CreativePortfolio({ userData, colors, size = 'normal', m
                 Connect
               </h2>
               <div className="flex flex-col gap-2">
-                {hasContent(userData.linkedin_url) && (
-                  <div 
-                    style={{
-                      backgroundColor: 'white',
-                      padding: '8px',
-                      borderRadius: '12px',
-                      border: `2px solid ${theme.primary}30`,
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '6px',
-                      fontSize: styles.text.fontSize,
-                      boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-                    }}
-                  >
-                    <Linkedin style={{ width: isSmall ? '10px' : '14px', height: isSmall ? '10px' : '14px', color: theme.primary }} />
-                    <span>LinkedIn</span>
-                  </div>
-                )}
-                {hasContent(userData.github_url) && (
-                  <div 
-                    style={{
-                      backgroundColor: 'white',
-                      padding: '8px',
-                      borderRadius: '12px',
-                      border: `2px solid ${theme.secondary}30`,
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '6px',
-                      fontSize: styles.text.fontSize,
-                      boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-                    }}
-                  >
-                    <Github style={{ width: isSmall ? '10px' : '14px', height: isSmall ? '10px' : '14px', color: theme.secondary }} />
-                    <span>GitHub</span>
-                  </div>
-                )}
-                {hasContent(userData.portfolio_url) && (
-                  <div 
-                    style={{
-                      backgroundColor: 'white',
-                      padding: '8px',
-                      borderRadius: '12px',
-                      border: `2px solid ${theme.accent}30`,
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '6px',
-                      fontSize: styles.text.fontSize,
-                      boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-                    }}
-                  >
-                    <Globe style={{ width: isSmall ? '10px' : '14px', height: isSmall ? '10px' : '14px', color: theme.accent }} />
-                    <span>Portfolio</span>
-                  </div>
-                )}
+                {userData.social_links.map((link, index) => {
+                  const getSocialIcon = (label: string) => {
+                    const lowerLabel = label.toLowerCase();
+                    if (lowerLabel.includes('linkedin')) return Linkedin;
+                    if (lowerLabel.includes('github')) return Github;
+                    return Globe;
+                  };
+                  
+                  const getSocialColor = (label: string) => {
+                    const lowerLabel = label.toLowerCase();
+                    if (lowerLabel.includes('linkedin')) return theme.primary;
+                    if (lowerLabel.includes('github')) return theme.secondary;
+                    return theme.accent;
+                  };
+                  
+                  const IconComponent = getSocialIcon(link.label);
+                  const iconColor = getSocialColor(link.label);
+                  const displayText = link.username || link.url.replace(/^https?:\/\//, '').replace(/\/$/, '');
+                  
+                  return (
+                    <a
+                      key={index}
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        backgroundColor: 'white',
+                        padding: '8px',
+                        borderRadius: '12px',
+                        border: `2px solid ${iconColor}30`,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        fontSize: styles.text.fontSize,
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                        textDecoration: 'none',
+                        color: theme.text,
+                        transition: 'all 0.2s ease'
+                      }}
+                      className="hover:shadow-lg hover:scale-105"
+                    >
+                      <IconComponent style={{ width: isSmall ? '10px' : '14px', height: isSmall ? '10px' : '14px', color: iconColor }} />
+                      <span>{displayText}</span>
+                    </a>
+                  );
+                })}
               </div>
             </div>
           )}

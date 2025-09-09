@@ -245,9 +245,15 @@ export const useResumeStore = create<ResumeStore>()((set, get) => ({
                 return acc
             }, {} as Record<string, any>),
             languages: {},
-            linkedin_url: state.personalInfo.websites.find(w => w.label.toLowerCase() === 'linkedin')?.url || '',
-            github_url: state.personalInfo.websites.find(w => w.label.toLowerCase() === 'github')?.url || '',
-            portfolio_url: state.personalInfo.websites.find(w => w.label.toLowerCase() === 'portfolio')?.url || '',
+            socail_links: state.personalInfo.websites.map(website => ({
+                label: website.label,
+                url: website.url,
+                username: website.label.toLowerCase() === 'linkedin' 
+                    ? website.url.split('/').pop() || '' 
+                    : website.label.toLowerCase() === 'github'
+                    ? website.url.split('/').pop() || ''
+                    : website.url.replace(/^https?:\/\//, '').replace(/\/$/, '')
+            })),
             template_id: parseInt(state.templateId) || 1,
             theme_color: 'blue'
         }
@@ -329,12 +335,27 @@ export const useResumeStore = create<ResumeStore>()((set, get) => ({
 
     // Populate from API data
     populateFromResumeData: (data) => {
-        // Create clean website array, filtering out empty URLs
-        const websites = [
-            ...(data.linkedin_url && data.linkedin_url.trim() ? [{ id: generateId(), label: 'LinkedIn', url: data.linkedin_url.trim() }] : []),
-            ...(data.github_url && data.github_url.trim() ? [{ id: generateId(), label: 'GitHub', url: data.github_url.trim() }] : []),
-            ...(data.portfolio_url && data.portfolio_url.trim() ? [{ id: generateId(), label: 'Portfolio', url: data.portfolio_url.trim() }] : [])
-        ]
+        // Handle social links - check both new and old format
+        let websites = []
+        
+        // Check for new social_links format first (socail_links due to DB typo)
+        if (data.socail_links && Array.isArray(data.socail_links)) {
+            websites = data.socail_links
+                .filter((link: any) => link.url && link.url.trim())
+                .map((link: any) => ({
+                    id: generateId(),
+                    label: link.label || 'Link',
+                    url: link.url.trim()
+                }))
+        } 
+        // Fall back to old format for backwards compatibility
+        else {
+            websites = [
+                ...(data.linkedin_url && data.linkedin_url.trim() ? [{ id: generateId(), label: 'LinkedIn', url: data.linkedin_url.trim() }] : []),
+                ...(data.github_url && data.github_url.trim() ? [{ id: generateId(), label: 'GitHub', url: data.github_url.trim() }] : []),
+                ...(data.portfolio_url && data.portfolio_url.trim() ? [{ id: generateId(), label: 'Portfolio', url: data.portfolio_url.trim() }] : [])
+            ]
+        }
 
         set({
             documentId: data.id,

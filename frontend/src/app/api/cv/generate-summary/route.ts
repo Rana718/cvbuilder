@@ -129,26 +129,40 @@ export async function POST(req: NextRequest) {
         if (seniorityOverride) {
             overallSeniority = seniorityOverride
         } else if (!cvData.experience || cvData.experience.length === 0) {
-            overallSeniority = 'fresher'
-        } else if (cvData.experience.some(exp =>
-            (exp.title || '').toLowerCase().includes('intern') ||
-            (exp.company || '').toLowerCase().includes('intern')
-        )) {
-            overallSeniority = 'intern'
+            overallSeniority = 'junior'
         } else {
-            let totalMonths = 0
-            let count = 0
+            // Check for leadership titles first
+            const hasLeadershipRole = cvData.experience.some(exp => {
+                const title = (exp.title || '').toLowerCase()
+                return title.includes('founder') || title.includes('co-founder') || title.includes('cofounder') ||
+                       title.includes('ceo') || title.includes('cto') || title.includes('director') ||
+                       title.includes('head of') || title.includes('lead') || title.includes('senior') ||
+                       title.includes('principal') || title.includes('manager') || title.includes('vp') ||
+                       title.includes('vice president')
+            })
 
-            for (const exp of cvData.experience) {
-                const months = parseMonthsSimple(exp.startDate, exp.endDate)
-                if (months !== null) {
-                    totalMonths += months
-                    count += 1
+            if (hasLeadershipRole) {
+                overallSeniority = 'senior'
+            } else if (cvData.experience.some(exp =>
+                (exp.title || '').toLowerCase().includes('intern') ||
+                (exp.company || '').toLowerCase().includes('intern')
+            )) {
+                overallSeniority = 'intern'
+            } else {
+                let totalMonths = 0
+                let count = 0
+
+                for (const exp of cvData.experience) {
+                    const months = parseMonthsSimple(exp.startDate, exp.endDate)
+                    if (months !== null) {
+                        totalMonths += months
+                        count += 1
+                    }
                 }
-            }
 
-            const avg = count > 0 ? totalMonths / count : 0
-            overallSeniority = avg >= 24 ? 'senior' : (avg >= 3 ? 'junior' : 'intern')
+                const avg = count > 0 ? totalMonths / count : 0
+                overallSeniority = avg >= 24 ? 'senior' : (avg >= 3 ? 'junior' : 'junior')
+            }
         }
 
         const prompt = `
@@ -160,8 +174,8 @@ Overall seniority: ${overallSeniority}
 
 Rules:
 - Third person, professional tone.
-- If overall_seniority is 'fresher' or 'intern', emphasize learning, coursework, projects, and eagerness to grow.
-- Avoid fabricating major product impact or large % improvements for junior/fresher candidates.
+- Match the tone and scope to the overall seniority level.
+- Avoid fabricating major product impact or large % improvements for junior candidates.
 - Each summary must be distinct and realistic.
 - Return ONLY a JSON array of strings.
 `

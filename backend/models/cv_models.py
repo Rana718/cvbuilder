@@ -2,6 +2,11 @@ from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
 from datetime import datetime
 
+class SocialLink(BaseModel):
+    label: str
+    url: str
+    username: Optional[str] = None
+
 class WorkExperience(BaseModel):
     title: str
     company: str
@@ -96,9 +101,7 @@ class ResumeCreate(BaseModel):
     certifications: Optional[Dict[str, Any]] = None
     projects: Optional[Dict[str, Any]] = None
     languages: Optional[Dict[str, Any]] = None
-    linkedin_url: Optional[str] = None
-    github_url: Optional[str] = None
-    portfolio_url: Optional[str] = None
+    socail_links: Optional[List[SocialLink]] = None
     template_id: int
     theme_color: Optional[str] = "blue"
 
@@ -119,9 +122,7 @@ class ResumeUpdate(BaseModel):
     certifications: Optional[Dict[str, Any]] = None
     projects: Optional[Dict[str, Any]] = None
     languages: Optional[Dict[str, Any]] = None
-    linkedin_url: Optional[str] = None
-    github_url: Optional[str] = None
-    portfolio_url: Optional[str] = None
+    socail_links: Optional[List[SocialLink]] = None
     template_id: Optional[int] = None
     theme_color: Optional[str] = None
 
@@ -145,9 +146,7 @@ class ResumeResponse(BaseModel):
     certifications: Optional[Dict[str, Any]] = None
     projects: Optional[Dict[str, Any]] = None
     languages: Optional[Dict[str, Any]] = None
-    linkedin_url: Optional[str] = None
-    github_url: Optional[str] = None
-    portfolio_url: Optional[str] = None
+    socail_links: Optional[List[SocialLink]] = None
     template_id: int
     theme_color: str
     created_at: datetime

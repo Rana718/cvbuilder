@@ -18,9 +18,11 @@ interface UserData {
   projects?: any[];
   certifications?: any[];
   languages?: any[];
-  linkedin_url?: string;
-  github_url?: string;
-  portfolio_url?: string;
+  social_links?: Array<{
+    label: string;
+    url: string;
+    username?: string;
+  }>;
   image_url?: string;
 }
 
@@ -544,7 +546,7 @@ export default function CorporateClassic({ userData, colors, size = 'normal', mo
             )}
 
             {/* Professional Links */}
-            {(hasContent(userData.linkedin_url) || hasContent(userData.github_url) || hasContent(userData.portfolio_url)) && (
+            {userData.social_links && userData.social_links.length > 0 && (
               <div>
                 <div 
                   style={{ 
@@ -565,24 +567,34 @@ export default function CorporateClassic({ userData, colors, size = 'normal', mo
                   </h2>
                 </div>
                 <div>
-                  {hasContent(userData.linkedin_url) && (
-                    <div className="flex items-center gap-1 mb-1">
-                      <Linkedin style={{ width: isSmall ? '8px' : '12px', height: isSmall ? '8px' : '12px', color: theme.secondary }} />
-                      <span style={{ fontSize: styles.text.fontSize, fontWeight: '500' }}>LinkedIn</span>
-                    </div>
-                  )}
-                  {hasContent(userData.github_url) && (
-                    <div className="flex items-center gap-1 mb-1">
-                      <Github style={{ width: isSmall ? '8px' : '12px', height: isSmall ? '8px' : '12px', color: theme.secondary }} />
-                      <span style={{ fontSize: styles.text.fontSize, fontWeight: '500' }}>GitHub</span>
-                    </div>
-                  )}
-                  {hasContent(userData.portfolio_url) && (
-                    <div className="flex items-center gap-1 mb-1">
-                      <Globe style={{ width: isSmall ? '8px' : '12px', height: isSmall ? '8px' : '12px', color: theme.secondary }} />
-                      <span style={{ fontSize: styles.text.fontSize, fontWeight: '500' }}>Portfolio</span>
-                    </div>
-                  )}
+                  {userData.social_links.map((link, index) => {
+                    const getSocialIcon = (label: string) => {
+                      const lowerLabel = label.toLowerCase();
+                      if (lowerLabel.includes('linkedin')) return Linkedin;
+                      if (lowerLabel.includes('github')) return Github;
+                      return Globe;
+                    };
+                    
+                    const IconComponent = getSocialIcon(link.label);
+                    const displayText = link.username || link.url.replace(/^https?:\/\//, '').replace(/\/$/, '');
+                    
+                    return (
+                      <a
+                        key={index}
+                        href={link.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1 mb-1 hover:text-blue-600 transition-colors"
+                        style={{
+                          color: theme.text,
+                          textDecoration: 'none'
+                        }}
+                      >
+                        <IconComponent style={{ width: isSmall ? '8px' : '12px', height: isSmall ? '8px' : '12px', color: theme.secondary }} />
+                        <span style={{ fontSize: styles.text.fontSize, fontWeight: '500' }}>{displayText}</span>
+                      </a>
+                    );
+                  })}
                 </div>
               </div>
             )}

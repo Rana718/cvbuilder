@@ -26,6 +26,11 @@ interface Resume {
     experience?: any;
     education?: any;
     projects?: any;
+    socail_links?: Array<{
+        label: string;
+        url: string;
+        username?: string;
+    }>;
 }
 
 interface DropdownMenuProps {
@@ -190,6 +195,7 @@ const ResumePage: React.FC = () => {
         address: [resume.city, resume.country].filter(Boolean).join(', ') || '',
         job_title: resume.job_title || 'Professional Title',
         summary: resume.summary || '',
+        social_links: resume.socail_links || [],
         skills: resume.skills ? Object.values(resume.skills).map((skill: any) => ({
             name: skill.name || '',
             rating: skill.rating || 3
@@ -210,10 +216,7 @@ const ResumePage: React.FC = () => {
             description: project.description || '',
             url: project.url || '',
             github_url: project.github_url || ''
-        })) : [],
-        linkedin_url: '',
-        github_url: '',
-        portfolio_url: ''
+        })) : []
     });
 
     const filteredResumes = resumes.filter(resume =>

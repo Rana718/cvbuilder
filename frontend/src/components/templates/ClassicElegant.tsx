@@ -18,9 +18,11 @@ interface UserData {
     projects?: any[];
     certifications?: any[];
     languages?: any[];
-    linkedin_url?: string;
-    github_url?: string;
-    portfolio_url?: string;
+    social_links?: Array<{
+        label: string;
+        url: string;
+        username?: string;
+    }>;
     image_url?: string;
 }
 
@@ -191,6 +193,50 @@ export default function ClassicElegant({ userData, colors, size = 'normal', mode
                         )}
                     </div>
                 </div>
+
+                {/* Social Links */}
+                {userData.social_links && userData.social_links.length > 0 && (
+                    <div
+                        style={{
+                            fontSize: styles.text.fontSize,
+                            color: theme.text,
+                            marginBottom: '16px',
+                            textAlign: 'center'
+                        }}
+                    >
+                        <div className="flex justify-center gap-4 flex-wrap">
+                            {userData.social_links.map((link, index) => {
+                                const getSocialIcon = (label: string) => {
+                                    const lowerLabel = label.toLowerCase();
+                                    if (lowerLabel.includes('linkedin')) return Linkedin;
+                                    if (lowerLabel.includes('github')) return Github;
+                                    return Globe;
+                                };
+                                
+                                const IconComponent = getSocialIcon(link.label);
+                                const displayText = link.username || link.url.replace(/^https?:\/\//, '').replace(/\/$/, '');
+                                
+                                return (
+                                    <a
+                                        key={index}
+                                        href={link.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex items-center gap-1 hover:text-blue-600 transition-colors"
+                                        style={{
+                                            color: theme.secondary,
+                                            textDecoration: 'none',
+                                            fontSize: isSmall ? '10px' : '12px'
+                                        }}
+                                    >
+                                        <IconComponent style={{ width: isSmall ? '10px' : '12px', height: isSmall ? '10px' : '12px' }} />
+                                        <span>{displayText}</span>
+                                    </a>
+                                );
+                            })}
+                        </div>
+                    </div>
+                )}
 
                 {/* Decorative bottom border */}
                 <div

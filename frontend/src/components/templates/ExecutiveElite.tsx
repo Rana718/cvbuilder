@@ -18,9 +18,11 @@ interface UserData {
   projects?: any[];
   certifications?: any[];
   languages?: any[];
-  linkedin_url?: string;
-  github_url?: string;
-  portfolio_url?: string;
+  social_links?: Array<{
+    label: string;
+    url: string;
+    username?: string;
+  }>;
   image_url?: string;
 }
 
@@ -438,7 +440,7 @@ export default function ExecutiveElite({ userData, colors, size = 'normal', mode
         )}
 
         {/* Professional Links */}
-        {(hasContent(userData.linkedin_url) || hasContent(userData.github_url) || hasContent(userData.portfolio_url)) && (
+        {userData.social_links && userData.social_links.length > 0 && (
           <div>
             <h2 
               className="font-bold mb-3"
@@ -451,25 +453,35 @@ export default function ExecutiveElite({ userData, colors, size = 'normal', mode
             >
               PROFESSIONAL LINKS
             </h2>
-            <div className="flex gap-3" style={{ fontSize: styles.text.fontSize }}>
-              {hasContent(userData.linkedin_url) && (
-                <div className="flex items-center gap-1">
-                  <Linkedin style={{ width: isSmall ? '10px' : '14px', height: isSmall ? '10px' : '14px' }} />
-                  <span>LinkedIn</span>
-                </div>
-              )}
-              {hasContent(userData.github_url) && (
-                <div className="flex items-center gap-1">
-                  <Github style={{ width: isSmall ? '10px' : '14px', height: isSmall ? '10px' : '14px' }} />
-                  <span>GitHub</span>
-                </div>
-              )}
-              {hasContent(userData.portfolio_url) && (
-                <div className="flex items-center gap-1">
-                  <Globe style={{ width: isSmall ? '10px' : '14px', height: isSmall ? '10px' : '14px' }} />
-                  <span>Portfolio</span>
-                </div>
-              )}
+            <div className="flex gap-3 flex-wrap" style={{ fontSize: styles.text.fontSize }}>
+              {userData.social_links.map((link, index) => {
+                const getSocialIcon = (label: string) => {
+                  const lowerLabel = label.toLowerCase();
+                  if (lowerLabel.includes('linkedin')) return Linkedin;
+                  if (lowerLabel.includes('github')) return Github;
+                  return Globe;
+                };
+                
+                const IconComponent = getSocialIcon(link.label);
+                const displayText = link.username || link.url.replace(/^https?:\/\//, '').replace(/\/$/, '');
+                
+                return (
+                  <a
+                    key={index}
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1 hover:text-blue-600 transition-colors"
+                    style={{
+                      color: theme.text,
+                      textDecoration: 'none'
+                    }}
+                  >
+                    <IconComponent style={{ width: isSmall ? '10px' : '14px', height: isSmall ? '10px' : '14px' }} />
+                    <span>{displayText}</span>
+                  </a>
+                );
+              })}
             </div>
           </div>
         )}

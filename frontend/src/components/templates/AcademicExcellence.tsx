@@ -18,9 +18,11 @@ interface UserData {
   projects?: any[];
   certifications?: any[];
   languages?: any[];
-  linkedin_url?: string;
-  github_url?: string;
-  portfolio_url?: string;
+  social_links?: Array<{
+    label: string;
+    url: string;
+    username?: string;
+  }>;
   image_url?: string;
 }
 
@@ -654,7 +656,7 @@ export default function AcademicExcellence({ userData, colors, size = 'normal', 
             </div>
 
             {/* Professional links */}
-            {(hasContent(userData.linkedin_url) || hasContent(userData.github_url) || hasContent(userData.portfolio_url)) && (
+            {userData.social_links && userData.social_links.length > 0 && (
               <div style={{ marginTop: styles.spacing.section }}>
                 <div 
                   className="flex items-center gap-2 mb-3"
@@ -676,21 +678,27 @@ export default function AcademicExcellence({ userData, colors, size = 'normal', 
                   </h2>
                 </div>
                 <div style={{ paddingLeft: '8px' }}>
-                  {hasContent(userData.linkedin_url) && (
-                    <p style={{ fontSize: styles.text.fontSize, marginBottom: '2px' }}>
-                      <span style={{ fontWeight: '600' }}>LinkedIn:</span> Available
-                    </p>
-                  )}
-                  {hasContent(userData.github_url) && (
-                    <p style={{ fontSize: styles.text.fontSize, marginBottom: '2px' }}>
-                      <span style={{ fontWeight: '600' }}>GitHub:</span> Available
-                    </p>
-                  )}
-                  {hasContent(userData.portfolio_url) && (
-                    <p style={{ fontSize: styles.text.fontSize, marginBottom: '2px' }}>
-                      <span style={{ fontWeight: '600' }}>Portfolio:</span> Available
-                    </p>
-                  )}
+                  {userData.social_links.map((link, index) => {
+                    const displayText = link.username || link.url.replace(/^https?:\/\//, '').replace(/\/$/, '');
+                    
+                    return (
+                      <p key={index} style={{ fontSize: styles.text.fontSize, marginBottom: '2px' }}>
+                        <span style={{ fontWeight: '600' }}>{link.label}:</span>{' '}
+                        <a
+                          href={link.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            color: theme.secondary,
+                            textDecoration: 'none'
+                          }}
+                          className="hover:underline"
+                        >
+                          {displayText}
+                        </a>
+                      </p>
+                    );
+                  })}
                 </div>
               </div>
             )}

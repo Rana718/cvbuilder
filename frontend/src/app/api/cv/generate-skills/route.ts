@@ -68,9 +68,18 @@ export async function POST(req: NextRequest) {
         const { workExperience, seniorityOverride } = await req.json()
 
         const txt = String(workExperience || '').toLowerCase()
-        const seniorityHint = txt.includes('intern') || txt.includes('1 mo') || txt.includes('1 month')
-            ? 'intern'
-            : (seniorityOverride || 'mixed')
+        
+        let seniorityHint: string
+        if (txt.includes('founder') || txt.includes('co-founder') || txt.includes('cofounder') ||
+            txt.includes('ceo') || txt.includes('cto') || txt.includes('director') ||
+            txt.includes('head of') || txt.includes('lead') || txt.includes('senior') ||
+            txt.includes('principal') || txt.includes('manager') || txt.includes('vp')) {
+            seniorityHint = 'senior'
+        } else if (txt.includes('intern') || txt.includes('1 mo') || txt.includes('1 month')) {
+            seniorityHint = 'intern'
+        } else {
+            seniorityHint = seniorityOverride || 'mixed'
+        }
 
         const prompt = `
 Based on this work experience, produce 5-15 concise, relevant professional skills.
@@ -80,7 +89,7 @@ Seniority hint: ${seniorityHint}
 
 Rules:
 - Prioritize concrete skills (e.g., "React", "REST APIs", "Unit testing", "SQL").
-- For freshers/interns, include tools, frameworks, and learning-focused skills (e.g., "Git", "React basics", "API integration").
+- Include relevant tools, frameworks, and technical skills based on the work experience.
 - Avoid vague adjectives like 'hardworking' or 'team player' as primary skills.
 - Return ONLY a JSON array of strings.
 `

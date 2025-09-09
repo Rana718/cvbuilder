@@ -18,9 +18,11 @@ interface UserData {
     projects?: any[];
     certifications?: any[];
     languages?: any[];
-    linkedin_url?: string;
-    github_url?: string;
-    portfolio_url?: string;
+    social_links?: Array<{
+        label: string;
+        url: string;
+        username?: string;
+    }>;
     image_url?: string;
 }
 
@@ -495,7 +497,7 @@ export default function ProfessionalClean({ userData, colors, size = 'normal', m
                     )}
 
                     {/* Professional links */}
-                    {(hasContent(userData.linkedin_url) || hasContent(userData.github_url) || hasContent(userData.portfolio_url)) && (
+                    {userData.social_links && userData.social_links.length > 0 && (
                         <div>
                             <h2
                                 style={{
@@ -511,24 +513,35 @@ export default function ProfessionalClean({ userData, colors, size = 'normal', m
                                 Professional Links
                             </h2>
                             <div style={{ fontSize: styles.text.fontSize }}>
-                                {hasContent(userData.linkedin_url) && (
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <Linkedin style={{ width: isSmall ? '8px' : '12px', height: isSmall ? '8px' : '12px', color: theme.secondary }} />
-                                        <span>LinkedIn Profile</span>
-                                    </div>
-                                )}
-                                {hasContent(userData.github_url) && (
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <Github style={{ width: isSmall ? '8px' : '12px', height: isSmall ? '8px' : '12px', color: theme.secondary }} />
-                                        <span>GitHub Profile</span>
-                                    </div>
-                                )}
-                                {hasContent(userData.portfolio_url) && (
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <Globe style={{ width: isSmall ? '8px' : '12px', height: isSmall ? '8px' : '12px', color: theme.secondary }} />
-                                        <span>Portfolio Website</span>
-                                    </div>
-                                )}
+                                {userData.social_links.map((link, index) => {
+                                    const getSocialIcon = (label: string) => {
+                                        const lowerLabel = label.toLowerCase();
+                                        if (lowerLabel.includes('linkedin')) return Linkedin;
+                                        if (lowerLabel.includes('github')) return Github;
+                                        return Globe;
+                                    };
+                                    
+                                    const IconComponent = getSocialIcon(link.label);
+                                    const displayText = link.username || link.url.replace(/^https?:\/\//, '').replace(/\/$/, '');
+                                    
+                                    return (
+                                        <div key={index} className="flex items-center gap-2 mb-2">
+                                            <IconComponent style={{ width: isSmall ? '8px' : '12px', height: isSmall ? '8px' : '12px', color: theme.secondary }} />
+                                            <a
+                                                href={link.url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                style={{
+                                                    color: theme.text,
+                                                    textDecoration: 'none'
+                                                }}
+                                                className="hover:text-blue-600 transition-colors"
+                                            >
+                                                {displayText}
+                                            </a>
+                                        </div>
+                                    );
+                                })}
                             </div>
                         </div>
                     )}

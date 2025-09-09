@@ -18,9 +18,11 @@ interface UserData {
     projects?: any[];
     certifications?: any[];
     languages?: any[];
-    linkedin_url?: string;
-    github_url?: string;
-    portfolio_url?: string;
+    social_links?: Array<{
+        label: string;
+        url: string;
+        username?: string;
+    }>;
     image_url?: string;
 }
 
