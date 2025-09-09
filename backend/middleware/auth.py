@@ -30,6 +30,7 @@ class JWTAuthMiddleware(BaseHTTPMiddleware):
             "/api/cover-letters", 
             "/api/linkedin", 
             "/api/payment",
+            "/api/dashboard",
             "/api/admin"  # Protect all admin routes
         ]
 
