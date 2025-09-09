@@ -48,38 +48,40 @@ export default function ClassicElegant({ userData, colors, size = 'normal', mode
 
     const isSmall = size === 'small';
 
-    // Classic elegant styling
+    // Classic elegant styling with refined spacing
     const styles = {
         container: {
-            fontSize: isSmall ? '6px' : '11px',
-            lineHeight: isSmall ? 1.4 : 1.6,
-            fontFamily: "'Libre Baskerville', 'Times New Roman', serif"
+            fontSize: isSmall ? '7px' : '12px',
+            lineHeight: isSmall ? 1.5 : 1.7,
+            fontFamily: "'Libre Baskerville', 'Times New Roman', 'Georgia', serif"
         },
         name: {
-            fontSize: isSmall ? '18px' : '34px',
+            fontSize: isSmall ? '20px' : '38px',
             fontWeight: '400',
-            letterSpacing: '2px'
+            letterSpacing: '2.5px'
         },
         jobTitle: {
-            fontSize: isSmall ? '8px' : '13px',
+            fontSize: isSmall ? '9px' : '15px',
             fontWeight: '300',
-            letterSpacing: '1px'
+            letterSpacing: '1.2px'
         },
         sectionTitle: {
-            fontSize: isSmall ? '7px' : '12px',
+            fontSize: isSmall ? '8px' : '14px',
             fontWeight: '600',
-            letterSpacing: '1px'
+            letterSpacing: '1.2px',
+            textTransform: 'uppercase' as const
         },
         text: {
-            fontSize: isSmall ? '6px' : '10px',
-            lineHeight: isSmall ? 1.5 : 1.7
+            fontSize: isSmall ? '7px' : '11px',
+            lineHeight: isSmall ? 1.6 : 1.8
         },
         spacing: {
-            section: isSmall ? '12px' : '24px',
-            item: isSmall ? '6px' : '12px'
+            section: isSmall ? '16px' : '32px',
+            item: isSmall ? '8px' : '16px',
+            micro: isSmall ? '4px' : '8px'
         },
         padding: {
-            container: isSmall ? '12px' : '24px'
+            container: isSmall ? '16px' : '32px'
         }
     };
 

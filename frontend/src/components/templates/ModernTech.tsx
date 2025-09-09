@@ -48,38 +48,40 @@ export default function ModernTech({ userData, colors, size = 'normal', mode = '
 
   const isSmall = size === 'small';
 
-  // Modern tech styling
+  // Modern tech styling with improved spacing
   const styles = {
     container: {
-      fontSize: isSmall ? '6px' : '11px',
-      lineHeight: isSmall ? 1.3 : 1.5,
-      fontFamily: "'JetBrains Mono', 'Fira Code', monospace"
+      fontSize: isSmall ? '7px' : '12px',
+      lineHeight: isSmall ? 1.4 : 1.6,
+      fontFamily: "'JetBrains Mono', 'Fira Code', 'Consolas', monospace"
     },
     name: {
-      fontSize: isSmall ? '16px' : '32px',
+      fontSize: isSmall ? '18px' : '36px',
       fontWeight: '700',
-      letterSpacing: '-1px'
+      letterSpacing: '-1.2px'
     },
     jobTitle: {
-      fontSize: isSmall ? '8px' : '14px',
-      fontWeight: '500'
+      fontSize: isSmall ? '9px' : '16px',
+      fontWeight: '500',
+      letterSpacing: '0.2px'
     },
     sectionTitle: {
-      fontSize: isSmall ? '7px' : '12px',
+      fontSize: isSmall ? '8px' : '14px',
       fontWeight: '700',
       textTransform: 'uppercase' as const,
-      letterSpacing: '1px'
+      letterSpacing: '1.2px'
     },
     text: {
-      fontSize: isSmall ? '6px' : '10px',
-      lineHeight: isSmall ? 1.4 : 1.6
+      fontSize: isSmall ? '7px' : '11px',
+      lineHeight: isSmall ? 1.5 : 1.7
     },
     spacing: {
-      section: isSmall ? '10px' : '20px',
-      item: isSmall ? '5px' : '10px'
+      section: isSmall ? '14px' : '28px',
+      item: isSmall ? '7px' : '14px',
+      micro: isSmall ? '4px' : '8px'
     },
     padding: {
-      container: isSmall ? '10px' : '20px'
+      container: isSmall ? '14px' : '28px'
     }
   };
 

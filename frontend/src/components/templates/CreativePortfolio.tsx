@@ -48,38 +48,40 @@ export default function CreativePortfolio({ userData, colors, size = 'normal', m
 
   const isSmall = size === 'small';
 
-  // Creative portfolio styling
+  // Creative portfolio styling with enhanced visual hierarchy
   const styles = {
     container: {
-      fontSize: isSmall ? '6px' : '11px',
-      lineHeight: isSmall ? 1.3 : 1.5,
-      fontFamily: "'Poppins', 'Inter', sans-serif"
+      fontSize: isSmall ? '7px' : '12px',
+      lineHeight: isSmall ? 1.4 : 1.6,
+      fontFamily: "'Poppins', 'Inter', -apple-system, sans-serif"
     },
     name: {
-      fontSize: isSmall ? '18px' : '36px',
+      fontSize: isSmall ? '20px' : '40px',
       fontWeight: '800',
-      letterSpacing: '-2px'
+      letterSpacing: '-2.5px'
     },
     jobTitle: {
-      fontSize: isSmall ? '8px' : '16px',
+      fontSize: isSmall ? '9px' : '18px',
       fontWeight: '300',
-      letterSpacing: '1px'
+      letterSpacing: '1.2px'
     },
     sectionTitle: {
-      fontSize: isSmall ? '8px' : '14px',
+      fontSize: isSmall ? '9px' : '16px',
       fontWeight: '700',
-      letterSpacing: '0.5px'
+      letterSpacing: '0.8px',
+      textTransform: 'uppercase' as const
     },
     text: {
-      fontSize: isSmall ? '6px' : '10px',
-      lineHeight: isSmall ? 1.4 : 1.6
+      fontSize: isSmall ? '7px' : '11px',
+      lineHeight: isSmall ? 1.5 : 1.7
     },
     spacing: {
-      section: isSmall ? '12px' : '24px',
-      item: isSmall ? '6px' : '12px'
+      section: isSmall ? '16px' : '32px',
+      item: isSmall ? '8px' : '16px',
+      micro: isSmall ? '4px' : '8px'
     },
     padding: {
-      container: isSmall ? '12px' : '24px'
+      container: isSmall ? '16px' : '32px'
     }
   };
 

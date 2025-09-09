@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { FileText, Sparkles, Download, ArrowRight, User, Star, Clock, Shield, Zap, CheckCircle } from "lucide-react";
+import { FileText, Sparkles, Download, ArrowRight, User, Star, Clock, Shield, Zap, CheckCircle, TrendingUp, Globe, Award, Brain } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PaymentCard from "@/components/PaymentCard";
@@ -15,6 +15,7 @@ export default function Home() {
   const { isPremium, refreshStatus } = usePremiumStatus();
   const router = useRouter();
   const [showPaymentCard, setShowPaymentCard] = useState(false);
+  
   useEffect(() => {
     console.log("Current user:", user);
   }, [user])
@@ -26,7 +27,6 @@ export default function Home() {
     }
 
     if (isPremium) {
-      // User is already premium, maybe show subscription management
       alert('You are already a premium user!');
       return;
     }
@@ -41,40 +41,58 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-slate-50">
       {/* Navbar */}
       <Navbar />
-      <section className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-purple-50">
-        {/* Background Elements */}
-        <div className="absolute top-20 left-10 w-72 h-72 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
-        <div className="absolute top-40 right-10 w-80 h-80 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse delay-1000"></div>
+      
+      {/* Hero Section */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-100/50 min-h-screen flex items-center">
+        {/* Enhanced Background Elements */}
+        <div className="absolute inset-0">
+          <div className="absolute top-20 left-10 w-96 h-96 bg-gradient-to-r from-blue-400/20 to-indigo-500/20 rounded-full mix-blend-multiply filter blur-3xl animate-pulse"></div>
+          <div className="absolute top-40 right-10 w-80 h-80 bg-gradient-to-r from-purple-400/20 to-pink-500/20 rounded-full mix-blend-multiply filter blur-3xl animate-pulse delay-1000"></div>
+          <div className="absolute bottom-20 left-1/2 w-72 h-72 bg-gradient-to-r from-emerald-400/20 to-teal-500/20 rounded-full mix-blend-multiply filter blur-3xl animate-pulse delay-2000"></div>
+        </div>
 
-        <div className="relative container mx-auto px-6 pt-12 pb-20">
-          {/* AI Badge */}
+        {/* Floating grid pattern */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
+
+        <div className="relative container mx-auto px-6 py-20">
+          {/* Enhanced AI Badge */}
           <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
+            initial={{ y: 20, opacity: 0, scale: 0.9 }}
+            animate={{ y: 0, opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, delay: 0.2 }}
             className="flex justify-center mb-8"
           >
-            <div className="inline-flex items-center bg-blue-100 text-blue-700 px-4 py-2 rounded-full text-sm font-medium">
-              <Sparkles className="h-4 w-4 mr-2" />
-              AI-Powered Resume Builder
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 blur-xl rounded-full"></div>
+              <div className="relative inline-flex items-center bg-white/90 backdrop-blur-sm border border-white/20 shadow-lg text-slate-700 px-6 py-3 rounded-full text-sm font-medium">
+                <div className="w-2 h-2 bg-green-500 rounded-full mr-3 animate-pulse"></div>
+                <Sparkles className="h-4 w-4 mr-2 text-blue-600" />
+                <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent font-semibold">
+                  AI-Powered Resume Builder
+                </span>
+              </div>
             </div>
           </motion.div>
 
-          <div className="grid lg:grid-cols-2 gap-12 items-center max-w-7xl mx-auto">
-            {/* Left Content */}
+          <div className="grid lg:grid-cols-2 gap-16 items-center max-w-7xl mx-auto">
+            {/* Enhanced Left Content */}
             <div className="text-center lg:text-left">
               <motion.h1
                 initial={{ y: 30, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.8, delay: 0.3 }}
-                className="text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-900 mb-6 leading-tight"
+                className="text-5xl lg:text-6xl xl:text-7xl font-bold text-slate-900 mb-6 leading-[1.1]"
               >
-                AI Resume Builder
-                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-600 mt-2">
-                  Fast, Easy & Free
+                Build Your
+                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 mt-2 relative">
+                  Dream Career
+                  <div className="absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 rounded-full transform scale-x-0 animate-pulse"></div>
+                </span>
+                <span className="block text-slate-700 text-3xl lg:text-4xl font-medium mt-4">
+                  with AI Precision
                 </span>
               </motion.h1>
 
@@ -82,87 +100,114 @@ export default function Home() {
                 initial={{ y: 30, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.8, delay: 0.5 }}
-                className="text-lg lg:text-xl text-gray-600 mb-8 leading-relaxed max-w-xl lg:max-w-none"
+                className="text-xl lg:text-2xl text-slate-600 mb-10 leading-relaxed max-w-2xl lg:max-w-none font-light"
               >
-                Land your next job with our intelligent AI resume builder. Work from your computer or phone with professionally designed templates and get AI-powered content suggestions tailored to your career.
+                Transform your career journey with our intelligent AI that crafts compelling resumes, 
+                optimizes for ATS systems, and helps you land interviews at top companies.
               </motion.p>
 
               <motion.div
                 initial={{ y: 30, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.8, delay: 0.7 }}
-                className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-10"
+                className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-12"
               >
                 <button
-                  className="group bg-[#ffc05a] text-black px-8 py-4 rounded-xl text-lg font-semibold flex items-center justify-center space-x-2 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                  className="group relative bg-gradient-to-r from-blue-600 to-purple-600 text-white px-10 py-5 rounded-2xl text-lg font-semibold flex items-center justify-center space-x-3 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 overflow-hidden"
                   onClick={() => router.push("/template")}
                 >
-                  <span>Create my resume</span>
-                  <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue-700 to-purple-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <span className="relative z-10">Create Resume Now</span>
+                  <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform relative z-10" />
                 </button>
-                <button className="bg-orange-400 hover:bg-orange-500 text-white px-8 py-4 rounded-xl text-lg font-semibold transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1">
-                  Import your resume
+                <button className="group bg-white/80 backdrop-blur-sm border-2 border-slate-200 hover:border-blue-300 text-slate-700 hover:text-blue-700 px-10 py-5 rounded-2xl text-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                  <span className="flex items-center space-x-2">
+                    <Download className="h-5 w-5" />
+                    <span>Import Resume</span>
+                  </span>
                 </button>
               </motion.div>
 
-              {/* Trust Indicators */}
+              {/* Enhanced Trust Indicators */}
               <motion.div
                 initial={{ y: 30, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.8, delay: 0.9 }}
-                className="flex flex-wrap items-center justify-center lg:justify-start gap-6 text-sm text-gray-500"
+                className="flex flex-wrap items-center justify-center lg:justify-start gap-8 text-sm"
               >
-                <div className="flex items-center space-x-2">
-                  <CheckCircle className="h-4 w-4 text-green-500" />
-                  <span>No credit card required</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <CheckCircle className="h-4 w-4 text-green-500" />
-                  <span>Free to use</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <CheckCircle className="h-4 w-4 text-green-500" />
-                  <span>ATS-friendly</span>
-                </div>
+                {[
+                  { icon: CheckCircle, text: "No credit card required", color: "text-emerald-600" },
+                  { icon: Shield, text: "100% Free to start", color: "text-blue-600" },
+                  { icon: Award, text: "ATS-optimized", color: "text-purple-600" }
+                ].map((item, i) => (
+                  <div key={i} className="flex items-center space-x-2 text-slate-600">
+                    <item.icon className={`h-5 w-5 ${item.color}`} />
+                    <span className="font-medium">{item.text}</span>
+                  </div>
+                ))}
               </motion.div>
             </div>
 
-            {/* Right Content - Image */}
+            {/* Enhanced Right Content */}
             <motion.div
               initial={{ x: 50, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               transition={{ duration: 1, delay: 0.5 }}
-              className="relative lg:mt-0 mt-8"
+              className="relative lg:mt-0 mt-12"
             >
               <div className="relative">
-                <img
-                  src="/img/banner.png"
-                  alt="AI Resume Builder Preview"
-                  className="w-full max-w-lg xl:max-w-xl mx-auto rounded-2xl shadow-2xl border border-gray-200"
-                />
+                {/* Main image with enhanced styling */}
+                <div className="relative rounded-3xl overflow-hidden shadow-2xl bg-white p-2">
+                  <img
+                    src="/img/banner.png"
+                    alt="AI Resume Builder Preview"
+                    className="w-full max-w-lg xl:max-w-2xl mx-auto rounded-2xl"
+                  />
+                </div>
 
-                {/* Floating elements - repositioned */}
+                {/* Enhanced floating elements */}
                 <motion.div
-                  initial={{ scale: 0, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
+                  initial={{ scale: 0, opacity: 0, rotate: -10 }}
+                  animate={{ scale: 1, opacity: 1, rotate: 0 }}
                   transition={{ duration: 0.5, delay: 1.2 }}
-                  className="absolute -top-4 -left-4 bg-white rounded-xl shadow-lg p-3 border border-gray-100"
+                  className="absolute -top-6 -left-6 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-2xl shadow-xl p-4"
                 >
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                    <span className="text-xs font-medium text-gray-700">Smart AI Help</span>
+                  <div className="flex items-center space-x-3">
+                    <Brain className="h-6 w-6" />
+                    <div>
+                      <p className="text-sm font-semibold">Smart AI Assistant</p>
+                      <p className="text-xs opacity-90">Writes better content</p>
+                    </div>
+                  </div>
+                </motion.div>
+
+                <motion.div
+                  initial={{ scale: 0, opacity: 0, rotate: 10 }}
+                  animate={{ scale: 1, opacity: 1, rotate: 0 }}
+                  transition={{ duration: 0.5, delay: 1.4 }}
+                  className="absolute -bottom-6 -right-6 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-2xl shadow-xl p-4"
+                >
+                  <div className="flex items-center space-x-3">
+                    <TrendingUp className="h-6 w-6" />
+                    <div>
+                      <p className="text-sm font-semibold">3x More Interviews</p>
+                      <p className="text-xs opacity-90">Proven results</p>
+                    </div>
                   </div>
                 </motion.div>
 
                 <motion.div
                   initial={{ scale: 0, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
-                  transition={{ duration: 0.5, delay: 1.4 }}
-                  className="absolute -bottom-4 -right-4 bg-white rounded-xl shadow-lg p-3 border border-gray-100"
+                  transition={{ duration: 0.5, delay: 1.6 }}
+                  className="absolute top-1/2 -left-8 transform -translate-y-1/2 bg-white rounded-2xl shadow-xl p-4 border border-slate-100"
                 >
-                  <div className="flex items-center space-x-2">
-                    <Zap className="h-4 w-4 text-yellow-500" />
-                    <span className="text-xs font-medium text-gray-700">2x Faster</span>
+                  <div className="flex items-center space-x-3">
+                    <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                    <div>
+                      <p className="text-sm font-semibold text-slate-800">Live Preview</p>
+                      <p className="text-xs text-slate-600">Real-time editing</p>
+                    </div>
                   </div>
                 </motion.div>
               </div>
@@ -171,28 +216,68 @@ export default function Home() {
         </div>
       </section>
 
-      {/* AI Feature Highlight */}
-      <section className="py-20 bg-gradient-to-r from-purple-50 to-blue-50">
-        <div className="container mx-auto px-6">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
+      {/* Enhanced AI Feature Highlight */}
+      <section className="py-24 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 relative overflow-hidden">
+        {/* Background pattern */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff08_1px,transparent_1px),linear-gradient(to_bottom,#ffffff08_1px,transparent_1px)] bg-[size:32px_32px]"></div>
+        
+        <div className="container mx-auto px-6 relative">
+          <div className="grid lg:grid-cols-2 gap-20 items-center">
             <motion.div
               initial={{ x: -50, opacity: 0 }}
               whileInView={{ x: 0, opacity: 1 }}
               transition={{ duration: 0.8 }}
               viewport={{ once: true }}
             >
-              <div className="bg-gradient-to-br from-purple-100 to-blue-100 rounded-2xl p-8 relative overflow-hidden">
-                <div className="absolute top-4 right-4 bg-purple-500 text-white px-3 py-1 rounded-full text-sm font-medium">
-                  AI Powered
+              <div className="relative">
+                {/* Glowing effect */}
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 blur-3xl rounded-3xl"></div>
+                
+                <div className="relative bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl rounded-3xl p-10 border border-white/10 shadow-2xl">
+                  <div className="absolute top-6 right-6 bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-2 rounded-full text-sm font-semibold">
+                    🤖 AI Powered
+                  </div>
+                  
+                  <div className="mb-8">
+                    <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl mb-6">
+                      <Sparkles className="h-8 w-8 text-white" />
+                    </div>
+                    
+                    <h3 className="text-3xl font-bold text-white mb-4">
+                      Let AI Write Your Success Story
+                    </h3>
+                    <p className="text-xl text-blue-100 mb-8 leading-relaxed">
+                      Our advanced AI analyzes your role, industry, and career goals to generate 
+                      compelling content that showcases your unique value proposition.
+                    </p>
+                  </div>
+                  
+                  <div className="space-y-4 mb-8">
+                    {[
+                      "Industry-specific keyword optimization",
+                      "Achievement-focused bullet points",
+                      "ATS-friendly formatting",
+                      "Professional tone and language"
+                    ].map((feature, i) => (
+                      <motion.div 
+                        key={i}
+                        initial={{ x: -20, opacity: 0 }}
+                        whileInView={{ x: 0, opacity: 1 }}
+                        transition={{ duration: 0.5, delay: i * 0.1 }}
+                        viewport={{ once: true }}
+                        className="flex items-center space-x-3"
+                      >
+                        <div className="w-2 h-2 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full"></div>
+                        <span className="text-blue-100 font-medium">{feature}</span>
+                      </motion.div>
+                    ))}
+                  </div>
+                  
+                  <button className="group bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-8 py-4 rounded-xl font-semibold transition-all transform hover:-translate-y-1 shadow-lg flex items-center space-x-2">
+                    <span>Experience AI Magic</span>
+                    <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                  </button>
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">🎯 Let AI do the work!</h3>
-                <p className="text-gray-700 mb-6 leading-relaxed">
-                  Describe your role in a few words, and we'll generate tailored content for your work experience section.
-                </p>
-                <button className="bg-purple-500 hover:bg-purple-600 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center space-x-2">
-                  <span>Try it first</span>
-                  <ArrowRight className="h-4 w-4" />
-                </button>
               </div>
             </motion.div>
 
@@ -201,24 +286,41 @@ export default function Home() {
               whileInView={{ x: 0, opacity: 1 }}
               transition={{ duration: 0.8 }}
               viewport={{ once: true }}
-              className="space-y-6"
+              className="space-y-8"
             >
-              <h2 className="text-4xl font-bold text-gray-900">Generate Your Resume Bullet Points with AI</h2>
-              <p className="text-xl text-gray-600 leading-relaxed">
-                Our advanced AI analyzes millions of successful resumes to provide you with industry-specific content suggestions that get results.
-              </p>
+              <div>
+                <h2 className="text-5xl font-bold text-white mb-6 leading-tight">
+                  Smart Content Generation That 
+                  <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
+                    Gets Results
+                  </span>
+                </h2>
+                <p className="text-xl text-blue-100 leading-relaxed mb-8">
+                  Stop struggling with writer's block. Our AI understands what recruiters want 
+                  and helps you articulate your achievements in the most impactful way.
+                </p>
+              </div>
 
-              <div className="space-y-4">
+              {/* Stats */}
+              <div className="grid grid-cols-2 gap-6">
                 {[
-                  "AI-generated content tailored to your industry",
-                  "Professional language and keywords",
-                  "ATS-optimized formatting",
-                  "Real-time suggestions as you type"
-                ].map((feature, i) => (
-                  <div key={i} className="flex items-center space-x-3">
-                    <CheckCircle className="h-5 w-5 text-green-500" />
-                    <span className="text-gray-700">{feature}</span>
-                  </div>
+                  { number: "3x", label: "More Interviews", icon: TrendingUp },
+                  { number: "95%", label: "ATS Pass Rate", icon: CheckCircle },
+                  { number: "10M+", label: "Resumes Created", icon: Globe },
+                  { number: "4.9★", label: "User Rating", icon: Star }
+                ].map((stat, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    whileInView={{ scale: 1, opacity: 1 }}
+                    transition={{ duration: 0.5, delay: i * 0.1 }}
+                    viewport={{ once: true }}
+                    className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 text-center"
+                  >
+                    <stat.icon className="h-8 w-8 text-blue-400 mx-auto mb-3" />
+                    <div className="text-3xl font-bold text-white mb-1">{stat.number}</div>
+                    <div className="text-sm text-blue-200">{stat.label}</div>
+                  </motion.div>
                 ))}
               </div>
             </motion.div>
@@ -226,65 +328,75 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Features */}
-      <section id="features" className="bg-gray-50 py-20">
+      {/* Enhanced Features Section */}
+      <section id="features" className="py-24 bg-gradient-to-br from-slate-50 to-blue-50/30">
         <div className="container mx-auto px-6">
           <motion.div
             initial={{ y: 50, opacity: 0 }}
             whileInView={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
-            className="text-center mb-16"
+            className="text-center mb-20"
           >
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Why Choose Our AI Resume Builder?</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Create professional resumes that stand out to employers with intelligent AI assistance and modern design principles.
+            <div className="inline-flex items-center bg-blue-100 text-blue-700 px-6 py-3 rounded-full text-sm font-medium mb-6">
+              <Award className="h-4 w-4 mr-2" />
+              Premium Features
+            </div>
+            <h2 className="text-5xl font-bold text-slate-900 mb-6">
+              Everything You Need to 
+              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
+                Stand Out
+              </span>
+            </h2>
+            <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
+              Our comprehensive suite of AI-powered tools and professional templates 
+              ensures your resume captures attention and drives results.
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
             {[
               {
-                icon: Sparkles,
-                title: "Intelligent Content Generation",
-                desc: "AI analyzes your role and suggests powerful, industry-specific bullet points that highlight your achievements and skills effectively.",
-                color: "blue",
-                gradient: "from-blue-500 to-blue-600"
+                icon: Brain,
+                title: "AI Content Generation",
+                desc: "Advanced machine learning creates compelling, industry-specific content that highlights your unique achievements and skills with precision.",
+                color: "from-blue-500 to-indigo-600",
+                bgColor: "from-blue-50 to-indigo-50"
               },
               {
                 icon: FileText,
-                title: "ATS-Optimized Templates",
-                desc: "Choose from carefully crafted templates designed to pass Applicant Tracking Systems while maintaining visual appeal.",
-                color: "purple",
-                gradient: "from-purple-500 to-purple-600"
+                title: "ATS-Optimized Templates", 
+                desc: "Professionally designed templates that pass through Applicant Tracking Systems while maintaining exceptional visual appeal.",
+                color: "from-purple-500 to-pink-600",
+                bgColor: "from-purple-50 to-pink-50"
               },
               {
                 icon: Download,
-                title: "Flexible Export Options",
-                desc: "Download your resume as PDF or Word document, or create shareable links for easy online applications.",
-                color: "green",
-                gradient: "from-green-500 to-green-600"
-              },
-              {
-                icon: Clock,
-                title: "Save Time & Effort",
-                desc: "Skip the blank page struggle. Our AI helps you write compelling content quickly, so you can focus on job hunting.",
-                color: "orange",
-                gradient: "from-orange-500 to-orange-600"
-              },
-              {
-                icon: Shield,
-                title: "Secure & Private",
-                desc: "Your personal information stays protected. We prioritize data privacy and never sell or share your details.",
-                color: "red",
-                gradient: "from-red-500 to-red-600"
+                title: "Multi-Format Export",
+                desc: "Download in PDF, Word, or create shareable links. Perfect formatting guaranteed across all platforms and devices.",
+                color: "from-emerald-500 to-teal-600",
+                bgColor: "from-emerald-50 to-teal-50"
               },
               {
                 icon: Zap,
-                title: "Live Preview & Editing",
-                desc: "See exactly how your resume looks as you build it. Make instant adjustments with real-time preview functionality.",
-                color: "indigo",
-                gradient: "from-indigo-500 to-indigo-600"
+                title: "Real-Time Preview",
+                desc: "See exactly how your resume looks as you build it. Make instant adjustments with live preview functionality.",
+                color: "from-orange-500 to-red-600",
+                bgColor: "from-orange-50 to-red-50"
+              },
+              {
+                icon: Shield,
+                title: "Enterprise Security",
+                desc: "Bank-level encryption protects your personal information. We never sell or share your data with third parties.",
+                color: "from-slate-500 to-gray-600",
+                bgColor: "from-slate-50 to-gray-50"
+              },
+              {
+                icon: Globe,
+                title: "Global Standards",
+                desc: "Templates and content optimized for international markets. Perfect for local and global job applications.",
+                color: "from-indigo-500 to-blue-600",
+                bgColor: "from-indigo-50 to-blue-50"
               }
             ].map((feature, i) => (
               <motion.div
@@ -293,143 +405,153 @@ export default function Home() {
                 whileInView={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.6, delay: i * 0.1 }}
                 viewport={{ once: true }}
-                className="bg-white rounded-2xl p-8 text-center hover:shadow-xl transition-all duration-300 border border-gray-100 group hover:-translate-y-2"
+                className="group relative"
               >
-                <div className={`bg-gradient-to-r ${feature.gradient} w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300`}>
-                  <feature.icon className="h-8 w-8 text-white" />
+                <div className={`absolute inset-0 bg-gradient-to-br ${feature.bgColor} rounded-3xl opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:scale-105`}></div>
+                
+                <div className="relative bg-white rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border border-slate-100 group-hover:border-white">
+                  <div className={`bg-gradient-to-br ${feature.color} w-16 h-16 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
+                    <feature.icon className="h-8 w-8 text-white" />
+                  </div>
+                  
+                  <h3 className="text-xl font-bold text-slate-900 mb-4 group-hover:text-slate-800 transition-colors">
+                    {feature.title}
+                  </h3>
+                  <p className="text-slate-600 leading-relaxed group-hover:text-slate-700 transition-colors">
+                    {feature.desc}
+                  </p>
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-4">{feature.title}</h3>
-                <p className="text-gray-600 leading-relaxed">{feature.desc}</p>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Pricing Plans Section */}
-      <section id="pricing" className="py-20 bg-gradient-to-br from-blue-50 to-purple-50">
-        <div className="container mx-auto px-6">
+      {/* Enhanced Pricing Plans */}
+      <section id="pricing" className="py-24 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff08_1px,transparent_1px),linear-gradient(to_bottom,#ffffff08_1px,transparent_1px)] bg-[size:40px_40px]"></div>
+        
+        <div className="container mx-auto px-6 relative">
           <motion.div
             initial={{ y: 50, opacity: 0 }}
             whileInView={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
-            className="text-center mb-16"
+            className="text-center mb-20"
           >
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Choose Your Plan</h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Start for free or upgrade for unlimited resumes without watermarks
+            <div className="inline-flex items-center bg-blue-500/20 border border-blue-400/30 text-blue-300 px-6 py-3 rounded-full text-sm font-medium mb-6 backdrop-blur-sm">
+              <Star className="h-4 w-4 mr-2" />
+              Simple, Transparent Pricing
+            </div>
+            <h2 className="text-5xl font-bold text-white mb-6">
+              Choose Your 
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
+                Success Plan
+              </span>
+            </h2>
+            <p className="text-xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
+              Start building for free or unlock premium features for unlimited professional resumes
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            {/* Free Plan */}
+          <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+            {/* Free Plan - Enhanced */}
             <motion.div
               initial={{ y: 50, opacity: 0 }}
               whileInView={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.6 }}
               viewport={{ once: true }}
-              className="bg-white rounded-2xl p-8 shadow-lg border-2 border-gray-200 relative flex flex-col h-full"
+              className="relative group"
             >
-              <div className="flex-1">
-                <div className="text-center mb-6">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">Free Plan</h3>
-                  <div className="text-4xl font-bold text-gray-900 mb-2">₹0</div>
-                  <p className="text-gray-600">Forever free</p>
+              <div className="absolute inset-0 bg-gradient-to-br from-slate-800/50 to-blue-800/50 blur-xl rounded-3xl group-hover:blur-2xl transition-all duration-300"></div>
+              
+              <div className="relative bg-white/10 backdrop-blur-xl rounded-3xl p-10 border border-white/20 shadow-2xl hover:shadow-3xl transition-all duration-300 flex flex-col h-full">
+                <div className="text-center mb-8">
+                  <div className="inline-flex items-center bg-white/10 text-white px-4 py-2 rounded-full text-sm font-medium mb-4">
+                    <CheckCircle className="h-4 w-4 mr-2" />
+                    Free Forever
+                  </div>
+                  <h3 className="text-2xl font-bold text-white mb-4">Starter Plan</h3>
+                  <div className="text-5xl font-bold text-white mb-2">₹0</div>
+                  <p className="text-blue-200">Perfect to get started</p>
                 </div>
 
-                <div className="space-y-4 mb-8">
-                  <div className="flex items-center space-x-3">
-                    <CheckCircle className="h-5 w-5 text-green-500" />
-                    <span className="text-gray-700">1 Resume creation</span>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <CheckCircle className="h-5 w-5 text-green-500" />
-                    <span className="text-gray-700">AI-powered content suggestions</span>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <CheckCircle className="h-5 w-5 text-green-500" />
-                    <span className="text-gray-700">Professional templates</span>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <CheckCircle className="h-5 w-5 text-green-500" />
-                    <span className="text-gray-700">PDF download</span>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <div className="h-5 w-5 bg-orange-100 rounded-full flex items-center justify-center">
-                      <span className="text-orange-600 text-xs">!</span>
+                <div className="space-y-4 mb-8 flex-grow">
+                  {[
+                    "1 Professional resume",
+                    "AI content suggestions",
+                    "3 Premium templates",
+                    "PDF download",
+                    "Basic customization",
+                    "Resume includes watermark"
+                  ].map((feature, i) => (
+                    <div key={i} className="flex items-center space-x-3">
+                      <CheckCircle className="h-5 w-5 text-blue-400 flex-shrink-0" />
+                      <span className="text-blue-100">{feature}</span>
                     </div>
-                    <span className="text-gray-700">Resume includes watermark</span>
-                  </div>
+                  ))}
                 </div>
-              </div>
 
-              <button className="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 rounded-lg font-semibold transition-colors mt-auto">
-                Get Started Free
-              </button>
+                <button className="w-full bg-white/10 hover:bg-white/20 border border-white/20 text-white py-4 rounded-xl font-semibold transition-all duration-300 backdrop-blur-sm">
+                  Start Building Free
+                </button>
+              </div>
             </motion.div>
 
-            {/* Monthly Premium Plan */}
+            {/* Premium Plan - Enhanced */}
             <motion.div
               initial={{ y: 50, opacity: 0 }}
               whileInView={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.6, delay: 0.1 }}
               viewport={{ once: true }}
-              className="bg-white rounded-2xl p-8 shadow-xl border-2 border-blue-500 relative flex flex-col h-full"
+              className="relative group"
             >
-              {/* Popular Badge */}
-              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                <span className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-2 rounded-full text-sm font-semibold">
-                  Most Popular
-                </span>
-              </div>
-
-              <div className="flex-1">
-                <div className="text-center mb-6">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">Premium Plan</h3>
-                  <div className="text-4xl font-bold text-blue-600 mb-1">₹90</div>
-                  <p className="text-gray-600">per month</p>
-                  <p className="text-sm text-gray-500 mt-1">Cancel anytime</p>
-                </div>
-
-                <div className="space-y-4 mb-8">
-                  <div className="flex items-center space-x-3">
-                    <CheckCircle className="h-5 w-5 text-green-500" />
-                    <span className="text-gray-700">Unlimited resume creation</span>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <CheckCircle className="h-5 w-5 text-green-500" />
-                    <span className="text-gray-700">AI-powered content suggestions</span>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <CheckCircle className="h-5 w-5 text-green-500" />
-                    <span className="text-gray-700">All professional templates</span>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <CheckCircle className="h-5 w-5 text-green-500" />
-                    <span className="text-gray-700">High-quality PDF downloads</span>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <CheckCircle className="h-5 w-5 text-green-500" />
-                    <span className="text-gray-700 font-medium">No watermark</span>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <CheckCircle className="h-5 w-5 text-green-500" />
-                    <span className="text-gray-700">Priority support</span>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <CheckCircle className="h-5 w-5 text-green-500" />
-                    <span className="text-gray-700">Multiple format exports</span>
-                  </div>
+              {/* Popular badge */}
+              <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 z-20">
+                <div className="bg-gradient-to-r from-orange-500 to-pink-600 text-white px-8 py-3 rounded-full text-sm font-bold shadow-lg">
+                  ⭐ Most Popular
                 </div>
               </div>
 
-              <button 
-                onClick={handlePremiumUpgrade}
-                className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white py-3 rounded-lg font-semibold transition-all transform hover:-translate-y-1 shadow-lg mt-auto"
-              >
-                {isPremium ? 'Already Premium ✓' : 'Upgrade to Premium'}
-              </button>
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/30 to-purple-600/30 blur-xl rounded-3xl group-hover:blur-2xl transition-all duration-300"></div>
+              
+              <div className="relative bg-gradient-to-br from-white/15 to-white/10 backdrop-blur-xl rounded-3xl p-10 border border-white/30 shadow-2xl hover:shadow-3xl transition-all duration-300 flex flex-col h-full">
+                <div className="text-center mb-8">
+                  <div className="inline-flex items-center bg-gradient-to-r from-blue-500/20 to-purple-600/20 border border-blue-400/30 text-blue-300 px-4 py-2 rounded-full text-sm font-medium mb-4 backdrop-blur-sm">
+                    <Award className="h-4 w-4 mr-2" />
+                    Premium Access
+                  </div>
+                  <h3 className="text-2xl font-bold text-white mb-4">Professional Plan</h3>
+                  <div className="text-5xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-2">₹90</div>
+                  <p className="text-blue-200 mb-2">per month</p>
+                  <p className="text-sm text-blue-300">Cancel anytime • 30-day guarantee</p>
+                </div>
+
+                <div className="space-y-4 mb-8 flex-grow">
+                  {[
+                    "Unlimited professional resumes",
+                    "Advanced AI content generation", 
+                    "15+ Premium templates",
+                    "Multiple export formats",
+                    "No watermarks",
+                    "Priority customer support",
+                    "Advanced customization",
+                    "Resume analytics & insights"
+                  ].map((feature, i) => (
+                    <div key={i} className="flex items-center space-x-3">
+                      <CheckCircle className="h-5 w-5 text-emerald-400 flex-shrink-0" />
+                      <span className="text-white font-medium">{feature}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <button 
+                  onClick={handlePremiumUpgrade}
+                  className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white py-4 rounded-xl font-bold transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-xl"
+                >
+                  {isPremium ? 'Already Premium ✓' : 'Upgrade to Premium'}
+                </button>
+              </div>
             </motion.div>
           </div>
 
@@ -439,37 +561,65 @@ export default function Home() {
             whileInView={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.4 }}
             viewport={{ once: true }}
-            className="text-center mt-12"
+            className="text-center mt-16"
           >
-            <div className="inline-flex items-center bg-green-100 text-green-700 px-6 py-3 rounded-full">
-              <Shield className="h-5 w-5 mr-2" />
-              <span className="font-medium">30-day money-back guarantee</span>
+            <div className="inline-flex items-center bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 px-8 py-4 rounded-full backdrop-blur-sm">
+              <Shield className="h-6 w-6 mr-3" />
+              <span className="font-semibold text-lg">30-Day Money-Back Guarantee</span>
             </div>
           </motion.div>
         </div>
       </section>
 
-      {/* Templates Preview */}
-      <section id="templates" className="py-20">
+      {/* Enhanced Templates Preview */}
+      <section id="templates" className="py-24 bg-gradient-to-br from-slate-50 to-blue-50/30">
         <div className="container mx-auto px-6">
           <motion.div
             initial={{ y: 50, opacity: 0 }}
             whileInView={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
-            className="text-center mb-16"
+            className="text-center mb-20"
           >
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Professional Templates</h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Choose from our collection of expertly designed templates that pass ATS systems and impress recruiters.
+            <div className="inline-flex items-center bg-purple-100 text-purple-700 px-6 py-3 rounded-full text-sm font-medium mb-6">
+              <FileText className="h-4 w-4 mr-2" />
+              Professional Templates
+            </div>
+            <h2 className="text-5xl font-bold text-slate-900 mb-6">
+              Templates That 
+              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">
+                Win Interviews
+              </span>
+            </h2>
+            <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
+              Choose from our expertly crafted templates designed by hiring professionals. 
+              Each template is optimized for ATS systems and modern recruiting practices.
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-8 mb-12 max-w-5xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-12 mb-16 max-w-6xl mx-auto">
             {[
-              { id: 1, name: "Modern Professional" },
-              { id: 2, name: "Creative Designer" },
-              { id: 3, name: "Tech Specialist" }
+              { 
+                id: 1, 
+                name: "Executive Professional", 
+                category: "Leadership",
+                color: "from-blue-500 to-indigo-600",
+                description: "Perfect for senior roles and C-level positions"
+              },
+              { 
+                id: 2, 
+                name: "Creative Designer", 
+                category: "Design & Creative",
+                color: "from-purple-500 to-pink-600",
+                description: "Showcase your creativity with visual appeal"
+              },
+              { 
+                id: 3, 
+                name: "Tech Specialist", 
+                category: "Technology",
+                color: "from-emerald-500 to-teal-600",
+                description: "Clean, modern design for technical roles"
+              }
             ].map((template, i) => (
               <motion.div
                 key={i}
@@ -477,58 +627,55 @@ export default function Home() {
                 whileInView={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.6, delay: i * 0.1 }}
                 viewport={{ once: true }}
-                className="group cursor-pointer"
+                className="group cursor-pointer relative"
               >
-                <div className="relative">
-                  {/* Choose Button on Top */}
-                  <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10">
-                    <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-all shadow-lg opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0">
-                      Choose
-                    </button>
-                  </div>
+                <div className="relative bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-100 group-hover:shadow-2xl transition-all duration-500 group-hover:-translate-y-2">
+                  {/* Template Preview */}
+                  <div className="relative aspect-[1/1.4] bg-gradient-to-br from-slate-50 to-white p-8">
+                    {/* Header */}
+                    <div className="text-center mb-6 border-b border-slate-100 pb-4">
+                      <div className="w-16 h-16 bg-gradient-to-br from-slate-200 to-slate-300 rounded-full mx-auto mb-3"></div>
+                      <div className="h-4 bg-slate-300 rounded-lg w-32 mx-auto mb-2"></div>
+                      <div className="h-2 bg-slate-200 rounded w-24 mx-auto"></div>
+                    </div>
 
-                  {/* A4 Template Preview */}
-                  <div className="relative bg-white border border-gray-200 rounded-lg shadow-md group-hover:shadow-lg transition-all aspect-[1/1.414] overflow-hidden">
-                    {/* Template Content - A4 Ratio */}
-                    <div className="p-4 h-full">
-                      {/* Header */}
-                      <div className="text-center mb-3 border-b border-gray-100 pb-3">
-                        <div className="w-16 h-16 bg-gray-200 rounded-full mx-auto mb-2"></div>
-                        <div className="h-3 bg-gray-300 rounded w-24 mx-auto mb-1"></div>
-                        <div className="h-2 bg-gray-200 rounded w-20 mx-auto"></div>
-                      </div>
-
-                      {/* Content Sections */}
-                      <div className="space-y-3">
-                        {/* Section 1 */}
-                        <div>
-                          <div className="h-2 bg-blue-300 rounded w-16 mb-2"></div>
-                          <div className="space-y-1">
-                            <div className="h-1.5 bg-gray-200 rounded w-full"></div>
-                            <div className="h-1.5 bg-gray-200 rounded w-4/5"></div>
-                            <div className="h-1.5 bg-gray-200 rounded w-3/4"></div>
+                    {/* Content Sections */}
+                    <div className="space-y-4">
+                      {[1, 2, 3].map((section, j) => (
+                        <div key={j}>
+                          <div className={`h-3 bg-gradient-to-r ${template.color} rounded w-20 mb-3 opacity-80`}></div>
+                          <div className="space-y-2">
+                            <div className="h-2 bg-slate-200 rounded w-full"></div>
+                            <div className="h-2 bg-slate-200 rounded w-4/5"></div>
+                            <div className="h-2 bg-slate-200 rounded w-3/4"></div>
                           </div>
                         </div>
+                      ))}
+                    </div>
 
-                        {/* Section 2 */}
-                        <div>
-                          <div className="h-2 bg-blue-300 rounded w-20 mb-2"></div>
-                          <div className="space-y-1">
-                            <div className="h-1.5 bg-gray-200 rounded w-full"></div>
-                            <div className="h-1.5 bg-gray-200 rounded w-5/6"></div>
-                          </div>
-                        </div>
-
-                        {/* Section 3 */}
-                        <div>
-                          <div className="h-2 bg-blue-300 rounded w-14 mb-2"></div>
-                          <div className="space-y-1">
-                            <div className="h-1.5 bg-gray-200 rounded w-4/5"></div>
-                            <div className="h-1.5 bg-gray-200 rounded w-3/5"></div>
-                          </div>
+                    {/* Hover overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-white/90 to-white/80 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center backdrop-blur-sm">
+                      <div className="text-center transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                        <button className={`bg-gradient-to-r ${template.color} text-white px-8 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all mb-4`}>
+                          Preview Template
+                        </button>
+                        <div className="flex items-center justify-center space-x-2">
+                          <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                          <span className="text-sm text-slate-600 font-medium">ATS Optimized</span>
                         </div>
                       </div>
                     </div>
+                  </div>
+
+                  {/* Template Info */}
+                  <div className="p-6 bg-white border-t border-slate-100">
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="font-bold text-slate-900 text-lg">{template.name}</h3>
+                      <span className={`bg-gradient-to-r ${template.color} text-white px-3 py-1 rounded-full text-xs font-medium`}>
+                        {template.category}
+                      </span>
+                    </div>
+                    <p className="text-slate-600 text-sm leading-relaxed">{template.description}</p>
                   </div>
                 </div>
               </motion.div>
@@ -536,49 +683,77 @@ export default function Home() {
           </div>
 
           <div className="text-center">
-            <a href="/template" className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold transition-colors inline-block">
-              View All Templates
-            </a>
+            <motion.div
+              initial={{ y: 30, opacity: 0 }}
+              whileInView={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+            >
+              <a 
+                href="/template" 
+                className="group inline-flex items-center bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-10 py-4 rounded-2xl font-semibold transition-all transform hover:-translate-y-1 shadow-xl hover:shadow-2xl"
+              >
+                <span>Explore All Templates</span>
+                <ArrowRight className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" />
+              </a>
+            </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Feedback/Reviews */}
-      <section id="feedback" className="bg-gray-50 py-20">
-        <div className="container mx-auto px-6">
+      {/* Enhanced Reviews Section */}
+      <section id="feedback" className="py-24 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff08_1px,transparent_1px),linear-gradient(to_bottom,#ffffff08_1px,transparent_1px)] bg-[size:32px_32px]"></div>
+        
+        <div className="container mx-auto px-6 relative">
           <motion.div
             initial={{ y: 50, opacity: 0 }}
             whileInView={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
-            className="text-center mb-16"
+            className="text-center mb-20"
           >
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">What Our Users Say</h2>
-            <p className="text-xl text-gray-600">Join thousands of professionals who landed their dream jobs</p>
+            <div className="inline-flex items-center bg-yellow-500/20 border border-yellow-400/30 text-yellow-300 px-6 py-3 rounded-full text-sm font-medium mb-6 backdrop-blur-sm">
+              <Star className="h-4 w-4 mr-2" />
+              Success Stories
+            </div>
+            <h2 className="text-5xl font-bold text-white mb-6">
+              Loved by 
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500">
+                Professionals
+              </span>
+              <span className="block">Worldwide</span>
+            </h2>
+            <p className="text-xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
+              Join thousands of professionals who transformed their careers with our AI-powered resume builder
+            </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-3 gap-8 mb-16">
             {[
               {
                 name: "Sarah Johnson",
-                role: "Marketing Manager",
-                company: "Tech Corp",
+                role: "Marketing Director",
+                company: "Fortune 500 Company",
                 rating: 5,
-                text: "This AI CV builder helped me land my dream job! The suggestions were spot-on and the templates look incredibly professional."
+                avatar: "SJ",
+                text: "This AI resume builder transformed my career search! The intelligent suggestions helped me articulate my achievements perfectly. I landed my dream role within 3 weeks of updating my resume."
               },
               {
                 name: "Michael Chen",
-                role: "Software Engineer",
-                company: "StartupXYZ",
+                role: "Senior Software Engineer",
+                company: "Tech Unicorn",
                 rating: 5,
-                text: "I was amazed by how quickly I could create a polished resume. The AI suggestions saved me hours of writing and editing."
+                avatar: "MC",
+                text: "As a developer, I was skeptical about AI writing tools. But this platform understood my technical background and generated compelling content that actually got me past ATS systems."
               },
               {
                 name: "Emily Rodriguez",
                 role: "Project Manager",
-                company: "Global Inc",
+                company: "Global Consulting Firm",
                 rating: 5,
-                text: "The ATS-friendly templates made all the difference. I started getting more interview calls within a week of updating my resume."
+                avatar: "ER",
+                text: "The professional templates and AI optimization made all the difference. My interview rate increased by 300% after switching to this platform. Absolutely worth the investment."
               }
             ].map((review, i) => (
               <motion.div
@@ -587,53 +762,139 @@ export default function Home() {
                 whileInView={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.6, delay: i * 0.2 }}
                 viewport={{ once: true }}
-                className="bg-white rounded-xl p-8 shadow-sm border border-gray-100"
+                className="relative group"
               >
-                <div className="flex items-center mb-4">
-                  {[...Array(review.rating)].map((_, j) => (
-                    <Star key={j} className="h-5 w-5 text-yellow-400 fill-current" />
-                  ))}
-                </div>
-                <p className="text-gray-600 mb-6 leading-relaxed">"{review.text}"</p>
-                <div className="flex items-center">
-                  <div className="bg-gray-200 w-12 h-12 rounded-full flex items-center justify-center mr-4">
-                    <User className="h-6 w-6 text-gray-600" />
+                <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-white/5 blur-xl rounded-3xl group-hover:blur-2xl transition-all duration-300"></div>
+                
+                <div className="relative bg-white/10 backdrop-blur-xl rounded-3xl p-8 border border-white/20 shadow-2xl hover:shadow-3xl transition-all duration-300">
+                  {/* Rating */}
+                  <div className="flex items-center mb-6">
+                    {[...Array(review.rating)].map((_, j) => (
+                      <Star key={j} className="h-5 w-5 text-yellow-400 fill-current" />
+                    ))}
+                    <span className="ml-2 text-yellow-400 font-medium text-sm">5.0</span>
                   </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-900">{review.name}</h4>
-                    <p className="text-sm text-gray-500">{review.role} at {review.company}</p>
+                  
+                  {/* Review Text */}
+                  <p className="text-blue-100 mb-8 leading-relaxed font-medium">
+                    "{review.text}"
+                  </p>
+                  
+                  {/* Reviewer Info */}
+                  <div className="flex items-center">
+                    <div className="bg-gradient-to-br from-blue-500 to-purple-600 w-12 h-12 rounded-full flex items-center justify-center mr-4 text-white font-bold">
+                      {review.avatar}
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-white text-lg">{review.name}</h4>
+                      <p className="text-blue-200 text-sm">{review.role}</p>
+                      <p className="text-blue-300 text-xs">{review.company}</p>
+                    </div>
                   </div>
                 </div>
               </motion.div>
             ))}
           </div>
+
+          {/* Trust indicators */}
+          <motion.div
+            initial={{ y: 30, opacity: 0 }}
+            whileInView={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+            className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center"
+          >
+            {[
+              { number: "50K+", label: "Happy Users" },
+              { number: "95%", label: "Success Rate" },
+              { number: "4.9/5", label: "User Rating" },
+              { number: "24/7", label: "Support" }
+            ].map((stat, i) => (
+              <div key={i} className="text-center">
+                <div className="text-3xl font-bold text-white mb-2">{stat.number}</div>
+                <div className="text-blue-200 text-sm">{stat.label}</div>
+              </div>
+            ))}
+          </motion.div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20">
-        <div className="container mx-auto px-6 text-center">
+      {/* Enhanced CTA Section */}
+      <section className="py-24 bg-gradient-to-br from-slate-50 to-blue-50/30 relative overflow-hidden">
+        {/* Background elements */}
+        <div className="absolute top-20 left-10 w-72 h-72 bg-blue-400/10 rounded-full mix-blend-multiply filter blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-400/10 rounded-full mix-blend-multiply filter blur-3xl animate-pulse delay-1000"></div>
+        
+        <div className="container mx-auto px-6 text-center relative">
           <motion.div
             initial={{ y: 50, opacity: 0 }}
             whileInView={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
+            className="max-w-4xl mx-auto"
           >
-            <h2 className="text-4xl font-bold text-gray-900 mb-6">Ready to Transform Your Career?</h2>
-            <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-              Join professionals who have successfully built their perfect resume with our AI-powered platform and landed great opportunities.
+            <div className="inline-flex items-center bg-gradient-to-r from-blue-100 to-purple-100 text-slate-700 px-6 py-3 rounded-full text-sm font-medium mb-8">
+              <Zap className="h-4 w-4 mr-2" />
+              <span>Ready to Transform Your Career?</span>
+            </div>
+            
+            <h2 className="text-5xl lg:text-6xl font-bold text-slate-900 mb-8 leading-tight">
+              Your Dream Job is Just 
+              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600">
+                One Resume Away
+              </span>
+            </h2>
+            
+            <p className="text-xl lg:text-2xl text-slate-600 mb-12 max-w-3xl mx-auto leading-relaxed">
+              Join thousands of successful professionals who landed their perfect roles 
+              with our AI-powered resume builder. Start your success story today.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a href="/template" className="bg-blue-500 hover:bg-blue-600 text-white px-12 py-4 rounded-lg text-xl font-semibold transition-all text-center">
-                Start Building Now
-              </a>
-              <a href="/template" className="border-2 border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white px-12 py-4 rounded-lg text-xl font-semibold transition-all text-center">
-                Try Free Demo
-              </a>
+            
+            <div className="flex flex-col sm:flex-row gap-6 justify-center mb-12">
+              <motion.a 
+                href="/template" 
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="group bg-gradient-to-r from-blue-600 to-purple-600 text-white px-12 py-5 rounded-2xl text-xl font-bold transition-all shadow-xl hover:shadow-2xl"
+              >
+                <span className="flex items-center justify-center space-x-3">
+                  <span>Start Building Now</span>
+                  <ArrowRight className="h-6 w-6 group-hover:translate-x-1 transition-transform" />
+                </span>
+              </motion.a>
+              
+              <motion.a 
+                href="/template" 
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="group bg-white border-2 border-slate-200 hover:border-blue-300 text-slate-700 hover:text-blue-700 px-12 py-5 rounded-2xl text-xl font-bold transition-all shadow-lg hover:shadow-xl"
+              >
+                <span className="flex items-center justify-center space-x-3">
+                  <FileText className="h-6 w-6" />
+                  <span>View Templates</span>
+                </span>
+              </motion.a>
+            </div>
+
+            {/* Final trust indicators */}
+            <div className="flex flex-wrap items-center justify-center gap-8 text-slate-500">
+              <div className="flex items-center space-x-2">
+                <CheckCircle className="h-5 w-5 text-emerald-500" />
+                <span>Free to start</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Shield className="h-5 w-5 text-blue-500" />
+                <span>Secure & private</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Star className="h-5 w-5 text-yellow-500" />
+                <span>Rated 4.9/5</span>
+              </div>
             </div>
           </motion.div>
         </div>
       </section>
+
       <Footer />
 
       {/* Payment Card Modal */}

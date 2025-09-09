@@ -48,38 +48,40 @@ export default function ProfessionalClean({ userData, colors, size = 'normal', m
 
     const isSmall = size === 'small';
 
-    // Professional clean styling
+    // Professional clean styling with optimized spacing
     const styles = {
         container: {
-            fontSize: isSmall ? '6px' : '11px',
-            lineHeight: isSmall ? 1.4 : 1.5,
+            fontSize: isSmall ? '7px' : '12px',
+            lineHeight: isSmall ? 1.5 : 1.6,
             fontFamily: "'Calibri', 'Arial', sans-serif"
         },
         name: {
-            fontSize: isSmall ? '16px' : '30px',
+            fontSize: isSmall ? '18px' : '34px',
             fontWeight: '600',
-            letterSpacing: '0.5px'
+            letterSpacing: '0.8px'
         },
         jobTitle: {
-            fontSize: isSmall ? '8px' : '13px',
-            fontWeight: '400'
+            fontSize: isSmall ? '9px' : '15px',
+            fontWeight: '400',
+            letterSpacing: '0.3px'
         },
         sectionTitle: {
-            fontSize: isSmall ? '7px' : '12px',
+            fontSize: isSmall ? '8px' : '14px',
             fontWeight: '700',
             textTransform: 'uppercase' as const,
-            letterSpacing: '0.5px'
+            letterSpacing: '0.8px'
         },
         text: {
-            fontSize: isSmall ? '6px' : '10px',
-            lineHeight: isSmall ? 1.4 : 1.5
+            fontSize: isSmall ? '7px' : '11px',
+            lineHeight: isSmall ? 1.5 : 1.6
         },
         spacing: {
-            section: isSmall ? '10px' : '18px',
-            item: isSmall ? '5px' : '8px'
+            section: isSmall ? '14px' : '28px',
+            item: isSmall ? '7px' : '14px',
+            micro: isSmall ? '4px' : '8px'
         },
         padding: {
-            container: isSmall ? '10px' : '20px'
+            container: isSmall ? '14px' : '28px'
         }
     };
 

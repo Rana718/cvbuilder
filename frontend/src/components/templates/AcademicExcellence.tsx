@@ -48,39 +48,41 @@ export default function AcademicExcellence({ userData, colors, size = 'normal', 
 
   const isSmall = size === 'small';
 
-  // Academic styling with serif fonts
+  // Academic styling with enhanced typography
   const styles = {
     container: {
-      fontSize: isSmall ? '6px' : '11px',
-      lineHeight: isSmall ? 1.4 : 1.6,
-      fontFamily: "'Crimson Text', 'Times New Roman', serif"
+      fontSize: isSmall ? '7px' : '12px',
+      lineHeight: isSmall ? 1.5 : 1.7,
+      fontFamily: "'Crimson Text', 'Times New Roman', 'Georgia', serif"
     },
     name: {
-      fontSize: isSmall ? '16px' : '32px',
+      fontSize: isSmall ? '18px' : '36px',
       fontWeight: '700',
-      letterSpacing: '0.5px'
+      letterSpacing: '0.8px'
     },
     jobTitle: {
-      fontSize: isSmall ? '8px' : '14px',
+      fontSize: isSmall ? '9px' : '16px',
       fontWeight: '400',
-      fontStyle: 'italic'
+      fontStyle: 'italic',
+      letterSpacing: '0.3px'
     },
     sectionTitle: {
-      fontSize: isSmall ? '7px' : '13px',
+      fontSize: isSmall ? '8px' : '15px',
       fontWeight: '700',
       textTransform: 'uppercase' as const,
-      letterSpacing: '1px'
+      letterSpacing: '1.2px'
     },
     text: {
-      fontSize: isSmall ? '6px' : '10px',
-      lineHeight: isSmall ? 1.5 : 1.7
+      fontSize: isSmall ? '7px' : '11px',
+      lineHeight: isSmall ? 1.6 : 1.8
     },
     spacing: {
-      section: isSmall ? '10px' : '20px',
-      item: isSmall ? '5px' : '10px'
+      section: isSmall ? '14px' : '28px',
+      item: isSmall ? '7px' : '14px',
+      micro: isSmall ? '4px' : '8px'
     },
     padding: {
-      container: isSmall ? '10px' : '20px'
+      container: isSmall ? '14px' : '28px'
     }
   };
 

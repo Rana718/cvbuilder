@@ -48,38 +48,41 @@ export default function ModernMinimalist({ userData, colors, size = 'normal', mo
 
   const isSmall = size === 'small';
   
-  // A4 optimized sizing
+  // A4 optimized sizing with improved spacing
   const styles = {
     container: {
-      fontSize: isSmall ? '6px' : '11px',
-      lineHeight: isSmall ? 1.2 : 1.4,
-      fontFamily: "'Inter', sans-serif"
+      fontSize: isSmall ? '7px' : '12px',
+      lineHeight: isSmall ? 1.3 : 1.5,
+      fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif"
     },
     name: {
-      fontSize: isSmall ? '14px' : '24px',
-      fontWeight: '700'
+      fontSize: isSmall ? '16px' : '28px',
+      fontWeight: '700',
+      letterSpacing: '-0.5px'
     },
     jobTitle: {
-      fontSize: isSmall ? '8px' : '14px',
-      fontWeight: '500'
+      fontSize: isSmall ? '9px' : '16px',
+      fontWeight: '500',
+      letterSpacing: '0.2px'
     },
     sectionTitle: {
-      fontSize: isSmall ? '7px' : '12px',
+      fontSize: isSmall ? '8px' : '14px',
       fontWeight: '700',
-      letterSpacing: '0.5px',
+      letterSpacing: '0.8px',
       textTransform: 'uppercase' as const
     },
     text: {
-      fontSize: isSmall ? '6px' : '10px',
-      lineHeight: isSmall ? 1.3 : 1.5
+      fontSize: isSmall ? '7px' : '11px',
+      lineHeight: isSmall ? 1.4 : 1.6
     },
     spacing: {
-      section: isSmall ? '8px' : '16px',
-      item: isSmall ? '4px' : '8px'
+      section: isSmall ? '12px' : '24px',
+      item: isSmall ? '6px' : '12px',
+      micro: isSmall ? '3px' : '6px'
     },
     padding: {
-      container: isSmall ? '8px' : '20px',
-      section: isSmall ? '6px' : '12px'
+      container: isSmall ? '12px' : '24px',
+      section: isSmall ? '8px' : '16px'
     }
   };
 
@@ -107,52 +110,73 @@ export default function ModernMinimalist({ userData, colors, size = 'normal', mo
     >
       {/* Header */}
       <div 
-        className="text-center border-b border-gray-200 pb-4 mb-6"
+        className="text-center border-b pb-6 mb-8"
         style={{ 
-          paddingBottom: styles.spacing.item, 
+          paddingBottom: styles.spacing.section, 
           marginBottom: styles.spacing.section,
-          borderBottomWidth: '1px',
-          borderBottomColor: '#e5e7eb'
+          borderBottomWidth: '2px',
+          borderBottomColor: theme.primary,
+          borderBottomStyle: 'solid'
         }}
       >
         <h1 
-          className="font-bold mb-1"
+          className="font-bold mb-3"
           style={{ 
             fontSize: styles.name.fontSize,
             fontWeight: styles.name.fontWeight,
-            color: theme.primary
+            color: theme.primary,
+            letterSpacing: styles.name.letterSpacing
           }}
         >
           {userData.name || "Your Name"}
         </h1>
         {hasContent(userData.job_title) && (
           <p 
-            className="font-medium mb-2"
+            className="font-medium mb-4"
             style={{ 
               fontSize: styles.jobTitle.fontSize,
               fontWeight: styles.jobTitle.fontWeight,
-              color: theme.secondary
+              color: theme.secondary,
+              letterSpacing: styles.jobTitle.letterSpacing
             }}
           >
             {userData.job_title}
           </p>
         )}
-        <div className="flex flex-wrap justify-center gap-2" style={{ fontSize: styles.text.fontSize }}>
+        <div 
+          className="flex flex-wrap justify-center gap-4" 
+          style={{ 
+            fontSize: styles.text.fontSize,
+            gap: isSmall ? '8px' : '16px'
+          }}
+        >
           {hasContent(userData.email) && (
-            <div className="flex items-center gap-1">
-              <Mail style={{ width: isSmall ? '8px' : '12px', height: isSmall ? '8px' : '12px' }} />
+            <div className="flex items-center gap-2">
+              <Mail style={{ 
+                width: isSmall ? '10px' : '16px', 
+                height: isSmall ? '10px' : '16px',
+                color: theme.accent
+              }} />
               <span>{userData.email}</span>
             </div>
           )}
           {hasContent(userData.phone) && (
-            <div className="flex items-center gap-1">
-              <Phone style={{ width: isSmall ? '8px' : '12px', height: isSmall ? '8px' : '12px' }} />
+            <div className="flex items-center gap-2">
+              <Phone style={{ 
+                width: isSmall ? '10px' : '16px', 
+                height: isSmall ? '10px' : '16px',
+                color: theme.accent
+              }} />
               <span>{userData.phone}</span>
             </div>
           )}
           {hasContent(userData.address) && (
-            <div className="flex items-center gap-1">
-              <MapPin style={{ width: isSmall ? '8px' : '12px', height: isSmall ? '8px' : '12px' }} />
+            <div className="flex items-center gap-2">
+              <MapPin style={{ 
+                width: isSmall ? '10px' : '16px', 
+                height: isSmall ? '10px' : '16px',
+                color: theme.accent
+              }} />
               <span>{userData.address}</span>
             </div>
           )}
@@ -160,38 +184,52 @@ export default function ModernMinimalist({ userData, colors, size = 'normal', mo
       </div>
 
       {/* Content */}
-      <div className="flex-1 flex gap-4">
+      <div className="flex-1 flex gap-6">
         {/* Left Column */}
         <div 
-          className="w-1/3 bg-gray-50 rounded-lg"
-          style={{ padding: styles.padding.section }}
+          className="w-1/3 bg-gray-50 rounded-xl"
+          style={{ 
+            padding: styles.padding.section,
+            backgroundColor: '#f8fafc'
+          }}
         >
           {/* Skills */}
           {hasContent(userData.skills) && (
             <div style={{ marginBottom: styles.spacing.section }}>
               <h3 
-                className="font-bold uppercase tracking-wide mb-2"
+                className="font-bold uppercase tracking-wide mb-4"
                 style={{ 
                   fontSize: styles.sectionTitle.fontSize,
                   color: theme.primary,
                   fontWeight: styles.sectionTitle.fontWeight,
-                  letterSpacing: styles.sectionTitle.letterSpacing
+                  letterSpacing: styles.sectionTitle.letterSpacing,
+                  marginBottom: styles.spacing.item
                 }}
               >
                 Skills
               </h3>
-              <div>
+              <div className="space-y-3">
                 {(userData.skills || []).slice(0, isSmall ? 8 : 12).map((skill, i) => (
-                  <div key={i} style={{ marginBottom: styles.spacing.item }}>
-                    <div className="flex justify-between items-center mb-1">
-                      <span style={{ fontSize: styles.text.fontSize, fontWeight: '500' }}>{skill.name}</span>
-                      <span style={{ fontSize: styles.text.fontSize, color: theme.secondary }}>
+                  <div key={i} style={{ marginBottom: styles.spacing.micro }}>
+                    <div className="flex justify-between items-center mb-2">
+                      <span style={{ 
+                        fontSize: styles.text.fontSize, 
+                        fontWeight: '600',
+                        color: theme.text
+                      }}>
+                        {skill.name}
+                      </span>
+                      <span style={{ 
+                        fontSize: styles.text.fontSize, 
+                        color: theme.secondary,
+                        fontWeight: '500'
+                      }}>
                         {skill.rating}/5
                       </span>
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-1">
+                    <div className="w-full bg-gray-200 rounded-full h-2">
                       <div
-                        className="h-full rounded-full"
+                        className="h-full rounded-full transition-all duration-300"
                         style={{
                           width: `${(skill.rating / 5) * 100}%`,
                           backgroundColor: theme.primary
@@ -208,7 +246,7 @@ export default function ModernMinimalist({ userData, colors, size = 'normal', mo
           {hasContent(userData.education) && (
             <div style={{ marginBottom: styles.spacing.section }}>
               <h3 
-                className="font-bold uppercase tracking-wide mb-2"
+                className="font-bold uppercase tracking-wide mb-4"
                 style={{ 
                   fontSize: styles.sectionTitle.fontSize,
                   color: theme.primary,
@@ -218,17 +256,30 @@ export default function ModernMinimalist({ userData, colors, size = 'normal', mo
               >
                 Education
               </h3>
-              <div>
+              <div className="space-y-3">
                 {(userData.education || []).slice(0, isSmall ? 3 : 4).map((edu, i) => (
-                  <div key={i} style={{ marginBottom: styles.spacing.item }}>
-                    <p className="font-medium" style={{ fontSize: styles.text.fontSize }}>
+                  <div key={i} style={{ marginBottom: styles.spacing.micro }}>
+                    <p className="font-semibold" style={{ 
+                      fontSize: styles.text.fontSize,
+                      fontWeight: '600',
+                      color: theme.text
+                    }}>
                       {edu.degree || 'Degree'}
                     </p>
-                    <p style={{ fontSize: styles.text.fontSize, color: theme.secondary }}>
+                    <p style={{ 
+                      fontSize: styles.text.fontSize, 
+                      color: theme.secondary,
+                      marginTop: '2px'
+                    }}>
                       {edu.institution || edu.school || 'Institution'}
                     </p>
                     {edu.year && (
-                      <p style={{ fontSize: styles.text.fontSize, color: theme.secondary }}>
+                      <p style={{ 
+                        fontSize: styles.text.fontSize, 
+                        color: theme.secondary,
+                        opacity: 0.8,
+                        marginTop: '1px'
+                      }}>
                         {edu.year}
                       </p>
                     )}
@@ -242,7 +293,7 @@ export default function ModernMinimalist({ userData, colors, size = 'normal', mo
           {hasContent(userData.languages) && (
             <div style={{ marginBottom: styles.spacing.section }}>
               <h3 
-                className="font-bold uppercase tracking-wide mb-2"
+                className="font-bold uppercase tracking-wide mb-4"
                 style={{ 
                   fontSize: styles.sectionTitle.fontSize,
                   color: theme.primary,
@@ -252,14 +303,15 @@ export default function ModernMinimalist({ userData, colors, size = 'normal', mo
               >
                 Languages
               </h3>
-              <div className="flex flex-wrap gap-1">
+              <div className="flex flex-wrap gap-2">
                 {(userData.languages || []).slice(0, isSmall ? 4 : 6).map((lang, i) => (
                   <span 
                     key={i}
-                    className="px-2 py-1 rounded text-white"
+                    className="px-3 py-1 rounded-full text-white font-medium"
                     style={{ 
                       fontSize: styles.text.fontSize,
-                      backgroundColor: theme.secondary
+                      backgroundColor: theme.secondary,
+                      boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
                     }}
                   >
                     {typeof lang === 'string' ? lang : lang.name || 'Language'}
@@ -273,7 +325,7 @@ export default function ModernMinimalist({ userData, colors, size = 'normal', mo
           {(hasContent(userData.linkedin_url) || hasContent(userData.github_url) || hasContent(userData.portfolio_url)) && (
             <div>
               <h3 
-                className="font-bold uppercase tracking-wide mb-2"
+                className="font-bold uppercase tracking-wide mb-4"
                 style={{ 
                   fontSize: styles.sectionTitle.fontSize,
                   color: theme.primary,
@@ -283,23 +335,44 @@ export default function ModernMinimalist({ userData, colors, size = 'normal', mo
               >
                 Links
               </h3>
-              <div>
+              <div className="space-y-2">
                 {hasContent(userData.linkedin_url) && (
-                  <div className="flex items-center gap-1 mb-1">
-                    <Linkedin style={{ width: isSmall ? '8px' : '12px', height: isSmall ? '8px' : '12px' }} />
-                    <span style={{ fontSize: styles.text.fontSize }}>LinkedIn</span>
+                  <div className="flex items-center gap-2">
+                    <Linkedin style={{ 
+                      width: isSmall ? '10px' : '16px', 
+                      height: isSmall ? '10px' : '16px',
+                      color: theme.accent
+                    }} />
+                    <span style={{ 
+                      fontSize: styles.text.fontSize,
+                      fontWeight: '500'
+                    }}>LinkedIn</span>
                   </div>
                 )}
                 {hasContent(userData.github_url) && (
-                  <div className="flex items-center gap-1 mb-1">
-                    <Github style={{ width: isSmall ? '8px' : '12px', height: isSmall ? '8px' : '12px' }} />
-                    <span style={{ fontSize: styles.text.fontSize }}>GitHub</span>
+                  <div className="flex items-center gap-2">
+                    <Github style={{ 
+                      width: isSmall ? '10px' : '16px', 
+                      height: isSmall ? '10px' : '16px',
+                      color: theme.accent
+                    }} />
+                    <span style={{ 
+                      fontSize: styles.text.fontSize,
+                      fontWeight: '500'
+                    }}>GitHub</span>
                   </div>
                 )}
                 {hasContent(userData.portfolio_url) && (
-                  <div className="flex items-center gap-1 mb-1">
-                    <Globe style={{ width: isSmall ? '8px' : '12px', height: isSmall ? '8px' : '12px' }} />
-                    <span style={{ fontSize: styles.text.fontSize }}>Portfolio</span>
+                  <div className="flex items-center gap-2">
+                    <Globe style={{ 
+                      width: isSmall ? '10px' : '16px', 
+                      height: isSmall ? '10px' : '16px',
+                      color: theme.accent
+                    }} />
+                    <span style={{ 
+                      fontSize: styles.text.fontSize,
+                      fontWeight: '500'
+                    }}>Portfolio</span>
                   </div>
                 )}
               </div>
@@ -308,12 +381,12 @@ export default function ModernMinimalist({ userData, colors, size = 'normal', mo
         </div>
 
         {/* Right Column */}
-        <div className="flex-1" style={{ padding: styles.padding.section }}>
+        <div className="flex-1" style={{ paddingLeft: styles.padding.section }}>
           {/* Summary */}
           {hasContent(userData.summary) && (
             <div style={{ marginBottom: styles.spacing.section }}>
               <h3 
-                className="font-bold uppercase tracking-wide mb-2"
+                className="font-bold uppercase tracking-wide mb-4"
                 style={{ 
                   fontSize: styles.sectionTitle.fontSize,
                   color: theme.primary,
@@ -323,7 +396,12 @@ export default function ModernMinimalist({ userData, colors, size = 'normal', mo
               >
                 Professional Summary
               </h3>
-              <p style={{ fontSize: styles.text.fontSize, lineHeight: styles.text.lineHeight }}>
+              <p style={{ 
+                fontSize: styles.text.fontSize, 
+                lineHeight: styles.text.lineHeight,
+                color: theme.text,
+                textAlign: 'justify'
+              }}>
                 {userData.summary}
               </p>
             </div>
@@ -333,7 +411,7 @@ export default function ModernMinimalist({ userData, colors, size = 'normal', mo
           {hasContent(userData.experience) && (
             <div style={{ marginBottom: styles.spacing.section }}>
               <h3 
-                className="font-bold uppercase tracking-wide mb-3"
+                className="font-bold uppercase tracking-wide mb-4"
                 style={{ 
                   fontSize: styles.sectionTitle.fontSize,
                   color: theme.primary,
@@ -343,28 +421,39 @@ export default function ModernMinimalist({ userData, colors, size = 'normal', mo
               >
                 Work Experience
               </h3>
-              <div>
+              <div className="space-y-6">
                 {(userData.experience || []).slice(0, isSmall ? 3 : 4).map((exp, i) => (
-                  <div key={i} style={{ marginBottom: styles.spacing.section }}>
-                    <div className="flex justify-between items-start mb-1">
-                      <h4 className="font-bold" style={{ fontSize: styles.text.fontSize }}>
+                  <div key={i} style={{ 
+                    marginBottom: styles.spacing.section,
+                    paddingBottom: styles.spacing.item,
+                    borderBottom: i < (userData.experience || []).length - 1 ? `1px solid ${theme.accent}20` : 'none'
+                  }}>
+                    <div className="flex justify-between items-start mb-2">
+                      <h4 className="font-bold" style={{ 
+                        fontSize: styles.text.fontSize,
+                        fontWeight: '700',
+                        color: theme.text
+                      }}>
                         {exp.title || exp.jobTitle || 'Position'}
                       </h4>
                       <span 
                         style={{ 
                           fontSize: styles.text.fontSize, 
                           color: theme.accent,
-                          fontWeight: '500'
+                          fontWeight: '600',
+                          whiteSpace: 'nowrap',
+                          marginLeft: '12px'
                         }}
                       >
                         {exp.duration || `${exp.start_date || ''} - ${exp.end_date || 'Present'}`}
                       </span>
                     </div>
                     <p 
-                      className="font-medium mb-1"
+                      className="font-medium mb-2"
                       style={{ 
                         fontSize: styles.text.fontSize, 
-                        color: theme.secondary 
+                        color: theme.secondary,
+                        fontWeight: '600'
                       }}
                     >
                       {exp.company || exp.employer || 'Company'}
@@ -373,12 +462,14 @@ export default function ModernMinimalist({ userData, colors, size = 'normal', mo
                       <p 
                         style={{ 
                           fontSize: styles.text.fontSize, 
-                          marginTop: styles.spacing.item,
-                          lineHeight: styles.text.lineHeight
+                          marginTop: styles.spacing.micro,
+                          lineHeight: styles.text.lineHeight,
+                          color: theme.text,
+                          textAlign: 'justify'
                         }}
                       >
-                        {isSmall && exp.description.length > 100 
-                          ? exp.description.substring(0, 100) + '...' 
+                        {isSmall && exp.description.length > 120 
+                          ? exp.description.substring(0, 120) + '...' 
                           : exp.description}
                       </p>
                     )}
@@ -392,7 +483,7 @@ export default function ModernMinimalist({ userData, colors, size = 'normal', mo
           {hasContent(userData.projects) && (
             <div style={{ marginBottom: styles.spacing.section }}>
               <h3 
-                className="font-bold uppercase tracking-wide mb-3"
+                className="font-bold uppercase tracking-wide mb-4"
                 style={{ 
                   fontSize: styles.sectionTitle.fontSize,
                   color: theme.primary,
@@ -402,22 +493,33 @@ export default function ModernMinimalist({ userData, colors, size = 'normal', mo
               >
                 Projects
               </h3>
-              <div>
+              <div className="space-y-4">
                 {(userData.projects || []).slice(0, isSmall ? 2 : 3).map((project, i) => (
-                  <div key={i} style={{ marginBottom: styles.spacing.item }}>
-                    <h4 className="font-bold" style={{ fontSize: styles.text.fontSize }}>
+                  <div key={i} style={{ 
+                    marginBottom: styles.spacing.item,
+                    paddingBottom: styles.spacing.micro,
+                    borderBottom: i < (userData.projects || []).length - 1 ? `1px solid ${theme.accent}15` : 'none'
+                  }}>
+                    <h4 className="font-bold" style={{ 
+                      fontSize: styles.text.fontSize,
+                      fontWeight: '700',
+                      color: theme.text,
+                      marginBottom: styles.spacing.micro
+                    }}>
                       {project.name || 'Project Name'}
                     </h4>
                     {project.description && (
                       <p 
                         style={{ 
                           fontSize: styles.text.fontSize, 
-                          marginTop: styles.spacing.item,
-                          lineHeight: styles.text.lineHeight
+                          marginTop: styles.spacing.micro,
+                          lineHeight: styles.text.lineHeight,
+                          color: theme.text,
+                          textAlign: 'justify'
                         }}
                       >
-                        {isSmall && project.description.length > 80 
-                          ? project.description.substring(0, 80) + '...' 
+                        {isSmall && project.description.length > 100 
+                          ? project.description.substring(0, 100) + '...' 
                           : project.description}
                       </p>
                     )}
@@ -431,7 +533,7 @@ export default function ModernMinimalist({ userData, colors, size = 'normal', mo
           {hasContent(userData.certifications) && (
             <div>
               <h3 
-                className="font-bold uppercase tracking-wide mb-3"
+                className="font-bold uppercase tracking-wide mb-4"
                 style={{ 
                   fontSize: styles.sectionTitle.fontSize,
                   color: theme.primary,
@@ -441,19 +543,27 @@ export default function ModernMinimalist({ userData, colors, size = 'normal', mo
               >
                 Certifications
               </h3>
-              <div>
+              <div className="space-y-2">
                 {(userData.certifications || []).slice(0, isSmall ? 3 : 5).map((cert, i) => (
-                  <div key={i} className="flex items-start gap-2 mb-1">
+                  <div key={i} className="flex items-start gap-3 mb-2">
                     <div 
-                      className="w-1 h-1 rounded-full flex-shrink-0 mt-1"
+                      className="w-2 h-2 rounded-full flex-shrink-0 mt-2"
                       style={{ backgroundColor: theme.accent }}
                     />
                     <div>
-                      <p className="font-medium" style={{ fontSize: styles.text.fontSize }}>
+                      <p className="font-medium" style={{ 
+                        fontSize: styles.text.fontSize,
+                        fontWeight: '600',
+                        color: theme.text
+                      }}>
                         {cert.name || cert.title || 'Certification'}
                       </p>
                       {(cert.issuer || cert.year) && (
-                        <p style={{ fontSize: styles.text.fontSize, color: '#6b7280' }}>
+                        <p style={{ 
+                          fontSize: styles.text.fontSize, 
+                          color: theme.secondary,
+                          marginTop: '2px'
+                        }}>
                           {cert.issuer && cert.year ? `${cert.issuer} • ${cert.year}` : cert.issuer || cert.year}
                         </p>
                       )}

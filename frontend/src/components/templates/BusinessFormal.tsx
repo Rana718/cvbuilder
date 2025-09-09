@@ -48,38 +48,41 @@ export default function BusinessFormal({ userData, colors, size = 'normal', mode
 
     const isSmall = size === 'small';
 
-    // Business formal styling
+    // Business formal styling with enhanced spacing
     const styles = {
         container: {
-            fontSize: isSmall ? '6px' : '11px',
-            lineHeight: isSmall ? 1.5 : 1.6,
-            fontFamily: "'Georgia', serif"
+            fontSize: isSmall ? '7px' : '12px',
+            lineHeight: isSmall ? 1.6 : 1.7,
+            fontFamily: "'Georgia', 'Times New Roman', serif"
         },
         name: {
-            fontSize: isSmall ? '16px' : '30px',
+            fontSize: isSmall ? '18px' : '34px',
             fontWeight: '700',
-            letterSpacing: '1px'
+            letterSpacing: '1.2px'
         },
         jobTitle: {
-            fontSize: isSmall ? '8px' : '14px',
+            fontSize: isSmall ? '9px' : '16px',
             fontWeight: '400',
-            fontStyle: 'italic'
+            fontStyle: 'italic',
+            letterSpacing: '0.3px'
         },
         sectionTitle: {
-            fontSize: isSmall ? '7px' : '12px',
+            fontSize: isSmall ? '8px' : '14px',
             fontWeight: '700',
-            letterSpacing: '1px'
+            letterSpacing: '1.2px',
+            textTransform: 'uppercase' as const
         },
         text: {
-            fontSize: isSmall ? '6px' : '10px',
-            lineHeight: isSmall ? 1.5 : 1.6
+            fontSize: isSmall ? '7px' : '11px',
+            lineHeight: isSmall ? 1.6 : 1.7
         },
         spacing: {
-            section: isSmall ? '12px' : '20px',
-            item: isSmall ? '6px' : '10px'
+            section: isSmall ? '16px' : '32px',
+            item: isSmall ? '8px' : '16px',
+            micro: isSmall ? '4px' : '8px'
         },
         padding: {
-            container: isSmall ? '12px' : '24px'
+            container: isSmall ? '16px' : '32px'
         }
     };
 

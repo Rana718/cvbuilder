@@ -8,98 +8,23 @@ import { auth } from '@/lib/firebase'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import LinkedInMini from '@/components/LinkedInMini'
-import PaymentHistory from '@/components/PaymentHistory'
 import {
     User,
     Mail,
     Calendar,
-    FileText,
     LogOut,
     ArrowLeft,
     Edit,
     Save,
     X,
-    Plus,
     Crown,
-    Award,
-    BarChart3,
-    Clock,
-    CreditCard,
     Shield,
     Settings,
-    Sparkles,
-    Zap
+    Phone,
+    MapPin,
+    Globe
 } from 'lucide-react'
 import axiosInstance from '@/lib/axios'
-
-// Premium Status Hook
-interface SubscriptionStatus {
-    has_subscription: boolean;
-    is_premium: boolean;
-    status: string;
-    current_period_end?: string;
-    plan?: string;
-}
-
-interface PremiumStatus {
-    isPremium: boolean;
-    loading: boolean;
-    subscriptionStatus?: SubscriptionStatus;
-    refreshStatus: () => Promise<void>;
-}
-
-const usePremiumStatus = (): PremiumStatus => {
-    const { user } = useAuth();
-    const [isPremium, setIsPremium] = useState(false);
-    const [loading, setLoading] = useState(true);
-    const [subscriptionStatus, setSubscriptionStatus] = useState<SubscriptionStatus>();
-
-    const checkPremiumStatus = async () => {
-        if (!user) {
-            setIsPremium(false);
-            setSubscriptionStatus(undefined);
-            setLoading(false);
-            return;
-        }
-
-        try {
-            const response = await axiosInstance.get('/api/payment/subscription-status');
-            const data: SubscriptionStatus = response.data;
-            setSubscriptionStatus(data);
-            setIsPremium(data.is_premium);
-        } catch (error: any) {
-            console.error('Failed to check premium status:', error);
-
-            // Fallback to token claims if API fails
-            try {
-                const tokenResult = await user.getIdTokenResult(true);
-                const premium = tokenResult.claims.premium === "true" || tokenResult.claims.premium === true;
-                setIsPremium(premium);
-            } catch (tokenError) {
-                console.error('Failed to get token claims:', tokenError);
-                setIsPremium(false);
-            }
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const refreshStatus = async () => {
-        setLoading(true);
-        await checkPremiumStatus();
-    };
-
-    useEffect(() => {
-        checkPremiumStatus();
-    }, [user]);
-
-    return {
-        isPremium,
-        loading,
-        subscriptionStatus,
-        refreshStatus
-    };
-};
 
 interface UserProfile {
     id: number
@@ -109,22 +34,14 @@ interface UserProfile {
     phone?: string
 }
 
-interface ProfileStats {
-    totalResumes: number
-    lastResumeCreated: string | null
-}
-
 function ProfilePage() {
     const { user, loading: authLoading } = useAuth()
     const { isAdmin, isSuperAdmin, loading: adminLoading } = useAdminAuth()
-    const { isPremium, loading: premiumLoading, subscriptionStatus, refreshStatus } = usePremiumStatus()
     const router = useRouter()
     const [profile, setProfile] = useState<UserProfile | null>(null)
-    const [stats, setStats] = useState<ProfileStats>({ totalResumes: 0, lastResumeCreated: null })
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState('')
     const [isEditing, setIsEditing] = useState(false)
-    const [showPaymentHistory, setShowPaymentHistory] = useState(false)
     const [editForm, setEditForm] = useState({
         full_name: ''
     })
@@ -138,7 +55,6 @@ function ProfilePage() {
         }
 
         fetchProfile()
-        fetchStats()
     }, [user, authLoading, router])
 
     const fetchProfile = async () => {
@@ -159,7 +75,6 @@ function ProfilePage() {
             if (error.response?.status === 401) {
                 router.push('/sign-in?callbackUrl=' + encodeURIComponent('/profile'))
             } else {
-                // Fallback to Firebase user data if API fails
                 const mockProfile: UserProfile = {
                     id: 1,
                     email: user?.email || '',
@@ -171,23 +86,6 @@ function ProfilePage() {
                     full_name: mockProfile.full_name || ''
                 })
             }
-        }
-    }
-
-    const fetchStats = async () => {
-        try {
-            setLoading(true)
-            const response = await axiosInstance.get('/api/resume-op/all')
-            const resumes = response.data
-
-            setStats({
-                totalResumes: resumes.length,
-                lastResumeCreated: resumes.length > 0 ?
-                    resumes.sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0].created_at
-                    : null
-            })
-        } catch (error: any) {
-            console.error('Failed to fetch stats:', error)
         } finally {
             setLoading(false)
         }
@@ -231,17 +129,21 @@ function ProfilePage() {
     const formatDate = (dateString: string) => {
         return new Date(dateString).toLocaleDateString('en-US', {
             year: 'numeric',
-            month: 'long',
+            month: 'short',
             day: 'numeric'
         })
     }
 
-    if (authLoading || loading || premiumLoading || adminLoading) {
+    if (authLoading || loading || adminLoading) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
+            <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
                 <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-3 border-blue-500 border-t-transparent mx-auto"></div>
-                    <p className="mt-4 text-gray-600 font-medium">Loading your profile...</p>
+                    <div className="relative w-12 h-12 mx-auto mb-4">
+                        <div className="absolute inset-0 border-3 border-slate-200 rounded-full"></div>
+                        <div className="absolute inset-0 border-3 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                    <h3 className="text-lg font-medium text-slate-700 mb-1">Loading Profile</h3>
+                    <p className="text-sm text-slate-500">Please wait...</p>
                 </div>
             </div>
         )
@@ -249,70 +151,72 @@ function ProfilePage() {
 
     if (!profile) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
+            <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
                 <div className="text-center">
-                    <p className="text-gray-600">Failed to load profile</p>
+                    <p className="text-slate-600">Failed to load profile</p>
                 </div>
             </div>
         )
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-            {/* Header */}
-            <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200/50 sticky top-0 z-10">
-                <div className="max-w-6xl mx-auto px-4 py-4">
+        <div className="min-h-screen bg-slate-50">
+            {/* Compact Header */}
+            <div className="bg-white border-b border-slate-200 sticky top-0 z-10">
+                <div className="max-w-4xl mx-auto px-4 py-4">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-4">
                             <Link
-                                href="/resusme"
-                                className="flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-colors group"
+                                href="/dashboard"
+                                className="flex items-center space-x-2 text-slate-600 hover:text-blue-600 transition-colors"
                             >
-                                <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-                                <span className="font-medium">Back</span>
+                                <ArrowLeft className="w-5 h-5" />
+                                <span className="hidden sm:inline font-medium">Dashboard</span>
                             </Link>
-                            <div className="h-6 w-px bg-gray-300" />
-                            <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-blue-600 bg-clip-text text-transparent">My Profile</h1>
+                            <div className="h-5 w-px bg-slate-300 hidden sm:block"></div>
+                            <h1 className="text-xl sm:text-2xl font-medium text-slate-900">Profile Settings</h1>
                         </div>
+                        <button className="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-all">
+                            <Settings className="w-5 h-5" />
+                        </button>
                     </div>
                 </div>
             </div>
 
-            {/* Content */}
-            <div className="max-w-6xl mx-auto px-4 py-8">
+            {/* Main Content */}
+            <div className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
                 {error && (
-                    <div className="mb-6 bg-red-50/80 backdrop-blur-sm border border-red-200 text-red-700 px-4 py-3 rounded-xl">
+                    <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
                         {error}
                     </div>
                 )}
 
-                <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
-                    {/* Main Profile Section */}
-                    <div className="xl:col-span-3 space-y-6">
-                        {/* Profile Header */}
-                        <div className="bg-white/80 backdrop-blur-sm border border-gray-200/50 rounded-2xl p-8 shadow-sm">
-                            <div className="flex items-start justify-between mb-8">
-                                <h2 className="text-xl font-semibold text-gray-900">Profile Information</h2>
+                <div className="space-y-6">
+                    {/* Profile Header Card */}
+                    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                        <div className="p-6 bg-gradient-to-br from-blue-50 to-indigo-50">
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+                                <h2 className="text-lg font-medium text-slate-900">Profile Information</h2>
                                 {!isEditing ? (
                                     <button
                                         onClick={() => setIsEditing(true)}
-                                        className="flex items-center space-x-2 px-6 py-3 text-blue-600 hover:text-white hover:bg-blue-600 transition-all duration-200 font-medium"
+                                        className="inline-flex items-center space-x-2 px-4 py-2 text-sm font-medium text-blue-700 bg-blue-100 hover:bg-blue-200 rounded-lg transition-colors"
                                     >
                                         <Edit className="w-4 h-4" />
-                                        <span>Edit Profile</span>
+                                        <span>Edit</span>
                                     </button>
                                 ) : (
-                                    <div className="flex items-center space-x-3">
+                                    <div className="flex items-center space-x-2">
                                         <button
                                             onClick={handleSaveProfile}
-                                            className="flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white hover:bg-blue-700 transition-all duration-200 font-medium"
+                                            className="inline-flex items-center space-x-2 px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors"
                                         >
                                             <Save className="w-4 h-4" />
                                             <span>Save</span>
                                         </button>
                                         <button
                                             onClick={handleCancelEdit}
-                                            className="flex items-center space-x-2 px-6 py-3 text-gray-600 hover:text-gray-800 hover:bg-gray-100 transition-all duration-200 font-medium"
+                                            className="inline-flex items-center space-x-2 px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors"
                                         >
                                             <X className="w-4 h-4" />
                                             <span>Cancel</span>
@@ -321,53 +225,52 @@ function ProfilePage() {
                                 )}
                             </div>
 
-                            {/* Avatar and Basic Info */}
-                            <div className="flex items-start space-x-6 mb-8">
-                                <div className="relative">
+                            {/* Avatar and Name Section */}
+                            <div className="flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-6">
+                                <div className="relative flex-shrink-0">
                                     {user?.photoURL ? (
                                         <img
                                             src={user.photoURL}
                                             alt="Profile"
-                                            className="w-24 h-24 object-cover"
+                                            className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-2xl border-4 border-white shadow-lg"
                                         />
                                     ) : (
-                                        <div className="w-24 h-24 bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center">
-                                            <User className="w-12 h-12 text-blue-600" />
-                                        </div>
-                                    )}
-                                    {isPremium && (
-                                        <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-r from-yellow-400 to-yellow-500 flex items-center justify-center">
-                                            <Crown className="w-4 h-4 text-white" />
+                                        <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl border-4 border-white shadow-lg flex items-center justify-center">
+                                            <User className="w-10 h-10 sm:w-12 sm:h-12 text-blue-600" />
                                         </div>
                                     )}
                                 </div>
-                                <div className="flex-1">
-                                    <div className="flex items-center space-x-3 mb-3">
-                                        <h3 className="text-2xl font-bold text-gray-900">
+                                <div className="flex-1 text-center sm:text-left min-w-0">
+                                    <div className="mb-3">
+                                        <h3 className="text-2xl font-medium text-slate-900 truncate">
                                             {profile.full_name || 'User'}
                                         </h3>
-                                        {isPremium && (
-                                            <div className="flex items-center space-x-2 bg-gradient-to-r from-yellow-400 to-yellow-500 text-white px-3 py-1 rounded-full text-sm font-medium shadow-sm">
-                                                <Award className="w-4 h-4" />
-                                                <span>Premium</span>
+                                        {(isAdmin || isSuperAdmin) && (
+                                            <div className="inline-flex items-center space-x-1 mt-2 px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-medium">
+                                                {isSuperAdmin ? <Crown className="w-4 h-4" /> : <Shield className="w-4 h-4" />}
+                                                <span>{isSuperAdmin ? 'Super Admin' : 'Admin'}</span>
                                             </div>
                                         )}
                                     </div>
-                                    <p className="text-gray-600 flex items-center mb-2">
-                                        <Mail className="w-5 h-5 mr-3 text-blue-500" />
-                                        {profile.email}
-                                    </p>
-                                    <p className="text-gray-500 flex items-center">
-                                        <Calendar className="w-5 h-5 mr-3 text-blue-500" />
-                                        Member since {formatDate(profile.created_at)}
-                                    </p>
+                                    <div className="space-y-2">
+                                        <div className="flex items-center justify-center sm:justify-start space-x-2 text-slate-600">
+                                            <Mail className="w-4 h-4 flex-shrink-0" />
+                                            <span className="text-sm truncate">{profile.email}</span>
+                                        </div>
+                                        <div className="flex items-center justify-center sm:justify-start space-x-2 text-slate-500">
+                                            <Calendar className="w-4 h-4 flex-shrink-0" />
+                                            <span className="text-sm">Joined {formatDate(profile.created_at)}</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
+                        </div>
 
-                            {/* Form Fields */}
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                        {/* Form Section */}
+                        <div className="p-6 space-y-6">
+                            <div className="grid grid-cols-1 gap-6">
                                 <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-3">
+                                    <label className="block text-sm font-medium text-slate-700 mb-2">
                                         Full Name
                                     </label>
                                     {isEditing ? (
@@ -375,188 +278,115 @@ function ProfilePage() {
                                             type="text"
                                             value={editForm.full_name}
                                             onChange={(e) => setEditForm({ ...editForm, full_name: e.target.value })}
-                                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                                            className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm bg-white"
                                             placeholder="Enter your full name"
                                         />
                                     ) : (
-                                        <div className="px-4 py-3 bg-gray-50/50 rounded-xl border border-gray-200">
-                                            <p className="text-gray-900 font-medium">{profile.full_name || 'Not provided'}</p>
+                                        <div className="px-4 py-3 bg-slate-50 rounded-xl border border-slate-200">
+                                            <p className="text-slate-800 text-sm">{profile.full_name || 'Not provided'}</p>
                                         </div>
                                     )}
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-3">
+                                    <label className="block text-sm font-medium text-slate-700 mb-2">
                                         Email Address
                                     </label>
-                                    <div className="px-4 py-3 bg-gray-50/50 rounded-xl border border-gray-200">
-                                        <p className="text-gray-900 font-medium">{profile.email}</p>
+                                    <div className="px-4 py-3 bg-slate-50 rounded-xl border border-slate-200">
+                                        <p className="text-slate-800 text-sm">{profile.email}</p>
+                                        <p className="text-slate-500 text-xs mt-1">Email cannot be changed</p>
                                     </div>
                                 </div>
-                            </div>
-
-                            {/* LinkedIn Integration Mini */}
-                            <div className="mb-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200">
-                                <LinkedInMini />
-                            </div>
-
-                            {/* Admin Panel Access */}
-                            {(isAdmin || isSuperAdmin) && (
-                                <div className="mb-8">
-                                    <Link
-                                        href="/admin"
-                                        className="flex items-center space-x-3 px-6 py-4 text-purple-600 hover:text-white hover:bg-gradient-to-r from-purple-600 to-purple-700 rounded-xl border border-purple-200 hover:border-purple-600 transition-all duration-200 font-medium group"
-                                    >
-                                        <Shield className="w-5 h-5" />
-                                        <span>Admin Panel</span>
-                                        {isSuperAdmin && (
-                                            <Crown className="w-5 h-5 ml-auto group-hover:rotate-12 transition-transform" />
-                                        )}
-                                    </Link>
-                                </div>
-                            )}
-
-                            {/* Sign Out Button */}
-                            <div className="pt-8 border-t border-gray-200">
-                                <button
-                                    onClick={handleSignOut}
-                                    className="flex items-center space-x-3 px-6 py-3 text-red-600 hover:text-white hover:bg-red-600 rounded-xl border border-red-200 hover:border-red-600 transition-all duration-200 font-medium"
-                                >
-                                    <LogOut className="w-5 h-5" />
-                                    <span>Sign Out</span>
-                                </button>
                             </div>
                         </div>
-
-                        {/* Payment History */}
-                        {isPremium && (
-                            <div className="bg-white/80 backdrop-blur-sm border border-gray-200/50 rounded-2xl shadow-sm">
-                                <div className="p-6 border-b border-gray-200">
-                                    <div className="flex items-center justify-between">
-                                        <h2 className="text-xl font-semibold text-gray-900 flex items-center">
-                                            <CreditCard className="w-6 h-6 mr-3 text-blue-500" />
-                                            Billing & Payments
-                                        </h2>
-                                        <button
-                                            onClick={() => setShowPaymentHistory(!showPaymentHistory)}
-                                            className="text-blue-600 hover:text-blue-700 font-medium px-4 py-2 rounded-lg hover:bg-blue-50 transition-all duration-200"
-                                        >
-                                            {showPaymentHistory ? 'Hide' : 'Show'} Details
-                                        </button>
-                                    </div>
-                                </div>
-                                {showPaymentHistory && (
-                                    <div className="p-6">
-                                        <PaymentHistory onRefreshStatus={refreshStatus} />
-                                    </div>
-                                )}
-                            </div>
-                        )}
                     </div>
 
-                    {/* Sidebar */}
-                    <div className="space-y-6">
-                        {/* Account Status */}
-                        <div className="bg-white/80 backdrop-blur-sm border border-gray-200/50 rounded-2xl p-6 shadow-sm">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Account Status</h3>
-                            <div className="space-y-4">
-                                {isPremium ? (
-                                    <div className="bg-gradient-to-r from-yellow-400 to-yellow-500 text-white p-4 rounded-xl">
-                                        <div className="flex items-center space-x-3 mb-2">
-                                            <Crown className="w-6 h-6" />
-                                            <span className="text-lg font-bold">Premium Member</span>
-                                        </div>
-                                        {subscriptionStatus?.current_period_end && (
-                                            <p className="text-yellow-100 text-sm">
-                                                Valid until {formatDate(subscriptionStatus.current_period_end)}
-                                            </p>
-                                        )}
-                                    </div>
-                                ) : (
-                                    <div className="space-y-4">
-                                        <div className="p-4 bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl border border-gray-200">
-                                            <div className="flex items-center space-x-3 mb-3">
-                                                <User className="w-5 h-5 text-gray-600" />
-                                                <span className="text-gray-700 font-medium">Free Account</span>
-                                            </div>
-                                            <p className="text-sm text-gray-600 mb-4">Unlock premium features to supercharge your resume building experience</p>
-                                            <Link
-                                                href="/pricing"
-                                                className="flex items-center justify-center space-x-2 w-full px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-200 font-semibold shadow-sm hover:shadow-md"
-                                            >
-                                                <Sparkles className="w-5 h-5" />
-                                                <span>Upgrade to Premium</span>
-                                            </Link>
-                                        </div>
-                                    </div>
-                                )}
+                    {/* LinkedIn Integration Card */}
+                    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm">
+                        <div className="p-6">
+                            <h3 className="text-lg font-medium text-slate-900 mb-4">LinkedIn Integration</h3>
+                            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4">
+                                <LinkedInMini />
                             </div>
                         </div>
+                    </div>
 
-                        {/* Resume Stats */}
-                        <div className="bg-white/80 backdrop-blur-sm border border-gray-200/50 rounded-2xl p-6 shadow-sm">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                                <BarChart3 className="w-6 h-6 mr-3 text-blue-500" />
-                                Statistics
-                            </h3>
-                            <div className="space-y-4">
-                                <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200">
-                                    <div className="text-3xl font-bold text-blue-600 mb-1">{stats.totalResumes}</div>
-                                    <div className="text-sm text-blue-700 font-medium">Total Resumes Created</div>
+                    {/* Admin Panel Access */}
+                    {(isAdmin || isSuperAdmin) && (
+                        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm">
+                            <div className="p-6">
+                                <Link
+                                    href="/admin"
+                                    className="flex items-center justify-between p-4 text-purple-700 hover:text-white hover:bg-gradient-to-r from-purple-600 to-purple-700 rounded-xl border-2 border-purple-200 hover:border-purple-600 transition-all group"
+                                >
+                                    <div className="flex items-center space-x-3">
+                                        <div className="p-2 bg-purple-100 group-hover:bg-white/20 rounded-lg transition-colors">
+                                            <Shield className="w-5 h-5" />
+                                        </div>
+                                        <div>
+                                            <h4 className="font-medium">Admin Panel</h4>
+                                            <p className="text-sm text-purple-600 group-hover:text-purple-100">Manage application</p>
+                                        </div>
+                                    </div>
+                                    {isSuperAdmin && (
+                                        <Crown className="w-6 h-6 group-hover:rotate-12 transition-transform" />
+                                    )}
+                                </Link>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Quick Actions Grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm">
+                            <div className="p-6">
+                                <h4 className="font-medium text-slate-900 mb-3">Account Security</h4>
+                                <div className="space-y-3">
+                                    <div className="flex items-center justify-between text-sm">
+                                        <span className="text-slate-600">Password</span>
+                                        <button className="text-blue-600 hover:text-blue-700 font-medium">Change</button>
+                                    </div>
+                                    <div className="flex items-center justify-between text-sm">
+                                        <span className="text-slate-600">Two-Factor Auth</span>
+                                        <button className="text-blue-600 hover:text-blue-700 font-medium">Enable</button>
+                                    </div>
                                 </div>
-                                {stats.lastResumeCreated && (
-                                    <div className="p-4 bg-gradient-to-r from-gray-50 to-slate-50 rounded-xl border border-gray-200">
-                                        <div className="flex items-center text-sm text-gray-600 mb-2">
-                                            <Clock className="w-4 h-4 mr-2" />
-                                            <span className="font-medium">Last Resume</span>
-                                        </div>
-                                        <div className="text-sm font-semibold text-gray-900">
-                                            {formatDate(stats.lastResumeCreated)}
-                                        </div>
-                                    </div>
-                                )}
                             </div>
                         </div>
 
-                        {/* Quick Actions */}
-                        <div className="bg-white/80 backdrop-blur-sm border border-gray-200/50 rounded-2xl p-6 shadow-sm">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
-                            <div className="space-y-3">
-                                <Link
-                                    href="/template"
-                                    className="flex items-center space-x-3 w-full px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-200 font-medium border border-gray-200 hover:border-blue-300 group"
+                        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm">
+                            <div className="p-6">
+                                <h4 className="font-medium text-slate-900 mb-3">Privacy Settings</h4>
+                                <div className="space-y-3">
+                                    <div className="flex items-center justify-between text-sm">
+                                        <span className="text-slate-600">Profile Visibility</span>
+                                        <button className="text-blue-600 hover:text-blue-700 font-medium">Public</button>
+                                    </div>
+                                    <div className="flex items-center justify-between text-sm">
+                                        <span className="text-slate-600">Data Export</span>
+                                        <button className="text-blue-600 hover:text-blue-700 font-medium">Download</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Sign Out Section */}
+                    <div className="bg-white rounded-2xl border border-red-200 shadow-sm">
+                        <div className="p-6">
+                            <h4 className="font-medium text-slate-900 mb-3">Account Actions</h4>
+                            <div className="flex flex-col sm:flex-row gap-3">
+                                <button
+                                    onClick={handleSignOut}
+                                    className="inline-flex items-center justify-center space-x-2 px-4 py-3 text-red-700 hover:text-white hover:bg-red-600 border border-red-300 hover:border-red-600 rounded-xl transition-all font-medium"
                                 >
-                                    <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
-                                    <span>Create New Resume</span>
-                                </Link>
-                                <Link
-                                    href="/resusme"
-                                    className="flex items-center space-x-3 w-full px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-200 font-medium border border-gray-200 hover:border-blue-300"
-                                >
-                                    <FileText className="w-5 h-5" />
-                                    <span>My Resumes</span>
-                                </Link>
-                                {isPremium && (
-                                    <button
-                                        onClick={() => setShowPaymentHistory(!showPaymentHistory)}
-                                        className="flex items-center space-x-3 w-full px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-200 font-medium border border-gray-200 hover:border-blue-300"
-                                    >
-                                        <CreditCard className="w-5 h-5" />
-                                        <span>Billing & Payments</span>
-                                    </button>
-                                )}
-                                {(isAdmin || isSuperAdmin) && (
-                                    <Link
-                                        href="/admin"
-                                        className="flex items-center space-x-3 w-full px-4 py-3 text-purple-700 hover:text-purple-600 hover:bg-purple-50 rounded-xl transition-all duration-200 font-medium border border-purple-200 hover:border-purple-300 group"
-                                    >
-                                        <Shield className="w-5 h-5" />
-                                        <span>Admin Panel</span>
-                                        {isSuperAdmin && (
-                                            <Crown className="w-4 h-4 ml-auto group-hover:rotate-12 transition-transform" />
-                                        )}
-                                    </Link>
-                                )}
+                                    <LogOut className="w-4 h-4" />
+                                    <span>Sign Out</span>
+                                </button>
+                                <button className="inline-flex items-center justify-center space-x-2 px-4 py-3 text-red-700 hover:text-white hover:bg-red-600 border border-red-300 hover:border-red-600 rounded-xl transition-all font-medium">
+                                    <X className="w-4 h-4" />
+                                    <span>Delete Account</span>
+                                </button>
                             </div>
                         </div>
                     </div>

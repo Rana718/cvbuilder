@@ -48,48 +48,49 @@ export default function CreativeDesigner({ userData, colors, size = 'normal', mo
 
   const isSmall = size === 'small';
 
-  // A4 optimized sizing with better typography
+  // A4 optimized sizing with enhanced typography
   const styles = {
     container: {
-      fontSize: isSmall ? '6px' : '11px',
-      lineHeight: isSmall ? 1.2 : 1.4,
-      fontFamily: "'Inter', sans-serif"
+      fontSize: isSmall ? '7px' : '12px',
+      lineHeight: isSmall ? 1.3 : 1.5,
+      fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif"
     },
     name: {
-      fontSize: isSmall ? '14px' : '28px',
+      fontSize: isSmall ? '16px' : '32px',
       fontWeight: '700',
-      letterSpacing: '-0.5px'
+      letterSpacing: '-0.8px'
     },
     jobTitle: {
-      fontSize: isSmall ? '8px' : '14px',
+      fontSize: isSmall ? '9px' : '16px',
       fontWeight: '500',
-      opacity: 0.9
+      opacity: 0.9,
+      letterSpacing: '0.3px'
     },
     sectionTitle: {
-      fontSize: isSmall ? '8px' : '13px',
+      fontSize: isSmall ? '9px' : '15px',
       fontWeight: '700',
-      letterSpacing: '0.5px',
+      letterSpacing: '0.6px',
       textTransform: 'uppercase' as const
     },
     text: {
+      fontSize: isSmall ? '7px' : '11px',
+      lineHeight: isSmall ? 1.4 : 1.6
+    },
+    subtext: {
       fontSize: isSmall ? '6px' : '10px',
       lineHeight: isSmall ? 1.3 : 1.5
     },
-    subtext: {
-      fontSize: isSmall ? '5px' : '9px',
-      lineHeight: isSmall ? 1.2 : 1.4
-    },
     contact: {
-      fontSize: isSmall ? '5px' : '9px'
+      fontSize: isSmall ? '6px' : '10px'
     },
     spacing: {
-      section: isSmall ? '8px' : '16px',
-      item: isSmall ? '4px' : '8px',
-      micro: isSmall ? '2px' : '4px'
+      section: isSmall ? '12px' : '24px',
+      item: isSmall ? '6px' : '12px',
+      micro: isSmall ? '3px' : '6px'
     },
     padding: {
-      container: isSmall ? '8px' : '20px',
-      section: isSmall ? '6px' : '12px'
+      container: isSmall ? '12px' : '24px',
+      section: isSmall ? '8px' : '16px'
     }
   };
 

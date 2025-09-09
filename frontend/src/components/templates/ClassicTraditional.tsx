@@ -48,38 +48,40 @@ export default function ClassicTraditional({ userData, colors, size = 'normal', 
 
     const isSmall = size === 'small';
 
-    // Classic professional styling
+    // Classic professional styling with improved spacing
     const styles = {
         container: {
-            fontSize: isSmall ? '6px' : '11px',
-            lineHeight: isSmall ? 1.4 : 1.6,
+            fontSize: isSmall ? '7px' : '12px',
+            lineHeight: isSmall ? 1.5 : 1.7,
             fontFamily: "'Times New Roman', Times, serif"
         },
         name: {
-            fontSize: isSmall ? '16px' : '28px',
+            fontSize: isSmall ? '18px' : '32px',
             fontWeight: '700',
             letterSpacing: '1px'
         },
         jobTitle: {
-            fontSize: isSmall ? '8px' : '13px',
-            fontWeight: '400'
+            fontSize: isSmall ? '9px' : '15px',
+            fontWeight: '400',
+            letterSpacing: '0.5px'
         },
         sectionTitle: {
-            fontSize: isSmall ? '7px' : '12px',
+            fontSize: isSmall ? '8px' : '14px',
             fontWeight: '700',
             textTransform: 'uppercase' as const,
             letterSpacing: '1px'
         },
         text: {
-            fontSize: isSmall ? '6px' : '10px',
-            lineHeight: isSmall ? 1.5 : 1.6
+            fontSize: isSmall ? '7px' : '11px',
+            lineHeight: isSmall ? 1.6 : 1.7
         },
         spacing: {
-            section: isSmall ? '12px' : '24px',
-            item: isSmall ? '6px' : '12px'
+            section: isSmall ? '16px' : '32px',
+            item: isSmall ? '8px' : '16px',
+            micro: isSmall ? '4px' : '8px'
         },
         padding: {
-            container: isSmall ? '12px' : '24px'
+            container: isSmall ? '16px' : '32px'
         }
     };
 
@@ -109,7 +111,7 @@ export default function ClassicTraditional({ userData, colors, size = 'normal', 
             <div
                 style={{
                     textAlign: 'center',
-                    borderBottom: `2px solid ${theme.primary}`,
+                    borderBottom: `3px solid ${theme.primary}`,
                     paddingBottom: styles.spacing.section,
                     marginBottom: styles.spacing.section
                 }}
@@ -120,7 +122,7 @@ export default function ClassicTraditional({ userData, colors, size = 'normal', 
                         fontWeight: styles.name.fontWeight,
                         letterSpacing: styles.name.letterSpacing,
                         color: theme.primary,
-                        marginBottom: '8px'
+                        marginBottom: styles.spacing.item
                     }}
                 >
                     {userData.name || "Professional Name"}
@@ -131,8 +133,9 @@ export default function ClassicTraditional({ userData, colors, size = 'normal', 
                         style={{
                             fontSize: styles.jobTitle.fontSize,
                             fontWeight: styles.jobTitle.fontWeight,
+                            letterSpacing: styles.jobTitle.letterSpacing,
                             color: theme.secondary,
-                            marginBottom: '12px'
+                            marginBottom: styles.spacing.item
                         }}
                     >
                         {userData.job_title}
@@ -145,7 +148,7 @@ export default function ClassicTraditional({ userData, colors, size = 'normal', 
                         display: 'flex',
                         justifyContent: 'center',
                         flexWrap: 'wrap',
-                        gap: '16px',
+                        gap: isSmall ? '12px' : '20px',
                         fontSize: styles.text.fontSize,
                         color: theme.text
                     }}

@@ -48,39 +48,40 @@ export default function MinimalistProfessional({ userData, colors, size = 'norma
 
   const isSmall = size === 'small';
 
-  // Ultra-clean minimalist styling
+  // Ultra-clean minimalist styling with enhanced spacing
   const styles = {
     container: {
-      fontSize: isSmall ? '6px' : '11px',
-      lineHeight: isSmall ? 1.3 : 1.5,
-      fontFamily: "'Helvetica Neue', Arial, sans-serif"
+      fontSize: isSmall ? '7px' : '12px',
+      lineHeight: isSmall ? 1.4 : 1.6,
+      fontFamily: "'Helvetica Neue', -apple-system, Arial, sans-serif"
     },
     name: {
-      fontSize: isSmall ? '16px' : '32px',
+      fontSize: isSmall ? '18px' : '36px',
       fontWeight: '300',
-      letterSpacing: '2px'
+      letterSpacing: '2.5px'
     },
     jobTitle: {
-      fontSize: isSmall ? '8px' : '14px',
+      fontSize: isSmall ? '9px' : '16px',
       fontWeight: '400',
-      letterSpacing: '1px'
+      letterSpacing: '1.2px'
     },
     sectionTitle: {
-      fontSize: isSmall ? '7px' : '11px',
+      fontSize: isSmall ? '8px' : '13px',
       fontWeight: '600',
-      letterSpacing: '2px',
+      letterSpacing: '2.5px',
       textTransform: 'uppercase' as const
     },
     text: {
-      fontSize: isSmall ? '6px' : '10px',
-      lineHeight: isSmall ? 1.4 : 1.6
+      fontSize: isSmall ? '7px' : '11px',
+      lineHeight: isSmall ? 1.5 : 1.7
     },
     spacing: {
-      section: isSmall ? '12px' : '24px',
-      item: isSmall ? '6px' : '12px'
+      section: isSmall ? '16px' : '32px',
+      item: isSmall ? '8px' : '16px',
+      micro: isSmall ? '4px' : '8px'
     },
     padding: {
-      container: isSmall ? '12px' : '32px'
+      container: isSmall ? '16px' : '40px'
     }
   };
 

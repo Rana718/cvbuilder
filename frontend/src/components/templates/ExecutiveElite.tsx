@@ -48,38 +48,41 @@ export default function ExecutiveElite({ userData, colors, size = 'normal', mode
 
   const isSmall = size === 'small';
 
-  // A4 optimized sizing
+  // Executive-level styling with enhanced proportions  
   const styles = {
     container: {
-      fontSize: isSmall ? '6px' : '11px',
-      lineHeight: isSmall ? 1.2 : 1.4,
-      fontFamily: "'Playfair Display', serif"
+      fontSize: isSmall ? '7px' : '12px',
+      lineHeight: isSmall ? 1.3 : 1.5,
+      fontFamily: "'Playfair Display', 'Georgia', serif"
     },
     name: {
-      fontSize: isSmall ? '14px' : '26px',
-      fontWeight: '700'
+      fontSize: isSmall ? '16px' : '30px',
+      fontWeight: '700',
+      letterSpacing: '0.5px'
     },
     jobTitle: {
-      fontSize: isSmall ? '7px' : '12px',
-      opacity: 0.9
+      fontSize: isSmall ? '8px' : '14px',
+      opacity: 0.9,
+      letterSpacing: '0.3px'
     },
     sectionTitle: {
-      fontSize: isSmall ? '7px' : '12px',
+      fontSize: isSmall ? '8px' : '14px',
       fontWeight: '700',
-      letterSpacing: '1px',
+      letterSpacing: '1.2px',
       textTransform: 'uppercase' as const
     },
     text: {
-      fontSize: isSmall ? '6px' : '10px',
-      lineHeight: isSmall ? 1.3 : 1.5
+      fontSize: isSmall ? '7px' : '11px',
+      lineHeight: isSmall ? 1.4 : 1.6
     },
     spacing: {
-      section: isSmall ? '8px' : '16px',
-      item: isSmall ? '4px' : '8px'
+      section: isSmall ? '12px' : '24px',
+      item: isSmall ? '6px' : '12px',
+      micro: isSmall ? '3px' : '6px'
     },
     padding: {
-      container: isSmall ? '8px' : '20px',
-      sidebar: isSmall ? '6px' : '16px'
+      container: isSmall ? '12px' : '24px',
+      sidebar: isSmall ? '8px' : '20px'
     }
   };
 

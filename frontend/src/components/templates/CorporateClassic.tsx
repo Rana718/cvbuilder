@@ -48,38 +48,41 @@ export default function CorporateClassic({ userData, colors, size = 'normal', mo
 
   const isSmall = size === 'small';
 
-  // Corporate professional styling
+  // Corporate professional styling with enhanced spacing
   const styles = {
     container: {
-      fontSize: isSmall ? '6px' : '11px',
-      lineHeight: isSmall ? 1.3 : 1.5,
-      fontFamily: "'Times New Roman', serif"
+      fontSize: isSmall ? '7px' : '12px',
+      lineHeight: isSmall ? 1.4 : 1.6,
+      fontFamily: "'Times New Roman', 'Georgia', serif"
     },
     name: {
-      fontSize: isSmall ? '18px' : '36px',
-      fontWeight: '700'
+      fontSize: isSmall ? '20px' : '40px',
+      fontWeight: '700',
+      letterSpacing: '0.5px'
     },
     jobTitle: {
-      fontSize: isSmall ? '9px' : '16px',
-      fontWeight: '500'
+      fontSize: isSmall ? '10px' : '18px',
+      fontWeight: '500',
+      letterSpacing: '0.3px'
     },
     sectionTitle: {
-      fontSize: isSmall ? '8px' : '14px',
+      fontSize: isSmall ? '9px' : '16px',
       fontWeight: '700',
       textTransform: 'uppercase' as const,
-      letterSpacing: '1px'
+      letterSpacing: '1.2px'
     },
     text: {
-      fontSize: isSmall ? '6px' : '10px',
-      lineHeight: isSmall ? 1.4 : 1.6
+      fontSize: isSmall ? '7px' : '11px',
+      lineHeight: isSmall ? 1.5 : 1.7
     },
     spacing: {
-      section: isSmall ? '10px' : '20px',
-      item: isSmall ? '5px' : '10px'
+      section: isSmall ? '14px' : '28px',
+      item: isSmall ? '7px' : '14px',
+      micro: isSmall ? '4px' : '8px'
     },
     padding: {
-      container: isSmall ? '10px' : '24px',
-      header: isSmall ? '8px' : '16px'
+      container: isSmall ? '14px' : '32px',
+      header: isSmall ? '12px' : '24px'
     }
   };
 
