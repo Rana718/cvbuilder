@@ -217,7 +217,6 @@ const CreateCoverLetterPage: React.FC = () => {
         populateFromCoverLetterData,
         saveToTemp,
         setFormData,
-        clearForNew
     } = useCoverLetterStore();
 
     const [showAIPopup, setShowAIPopup] = useState<boolean>(false);
@@ -226,11 +225,6 @@ const CreateCoverLetterPage: React.FC = () => {
     const edit: string | null = searchParams.get('edit');
     const coverLetterId: string | null = searchParams.get('coverLetterId');
 
-    useEffect(() => {
-        if (!coverLetterId && !edit) {
-            clearForNew();
-        }
-    }, [coverLetterId, edit, clearForNew]);
 
     useEffect(() => {
         if (coverLetterId) {
