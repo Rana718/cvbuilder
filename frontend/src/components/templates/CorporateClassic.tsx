@@ -125,6 +125,7 @@ export default function CorporateClassic({ userData, colors, size = 'normal', mo
               fontWeight: styles.name.fontWeight,
               marginBottom: styles.spacing.item
             }}
+            className='text-white'
           >
             {userData.name || "Your Name"}
           </h1>
@@ -357,8 +358,9 @@ export default function CorporateClassic({ userData, colors, size = 'normal', mo
                       fontWeight: styles.sectionTitle.fontWeight,
                       letterSpacing: styles.sectionTitle.letterSpacing
                     }}
+                    className='text-white'
                   >
-                    Core Skills
+                    Skills
                   </h2>
                 </div>
                 <div>
@@ -422,6 +424,7 @@ export default function CorporateClassic({ userData, colors, size = 'normal', mo
                       fontWeight: styles.sectionTitle.fontWeight,
                       letterSpacing: styles.sectionTitle.letterSpacing
                     }}
+                    className='text-white'
                   >
                     Education
                   </h2>

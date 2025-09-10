@@ -97,11 +97,9 @@ function ResumePage() {
 
         setIsDownloading(true)
         try {
-            let resumeContent = document.querySelector(".hidden.sm\\:block [data-resume-content]") as HTMLElement
-            if (!resumeContent) {
-                resumeContent = document.querySelector("[data-resume-content]") as HTMLElement
-            }
-
+            // Look for resume content using the data attribute
+            let resumeContent = document.querySelector("[data-resume-content]") as HTMLElement
+            
             if (!resumeContent) {
                 alert('Resume content not found. Please refresh and try again.')
                 return
@@ -296,17 +294,15 @@ function ResumePage() {
                         <div
                             className="mx-auto bg-white shadow-xl rounded-lg overflow-hidden border"
                             style={{
+                                aspectRatio: '210/297', // A4 ratio
                                 width: '95vw',
                                 maxWidth: '350px',
-                                minHeight: '480px',
                                 transform: 'scale(0.98)',
                                 transformOrigin: 'top center'
                             }}
                             data-resume-content
                         >
-                            <div className="p-3 text-xs leading-tight">
-                                <ResumePreview />
-                            </div>
+                            <ResumePreview mode="live" />
                         </div>
                     </div>
 
@@ -315,9 +311,9 @@ function ResumePage() {
                         <div
                             className="mx-auto bg-white shadow-xl rounded-lg overflow-hidden border"
                             style={{
-                                maxWidth: '794px',
-                                minHeight: '1123px',
-                                width: '100%'
+                                aspectRatio: '210/297', // A4 ratio
+                                width: '100%',
+                                maxWidth: '794px'
                             }}
                             data-resume-content
                         >

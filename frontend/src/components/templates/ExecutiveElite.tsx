@@ -149,7 +149,7 @@ export default function ExecutiveElite({ userData, colors, size = 'normal', mode
         {(hasContent(userData.email) || hasContent(userData.phone) || hasContent(userData.address)) && (
           <div style={{ marginBottom: styles.spacing.section }}>
             <h3 
-              className="font-bold uppercase tracking-wide mb-2"
+              className="font-bold uppercase text-white tracking-wide mb-2"
               style={{ 
                 fontSize: styles.sectionTitle.fontSize,
                 fontWeight: styles.sectionTitle.fontWeight,
@@ -185,7 +185,7 @@ export default function ExecutiveElite({ userData, colors, size = 'normal', mode
         {hasContent(userData.skills) && (
           <div style={{ marginBottom: styles.spacing.section }}>
             <h3 
-              className="font-bold uppercase tracking-wide mb-2"
+              className="font-bold uppercase text-white tracking-wide mb-2"
               style={{ 
                 fontSize: styles.sectionTitle.fontSize,
                 fontWeight: styles.sectionTitle.fontWeight,
@@ -224,7 +224,7 @@ export default function ExecutiveElite({ userData, colors, size = 'normal', mode
         {hasContent(userData.education) && (
           <div style={{ marginBottom: styles.spacing.section }}>
             <h3 
-              className="font-bold uppercase tracking-wide mb-2"
+              className="font-bold text-white uppercase tracking-wide mb-2"
               style={{ 
                 fontSize: styles.sectionTitle.fontSize,
                 fontWeight: styles.sectionTitle.fontWeight,
