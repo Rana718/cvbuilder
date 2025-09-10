@@ -38,10 +38,6 @@ class JWTAuthMiddleware(BaseHTTPMiddleware):
         if request.method == "OPTIONS":
             return await call_next(request)
 
-        # Allow payment-plans endpoint without auth
-        if request.url.path == "/api/payment/payment-plans":
-            return await call_next(request)
-
         if not any(request.url.path.startswith(prefix) for prefix in self.protected_prefixes):
             return await call_next(request)
 

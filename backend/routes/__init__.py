@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
 from .public_route import cv_gen, shared
-from . import auth, resumeop, upload, coverletter, rayzorpay, dashboard
+from . import auth, resumeop, upload, coverletter, rayzorpay, dashboard, cv_parser
 from .admin import adminRouter
 from .public_route import publicrouter
 from .linkedin_auth import linkedinauth
@@ -18,3 +18,4 @@ mainrouter.include_router(coverletter.router, prefix="/cover-letters", tags=["Co
 mainrouter.include_router(linkedinauth, prefix="/linkedin", tags=["LinkedIn Integration"])
 mainrouter.include_router(rayzorpay.router, prefix="/payment", tags=["Payment"])
 mainrouter.include_router(adminRouter, prefix="/admin", tags=["Admin Operations"])
+mainrouter.include_router(cv_parser.router, prefix="/cv-parser", tags=["CV Parser"])
