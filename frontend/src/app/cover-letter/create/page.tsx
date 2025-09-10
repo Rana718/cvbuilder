@@ -99,30 +99,30 @@ const AIGenerationPopup: React.FC<AIGenerationPopupProps> = ({
                         initial={{ opacity: 0, scale: 0.95, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                        className="bg-white rounded-lg p-8 max-w-2xl w-full max-h-[85vh] relative shadow-2xl"
+                        className="bg-white rounded-lg p-4 sm:p-6 lg:p-8 max-w-xs sm:max-w-lg lg:max-w-2xl w-full max-h-[90vh] sm:max-h-[85vh] relative shadow-2xl mx-4 sm:mx-0"
                         onClick={(e: React.MouseEvent) => e.stopPropagation()}
                         style={{ overflowY: 'hidden' }}
                     >
-                        <div className="flex justify-between items-center mb-8">
+                        <div className="flex justify-between items-center mb-6 sm:mb-8">
                             <div className="flex items-center">
                                 <motion.div
-                                    className="p-2 bg-blue-100 rounded-full mr-3"
+                                    className="p-1.5 sm:p-2 bg-blue-100 rounded-full mr-2 sm:mr-3"
                                     animate={{ rotate: [0, 10, -10, 0] }}
                                     transition={{ duration: 4, repeat: Infinity }}
                                 >
-                                    <Wand2 className="w-6 h-6 text-blue-600" />
+                                    <Wand2 className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-blue-600" />
                                 </motion.div>
-                                <h3 className="text-xl font-semibold text-gray-900">AI Cover Letter Generation</h3>
+                                <h3 className="text-lg sm:text-xl font-semibold text-gray-900">AI Cover Letter Generation</h3>
                             </div>
                             <button
                                 onClick={onClose}
-                                className="p-2 hover:bg-gray-50 rounded-lg transition-colors"
+                                className="p-1.5 sm:p-2 hover:bg-gray-50 rounded-lg transition-colors"
                             >
-                                <X className="w-5 h-5 text-gray-500" />
+                                <X className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500" />
                             </button>
                         </div>
 
-                        <div className="space-y-6" style={{ maxHeight: 'calc(85vh - 160px)', overflowY: 'auto', paddingRight: '8px' }}>
+                        <div className="space-y-4 sm:space-y-6" style={{ maxHeight: 'calc(90vh - 120px)', overflowY: 'auto', paddingRight: '4px' }}>
                             <div className="bg-blue-50 rounded-lg p-4 border border-blue-100">
                                 <h4 className="font-medium text-gray-900 mb-2">Job Details</h4>
                                 <div className="text-sm text-gray-700">
@@ -293,7 +293,7 @@ const CreateCoverLetterPage: React.FC = () => {
 
     return (
         <div className="min-h-screen bg-gray-50 relative overflow-hidden">
-            <Navbar/>
+            <Navbar />
             <div className="fixed inset-0 pointer-events-none">
                 <motion.div
                     className="absolute top-20 left-10 opacity-5 text-blue-200"
@@ -342,7 +342,7 @@ const CreateCoverLetterPage: React.FC = () => {
                 </motion.div>
             </div>
 
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
+            <div className="container mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-8 relative z-10">
                 <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -350,35 +350,35 @@ const CreateCoverLetterPage: React.FC = () => {
                     className="max-w-4xl mx-auto"
                 >
                     {/* Header */}
-                    <div className="text-left mb-8">
-                        <div className="flex items-start mb-4">
-                            <div className="p-2 md:p-3 bg-blue-100 rounded-full mr-3 md:mr-2">
-                                <FileText className="w-6 h-6 md:w-8 md:h-8 text-blue-600" />
+                    <div className="text-left mb-6 sm:mb-8">
+                        <div className="flex items-start mb-3 sm:mb-4">
+                            <div className="p-2 sm:p-3 bg-blue-100 rounded-full mr-2 sm:mr-3 flex-shrink-0">
+                                <FileText className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-blue-600" />
                             </div>
-                            <div className="flex-1">
-                                <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+                            <div className="flex-1 min-w-0">
+                                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-1 sm:mb-2">
                                     {edit ? 'Edit Cover Letter' : 'Create Professional Cover Letter'}
                                 </h1>
-                                <p className="text-base md:text-lg text-gray-600">
+                                <p className="text-sm sm:text-base lg:text-lg text-gray-600">
                                     Build a compelling cover letter that showcases your qualifications and helps you stand out to employers.
                                 </p>
                             </div>
                         </div>
                     </div>
 
-                    <div className="space-y-4">
+                    <div className="space-y-3 sm:space-y-4">
                         <motion.section
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ delay: 0.2 }}
-                            className="bg-white p-3 rounded-xl border border-gray-200"
+                            className="bg-white p-3 sm:p-4 lg:p-6 rounded-xl border border-gray-200"
                         >
-                            <div className="flex items-center mb-6">
-                                <User className="w-4 md:w-6 md:h-6 text-blue-600 mr-3" />
-                                <h2 className="text-base md:text-xl font-semibold text-gray-900">Personal Information</h2>
+                            <div className="flex items-center mb-4 sm:mb-6">
+                                <User className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-blue-600 mr-2 sm:mr-3" />
+                                <h2 className="text-base sm:text-lg lg:text-xl font-semibold text-gray-900">Personal Information</h2>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                                 <div>
                                     <label htmlFor="name" className="block text-sm font-semibold text-gray-800 mb-2">
                                         Full Name *
@@ -388,7 +388,7 @@ const CreateCoverLetterPage: React.FC = () => {
                                         type="text"
                                         value={name}
                                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('name', e.target.value)}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                        className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all"
                                         placeholder="Your full name"
                                         required
                                     />
@@ -402,7 +402,7 @@ const CreateCoverLetterPage: React.FC = () => {
                                         type="email"
                                         value={email}
                                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('email', e.target.value)}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                        className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all"
                                         placeholder="your.email@example.com"
                                         required
                                     />
@@ -416,7 +416,7 @@ const CreateCoverLetterPage: React.FC = () => {
                                         type="tel"
                                         value={phone || ''}
                                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('phone', e.target.value)}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                        className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all"
                                         placeholder="Your phone number"
                                     />
                                 </div>
@@ -429,7 +429,7 @@ const CreateCoverLetterPage: React.FC = () => {
                                         type="text"
                                         value={address || ''}
                                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('address', e.target.value)}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                        className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all"
                                         placeholder="Your address"
                                     />
                                 </div>
@@ -440,14 +440,14 @@ const CreateCoverLetterPage: React.FC = () => {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.3 }}
-                            className="bg-white p-3 rounded-xl border border-gray-200"
+                            className="bg-white p-3 sm:p-4 lg:p-6 rounded-xl border border-gray-200"
                         >
-                            <div className="flex items-center mb-6">
-                                <Briefcase className="w-4 md:w-6 md:h-6 text-blue-600 mr-3" />
-                                <h2 className="text-base md:text-xl font-semibold text-gray-900">Position Details</h2>
+                            <div className="flex items-center mb-4 sm:mb-6">
+                                <Briefcase className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-blue-600 mr-2 sm:mr-3" />
+                                <h2 className="text-base sm:text-lg lg:text-xl font-semibold text-gray-900">Position Details</h2>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                                 <div>
                                     <label htmlFor="jobTitle" className="block text-sm font-semibold text-gray-800 mb-2">
                                         Job Title *

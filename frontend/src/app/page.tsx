@@ -16,7 +16,7 @@ export default function Home() {
   const { isPremium, refreshStatus } = usePremiumStatus();
   const router = useRouter();
   const [showPaymentCard, setShowPaymentCard] = useState(false);
-  
+
   useEffect(() => {
     console.log("Current user:", user);
   }, [user])
@@ -45,7 +45,7 @@ export default function Home() {
     <div className="min-h-screen bg-slate-50">
       {/* Navbar */}
       <Navbar />
-      
+
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-100/50 min-h-screen flex items-center">
         {/* Enhanced Background Elements */}
@@ -103,7 +103,7 @@ export default function Home() {
                 transition={{ duration: 0.8, delay: 0.5 }}
                 className="text-lg sm:text-xl lg:text-2xl text-slate-600 mb-8 sm:mb-10 leading-relaxed max-w-2xl lg:max-w-none font-light px-2 sm:px-0"
               >
-                Transform your career journey with our intelligent AI that crafts compelling resumes, 
+                Transform your career journey with our intelligent AI that crafts compelling resumes,
                 optimizes for ATS systems, and helps you land interviews at top companies.
               </motion.p>
 
@@ -121,7 +121,10 @@ export default function Home() {
                   <span className="relative z-10">Create Resume Now</span>
                   <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform relative z-10" />
                 </button>
-                <button className="group bg-white/80 backdrop-blur-sm border-2 border-slate-200 hover:border-blue-300 text-slate-700 hover:text-blue-700 px-6 sm:px-10 py-4 sm:py-5 rounded-2xl text-base sm:text-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                <button
+                  onClick={() => router.push('/resusme/parse')}
+                  className="group bg-white/80 backdrop-blur-sm border-2 border-slate-200 hover:border-blue-300 text-slate-700 hover:text-blue-700 px-6 sm:px-10 py-4 sm:py-5 rounded-2xl text-base sm:text-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                >
                   <span className="flex items-center space-x-2">
                     <Download className="h-5 w-5" />
                     <span>Import Resume</span>
@@ -221,7 +224,7 @@ export default function Home() {
       <section className="py-12 sm:py-16 lg:py-24 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 relative overflow-hidden">
         {/* Background pattern */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff08_1px,transparent_1px),linear-gradient(to_bottom,#ffffff08_1px,transparent_1px)] bg-[size:32px_32px]"></div>
-        
+
         <div className="container mx-auto px-4 sm:px-6 relative">
           <div className="grid lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-20 items-center">
             <motion.div
@@ -233,26 +236,26 @@ export default function Home() {
               <div className="relative">
                 {/* Glowing effect */}
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 blur-3xl rounded-3xl"></div>
-                
+
                 <div className="relative bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl rounded-3xl p-6 sm:p-8 lg:p-10 border border-white/10 shadow-2xl">
                   <div className="absolute top-4 sm:top-6 right-4 sm:right-6 bg-gradient-to-r from-blue-500 to-purple-600 text-white px-3 sm:px-4 py-1 sm:py-2 rounded-full text-xs sm:text-sm font-semibold">
                     🤖 AI Powered
                   </div>
-                  
+
                   <div className="mb-6 sm:mb-8">
                     <div className="inline-flex items-center justify-center w-12 sm:w-16 h-12 sm:h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl sm:rounded-2xl mb-4 sm:mb-6">
                       <Sparkles className="h-6 sm:h-8 w-6 sm:w-8 text-white" />
                     </div>
-                    
+
                     <h3 className="text-2xl sm:text-3xl font-bold text-white mb-3 sm:mb-4">
                       Let AI Write Your Success Story
                     </h3>
                     <p className="text-lg sm:text-xl text-blue-100 mb-6 sm:mb-8 leading-relaxed">
-                      Our advanced AI analyzes your role, industry, and career goals to generate 
+                      Our advanced AI analyzes your role, industry, and career goals to generate
                       compelling content that showcases your unique value proposition.
                     </p>
                   </div>
-                  
+
                   <div className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
                     {[
                       "Industry-specific keyword optimization",
@@ -260,7 +263,7 @@ export default function Home() {
                       "ATS-friendly formatting",
                       "Professional tone and language"
                     ].map((feature, i) => (
-                      <motion.div 
+                      <motion.div
                         key={i}
                         initial={{ x: -20, opacity: 0 }}
                         whileInView={{ x: 0, opacity: 1 }}
@@ -273,7 +276,7 @@ export default function Home() {
                       </motion.div>
                     ))}
                   </div>
-                  
+
                   <button className="group bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold transition-all transform hover:-translate-y-1 shadow-lg flex items-center space-x-2">
                     <span>Experience AI Magic</span>
                     <ArrowRight className="h-4 sm:h-5 w-4 sm:w-5 group-hover:translate-x-1 transition-transform" />
@@ -291,13 +294,13 @@ export default function Home() {
             >
               <div>
                 <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4 sm:mb-6 leading-tight">
-                  Smart Content Generation That 
+                  Smart Content Generation That
                   <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
                     Gets Results
                   </span>
                 </h2>
                 <p className="text-lg sm:text-xl text-blue-100 leading-relaxed mb-6 sm:mb-8">
-                  Stop struggling with writer's block. Our AI understands what recruiters want 
+                  Stop struggling with writer's block. Our AI understands what recruiters want
                   and helps you articulate your achievements in the most impactful way.
                 </p>
               </div>
@@ -344,13 +347,13 @@ export default function Home() {
               Premium Features
             </div>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 mb-4 sm:mb-6">
-              Everything You Need to 
+              Everything You Need to
               <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
                 Stand Out
               </span>
             </h2>
             <p className="text-lg sm:text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed px-2 sm:px-0">
-              Our comprehensive suite of AI-powered tools and professional templates 
+              Our comprehensive suite of AI-powered tools and professional templates
               ensures your resume captures attention and drives results.
             </p>
           </motion.div>
@@ -366,7 +369,7 @@ export default function Home() {
               },
               {
                 icon: FileText,
-                title: "ATS-Optimized Templates", 
+                title: "ATS-Optimized Templates",
                 desc: "Professionally designed templates that pass through Applicant Tracking Systems while maintaining exceptional visual appeal.",
                 color: "from-purple-500 to-pink-600",
                 bgColor: "from-purple-50 to-pink-50"
@@ -409,12 +412,12 @@ export default function Home() {
                 className="group relative"
               >
                 <div className={`absolute inset-0 bg-gradient-to-br ${feature.bgColor} rounded-3xl opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:scale-105`}></div>
-                
+
                 <div className="relative bg-white rounded-3xl p-6 sm:p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border border-slate-100 group-hover:border-white">
                   <div className={`bg-gradient-to-br ${feature.color} w-12 sm:w-16 h-12 sm:h-16 rounded-xl sm:rounded-2xl flex items-center justify-center mb-4 sm:mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
                     <feature.icon className="h-6 sm:h-8 w-6 sm:w-8 text-white" />
                   </div>
-                  
+
                   <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-3 sm:mb-4 group-hover:text-slate-800 transition-colors">
                     {feature.title}
                   </h3>
@@ -431,7 +434,7 @@ export default function Home() {
       {/* Enhanced Pricing Plans */}
       <section id="pricing" className="py-12 sm:py-16 lg:py-24 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 relative overflow-hidden">
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff08_1px,transparent_1px),linear-gradient(to_bottom,#ffffff08_1px,transparent_1px)] bg-[size:40px_40px]"></div>
-        
+
         <div className="container mx-auto px-4 sm:px-6 relative">
           <motion.div
             initial={{ y: 50, opacity: 0 }}
@@ -445,7 +448,7 @@ export default function Home() {
               Simple, Transparent Pricing
             </div>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4 sm:mb-6">
-              Choose Your 
+              Choose Your
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
                 Success Plan
               </span>
@@ -465,7 +468,7 @@ export default function Home() {
               className="relative group"
             >
               <div className="absolute inset-0 bg-gradient-to-br from-slate-800/50 to-blue-800/50 blur-xl rounded-3xl group-hover:blur-2xl transition-all duration-300"></div>
-              
+
               <div className="relative bg-white/10 backdrop-blur-xl rounded-3xl p-6 sm:p-8 lg:p-10 border border-white/20 shadow-2xl hover:shadow-3xl transition-all duration-300 flex flex-col h-full">
                 <div className="text-center mb-6 sm:mb-8">
                   <div className="inline-flex items-center bg-white/10 text-white px-3 sm:px-4 py-1 sm:py-2 rounded-full text-sm font-medium mb-3 sm:mb-4">
@@ -515,7 +518,7 @@ export default function Home() {
               </div>
 
               <div className="absolute inset-0 bg-gradient-to-br from-blue-500/30 to-purple-600/30 blur-xl rounded-3xl group-hover:blur-2xl transition-all duration-300"></div>
-              
+
               <div className="relative bg-gradient-to-br from-white/15 to-white/10 backdrop-blur-xl rounded-3xl p-6 sm:p-8 lg:p-10 border border-white/30 shadow-2xl hover:shadow-3xl transition-all duration-300 flex flex-col h-full">
                 <div className="text-center mb-6 sm:mb-8">
                   <div className="inline-flex items-center bg-gradient-to-r from-blue-500/20 to-purple-600/20 border border-blue-400/30 text-blue-300 px-3 sm:px-4 py-1 sm:py-2 rounded-full text-sm font-medium mb-3 sm:mb-4 backdrop-blur-sm">
@@ -531,7 +534,7 @@ export default function Home() {
                 <div className="space-y-3 sm:space-y-4 mb-6 sm:mb-8 flex-grow">
                   {[
                     "Unlimited professional resumes",
-                    "Advanced AI content generation", 
+                    "Advanced AI content generation",
                     "15+ Premium templates",
                     "Multiple export formats",
                     "No watermarks",
@@ -546,7 +549,7 @@ export default function Home() {
                   ))}
                 </div>
 
-                <button 
+                <button
                   onClick={handlePremiumUpgrade}
                   className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white py-3 sm:py-4 rounded-xl font-bold transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-xl"
                 >
@@ -587,36 +590,36 @@ export default function Home() {
               Professional Templates
             </div>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 mb-4 sm:mb-6">
-              Templates That 
+              Templates That
               <span className="block text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">
                 Win Interviews
               </span>
             </h2>
             <p className="text-lg sm:text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed px-2 sm:px-0">
-              Choose from our expertly crafted templates designed by hiring professionals. 
+              Choose from our expertly crafted templates designed by hiring professionals.
               Each template is optimized for ATS systems and modern recruiting practices.
             </p>
           </motion.div>
 
           <div className="grid md:grid-cols-3 gap-8 sm:gap-12 mb-12 sm:mb-16 max-w-6xl mx-auto">
             {[
-              { 
-                id: 1, 
-                name: "Executive Professional", 
+              {
+                id: 1,
+                name: "Executive Professional",
                 category: "Leadership",
                 color: "from-blue-500 to-indigo-600",
                 description: "Perfect for senior roles and C-level positions"
               },
-              { 
-                id: 2, 
-                name: "Creative Designer", 
+              {
+                id: 2,
+                name: "Creative Designer",
                 category: "Design & Creative",
                 color: "from-purple-500 to-pink-600",
                 description: "Showcase your creativity with visual appeal"
               },
-              { 
-                id: 3, 
-                name: "Tech Specialist", 
+              {
+                id: 3,
+                name: "Tech Specialist",
                 category: "Technology",
                 color: "from-emerald-500 to-teal-600",
                 description: "Clean, modern design for technical roles"
@@ -690,8 +693,8 @@ export default function Home() {
               transition={{ duration: 0.6 }}
               viewport={{ once: true }}
             >
-              <a 
-                href="/template" 
+              <a
+                href="/template"
                 className="group inline-flex items-center bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 sm:px-10 py-3 sm:py-4 rounded-2xl font-semibold transition-all transform hover:-translate-y-1 shadow-xl hover:shadow-2xl"
               >
                 <span>Explore All Templates</span>
@@ -705,7 +708,7 @@ export default function Home() {
       {/* Enhanced Reviews Section */}
       <section id="feedback" className="py-12 sm:py-16 lg:py-24 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 relative overflow-hidden">
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff08_1px,transparent_1px),linear-gradient(to_bottom,#ffffff08_1px,transparent_1px)] bg-[size:32px_32px]"></div>
-        
+
         <div className="container mx-auto px-4 sm:px-6 relative">
           <motion.div
             initial={{ y: 50, opacity: 0 }}
@@ -719,7 +722,7 @@ export default function Home() {
               Success Stories
             </div>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4 sm:mb-6">
-              Loved by 
+              Loved by
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500">
                 Professionals
               </span>
@@ -766,7 +769,7 @@ export default function Home() {
                 className="relative group"
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-white/5 blur-xl rounded-3xl group-hover:blur-2xl transition-all duration-300"></div>
-                
+
                 <div className="relative bg-white/10 backdrop-blur-xl rounded-3xl p-6 sm:p-8 border border-white/20 shadow-2xl hover:shadow-3xl transition-all duration-300">
                   {/* Rating */}
                   <div className="flex items-center mb-4 sm:mb-6">
@@ -775,12 +778,12 @@ export default function Home() {
                     ))}
                     <span className="ml-2 text-yellow-400 font-medium text-sm">5.0</span>
                   </div>
-                  
+
                   {/* Review Text */}
                   <p className="text-blue-100 mb-6 sm:mb-8 leading-relaxed font-medium text-sm sm:text-base">
                     "{review.text}"
                   </p>
-                  
+
                   {/* Reviewer Info */}
                   <div className="flex items-center">
                     <div className="bg-gradient-to-br from-blue-500 to-purple-600 w-10 sm:w-12 h-10 sm:h-12 rounded-full flex items-center justify-center mr-3 sm:mr-4 text-white font-bold text-sm sm:text-base">
@@ -825,7 +828,7 @@ export default function Home() {
         {/* Background elements */}
         <div className="absolute top-20 left-10 w-72 h-72 bg-blue-400/10 rounded-full mix-blend-multiply filter blur-3xl animate-pulse"></div>
         <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-400/10 rounded-full mix-blend-multiply filter blur-3xl animate-pulse delay-1000"></div>
-        
+
         <div className="container mx-auto px-4 sm:px-6 text-center relative">
           <motion.div
             initial={{ y: 50, opacity: 0 }}
@@ -838,22 +841,22 @@ export default function Home() {
               <Zap className="h-4 w-4 mr-2" />
               <span>Ready to Transform Your Career?</span>
             </div>
-            
+
             <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 mb-6 sm:mb-8 leading-tight px-2 sm:px-0">
-              Your Dream Job is Just 
+              Your Dream Job is Just
               <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600">
                 One Resume Away
               </span>
             </h2>
-            
+
             <p className="text-lg sm:text-xl lg:text-2xl text-slate-600 mb-8 sm:mb-12 max-w-3xl mx-auto leading-relaxed px-2 sm:px-0">
-              Join thousands of successful professionals who landed their perfect roles 
+              Join thousands of successful professionals who landed their perfect roles
               with our AI-powered resume builder. Start your success story today.
             </p>
-            
+
             <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center mb-8 sm:mb-12">
-              <motion.a 
-                href="/template" 
+              <motion.a
+                href="/template"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className="group bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 sm:px-12 py-4 sm:py-5 rounded-2xl text-lg sm:text-xl font-bold transition-all shadow-xl hover:shadow-2xl"
@@ -863,9 +866,9 @@ export default function Home() {
                   <ArrowRight className="h-5 sm:h-6 w-5 sm:w-6 group-hover:translate-x-1 transition-transform" />
                 </span>
               </motion.a>
-              
-              <motion.a 
-                href="/template" 
+
+              <motion.a
+                href="/template"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className="group bg-white border-2 border-slate-200 hover:border-blue-300 text-slate-700 hover:text-blue-700 px-8 sm:px-12 py-4 sm:py-5 rounded-2xl text-lg sm:text-xl font-bold transition-all shadow-lg hover:shadow-xl"

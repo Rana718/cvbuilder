@@ -192,7 +192,17 @@ function Dashboard() {
     return (
         <>
             <Navbar />
-            <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+            <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-100/50">
+                {/* Enhanced Background Elements */}
+                <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                    <div className="absolute top-20 left-10 w-96 h-96 bg-gradient-to-r from-blue-400/20 to-indigo-500/20 rounded-full mix-blend-multiply filter blur-3xl animate-pulse"></div>
+                    <div className="absolute top-40 right-10 w-80 h-80 bg-gradient-to-r from-purple-400/20 to-pink-500/20 rounded-full mix-blend-multiply filter blur-3xl animate-pulse delay-1000"></div>
+                    <div className="absolute bottom-20 left-1/2 w-72 h-72 bg-gradient-to-r from-emerald-400/20 to-teal-500/20 rounded-full mix-blend-multiply filter blur-3xl animate-pulse delay-2000"></div>
+                </div>
+
+                {/* Floating grid pattern */}
+                <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none"></div>
+
                 {/* Hero Header */}
                 <div className="relative bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-700 text-white overflow-hidden">
                     <div className="absolute inset-0 bg-black/10"></div>
@@ -204,28 +214,48 @@ function Dashboard() {
                     <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                             <div>
-                                <div className="flex items-center gap-4 mb-3">
-                                    <h1 className="text-3xl sm:text-4xl font-bold text-white">
-                                        {getGreeting()}, {user?.displayName?.split(' ')[0] || user?.email?.split('@')[0] || 'User'}!
-                                    </h1>
-                                    {isPremium && (
-                                        <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 rounded-full">
-                                            <Crown className="w-5 h-5 text-yellow-300" />
-                                            <span className="text-white text-sm font-semibold">Pro Member</span>
+                                <motion.div
+                                    initial={{ y: 20, opacity: 0, scale: 0.9 }}
+                                    animate={{ y: 0, opacity: 1, scale: 1 }}
+                                    transition={{ duration: 0.6, delay: 0.2 }}
+                                    className="flex items-center mb-4"
+                                >
+                                    <div className="relative">
+                                        <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-white/10 blur-xl rounded-full"></div>
+                                        <div className="relative inline-flex items-center bg-white/20 backdrop-blur-sm border border-white/30 shadow-lg text-white px-4 py-2 rounded-full text-sm font-medium">
+                                            <div className="w-2 h-2 bg-green-400 rounded-full mr-3 animate-pulse"></div>
+                                            <Sparkles className="h-4 w-4 mr-2" />
+                                            <span className="font-semibold">Dashboard</span>
                                         </div>
-                                    )}
-                                </div>
-                                <p className="text-blue-100 text-lg">
-                                    Ready to build your career? Let's create something amazing together.
-                                </p>
+                                    </div>
+                                </motion.div>
+                                <motion.h1
+                                    initial={{ y: 30, opacity: 0 }}
+                                    animate={{ y: 0, opacity: 1 }}
+                                    transition={{ duration: 0.8, delay: 0.3 }}
+                                    className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 text-white"
+                                >
+                                    {getGreeting()}, {user?.displayName?.split(' ')[0] || 'User'}!
+                                </motion.h1>
+                                <motion.p
+                                    initial={{ y: 30, opacity: 0 }}
+                                    animate={{ y: 0, opacity: 1 }}
+                                    transition={{ duration: 0.8, delay: 0.5 }}
+                                    className="text-xl text-white/90 font-light"
+                                >
+                                    Welcome back to your professional workspace
+                                </motion.p>
                             </div>
-                            <button
+                            <motion.button
+                                initial={{ y: 30, opacity: 0 }}
+                                animate={{ y: 0, opacity: 1 }}
+                                transition={{ duration: 0.8, delay: 0.7 }}
                                 onClick={() => router.push('/profile')}
-                                className="inline-flex items-center gap-2 px-6 py-3 text-sm font-medium text-blue-600 bg-white hover:bg-blue-50 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+                                className="inline-flex items-center gap-2 px-6 py-3 text-sm font-medium text-blue-600 bg-white/90 hover:bg-white backdrop-blur-sm rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
                             >
                                 <User className="w-4 h-4" />
                                 View Profile
-                            </button>
+                            </motion.button>
                         </div>
                     </div>
                 </div>

@@ -95,11 +95,11 @@ function DesktopFrom() {
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.4, delay: 0.3 }}
-                    className="hidden xl:block w-80"
+                    className="hidden xl:block w-120"
                 >
                     <div className="sticky top-0 h-screen flex items-center justify-center">
-                        <div className="w-full pr-4 lg:pr-6">
-                            <ResumePreview mode="live" />
+                        <div className="w-full pr-1 scale-[0.4]">
+                            <ResumePreview />
                         </div>
                     </div>
                 </motion.div>

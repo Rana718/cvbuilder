@@ -1,10 +1,11 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
 import { useAuth } from '@/components/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Plus, Edit, Trash2, Search, MoreHorizontal, Share2, Calendar, User, Briefcase } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, MoreHorizontal, Share2, Calendar, User, Briefcase, FileText, Upload } from 'lucide-react';
 import axiosInstance from '@/lib/axios';
 import TemplateRenderer from '@/components/templates/TemplateRenderer';
 import Navbar from '@/components/Navbar';
@@ -242,38 +243,93 @@ const ResumePage: React.FC = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-100/50">
+            {/* Enhanced Background Elements */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute top-20 left-10 w-96 h-96 bg-gradient-to-r from-blue-400/20 to-indigo-500/20 rounded-full mix-blend-multiply filter blur-3xl animate-pulse"></div>
+                <div className="absolute top-40 right-10 w-80 h-80 bg-gradient-to-r from-purple-400/20 to-pink-500/20 rounded-full mix-blend-multiply filter blur-3xl animate-pulse delay-1000"></div>
+                <div className="absolute bottom-20 left-1/2 w-72 h-72 bg-gradient-to-r from-emerald-400/20 to-teal-500/20 rounded-full mix-blend-multiply filter blur-3xl animate-pulse delay-2000"></div>
+            </div>
+
+            {/* Floating grid pattern */}
+            {/* <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none"></div> */}
+
             <Navbar />
 
-            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
-                    <div className="mb-4 sm:mb-0">
-                        <h1 className="text-2xl font-bold text-gray-900">Resumes</h1>
-                        <p className="text-gray-600 mt-1">
+            <main className="relative max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-8">
+                {/* Enhanced Header */}
+                <motion.div
+                    initial={{ y: 20, opacity: 0, scale: 0.9 }}
+                    animate={{ y: 0, opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.6, delay: 0.2 }}
+                    className="flex justify-center mb-4 sm:mb-6"
+                >
+                    <div className="relative">
+                        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 blur-xl rounded-full"></div>
+                        <div className="relative inline-flex items-center bg-white/90 backdrop-blur-sm border border-white/20 shadow-lg text-slate-700 px-3 sm:px-6 py-2 sm:py-3 rounded-full text-xs sm:text-sm font-medium">
+                            <div className="w-2 h-2 bg-green-500 rounded-full mr-2 sm:mr-3 animate-pulse"></div>
+                            <FileText className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2 text-blue-600" />
+                            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent font-semibold">
+                                Resume Manager
+                            </span>
+                        </div>
+                    </div>
+                </motion.div>
+
+                <div className="flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-8">
+                    <motion.div
+                        initial={{ y: 30, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ duration: 0.8, delay: 0.3 }}
+                        className="mb-4 sm:mb-0"
+                    >
+                        <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-slate-900 mb-1 sm:mb-2">
+                            Your
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 ml-2">
+                                Resumes
+                            </span>
+                        </h1>
+                        <p className="text-sm sm:text-base lg:text-lg text-slate-600 font-light">
                             Create and manage your professional resumes with our templates
                         </p>
-                    </div>
+                    </motion.div>
 
-                    <div className="flex items-center space-x-4">
+                    <motion.div
+                        initial={{ y: 30, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ duration: 0.8, delay: 0.5 }}
+                        className="flex flex-col space-y-3 sm:space-y-0 sm:flex-row sm:items-center sm:space-x-4"
+                    >
                         <div className="relative">
-                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-3 h-3 sm:w-4 sm:h-4 text-slate-400" />
                             <input
                                 type="text"
                                 placeholder="Search resumes..."
                                 value={searchTerm}
                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
-                                className="pl-10 pr-4 py-2 w-64 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                className="pl-8 sm:pl-10 pr-3 sm:pr-4 py-2 sm:py-3 w-full sm:w-64 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white/80 backdrop-blur-sm shadow-sm text-sm"
                             />
                         </div>
 
-                        <Link
-                            href="/template"
-                            className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all shadow-sm"
-                        >
-                            <Plus className="w-4 h-4" />
-                            <span>Create New</span>
-                        </Link>
-                    </div>
+                        <div className="flex items-center space-x-2">
+                            <Link
+                                href="/template"
+                                className="group flex items-center justify-center space-x-2 px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 font-medium text-sm"
+                            >
+                                <Plus className="w-3 h-3 sm:w-4 sm:h-4 group-hover:rotate-90 transition-transform duration-300" />
+                                <span className="hidden sm:inline">Create New</span>
+                                <span className="sm:hidden">Create</span>
+                            </Link>
+                            <Link
+                                href="/resusme/parse"
+                                className="group flex items-center justify-center space-x-2 px-4 sm:px-6 py-2 sm:py-3 bg-white/80 backdrop-blur-sm border border-slate-300 hover:border-blue-300 text-slate-700 hover:text-blue-700 rounded-xl transition-all shadow-sm hover:shadow-md font-medium text-sm"
+                            >
+                                <Upload className="w-3 h-3 sm:w-4 sm:h-4" />
+                                <span className="hidden sm:inline">Import PDF</span>
+                                <span className="sm:hidden">Import</span>
+                            </Link>
+                        </div>
+                    </motion.div>
                 </div>
 
                 {error && (
@@ -283,44 +339,51 @@ const ResumePage: React.FC = () => {
                 )}
 
                 {filteredResumes.length === 0 && searchTerm ? (
-                    <div className="text-center py-16">
-                        <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <Search className="w-8 h-8 text-gray-400" />
+                    <div className="text-center py-12 sm:py-16">
+                        <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                            <Search className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400" />
                         </div>
-                        <h3 className="text-lg font-medium text-gray-900 mb-2">No matching resumes</h3>
-                        <p className="text-gray-600 mb-4">Try adjusting your search terms or create a new resume</p>
+                        <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-2">No matching resumes</h3>
+                        <p className="text-sm sm:text-base text-gray-600 mb-3 sm:mb-4 px-4">Try adjusting your search terms or create a new resume</p>
                         <button
                             onClick={() => setSearchTerm('')}
-                            className="text-blue-600 hover:text-blue-700 font-medium"
+                            className="text-blue-600 hover:text-blue-700 font-medium text-sm sm:text-base"
                         >
                             Clear search
                         </button>
                     </div>
                 ) : resumes.length === 0 ? (
-                    <div className="text-center py-20">
-                        <div className="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                            <User className="w-12 h-12 text-blue-600" />
+                    <div className="text-center py-12 sm:py-20">
+                        <div className="w-16 h-16 sm:w-24 sm:h-24 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
+                            <User className="w-8 h-8 sm:w-12 sm:h-12 text-blue-600" />
                         </div>
-                        <h3 className="text-xl font-semibold text-gray-900 mb-3">Welcome to your resume dashboard</h3>
-                        <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                        <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2 sm:mb-3">Welcome to your resume dashboard</h3>
+                        <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6 max-w-xs sm:max-w-md mx-auto px-4">
                             Start building your professional resume with our beautiful templates and AI-powered tools
                         </p>
                         <Link
                             href="/template"
-                            className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium shadow-sm"
+                            className="inline-flex items-center px-4 sm:px-6 py-2 sm:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium shadow-sm text-sm sm:text-base"
                         >
-                            <Plus className="w-5 h-5 mr-2" />
+                            <Plus className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                             Create Your First Resume
                         </Link>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        {filteredResumes.map((resume) => (
-                            <div key={resume.id} className="group relative">
-                                <Link href={`/resume/${resume.id}?template=${resume.template_id}`} className="block">
-                                    <div className="bg-white rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-lg transition-all duration-200 overflow-hidden">
-                                        <div className="aspect-[3/4] bg-gray-50 border-b border-gray-100 p-3 relative">
-                                            <div className="absolute top-3 right-3 z-10">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+                        {filteredResumes.map((resume, index) => (
+                            <motion.div 
+                                key={resume.id} 
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.3, delay: index * 0.05 }}
+                                className="group cursor-pointer"
+                            >
+                                <Link href={`/resusme/${resume.id}?template=${resume.template_id}`} className="block">
+                                    <div className="relative bg-white border border-gray-200 rounded-lg overflow-hidden hover:border-blue-300 hover:shadow-lg transition-all duration-200">
+                                        {/* Resume Preview */}
+                                        <div className="relative aspect-[3/4] bg-white">
+                                            <div className="absolute top-2 right-2 z-20">
                                                 <DropdownMenu
                                                     resumeId={resume.id}
                                                     templateId={resume.template_id}
@@ -330,56 +393,33 @@ const ResumePage: React.FC = () => {
                                                 />
                                             </div>
 
-                                            <div className="h-full flex flex-col">
-                                                <div className="flex items-start justify-between mb-3">
-                                                    <div className="flex-1 pr-8">
-                                                        <h4 className="font-semibold text-gray-900 text-sm mb-1 line-clamp-1">
-                                                            {resume.name || 'Untitled Resume'}
-                                                        </h4>
-                                                        <p className="text-xs text-gray-500 line-clamp-1">
-                                                            {resume.job_title || 'Position not specified'}
-                                                        </p>
+                                            <div className="w-full h-full p-2 sm:p-3">
+                                                <div className="w-full h-full overflow-hidden rounded border border-gray-200 bg-white">
+                                                    <div className="w-full h-full transform scale-[0.8] sm:scale-[0.85] origin-top-left overflow-hidden">
+                                                        <div className="w-[125%] h-[125%] sm:w-[117.6%] sm:h-[117.6%]">
+                                                            <TemplateRenderer
+                                                                templateId={resume.template_id}
+                                                                userData={convertToUserData(resume)}
+                                                                size="small"
+                                                            />
+                                                        </div>
                                                     </div>
                                                 </div>
-
-                                                <div className="flex-1 overflow-hidden rounded border border-gray-200 bg-white">
-                                                    <TemplateRenderer
-                                                        templateId={resume.template_id}
-                                                        userData={convertToUserData(resume)}
-                                                        size="small"
-                                                    />
-                                                </div>
-
-                                                <div className="flex items-center justify-between mt-3">
-                                                    <div className="flex items-center text-xs text-gray-500">
-                                                        <Briefcase className="w-3 h-3 mr-1" />
-                                                        <span className="line-clamp-1">
-                                                            Template {resume.template_id}
-                                                        </span>
-                                                    </div>
-                                                    <div
-                                                        className="w-3 h-3 rounded-full border border-gray-200"
-                                                        style={{ backgroundColor: resume.theme_color || '#3B82F6' }}
-                                                        title="Theme Color"
-                                                    />
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="p-4 bg-white">
-                                            <div className="flex items-center justify-between">
-                                                <div className="flex items-center text-xs text-gray-500">
-                                                    <Calendar className="w-3 h-3 mr-1" />
-                                                    {formatDate(resume.updated_at)}
-                                                </div>
-                                                <span className="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded">
-                                                    {resume.job_title ? resume.job_title.split(' ').slice(0, 2).join(' ') : 'Resume'}
-                                                </span>
                                             </div>
                                         </div>
                                     </div>
                                 </Link>
-                            </div>
+
+                                {/* Resume Info - Outside card */}
+                                <div className="text-center mt-3">
+                                    <h3 className="font-medium text-gray-900 text-sm sm:text-base mb-1 group-hover:text-blue-600 transition-colors line-clamp-1">
+                                        {resume.name || 'Untitled Resume'}
+                                    </h3>
+                                    <div className="flex items-center justify-center space-x-2 text-xs sm:text-sm text-gray-500">
+                                        <span>{resume.job_title || 'Position not specified'}</span>
+                                    </div>
+                                </div>
+                            </motion.div>
                         ))}
                     </div>
                 )}

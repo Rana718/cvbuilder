@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
+import { motion } from 'framer-motion'
 import { useAuth } from '@/components/AuthContext'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -210,44 +211,65 @@ function ProfilePage() {
     }
 
     return (
-        <div className="min-h-screen bg-slate-50">
-            <div className="bg-white border-b border-slate-200 sticky top-0 z-10">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-100/50">
+            {/* Enhanced Background Elements */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute top-20 left-10 w-96 h-96 bg-gradient-to-r from-blue-400/20 to-indigo-500/20 rounded-full mix-blend-multiply filter blur-3xl animate-pulse"></div>
+                <div className="absolute top-40 right-10 w-80 h-80 bg-gradient-to-r from-purple-400/20 to-pink-500/20 rounded-full mix-blend-multiply filter blur-3xl animate-pulse delay-1000"></div>
+                <div className="absolute bottom-20 left-1/2 w-72 h-72 bg-gradient-to-r from-emerald-400/20 to-teal-500/20 rounded-full mix-blend-multiply filter blur-3xl animate-pulse delay-2000"></div>
+            </div>
+
+            {/* Floating grid pattern */}
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none"></div>
+
+            <div className="bg-white/60 backdrop-blur-md border-b border-slate-200/30 sticky top-0 z-[999] shadow-sm">
                 <div className="max-w-4xl mx-auto px-4 py-4">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-4">
                             <Link
                                 href="/dashboard"
-                                className="flex items-center space-x-2 text-slate-600 hover:text-blue-600 transition-colors"
+                                className="flex items-center space-x-2 text-slate-600 hover:text-blue-600 transition-colors group"
                             >
-                                <ArrowLeft className="w-5 h-5" />
+                                <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
                                 <span className="hidden sm:inline font-medium">Dashboard</span>
                             </Link>
                             <div className="h-5 w-px bg-slate-300 hidden sm:block"></div>
-                            <h1 className="text-xl sm:text-2xl font-medium text-slate-900">Profile Settings</h1>
+                            <motion.h1 
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                className="text-xl sm:text-2xl font-semibold text-slate-900"
+                            >
+                                Profile Settings
+                            </motion.h1>
                         </div>
-                        <button className="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-all">
+                        <motion.button 
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            className="p-2 text-slate-500 hover:text-slate-700 hover:bg-white/40 rounded-xl transition-all shadow-sm hover:shadow-md backdrop-blur-sm"
+                        >
                             <Settings className="w-5 h-5" />
-                        </button>
+                        </motion.button>
                     </div>
                 </div>
             </div>
 
-            <div className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
+            <div className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8 relative z-10">
                 {error && (
-                    <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
+                    <div className="mb-6 bg-red-50/80 backdrop-blur-sm border border-red-200/60 text-red-700 px-4 py-3 rounded-xl text-sm">
                         {error}
                     </div>
                 )}
 
                 <div className="space-y-6">
-                    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                        <div className="p-6 bg-gradient-to-br from-blue-50 to-indigo-50">
+                    {/* Main Profile Card */}
+                    <div className="bg-white/70 backdrop-blur-lg rounded-2xl border border-white/30 shadow-lg shadow-slate-200/50 overflow-hidden">
+                        <div className="p-6 bg-gradient-to-br from-blue-50/60 to-indigo-50/60 backdrop-blur-sm">
                             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
                                 <h2 className="text-lg font-medium text-slate-900">Profile Information</h2>
                                 {!isEditing ? (
                                     <button
                                         onClick={() => setIsEditing(true)}
-                                        className="inline-flex items-center space-x-2 px-4 py-2 text-sm font-medium text-blue-700 bg-blue-100 hover:bg-blue-200 rounded-lg transition-colors"
+                                        className="inline-flex items-center space-x-2 px-4 py-2 text-sm font-medium text-blue-700 bg-blue-100/70 hover:bg-blue-200/70 backdrop-blur-sm rounded-lg transition-colors"
                                     >
                                         <Edit className="w-4 h-4" />
                                         <span>Edit</span>
@@ -256,14 +278,14 @@ function ProfilePage() {
                                     <div className="flex items-center space-x-2">
                                         <button
                                             onClick={handleSaveProfile}
-                                            className="inline-flex items-center space-x-2 px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors"
+                                            className="inline-flex items-center space-x-2 px-4 py-2 text-sm font-medium text-white bg-green-600/90 hover:bg-green-700/90 backdrop-blur-sm rounded-lg transition-colors"
                                         >
                                             <Save className="w-4 h-4" />
                                             <span>Save</span>
                                         </button>
                                         <button
                                             onClick={handleCancelEdit}
-                                            className="inline-flex items-center space-x-2 px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors"
+                                            className="inline-flex items-center space-x-2 px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-800 hover:bg-slate-100/70 backdrop-blur-sm rounded-lg transition-colors"
                                         >
                                             <X className="w-4 h-4" />
                                             <span>Cancel</span>
@@ -278,10 +300,10 @@ function ProfilePage() {
                                         <img
                                             src={user.photoURL}
                                             alt="Profile"
-                                            className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-2xl border-4 border-white shadow-lg"
+                                            className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-2xl border-4 border-white/80 shadow-lg"
                                         />
                                     ) : (
-                                        <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl border-4 border-white shadow-lg flex items-center justify-center">
+                                        <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-blue-100/80 to-blue-200/80 backdrop-blur-sm rounded-2xl border-4 border-white/80 shadow-lg flex items-center justify-center">
                                             <User className="w-10 h-10 sm:w-12 sm:h-12 text-blue-600" />
                                         </div>
                                     )}
@@ -292,7 +314,7 @@ function ProfilePage() {
                                             {profile.full_name || 'User'}
                                         </h3>
                                         {(isAdmin || isSuperAdmin) && (
-                                            <div className="inline-flex items-center space-x-1 mt-2 px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-medium">
+                                            <div className="inline-flex items-center space-x-1 mt-2 px-3 py-1 bg-purple-100/70 backdrop-blur-sm text-purple-700 rounded-full text-sm font-medium">
                                                 {isSuperAdmin ? <Crown className="w-4 h-4" /> : <Shield className="w-4 h-4" />}
                                                 <span>{isSuperAdmin ? 'Super Admin' : 'Admin'}</span>
                                             </div>
@@ -312,7 +334,7 @@ function ProfilePage() {
                             </div>
                         </div>
 
-                        <div className="p-6 space-y-6">
+                        <div className="p-6 space-y-6 bg-white/40 backdrop-blur-sm">
                             <div className="grid grid-cols-1 gap-6">
                                 <div>
                                     <label className="block text-sm font-medium text-slate-700 mb-2">
@@ -323,11 +345,11 @@ function ProfilePage() {
                                             type="text"
                                             value={editForm.full_name}
                                             onChange={(e) => setEditForm({ ...editForm, full_name: e.target.value })}
-                                            className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm bg-white"
+                                            className="w-full px-4 py-3 border border-slate-300/60 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm bg-white/70 backdrop-blur-sm"
                                             placeholder="Enter your full name"
                                         />
                                     ) : (
-                                        <div className="px-4 py-3 bg-slate-50 rounded-xl border border-slate-200">
+                                        <div className="px-4 py-3 bg-slate-50/70 backdrop-blur-sm rounded-xl border border-slate-200/60">
                                             <p className="text-slate-800 text-sm">{profile.full_name || 'Not provided'}</p>
                                         </div>
                                     )}
@@ -337,7 +359,7 @@ function ProfilePage() {
                                     <label className="block text-sm font-medium text-slate-700 mb-2">
                                         Email Address
                                     </label>
-                                    <div className="px-4 py-3 bg-slate-50 rounded-xl border border-slate-200">
+                                    <div className="px-4 py-3 bg-slate-50/70 backdrop-blur-sm rounded-xl border border-slate-200/60">
                                         <p className="text-slate-800 text-sm">{profile.email}</p>
                                         <p className="text-slate-500 text-xs mt-1">Email cannot be changed</p>
                                     </div>
@@ -346,24 +368,26 @@ function ProfilePage() {
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm">
+                    {/* LinkedIn Integration Card */}
+                    <div className="bg-white/70 backdrop-blur-lg rounded-2xl border border-white/30 shadow-lg shadow-slate-200/50">
                         <div className="p-6">
                             <h3 className="text-lg font-medium text-slate-900 mb-4">LinkedIn Integration</h3>
-                            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4">
+                            <div className="bg-gradient-to-r from-blue-50/60 to-indigo-50/60 backdrop-blur-sm rounded-xl p-4">
                                 <LinkedInMini />
                             </div>
                         </div>
                     </div>
 
+                    {/* Admin Panel Card */}
                     {(isAdmin || isSuperAdmin) && (
-                        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm">
+                        <div className="bg-white/70 backdrop-blur-lg rounded-2xl border border-white/30 shadow-lg shadow-slate-200/50">
                             <div className="p-6">
                                 <Link
                                     href="/admin"
-                                    className="flex items-center justify-between p-4 text-purple-700 hover:text-white hover:bg-gradient-to-r from-purple-600 to-purple-700 rounded-xl border-2 border-purple-200 hover:border-purple-600 transition-all group"
+                                    className="flex items-center justify-between p-4 text-purple-700 hover:text-white hover:bg-gradient-to-r from-purple-600/90 to-purple-700/90 rounded-xl border-2 border-purple-200/60 hover:border-purple-600/60 transition-all group backdrop-blur-sm"
                                 >
                                     <div className="flex items-center space-x-3">
-                                        <div className="p-2 bg-purple-100 group-hover:bg-white/20 rounded-lg transition-colors">
+                                        <div className="p-2 bg-purple-100/70 group-hover:bg-white/20 backdrop-blur-sm rounded-lg transition-colors">
                                             <Shield className="w-5 h-5" />
                                         </div>
                                         <div>
@@ -379,12 +403,13 @@ function ProfilePage() {
                         </div>
                     )}
 
-                    <div className="bg-white rounded-2xl border border-red-200 shadow-sm">
+                    {/* Account Actions Card */}
+                    <div className="bg-white/70 backdrop-blur-lg rounded-2xl border border-red-200/60 shadow-lg shadow-slate-200/50">
                         <div className="p-6">
                             <h4 className="font-medium text-slate-900 mb-3">Account Actions</h4>
                             <button
                                 onClick={handleSignOut}
-                                className="inline-flex items-center justify-center space-x-2 px-4 py-3 text-red-700 hover:text-white hover:bg-red-600 border border-red-300 hover:border-red-600 rounded-xl transition-all font-medium"
+                                className="inline-flex items-center justify-center space-x-2 px-4 py-3 text-red-700 hover:text-white hover:bg-red-600/90 border border-red-300/60 hover:border-red-600/60 rounded-xl transition-all font-medium backdrop-blur-sm"
                             >
                                 <LogOut className="w-4 h-4" />
                                 <span>Sign Out</span>

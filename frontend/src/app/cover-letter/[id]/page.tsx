@@ -91,6 +91,7 @@ function CoverLetterPage() {
 
         if (!user || !isPremium) {
             setShowPaymentCard(true);
+            await saveCoverLetter();
             return;
         }
 
@@ -121,7 +122,11 @@ function CoverLetterPage() {
             return;
         }
 
-        // If UUID already exists and shareUrl is set, just copy it
+        if(!isPremium){
+            alert('Sharing is a premium feature. Please upgrade to share your cover letter.')
+            return
+        }
+
         if (shareableUuid && shareUrl) {
             copyShareUrl();
             return;

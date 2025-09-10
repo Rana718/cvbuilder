@@ -91,12 +91,12 @@ export default function TemplatesPage() {
                                         <TemplatePreview templateId={template.id} size="small" />
                                         
                                         {/* Premium Badge */}
-                                        {template.isPremium && (
+                                        {/* {template.isPremium && (
                                             <div className="absolute top-3 right-3 bg-amber-500 text-white rounded-md px-2 py-1 text-xs font-medium flex items-center space-x-1">
                                                 <Crown className="h-3 w-3" />
                                                 <span>PRO</span>
                                             </div>
-                                        )}
+                                        )} */}
                                     </div>
 
                                 </div>

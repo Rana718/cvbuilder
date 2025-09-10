@@ -1,7 +1,6 @@
 import { create } from 'zustand'
+import { persist, createJSONStorage } from 'zustand/middleware'
 import axiosInstance from '@/lib/axios'
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { storage } from '@/lib/firebase'
 
 export interface PersonalInfo {
     firstName: string
@@ -100,6 +99,7 @@ interface ResumeStore extends ResumeState {
     uploadImage: (file: File) => Promise<void>
     generatePreviewId: () => string
     isPreviewId: (id: string) => boolean
+    isCurrentPreview: () => boolean
 
     // Populate from API data
     populateFromResumeData: (data: any) => void
@@ -141,6 +141,7 @@ interface ResumeStore extends ResumeState {
     // Reset - only when explicitly called
     resetStore: () => void
     startNewResume: () => void
+    clearResumeData: () => void
 }
 
 const generateId = () => Math.random().toString(36).substr(2, 9)
@@ -170,26 +171,28 @@ const initialState: ResumeState = {
     additionalSections: []
 }
 
-export const useResumeStore = create<ResumeStore>()((set, get) => ({
-    ...initialState,
+export const useResumeStore = create<ResumeStore>()(
+    persist(
+        (set, get) => ({
+            ...initialState,
 
-    // Navigation
-    setCurrentStep: (step) => set({ currentStep: step }),
-    nextStep: () => set((state) => ({ currentStep: Math.min(state.currentStep + 1, 6) })),
-    prevStep: () => set((state) => ({ currentStep: Math.max(state.currentStep - 1, 1) })),
+            // Navigation
+            setCurrentStep: (step) => set({ currentStep: step }),
+            nextStep: () => set((state) => ({ currentStep: Math.min(state.currentStep + 1, 6) })),
+            prevStep: () => set((state) => ({ currentStep: Math.max(state.currentStep - 1, 1) })),
 
-    // Template
-    setTemplateId: (id) => set({ templateId: id }),
+            // Template
+            setTemplateId: (id) => set({ templateId: id }),
 
-    // Document ID
-    setDocumentId: (id) => set({ documentId: id }),
+            // Document ID
+            setDocumentId: (id) => set({ documentId: id }),
 
-    clearDocumentId: () => {
-        set({ documentId: null })
-    },
+            clearDocumentId: () => {
+                set({ documentId: null })
+            },
 
-    // Shareable UUID
-    setShareableUuid: (uuid) => set({ shareableUuid: uuid }),
+            // Shareable UUID
+            setShareableUuid: (uuid) => set({ shareableUuid: uuid }),
 
     // API methods
     saveResume: async () => {
@@ -288,14 +291,21 @@ export const useResumeStore = create<ResumeStore>()((set, get) => ({
         try {
             if (!file) return;
             
-            const storageRef = ref(storage, `profile_images/${Date.now()}_${file.name}`);
-            await uploadBytes(storageRef, file);
-            const downloadURL = await getDownloadURL(storageRef);
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            const response = await axiosInstance.post('/api/upload', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            
+            const imageUrl = response.data.image_url;
             
             set((state) => ({
                 personalInfo: {
                     ...state.personalInfo,
-                    image_url: downloadURL
+                    image_url: imageUrl
                 }
             }))
         } catch (error) {
@@ -318,22 +328,23 @@ export const useResumeStore = create<ResumeStore>()((set, get) => ({
         )
     },
 
-    // Generate temporary preview ID for unsaved resumes
     generatePreviewId: () => {
         return 'preview-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9)
     },
 
-    // Check if a resume ID is a preview ID (for local/unsaved resumes)
     isPreviewId: (id: string) => {
         return !!(id && id.startsWith('preview-'))
     },
 
+    isCurrentPreview: (): boolean => {
+        const state = get()
+        return !state.documentId || get().isPreviewId(state.documentId.toString())
+    },
+
     // Populate from API data
     populateFromResumeData: (data) => {
-        // Handle social links - check both new and old format
         let websites = []
         
-        // Check for new social_links format first (socail_links due to DB typo)
         if (data.socail_links && Array.isArray(data.socail_links)) {
             websites = data.socail_links
                 .filter((link: any) => link.url && link.url.trim())
@@ -343,7 +354,6 @@ export const useResumeStore = create<ResumeStore>()((set, get) => ({
                     url: link.url.trim()
                 }))
         } 
-        // Fall back to old format for backwards compatibility
         else {
             websites = [
                 ...(data.linkedin_url && data.linkedin_url.trim() ? [{ id: generateId(), label: 'LinkedIn', url: data.linkedin_url.trim() }] : []),
@@ -532,5 +542,49 @@ export const useResumeStore = create<ResumeStore>()((set, get) => ({
     // Start new resume - explicitly called when user wants to create new
     startNewResume: () => {
         set({ ...initialState, documentId: null, shareableUuid: null })
+    },
+
+    // Clear resume data but keep current session info
+    clearResumeData: () => {
+        set({
+            personalInfo: initialState.personalInfo,
+            workExperience: [],
+            education: [],
+            skills: [],
+            projects: [],
+            summary: '',
+            additionalSections: [],
+            currentStep: 1,
+            documentId: null,
+            shareableUuid: null
+        })
     }
-}))
+}),
+{
+    name: 'resume-storage',
+    version: 1,
+    storage: createJSONStorage(() => localStorage),
+    // Only persist essential data, not loading states
+    partialize: (state) => ({
+        templateId: state.templateId,
+        documentId: state.documentId,
+        shareableUuid: state.shareableUuid,
+        personalInfo: state.personalInfo,
+        workExperience: state.workExperience,
+        education: state.education,
+        skills: state.skills,
+        projects: state.projects,
+        summary: state.summary,
+        additionalSections: state.additionalSections,
+        currentStep: state.currentStep
+    }),
+    // Migration function for version updates
+    migrate: (persistedState: any, version: number) => {
+        if (version === 0) {
+            // Migration from version 0 to 1
+            return persistedState
+        }
+        return persistedState
+    },
+}
+))
