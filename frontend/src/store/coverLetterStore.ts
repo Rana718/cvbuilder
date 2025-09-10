@@ -60,11 +60,9 @@ interface CoverLetterStore {
     // Loading state
     setLoading: (loading: boolean) => void
 
-    // Reset
+    // Reset - only when explicitly called
     resetStore: () => void
-    
-    // Clear store for new cover letter
-    clearForNew: () => void
+    startNewCoverLetter: () => void
 }
 
 const initialState: CoverLetterFormData = {
@@ -123,7 +121,7 @@ export const useCoverLetterStore = create<CoverLetterStore>()((set, get) => ({
                 const response = await axiosInstance.post('/api/cover-letters/', coverLetterData)
                 set({ documentId: response.data.id })
             } else {
-                // Update existing cover letter - don't reset store
+                // Update existing cover letter
                 const response = await axiosInstance.put(`/api/cover-letters/${state.documentId}`, coverLetterData)
                 set({ documentId: response.data.id })
             }
@@ -208,13 +206,13 @@ export const useCoverLetterStore = create<CoverLetterStore>()((set, get) => ({
     // Loading state
     setLoading: (loading) => set({ isLoading: loading }),
 
-    // Reset
+    // Reset - only when explicitly called
     resetStore: () => {
         set({ ...initialState, isLoading: false, tempCoverLetter: null })
     },
 
-    // Clear store for new cover letter
-    clearForNew: () => {
+    // Start new cover letter - explicitly called when user wants to create new
+    startNewCoverLetter: () => {
         set({ 
             ...initialState, 
             isLoading: false, 

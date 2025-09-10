@@ -65,7 +65,7 @@ function ProjectsStep({ onNext, onPrev }: ProjectsStepProps) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
-            className="space-y-8"
+            className="space-y-4 md:space-y-6 lg:space-y-8"
         >
             {/* Header */}
             <motion.div
@@ -74,19 +74,19 @@ function ProjectsStep({ onNext, onPrev }: ProjectsStepProps) {
                 transition={{ delay: 0.1 }}
                 className="text-left"
             >
-                <div className="flex items-start mb-4">
-                    <div className="p-3 bg-blue-100 rounded-full mr-2">
-                        <FolderOpen className="md:w-8 md:h-8 w-5 h-5 text-blue-600" />
+                <div className="flex items-start mb-3 md:mb-4">
+                    <div className="p-1.5 md:p-2 lg:p-3 bg-blue-100 rounded-full mr-2 md:mr-3">
+                        <FolderOpen className="w-5 h-5 md:w-6 md:h-6 lg:w-8 lg:h-8 text-blue-600" />
                     </div>
                     <div>
-                        <h2 className="md:text-3xl text-xl font-bold text-gray-900">Projects</h2>
-                        <p className="md:text-lg text-base text-gray-600">Showcase your key projects and achievements</p>
+                        <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900">Projects</h2>
+                        <p className="text-sm md:text-base lg:text-lg text-gray-600">Showcase your key projects and achievements</p>
                     </div>
                 </div>
             </motion.div>
 
             {/* Projects List */}
-            <div className="space-y-6">
+            <div className="space-y-3 md:space-y-4 lg:space-y-6">
                 <AnimatePresence>
                     {projects.map((project: Project, index) => (
                         <motion.div
@@ -95,7 +95,7 @@ function ProjectsStep({ onNext, onPrev }: ProjectsStepProps) {
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -20 }}
                             transition={{ delay: index * 0.1 }}
-                            className="bg-white border border-gray-300 rounded-sm p-3 md:p-4 hover:border-blue-600 transition-all"
+                            className="bg-white border border-gray-300 rounded-sm p-2 md:p-3 lg:p-4 hover:border-blue-600 transition-all"
                         >
                             {editingId === project.id ? (
                                 <div className="space-y-4">

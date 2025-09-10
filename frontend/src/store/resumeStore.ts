@@ -138,11 +138,9 @@ interface ResumeStore extends ResumeState {
     updateAdditionalSection: (id: string, section: Partial<AdditionalSection>) => void
     removeAdditionalSection: (id: string) => void
 
-    // Reset
+    // Reset - only when explicitly called
     resetStore: () => void
-    
-    // Clear store for new resume creation only
-    clearForNewResume: () => void
+    startNewResume: () => void
 }
 
 const generateId = () => Math.random().toString(36).substr(2, 9)
@@ -265,10 +263,8 @@ export const useResumeStore = create<ResumeStore>()((set, get) => ({
                 // Create new resume
                 const response = await axiosInstance.post('/api/resume-op/save', resumeData)
                 set({ documentId: response.data.id })
-                // Only reset store for new resumes after a delay to allow navigation
-                setTimeout(() => set(initialState), 2000)
             } else {
-                // Update existing resume - don't reset store
+                // Update existing resume
                 const response = await axiosInstance.put(`/api/resume-op/${state.documentId}`, resumeData)
                 set({ documentId: response.data.id })
             }
@@ -290,7 +286,6 @@ export const useResumeStore = create<ResumeStore>()((set, get) => ({
 
     uploadImage: async (file: File) => {
         try {
-
             if (!file) return;
             
             const storageRef = ref(storage, `profile_images/${Date.now()}_${file.name}`);
@@ -529,13 +524,13 @@ export const useResumeStore = create<ResumeStore>()((set, get) => ({
             additionalSections: state.additionalSections.filter(s => s.id !== id)
         })),
 
-    // Reset
+    // Reset - only when explicitly called
     resetStore: () => {
         set(initialState)
     },
 
-    // Clear store for new resume creation only
-    clearForNewResume: () => {
+    // Start new resume - explicitly called when user wants to create new
+    startNewResume: () => {
         set({ ...initialState, documentId: null, shareableUuid: null })
     }
 }))

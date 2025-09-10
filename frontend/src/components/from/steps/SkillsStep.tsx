@@ -89,7 +89,12 @@ function SkillsStep({ onNext, onPrev }: SkillsStepProps) {
   }
 
   const addSuggestedSkill = (skillName: string) => {
-    if (!skills.find(skill => skill.name.toLowerCase() === skillName.toLowerCase())) {
+    const existingSkill = skills.find(skill => skill.name.toLowerCase() === skillName.toLowerCase())
+    if (existingSkill) {
+      // If skill exists, remove it (toggle off)
+      removeSkill(existingSkill.id)
+    } else {
+      // If skill doesn't exist, add it (toggle on)
       addSkill({ name: skillName, rating: 3 })
     }
   }
@@ -128,7 +133,7 @@ function SkillsStep({ onNext, onPrev }: SkillsStepProps) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.3 }}
-      className="space-y-8"
+      className="space-y-4 md:space-y-6 lg:space-y-8"
     >
       {/* Header */}
       <motion.div
@@ -137,13 +142,13 @@ function SkillsStep({ onNext, onPrev }: SkillsStepProps) {
         transition={{ delay: 0.1 }}
         className="text-left"
       >
-        <div className="flex items-start mb-4">
-          <div className="p-2 md:p-3 bg-blue-100 rounded-full mr-3 md:mr-2">
-            <Award className="w-6 h-6 md:w-8 md:h-8 text-blue-600" />
+        <div className="flex items-start mb-3 md:mb-4">
+          <div className="p-1.5 md:p-2 lg:p-3 bg-blue-100 rounded-full mr-2 md:mr-3">
+            <Award className="w-5 h-5 md:w-6 md:h-6 lg:w-8 lg:h-8 text-blue-600" />
           </div>
           <div className="flex-1">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900">Skills</h2>
-            <p className="text-base md:text-lg text-gray-600">Showcase your professional skills and expertise</p>
+            <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900">Skills</h2>
+            <p className="text-sm md:text-base lg:text-lg text-gray-600">Showcase your professional skills and expertise</p>
           </div>
         </div>
       </motion.div>
@@ -314,7 +319,7 @@ function SkillsStep({ onNext, onPrev }: SkillsStepProps) {
           transition={{ delay: 0.4 }}
           className="space-y-4"
         >
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
             <h4 className="text-base md:text-lg font-semibold text-gray-700 flex items-center">
               <Sparkles className="w-4 h-4 md:w-5 md:h-5 mr-2 text-blue-500" />
               AI-Suggested Skills
@@ -324,9 +329,9 @@ function SkillsStep({ onNext, onPrev }: SkillsStepProps) {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={fetchAISkills}
-                className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-sm hover:bg-blue-700 text-sm font-medium transition-all"
+                className="flex items-center space-x-2 px-3 md:px-4 py-1.5 md:py-2 bg-blue-600 text-white rounded-sm hover:bg-blue-700 text-xs md:text-sm font-medium transition-all"
               >
-                <Sparkles className="w-4 h-4" />
+                <Sparkles className="w-3 h-3 md:w-4 md:h-4" />
                 <span>Generate Skills</span>
               </motion.button>
             )}
@@ -396,17 +401,23 @@ function SkillsStep({ onNext, onPrev }: SkillsStepProps) {
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ delay: index * 0.05 }}
-                      whileHover={{ scale: isAdded ? 1 : 1.05, y: isAdded ? 0 : -2 }}
-                      whileTap={{ scale: isAdded ? 1 : 0.95 }}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
                       onClick={() => addSuggestedSkill(skillName)}
-                      disabled={!!isAdded}
-                      className={`text-left p-3 md:p-4 text-xs md:text-sm rounded-sm border-2 transition-all duration-200 font-medium ${isAdded
-                          ? 'bg-green-100 text-green-700 border-green-300 cursor-not-allowed'
-                          : 'bg-white text-gray-700 hover:bg-blue-50 hover:text-blue-700 border-gray-200 hover:border-blue-300 shadow-sm hover:shadow-md'
+                      className={`text-left p-3 md:p-4 text-xs md:text-sm rounded-sm border transition-all duration-200 font-medium ${isAdded
+                          ? 'bg-blue-50 text-blue-700 border-blue-500'
+                          : 'bg-white text-gray-700 hover:bg-blue-50 hover:text-blue-700 border-gray-200 hover:border-blue-300'
                         }`}
                     >
-                      {isAdded && <span className="text-green-600 mr-1">✓</span>}
-                      {skillName}
+                      <div className="flex items-center justify-between">
+                        <span>{skillName}</span>
+                        {isAdded && <span className="text-blue-600 text-xs">✓</span>}
+                      </div>
+                      {isAdded && (
+                        <div className="text-xs text-blue-600 mt-1 font-medium">
+                          Click to remove
+                        </div>
+                      )}
                     </motion.button>
                   )
                 })}

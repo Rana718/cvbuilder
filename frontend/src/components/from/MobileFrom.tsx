@@ -1,4 +1,5 @@
 import React from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useStepNavigation } from '@/hooks/useStepNavigation'
 import StepIndicator from '@/components/ui/StepIndicator'
 import PersonalInfoStep from './steps/PersonalInfoStep'
@@ -25,40 +26,53 @@ function MobileFrom() {
     }
 
     const renderCurrentStep = () => {
-        switch (currentStep) {
-            case 1:
-                return <PersonalInfoStep onNext={nextStep} />
-            case 2:
-                return <WorkExperienceStep onNext={nextStep} onPrev={prevStep} />
-            case 3:
-                return <EducationStep onNext={nextStep} onPrev={prevStep} />
-            case 4:
-                return <SkillsStep onNext={nextStep} onPrev={prevStep} />
-            case 5:
-                return <ProjectsStep onNext={nextStep} onPrev={prevStep} />
-            case 6:
-                return <SummaryStep onNext={nextStep} onPrev={prevStep} />
-            // case 7:
-            //     return <AdditionalInfoStep onPrev={prevStep} />
-            default:
-                return <PersonalInfoStep onNext={nextStep} />
+        const stepComponents = {
+            1: <PersonalInfoStep onNext={nextStep} />,
+            2: <WorkExperienceStep onNext={nextStep} onPrev={prevStep} />,
+            3: <EducationStep onNext={nextStep} onPrev={prevStep} />,
+            4: <SkillsStep onNext={nextStep} onPrev={prevStep} />,
+            5: <ProjectsStep onNext={nextStep} onPrev={prevStep} />,
+            6: <SummaryStep onNext={nextStep} onPrev={prevStep} />
+            // 7: <AdditionalInfoStep onPrev={prevStep} />
         }
+        
+        return stepComponents[currentStep as keyof typeof stepComponents] || stepComponents[1]
     }
 
     return (
-        <div className="min-h-screen bg-white">
+        <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
+            className="min-h-screen bg-white"
+        >
             {/* Step Indicator */}
-            <StepIndicator currentStep={currentStep} totalSteps={6} />
+            <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.1 }}
+            >
+                <StepIndicator currentStep={currentStep} totalSteps={6} />
+            </motion.div>
 
             {/* Main Content */}
-            <div className="p-1 sm:p-2 pt-1">
+            <div className="px-2 py-1 sm:px-3 sm:py-2">
                 <div className="bg-white">
-                    <div className="p-1 sm:p-3">
-                        {renderCurrentStep()}
-                    </div>
+                    <AnimatePresence mode="wait">
+                        <motion.div
+                            key={currentStep}
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -20 }}
+                            transition={{ duration: 0.3 }}
+                            className="px-1 py-2 sm:px-2 sm:py-3"
+                        >
+                            {renderCurrentStep()}
+                        </motion.div>
+                    </AnimatePresence>
                 </div>
             </div>
-        </div>
+        </motion.div>
     )
 }
 

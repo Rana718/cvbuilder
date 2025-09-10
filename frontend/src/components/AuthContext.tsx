@@ -27,15 +27,12 @@ export const useAuth = () => {
 // Sync user with backend silently
 const syncUserWithBackend = async (firebaseUser: User) => {
   try {
-    // Get fresh token with claims
     const tokenResult = await firebaseUser.getIdTokenResult(true);
     
-    // Check if user already exists in database
     if (tokenResult.claims.dbUser === "true") {
-      return; // User already exists in database
+      return;
     }
 
-    // Extract user data from Firebase
     const userData = {
       firebase_uid: firebaseUser.uid,
       email: firebaseUser.email || '',
@@ -44,11 +41,9 @@ const syncUserWithBackend = async (firebaseUser: User) => {
       google_id: firebaseUser.providerData.find(p => p.providerId === 'google.com')?.uid || null
     };
 
-    // Add user to database silently
     await axiosInstance.post('/api/auth/add-user', userData);
   } catch (error) {
     console.error('Failed to sync user with backend:', error);
-    // Don't throw error - continue silently
   }
 };
 
@@ -59,11 +54,11 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
-        // Sync with backend silently in background
         syncUserWithBackend(firebaseUser);
         setUser(firebaseUser);
       } else {
         setUser(null);
+        localStorage.removeItem('profile_cache');
       }
       setLoading(false);
     });

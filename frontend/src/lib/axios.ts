@@ -24,10 +24,7 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
     (response) => response,
     async (error) => {
-        if (error.response?.status === 401) {
-            // Redirect to sign-in on unauthorized
-            window.location.href = '/sign-in';
-        }
+        // Don't auto-redirect on 401 - let components handle it
         return Promise.reject(error);
     }
 );

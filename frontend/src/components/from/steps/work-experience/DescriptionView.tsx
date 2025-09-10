@@ -28,8 +28,21 @@ function DescriptionView({ formData, onFormDataChange, onSave, onBack, aiSuggest
             .replace(/^•\s*/, '')
             .trim()
 
-        // Check if suggestion is already selected
+        // Check if suggestion is already selected - if so, remove it
         if (selectedSuggestions.includes(suggestion)) {
+            // Remove from selected suggestions
+            setSelectedSuggestions(prev => prev.filter(s => s !== suggestion))
+            
+            // Remove from description
+            const currentDesc = formData.description
+            const bulletPoint = '• ' + cleanSuggestion
+            let newDesc = currentDesc
+                .replace(new RegExp('<br>' + bulletPoint.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), '')
+                .replace(new RegExp('^' + bulletPoint.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), '')
+                .replace(/^<br>/, '')
+                .trim()
+            
+            onFormDataChange({ description: newDesc })
             return
         }
 
@@ -147,7 +160,7 @@ function DescriptionView({ formData, onFormDataChange, onSave, onBack, aiSuggest
                     ) : (
                         <>
                             <p className="text-gray-600 text-sm">
-                                Click on any suggestion to add it to your description
+                                Click on suggestions to add them to your description. Click again to remove.
                             </p>
 
                             <div className="grid gap-2 md:gap-3">
@@ -165,23 +178,26 @@ function DescriptionView({ formData, onFormDataChange, onSave, onBack, aiSuggest
                                             initial={{ opacity: 0, x: -20 }}
                                             animate={{ opacity: 1, x: 0 }}
                                             transition={{ delay: 0.1 * index }}
+                                            whileHover={{ scale: 1.02 }}
+                                            whileTap={{ scale: 0.98 }}
                                             onClick={() => addSuggestionToDescription(suggestion)}
-                                            disabled={isSelected}
                                             className={`text-left p-3 md:p-4 rounded-sm border transition-all ${isSelected
-                                                ? 'bg-green-50 border-green-200 cursor-not-allowed'
-                                                : 'bg-white border-gray-300 hover:border-blue-600 hover:bg-blue-50 cursor-pointer'
+                                                ? 'bg-blue-50 border-blue-500 text-blue-700'
+                                                : 'bg-white border-gray-300 hover:border-blue-600 hover:bg-blue-50 text-gray-700'
                                                 }`}
                                         >
-                                            <div className="flex items-start space-x-3">
-                                                <div className={`mt-1 w-5 h-5 rounded-full border-2 flex items-center justify-center ${isSelected
-                                                    ? 'bg-green-500 border-green-500'
-                                                    : 'border-gray-300'
-                                                    }`}>
-                                                    {isSelected && <Check className="w-3 h-3 text-white" />}
+                                            <div className="flex items-start justify-between">
+                                                <div className="flex items-start space-x-3">
+                                                    <div className={`mt-1 w-5 h-5 rounded-full border-2 flex items-center justify-center ${isSelected
+                                                        ? 'bg-blue-500 border-blue-500'
+                                                        : 'border-gray-300'
+                                                        }`}>
+                                                        {isSelected && <Check className="w-3 h-3 text-white" />}
+                                                    </div>
+                                                    <span className={`text-sm ${isSelected ? 'text-blue-700' : 'text-gray-700'}`}>
+                                                        {cleanSuggestion}
+                                                    </span>
                                                 </div>
-                                                <span className={`text-sm ${isSelected ? 'text-green-700' : 'text-gray-700'}`}>
-                                                    {cleanSuggestion}
-                                                </span>
                                             </div>
                                         </motion.button>
                                     )

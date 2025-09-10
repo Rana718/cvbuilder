@@ -108,8 +108,6 @@ function SummaryStep({ onNext, onPrev }: SummaryStepProps) {
         )
     }
 
-    // Removed automatic fetch; user triggers with button below
-    const retryFetchSummary = () => fetchAISummary()
 
     const useSummaryTemplate = (template: string) => {
         setSummary(template)
@@ -122,7 +120,7 @@ function SummaryStep({ onNext, onPrev }: SummaryStepProps) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="space-y-8 max-w-4xl mx-auto"
+            className="space-y-4 md:space-y-6 lg:space-y-8 max-w-4xl mx-auto"
         >
             {/* Header Section */}
             <motion.div
@@ -131,15 +129,15 @@ function SummaryStep({ onNext, onPrev }: SummaryStepProps) {
                 transition={{ delay: 0.1 }}
                 className="text-left"
             >
-                <div className="flex items-start mb-4">
-                    <div className="p-3 bg-blue-100 rounded-full mr-2">
-                        <Target className="w-8 h-8 text-blue-600" />
+                <div className="flex items-start mb-3 md:mb-4">
+                    <div className="p-1.5 md:p-2 lg:p-3 bg-blue-100 rounded-full mr-2 md:mr-3">
+                        <Target className="w-5 h-5 md:w-6 md:h-6 lg:w-8 lg:h-8 text-blue-600" />
                     </div>
                     <div>
-                        <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                        <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 mb-2">
                             Professional Summary
                         </h2>
-                        <p className="text-lg text-gray-600">
+                        <p className="text-sm md:text-base lg:text-lg text-gray-600">
                             Create a compelling summary that highlights your experience and career objectives
                         </p>
                     </div>
@@ -196,9 +194,9 @@ function SummaryStep({ onNext, onPrev }: SummaryStepProps) {
                         transition={{ delay: 0.3 }}
                         className="space-y-4"
                     >
-                        <div className="flex items-center justify-between">
-                            <h4 className="text-lg font-semibold text-gray-700 flex items-center">
-                                <Sparkles className="w-5 h-5 mr-2 text-blue-500" />
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+                            <h4 className="text-base md:text-lg font-semibold text-gray-700 flex items-center">
+                                <Sparkles className="w-4 h-4 md:w-5 md:h-5 mr-2 text-blue-500" />
                                 AI-Generated Summary Suggestions
                             </h4>
                             {(personalInfo.firstName || workExperience.length > 0 || skills.length > 0) && !isLoadingSuggestions && (
@@ -206,9 +204,9 @@ function SummaryStep({ onNext, onPrev }: SummaryStepProps) {
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
                                     onClick={fetchAISummary}
-                                    className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:from-blue-600 hover:to-indigo-700 text-sm font-medium transition-all shadow-md"
+                                    className="flex items-center space-x-2 px-3 md:px-4 py-1.5 md:py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:from-blue-600 hover:to-indigo-700 text-xs md:text-sm font-medium transition-all shadow-md"
                                 >
-                                    <Sparkles className="w-4 h-4" />
+                                    <Sparkles className="w-3 h-3 md:w-4 md:h-4" />
                                     <span>Generate Summary</span>
                                 </motion.button>
                             )}
@@ -268,22 +266,42 @@ function SummaryStep({ onNext, onPrev }: SummaryStepProps) {
                                 <motion.div
                                     initial={{ opacity: 0, y: 10 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    className="space-y-3"
+                                    className="grid gap-2 md:gap-3"
                                 >
-                                    {aiSuggestions.map((suggestion: string, index: number) => (
-                                        <motion.button
-                                            key={index}
-                                            initial={{ opacity: 0, x: -20 }}
-                                            animate={{ opacity: 1, x: 0 }}
-                                            transition={{ delay: index * 0.1 }}
-                                            whileHover={{ scale: 1.02, y: -2 }}
-                                            whileTap={{ scale: 0.98 }}
-                                            onClick={() => useSummaryTemplate(suggestion)}
-                                            className="w-full text-left p-4 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-xl border border-gray-200 hover:border-blue-300 transition-all shadow-sm hover:shadow-md"
-                                        >
-                                            {suggestion}
-                                        </motion.button>
-                                    ))}
+                                    {aiSuggestions.map((suggestion: string, index: number) => {
+                                        const isSelected = summary === suggestion
+                                        
+                                        return (
+                                            <motion.button
+                                                key={index}
+                                                initial={{ opacity: 0, x: -20 }}
+                                                animate={{ opacity: 1, x: 0 }}
+                                                transition={{ delay: index * 0.1 }}
+                                                whileHover={{ scale: 1.01 }}
+                                                whileTap={{ scale: 0.99 }}
+                                                onClick={() => {
+                                                    if (isSelected) {
+                                                        setSummary('')
+                                                    } else {
+                                                        useSummaryTemplate(suggestion)
+                                                    }
+                                                }}
+                                                className={`text-left p-3 md:p-4 rounded-sm border transition-all ${isSelected
+                                                    ? 'bg-blue-50 border-blue-500 text-blue-900'
+                                                    : 'bg-white border-gray-200 text-gray-700 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700'
+                                                }`}
+                                            >
+                                                <div className="text-sm md:text-base leading-relaxed">
+                                                    {suggestion}
+                                                </div>
+                                                {isSelected && (
+                                                    <div className="text-xs text-blue-600 mt-2 font-medium">
+                                                        ✓ Selected - Click to deselect
+                                                    </div>
+                                                )}
+                                            </motion.button>
+                                        )
+                                    })}
                                 </motion.div>
                             )}
                             

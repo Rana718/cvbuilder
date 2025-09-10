@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { FileText, Sparkles, Download, ArrowRight, User, Star, Clock, Shield, Zap, CheckCircle, TrendingUp, Globe, Award, Brain } from "lucide-react";
+import { FileText, Sparkles, Download, ArrowRight, User, Star, Clock, Shield, Zap, CheckCircle, TrendingUp, Globe, Award, Brain, Mail } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PaymentCard from "@/components/PaymentCard";
@@ -9,6 +9,7 @@ import { useAuth } from "@/components/AuthContext";
 import { usePremiumStatus } from "@/hooks/usePremiumStatus";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 export default function Home() {
   const { user } = useAuth();
@@ -57,7 +58,7 @@ export default function Home() {
         {/* Floating grid pattern */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
 
-        <div className="relative container mx-auto px-4 sm:px-6 py-12 sm:py-20">
+        <div className="relative container mx-auto px-4 pt-8 md:pt-0">
           {/* Enhanced AI Badge */}
           <motion.div
             initial={{ y: 20, opacity: 0, scale: 0.9 }}
@@ -891,6 +892,88 @@ export default function Home() {
                 <span className="text-sm sm:text-base">Rated 4.9/5</span>
               </div>
             </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="py-16 sm:py-24 bg-white">
+        <div className="container mx-auto px-4 sm:px-6 max-w-4xl">
+          <motion.div
+            initial={{ y: 30, opacity: 0 }}
+            whileInView={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
+              Frequently Asked Questions
+            </h2>
+            <p className="text-lg text-slate-600">
+              Everything you need to know about our AI resume builder
+            </p>
+          </motion.div>
+
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            whileInView={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            viewport={{ once: true }}
+          >
+            <Accordion type="single" collapsible className="space-y-4">
+              {[
+                {
+                  question: "Is the resume builder really free?",
+                  answer: "Yes! You can create and download your first resume completely free. Premium features unlock additional templates and AI enhancements."
+                },
+                {
+                  question: "How does the AI help with my resume?",
+                  answer: "Our AI analyzes your experience and suggests optimized content, skills, and formatting to help you stand out to employers and pass ATS systems."
+                },
+                {
+                  question: "Are the resumes ATS-friendly?",
+                  answer: "Absolutely! All our templates are designed to be ATS-compatible, ensuring your resume gets past automated screening systems."
+                },
+                {
+                  question: "Can I edit my resume after downloading?",
+                  answer: "Yes, you can return anytime to edit your saved resumes. Premium users get unlimited edits and downloads."
+                },
+                {
+                  question: "What file formats are available?",
+                  answer: "You can download your resume as a high-quality PDF, which is the preferred format by most employers."
+                },
+                {
+                  question: "How secure is my personal information?",
+                  answer: "We use enterprise-grade security with SSL encryption. Your data is never shared with third parties and you can delete it anytime."
+                }
+              ].map((faq, index) => (
+                <AccordionItem key={index} value={`item-${index}`} className="bg-slate-50 rounded-xl px-6 border-0">
+                  <AccordionTrigger className="text-lg font-semibold text-slate-900 hover:no-underline">
+                    {faq.question}
+                  </AccordionTrigger>
+                  <AccordionContent className="text-slate-600 leading-relaxed">
+                    {faq.answer}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </motion.div>
+
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            whileInView={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mt-12"
+          >
+            <p className="text-slate-600 mb-4">Still have questions?</p>
+            <a
+              href="mailto:support@airesumebuidler.com"
+              className="inline-flex items-center space-x-2 text-blue-600 hover:text-blue-700 font-medium"
+            >
+              <Mail className="h-5 w-5" />
+              <span>Contact our support team</span>
+            </a>
           </motion.div>
         </div>
       </section>
