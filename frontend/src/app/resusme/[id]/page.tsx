@@ -96,7 +96,18 @@ function ResumePage() {
     const handleDownload = async () => {
         if (isDownloading) return
 
-        if (!user || !isPremium) {
+        if (!user) {
+            redirectToAuth()
+            return
+        }
+
+        console.log("User premium status:", isPremium)
+        const tokenResult = await user.getIdTokenResult(true);
+
+        console.log("Token claims:", tokenResult.claims)
+        await refreshStatus()
+        
+        if (!isPremium) {
             setShowPaymentCard(true)
             await saveResume()
             return
@@ -214,17 +225,13 @@ function ResumePage() {
 
         const resumeIdNum = Number(resumeId)
         
-        // Always update templateId in store when URL parameter changes
         if (templateId) {
             setTemplateId(templateId)
         }
 
-        // Handle different resume types
         if (useResumeStore.getState().isPreviewId(resumeId)) {
-            // This is a preview/local resume, just set the document ID but don't load from API
             setDocumentId(resumeIdNum)
         } else {
-            // This is a saved resume, set document ID and load if no data
             setDocumentId(resumeIdNum)
             
             if (!hasData() && !hasLoadedOnce) {
@@ -401,14 +408,11 @@ function ResumePage() {
                 </div>
             </div>
 
-            {/* Main Content Layout */}
             <div className="flex flex-col lg:flex-row min-h-[calc(100vh-4rem)]">
-                {/* Template Selector - Left Side for Desktop */}
                 <div className="hidden lg:block w-[450px] xl:w-[500px] 2xl:w-[550px] p-4">
                     <TemplateSelectorPanel />
                 </div>
 
-                {/* Template Selector Toggle Button - Mobile/Tablet */}
                 <div className="lg:hidden p-3">
                     <button
                         onClick={() => setShowTemplateSelector(!showTemplateSelector)}
@@ -418,7 +422,6 @@ function ResumePage() {
                         <span>Change Template</span>
                     </button>
 
-                    {/* Mobile Template Selector Modal */}
                     {showTemplateSelector && (
                         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-end lg:hidden">
                             <div className="bg-white w-full h-[90vh] rounded-t-2xl transform transition-transform overflow-hidden">
@@ -430,7 +433,6 @@ function ResumePage() {
 
                 {/* Resume Content Area */}
                 <div className="flex-1 lg:pr-4 lg:py-4">
-                    {/* Action Buttons - Responsive Layout */}
                     <div className="print:hidden py-3 lg:py-4">
                         <div className="max-w-4xl mx-auto px-3">
                             {/* Desktop Layout */}

@@ -70,7 +70,7 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({ resumeId, templateId, onEdi
                     e.stopPropagation();
                     setIsOpen(!isOpen);
                 }}
-                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-white rounded-lg transition-all shadow-sm"
+                className="p-2 text-gray-600 bg-white rounded-lg shadow-sm"
             >
                 <MoreHorizontal className="w-4 h-4" />
             </button>
@@ -370,7 +370,7 @@ const ResumePage: React.FC = () => {
                         </Link>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         {filteredResumes.map((resume, index) => (
                             <motion.div 
                                 key={resume.id} 
@@ -380,27 +380,28 @@ const ResumePage: React.FC = () => {
                                 className="group cursor-pointer"
                             >
                                 <Link href={`/resusme/${resume.id}?template=${resume.template_id}`} className="block">
-                                    <div className="relative bg-white border border-gray-200 rounded-lg overflow-hidden hover:border-blue-300 hover:shadow-lg transition-all duration-200">
-                                        {/* Resume Preview */}
-                                        <div className="relative aspect-[3/4] bg-white">
-                                            <div className="absolute top-2 right-2 z-20">
-                                                <DropdownMenu
-                                                    resumeId={resume.id}
-                                                    templateId={resume.template_id}
-                                                    onEdit={() => router.push(`/template/${resume.template_id}?resumeId=${resume.id}`)}
-                                                    onDelete={() => handleDeleteResume(resume.id)}
-                                                    onShare={() => handleShareResume(resume.id, resume.template_id)}
-                                                />
-                                            </div>
+                                    <div className="relative overflow-hidden hover:border-blue-300 transition-all duration-200">
+                                        {/* Dropdown Menu */}
+                                        <div className="absolute top-2 right-2 z-20">
+                                            <DropdownMenu
+                                                resumeId={resume.id}
+                                                templateId={resume.template_id}
+                                                onEdit={() => router.push(`/template/${resume.template_id}?resumeId=${resume.id}`)}
+                                                onDelete={() => handleDeleteResume(resume.id)}
+                                                onShare={() => handleShareResume(resume.id, resume.template_id)}
+                                            />
+                                        </div>
 
-                                            <div className="w-full h-full p-2 sm:p-3">
-                                                <div className="w-full h-full overflow-hidden rounded border border-gray-200 bg-white">
-                                                    <div className="w-full h-full transform scale-[0.8] sm:scale-[0.85] origin-top-left overflow-hidden">
-                                                        <div className="w-[125%] h-[125%] sm:w-[117.6%] sm:h-[117.6%]">
+                                        {/* Resume Preview */}
+                                        <div className="relative">
+                                            <div className="aspect-[3/4] overflow-hidden ">
+                                                <div className="w-full h-full flex items-center justify-center">
+                                                    <div className="transform scale-[0.45] md:scale-[0.34] shadow-xl border border-gray-900">
+                                                        <div className="w-[794px] h-[1123px]">
                                                             <TemplateRenderer
                                                                 templateId={resume.template_id}
                                                                 userData={convertToUserData(resume)}
-                                                                size="small"
+                                                                size="normal"
                                                             />
                                                         </div>
                                                     </div>
@@ -412,11 +413,15 @@ const ResumePage: React.FC = () => {
 
                                 {/* Resume Info - Outside card */}
                                 <div className="text-center mt-3">
-                                    <h3 className="font-medium text-gray-900 text-sm sm:text-base mb-1 group-hover:text-blue-600 transition-colors line-clamp-1">
+                                    <h3 className="font-medium text-gray-900 text-base mb-1 group-hover:text-blue-600 transition-colors line-clamp-1">
                                         {resume.name || 'Untitled Resume'}
                                     </h3>
-                                    <div className="flex items-center justify-center space-x-2 text-xs sm:text-sm text-gray-500">
-                                        <span>{resume.job_title || 'Position not specified'}</span>
+                                    <p className="text-sm text-gray-500 mb-1">
+                                        {resume.job_title || 'Position not specified'}
+                                    </p>
+                                    <div className="flex items-center justify-center text-xs text-gray-400">
+                                        <Calendar className="w-3 h-3 mr-1" />
+                                        <span>{formatDate(resume.updated_at)}</span>
                                     </div>
                                 </div>
                             </motion.div>

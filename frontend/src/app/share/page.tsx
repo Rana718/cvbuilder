@@ -89,28 +89,137 @@ function SharePage() {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-100 via-gray-50 to-blue-50">
-            <div className="flex justify-center items-start min-h-screen py-4 sm:py-8 px-2 sm:px-4">
-                <div className="w-fit mx-auto max-w-full">
+            <div className="flex justify-center items-start pb-6">
+                <div className="w-full">
                     {shareType === 'cover-letter' ? (
-                        <CoverLetterTemplate 
-                            data={{
-                                name: name || '',
-                                email: email || '',
-                                phone: phone || '',
-                                address: address || '',
-                                recipient_company: recipient_company || '',
-                                recipient_title: recipient_title || '',
-                                body: body || '',
-                                template_id: 1,
-                                id: 0,
-                                created_at: '',
-                                updated_at: ''
-                            }}
-                            isPreview={true}
-                            hideWatermark={true}
-                        />
+                        <>
+                            {/* Mobile view - Scaled down */}
+                            <div className="sm:hidden w-full min-h-[400px] pt-10 flex justify-center items-center">
+                                <div className="scale-[0.45] origin-top">
+                                    <div
+                                        className="bg-white shadow-xl rounded-lg overflow-hidden border"
+                                        style={{
+                                            width: '794px',
+                                            minHeight: '1123px'
+                                        }}
+                                    >
+                                        <CoverLetterTemplate 
+                                            data={{
+                                                name: name || '',
+                                                email: email || '',
+                                                phone: phone || '',
+                                                address: address || '',
+                                                recipient_company: recipient_company || '',
+                                                recipient_title: recipient_title || '',
+                                                body: body || '',
+                                                template_id: 1,
+                                                id: 0,
+                                                created_at: '',
+                                                updated_at: ''
+                                            }}
+                                            isPreview={true}
+                                            hideWatermark={true}
+                                            size="normal"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Tablet view - A4 ratio ONLY */}
+                            <div className="hidden sm:block md:hidden w-full py-4">
+                                <div className="max-w-[600px] mx-auto px-4">
+                                    <div
+                                        className="mx-auto bg-white shadow-xl rounded-lg overflow-hidden border aspect-[210/297] w-full"
+                                    >
+                                        <CoverLetterTemplate 
+                                            data={{
+                                                name: name || '',
+                                                email: email || '',
+                                                phone: phone || '',
+                                                address: address || '',
+                                                recipient_company: recipient_company || '',
+                                                recipient_title: recipient_title || '',
+                                                body: body || '',
+                                                template_id: 1,
+                                                id: 0,
+                                                created_at: '',
+                                                updated_at: ''
+                                            }}
+                                            isPreview={true}
+                                            hideWatermark={true}
+                                            size="normal"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Desktop view - A4 ratio ONLY */}
+                            <div className="hidden md:block py-4">
+                                <div className="max-w-4xl mx-auto px-4">
+                                    <div
+                                        className="mx-auto bg-white shadow-xl rounded-lg overflow-hidden border aspect-[210/297] w-full max-w-[794px]"
+                                    >
+                                        <CoverLetterTemplate 
+                                            data={{
+                                                name: name || '',
+                                                email: email || '',
+                                                phone: phone || '',
+                                                address: address || '',
+                                                recipient_company: recipient_company || '',
+                                                recipient_title: recipient_title || '',
+                                                body: body || '',
+                                                template_id: 1,
+                                                id: 0,
+                                                created_at: '',
+                                                updated_at: ''
+                                            }}
+                                            isPreview={true}
+                                            hideWatermark={true}
+                                            size="normal"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </>
                     ) : (
-                        <ResumePreview pass={true} />
+                        <>
+                            {/* Mobile view - Scaled down resume */}
+                            <div className="sm:hidden w-full min-h-[400px] pt-10 flex justify-center items-center">
+                                <div className="scale-[0.45] origin-top">
+                                    <div
+                                        className="bg-white shadow-xl rounded-lg overflow-hidden border"
+                                        style={{
+                                            width: '794px',
+                                            minHeight: '1123px'
+                                        }}
+                                    >
+                                        <ResumePreview pass={true} />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Tablet view - A4 ratio ONLY */}
+                            <div className="hidden sm:block md:hidden w-full py-4">
+                                <div className="max-w-[600px] mx-auto px-4">
+                                    <div
+                                        className="mx-auto bg-white shadow-xl rounded-lg overflow-hidden border aspect-[210/297] w-full"
+                                    >
+                                        <ResumePreview pass={true} />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Desktop view - A4 ratio ONLY */}
+                            <div className="hidden md:block py-4">
+                                <div className="max-w-4xl mx-auto px-4">
+                                    <div
+                                        className="mx-auto bg-white shadow-xl rounded-lg overflow-hidden border aspect-[210/297] w-full max-w-[794px]"
+                                    >
+                                        <ResumePreview pass={true} />
+                                    </div>
+                                </div>
+                            </div>
+                        </>
                     )}
                 </div>
             </div>

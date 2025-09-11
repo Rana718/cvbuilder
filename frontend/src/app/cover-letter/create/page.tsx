@@ -80,125 +80,134 @@ const AIGenerationPopup: React.FC<AIGenerationPopupProps> = ({
         onGenerate(resumeFile, jobDescription);
     };
 
+    if (!isOpen) return null;
+
     return (
-        <AnimatePresence>
-            {isOpen && (
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="fixed inset-0 border border-gray-100 shadow-2xl backdrop-blur-sm scrollbar-none flex items-center justify-center z-[999] p-4"
-                    onClick={onClose}
-                >
-                    {/* Floating Background Elements */}
-                    <FloatingIcon icon={Sparkles} delay={0} />
-                    <FloatingIcon icon={FileText} delay={1} />
-                    <FloatingIcon icon={Wand2} delay={2} />
+        <div className="fixed inset-0 bg-white/20 backdrop-blur-md flex items-center justify-center z-[9999] p-4">
+            {/* Floating Background Elements */}
+            <FloatingIcon icon={Sparkles} delay={0} />
+            <FloatingIcon icon={FileText} delay={1} />
+            <FloatingIcon icon={Wand2} delay={2} />
 
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                        className="bg-white rounded-lg p-4 sm:p-6 lg:p-8 max-w-xs sm:max-w-lg lg:max-w-2xl w-full max-h-[90vh] sm:max-h-[85vh] relative shadow-2xl mx-4 sm:mx-0"
-                        onClick={(e: React.MouseEvent) => e.stopPropagation()}
-                        style={{ overflowY: 'hidden' }}
+            <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                className="bg-white rounded-lg shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col"
+                onClick={(e: React.MouseEvent) => e.stopPropagation()}
+            >
+                {/* Header - Fixed */}
+                <div className="flex justify-between items-center p-6 border-b border-gray-200 flex-shrink-0">
+                    <div className="flex items-center">
+                        <motion.div
+                            className="p-2 bg-blue-100 rounded-full mr-3"
+                            animate={{ rotate: [0, 10, -10, 0] }}
+                            transition={{ duration: 4, repeat: Infinity }}
+                        >
+                            <Wand2 className="w-6 h-6 text-blue-600" />
+                        </motion.div>
+                        <h3 className="text-xl font-semibold text-gray-900">AI Cover Letter Generation</h3>
+                    </div>
+                    <button
+                        onClick={onClose}
+                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                     >
-                        <div className="flex justify-between items-center mb-6 sm:mb-8">
-                            <div className="flex items-center">
-                                <motion.div
-                                    className="p-1.5 sm:p-2 bg-blue-100 rounded-full mr-2 sm:mr-3"
-                                    animate={{ rotate: [0, 10, -10, 0] }}
-                                    transition={{ duration: 4, repeat: Infinity }}
-                                >
-                                    <Wand2 className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-blue-600" />
-                                </motion.div>
-                                <h3 className="text-lg sm:text-xl font-semibold text-gray-900">AI Cover Letter Generation</h3>
+                        <X className="w-5 h-5 text-gray-500" />
+                    </button>
+                </div>
+
+                {/* Content - Scrollable Area */}
+                <div className="flex-1 overflow-y-auto p-6 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+                    <div className="space-y-6 pb-4">
+                        {/* Job Details */}
+                        <div className="bg-blue-50 rounded-lg p-4 border border-blue-100">
+                            <h4 className="font-medium text-gray-900 mb-2">Job Details</h4>
+                            <div className="text-sm text-gray-700">
+                                <p><span className="font-medium">Position:</span> {jobTitle}</p>
+                                <p><span className="font-medium">Company:</span> {companyName}</p>
                             </div>
-                            <button
-                                onClick={onClose}
-                                className="p-1.5 sm:p-2 hover:bg-gray-50 rounded-lg transition-colors"
+                        </div>
+
+                        {/* Resume Upload */}
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-800 mb-2">
+                                Upload Resume (PDF) *
+                            </label>
+                            <div
+                                onClick={() => fileInputRef.current?.click()}
+                                className="border-2 border-dashed border-blue-300 rounded-lg p-6 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-all"
                             >
-                                <X className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500" />
-                            </button>
+                                <Upload className="w-8 h-8 text-blue-400 mx-auto mb-2" />
+                                <p className="text-sm text-gray-600">
+                                    {resumeFile ? resumeFile.name : 'Click to upload your resume'}
+                                </p>
+                            </div>
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                accept=".pdf"
+                                onChange={handleFileUpload}
+                                className="hidden"
+                            />
                         </div>
 
-                        <div className="space-y-4 sm:space-y-6" style={{ maxHeight: 'calc(90vh - 120px)', overflowY: 'auto', paddingRight: '4px' }}>
-                            <div className="bg-blue-50 rounded-lg p-4 border border-blue-100">
-                                <h4 className="font-medium text-gray-900 mb-2">Job Details</h4>
-                                <div className="text-sm text-gray-700">
-                                    <p><span className="font-medium">Position:</span> {jobTitle}</p>
-                                    <p><span className="font-medium">Company:</span> {companyName}</p>
-                                </div>
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-semibold text-gray-800 mb-2">
-                                    Upload Resume (PDF) *
-                                </label>
-                                <div
-                                    onClick={() => fileInputRef.current?.click()}
-                                    className="border-2 border-dashed border-blue-300 rounded-sm p-6 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-all"
-                                >
-                                    <Upload className="w-8 h-8 text-blue-400 mx-auto mb-2" />
-                                    <p className="text-sm text-gray-600">
-                                        {resumeFile ? resumeFile.name : 'Click to upload your resume'}
-                                    </p>
-                                </div>
-                                <input
-                                    ref={fileInputRef}
-                                    type="file"
-                                    accept=".pdf"
-                                    onChange={handleFileUpload}
-                                    className="hidden"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-semibold text-gray-800 mb-2">
-                                    Job Description (Optional)
-                                </label>
-                                <textarea
-                                    value={jobDescription}
-                                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setJobDescription(e.target.value)}
-                                    rows={6}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 resize-none transition-all"
-                                    placeholder="Paste the job description here for better AI generation..."
-                                />
-                            </div>
-
-                            <div className="flex justify-end space-x-3 pt-4">
-                                <button
-                                    onClick={onClose}
-                                    disabled={isLoading}
-                                    className="px-6 py-2 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-sm hover:bg-gray-50 transition-colors"
-                                >
-                                    Cancel
-                                </button>
-                                <motion.button
-                                    whileHover={{ scale: 1.02 }}
-                                    whileTap={{ scale: 0.98 }}
-                                    onClick={handleGenerate}
-                                    disabled={isLoading || !resumeFile}
-                                    className="px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-sm hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center shadow-lg"
-                                >
-                                    {isLoading ? (
-                                        <>
-                                            <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                                            Generating...
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Sparkles className="w-4 h-4 mr-2" />
-                                            Generate Cover Letter
-                                        </>
-                                    )}
-                                </motion.button>
-                            </div>
+                        {/* Job Description */}
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-800 mb-2">
+                                Job Description (Optional)
+                            </label>
+                            <textarea
+                                value={jobDescription}
+                                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setJobDescription(e.target.value)}
+                                rows={8}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none transition-all"
+                                placeholder="Paste the job description here for better AI generation..."
+                            />
                         </div>
-                    </motion.div>
-                </motion.div>
-            )}
-        </AnimatePresence>
+
+                        {/* Extra content to test scrolling */}
+                        <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                            <h4 className="font-medium text-gray-900 mb-2">Tips for Better Results</h4>
+                            <ul className="text-sm text-gray-600 space-y-1">
+                                <li>• Upload a recent PDF version of your resume</li>
+                                <li>• Include the complete job description for better matching</li>
+                                <li>• Ensure your resume highlights relevant skills</li>
+                                <li>• Review and customize the generated content</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="flex justify-end space-x-3 pb-2 pr-4 flex-shrink-0">
+                    <button
+                        onClick={onClose}
+                        disabled={isLoading}
+                        className="px-6 py-2 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-50"
+                    >
+                        Cancel
+                    </button>
+                    <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={handleGenerate}
+                        disabled={isLoading || !resumeFile}
+                        className="px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center shadow-lg"
+                    >
+                        {isLoading ? (
+                            <>
+                                <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                                <span>Generating...</span>
+                            </>
+                        ) : (
+                            <>
+                                <Sparkles className="w-4 h-4 mr-2" />
+                                <span>Generate Cover Letter</span>
+                            </>
+                        )}
+                    </motion.button>
+                </div>
+            </motion.div>
+        </div>
     );
 };
 
@@ -224,7 +233,6 @@ const CreateCoverLetterPage: React.FC = () => {
 
     const edit: string | null = searchParams.get('edit');
     const coverLetterId: string | null = searchParams.get('coverLetterId');
-
 
     useEffect(() => {
         if (coverLetterId) {
@@ -259,7 +267,7 @@ const CreateCoverLetterPage: React.FC = () => {
             formDataToSend.append('job_description', jobDescription);
             formDataToSend.append('company_name', recipient_company);
 
-            const response = await axiosInstance.post('/api/public/cover-letters/generate', formDataToSend, {
+            const response = await axiosInstance.post('/api/public/cover-letter/generate', formDataToSend, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
@@ -294,6 +302,8 @@ const CreateCoverLetterPage: React.FC = () => {
     return (
         <div className="min-h-screen bg-gray-50 relative overflow-hidden">
             <Navbar />
+            
+            {/* Background Floating Icons */}
             <div className="fixed inset-0 pointer-events-none">
                 <motion.div
                     className="absolute top-20 left-10 opacity-5 text-blue-200"
@@ -367,6 +377,7 @@ const CreateCoverLetterPage: React.FC = () => {
                     </div>
 
                     <div className="space-y-3 sm:space-y-4">
+                        {/* Personal Information Section */}
                         <motion.section
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
@@ -388,7 +399,7 @@ const CreateCoverLetterPage: React.FC = () => {
                                         type="text"
                                         value={name}
                                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('name', e.target.value)}
-                                        className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                        className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                                         placeholder="Your full name"
                                         required
                                     />
@@ -402,7 +413,7 @@ const CreateCoverLetterPage: React.FC = () => {
                                         type="email"
                                         value={email}
                                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('email', e.target.value)}
-                                        className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                        className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                                         placeholder="your.email@example.com"
                                         required
                                     />
@@ -416,7 +427,7 @@ const CreateCoverLetterPage: React.FC = () => {
                                         type="tel"
                                         value={phone || ''}
                                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('phone', e.target.value)}
-                                        className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                        className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                                         placeholder="Your phone number"
                                     />
                                 </div>
@@ -429,13 +440,14 @@ const CreateCoverLetterPage: React.FC = () => {
                                         type="text"
                                         value={address || ''}
                                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('address', e.target.value)}
-                                        className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                        className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                                         placeholder="Your address"
                                     />
                                 </div>
                             </div>
                         </motion.section>
 
+                        {/* Position Details Section */}
                         <motion.section
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
@@ -457,7 +469,7 @@ const CreateCoverLetterPage: React.FC = () => {
                                         type="text"
                                         value={recipient_title || ''}
                                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('recipient_title', e.target.value)}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                                         placeholder="e.g., Software Engineer"
                                         required
                                     />
@@ -471,7 +483,7 @@ const CreateCoverLetterPage: React.FC = () => {
                                         type="text"
                                         value={recipient_company || ''}
                                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('recipient_company', e.target.value)}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                                         placeholder="e.g., Google Inc."
                                         required
                                     />
@@ -479,23 +491,24 @@ const CreateCoverLetterPage: React.FC = () => {
                             </div>
                         </motion.section>
 
+                        {/* Cover Letter Content Section */}
                         <motion.section
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.4 }}
-                            className="bg-white p-3 rounded-xl border border-gray-200"
+                            className="bg-white p-3 sm:p-4 lg:p-6 rounded-xl border border-gray-200"
                         >
-                            <div className="flex items-center justify-between mb-6">
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
                                 <div className="flex items-center">
-                                    <Type className="w-4 md:w-6 md:h-6 text-blue-600 mr-3" />
-                                    <h2 className="text-base md:text-xl font-semibold text-gray-900">Cover Letter Content *</h2>
+                                    <Type className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-blue-600 mr-2 sm:mr-3" />
+                                    <h2 className="text-base sm:text-lg lg:text-xl font-semibold text-gray-900">Cover Letter Content *</h2>
                                 </div>
                                 <motion.button
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
                                     onClick={() => setShowAIPopup(true)}
                                     disabled={isLoadingAI}
-                                    className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-sm hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                                    className="flex items-center justify-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl text-sm font-medium min-w-fit"
                                 >
                                     {isLoadingAI ? (
                                         <>
@@ -519,6 +532,7 @@ const CreateCoverLetterPage: React.FC = () => {
                             />
                         </motion.section>
 
+                        {/* Next Button */}
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
@@ -530,7 +544,7 @@ const CreateCoverLetterPage: React.FC = () => {
                                 whileTap={{ scale: 0.98 }}
                                 onClick={handleNext}
                                 disabled={!isFormValid}
-                                className="flex items-center space-x-2 px-8 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-sm hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold shadow-lg hover:shadow-xl transition-all"
+                                className="flex items-center space-x-2 px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold shadow-lg hover:shadow-xl transition-all"
                             >
                                 <span>Preview Cover Letter</span>
                                 <ChevronRight className="w-5 h-5" />
@@ -540,6 +554,7 @@ const CreateCoverLetterPage: React.FC = () => {
                 </motion.div>
             </div>
 
+            {/* AI Generation Popup */}
             <AIGenerationPopup
                 isOpen={showAIPopup}
                 onClose={() => setShowAIPopup(false)}
@@ -554,9 +569,11 @@ const CreateCoverLetterPage: React.FC = () => {
 
 const CreateCoverLetterPageWrapper: React.FC = () => {
     return (
-        <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-500 border-t-transparent"></div>
-        </div>}>
+        <Suspense fallback={
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-500 border-t-transparent"></div>
+            </div>
+        }>
             <CreateCoverLetterPage />
         </Suspense>
     );

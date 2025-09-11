@@ -233,7 +233,7 @@ const CoverLetterPage: React.FC = () => {
                 </motion.div>
 
                 <div className="flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-8">
-                    <motion.div 
+                    <motion.div
                         initial={{ y: 30, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
                         transition={{ duration: 0.8, delay: 0.3 }}
@@ -250,7 +250,7 @@ const CoverLetterPage: React.FC = () => {
                         </p>
                     </motion.div>
 
-                    <motion.div 
+                    <motion.div
                         initial={{ y: 30, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
                         transition={{ duration: 0.8, delay: 0.5 }}
@@ -284,21 +284,36 @@ const CoverLetterPage: React.FC = () => {
                 )}
 
                 {filteredCoverLetters.length === 0 && searchTerm ? (
-                    <div className="text-center py-12 sm:py-16">
-                        <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
-                            <Search className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400" />
-                        </div>
-                        <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-2">No matching cover letters</h3>
-                        <p className="text-sm sm:text-base text-gray-600 mb-3 sm:mb-4 px-4">Try adjusting your search terms or create a new cover letter</p>
-                        <button
-                            onClick={() => setSearchTerm('')}
-                            className="text-blue-600 hover:text-blue-700 font-medium text-sm sm:text-base"
-                        >
-                            Clear search
-                        </button>
-                    </div>
-                ) : coverLetters.length === 0 ? (
                     <motion.div 
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5 }}
+                        className="text-center py-8 sm:py-12 lg:py-16"
+                    >
+                        <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center mx-auto mb-4 sm:mb-6">
+                            <Search className="w-8 h-8 sm:w-10 sm:h-10 text-gray-400" />
+                        </div>
+                        <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">No matching cover letters</h3>
+                        <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6 px-4 max-w-md mx-auto">
+                            Try adjusting your search terms or create a new cover letter to get started
+                        </p>
+                        <div className="flex flex-col sm:flex-row gap-3 items-center justify-center">
+                            <button
+                                onClick={() => setSearchTerm('')}
+                                className="px-4 py-2 text-blue-600 hover:text-blue-700 font-medium text-sm sm:text-base border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors"
+                            >
+                                Clear search
+                            </button>
+                            <Link
+                                href="/createcover-letter"
+                                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium text-sm sm:text-base transition-colors"
+                            >
+                                Create New Cover Letter
+                            </Link>
+                        </div>
+                    </motion.div>
+                ) : coverLetters.length === 0 ? (
+                    <motion.div
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8 }}
@@ -321,66 +336,92 @@ const CoverLetterPage: React.FC = () => {
                         <p className="text-sm sm:text-base lg:text-lg text-slate-600 mb-6 sm:mb-8 max-w-sm sm:max-w-md mx-auto font-light leading-relaxed px-4">
                             Start building your professional cover letters with our AI-powered tools and stunning templates
                         </p>
-                        <Link
-                            href="/createcover-letter"
-                            className="group inline-flex items-center px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 text-sm sm:text-base"
-                        >
-                            <Plus className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 group-hover:rotate-90 transition-transform duration-300" />
-                            Create Your First Cover Letter
-                        </Link>
+                        <div className="flex flex-col sm:flex-row gap-3 items-center justify-center">
+                            <Link
+                                href="/createcover-letter"
+                                className="group inline-flex items-center px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 text-sm sm:text-base"
+                            >
+                                <Plus className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 group-hover:rotate-90 transition-transform duration-300" />
+                                Create Your First Cover Letter
+                            </Link>
+                        </div>
                     </motion.div>
                 ) : (
-                    <motion.div 
+                    <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6, staggerChildren: 0.1 }}
-                        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6"
+                        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
                     >
                         {filteredCoverLetters.map((letter, index) => (
-                            <motion.div 
-                                key={letter.id} 
-                                initial={{ opacity: 0, y: 30 }}
+                            <motion.div
+                                key={letter.id}
+                                initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: index * 0.05 }}
+                                transition={{ duration: 0.3, delay: index * 0.05 }}
                                 className="group cursor-pointer"
                             >
                                 <Link href={`/cover-letter/${letter.id}`} className="block">
-                                    <div className="relative bg-white border border-gray-200 rounded-lg overflow-hidden hover:border-blue-300 hover:shadow-lg transition-all duration-200">
+                                    <div className="relative overflow-hidden hover:border-blue-300 hover:shadow-lg transition-all duration-200">
+                                        {/* Dropdown Menu */}
+                                        <div className="absolute top-2 right-2 z-20">
+                                            <DropdownMenu
+                                                coverId={letter.id}
+                                                onEdit={() => router.push(`/cover-letter/create?coverLetterId=${letter.id}&edit=true`)}
+                                                onDelete={() => handleDeleteCoverLetter(letter.id)}
+                                                onShare={() => handleShareCoverLetter(letter.id)}
+                                            />
+                                        </div>
+
                                         {/* Cover Letter Preview */}
-                                        <div className="relative aspect-[3/4] bg-gradient-to-br from-blue-50 to-indigo-50 p-3 sm:p-4">
-                                            <div className="absolute top-2 right-2 z-10">
-                                                <DropdownMenu
-                                                    coverId={letter.id}
-                                                    onEdit={() => router.push(`/createcover-letter?coverLetterId=${letter.id}&edit=true`)}
-                                                    onDelete={() => handleDeleteCoverLetter(letter.id)}
-                                                    onShare={() => handleShareCoverLetter(letter.id)}
-                                                />
-                                            </div>
+                                        <div className="relative">
+                                            <div className="aspect-[3/4] overflow-hidden">
+                                                <div className="w-full h-full flex items-center justify-center">
+                                                    <div className="transform scale-[0.45] border border-gray-600 md:scale-[0.3] origin-center">
+                                                        <div className="w-[794px] h-[1123px] bg-white border border-gray-200 shadow-sm p-12">
+                                                            {/* Cover Letter Content Preview */}
+                                                            <div className="h-full flex flex-col">
+                                                                {/* Header */}
+                                                                <div className="mb-8">
+                                                                    <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                                                                        {letter.name || 'Your Name'}
+                                                                    </h1>
+                                                                    <p className="text-gray-600">{letter.email}</p>
+                                                                </div>
 
-                                            <div className="h-full flex flex-col">
-                                                <div className="flex items-start justify-between mb-2 sm:mb-3">
-                                                    <div className="flex-1 pr-6 sm:pr-8">
-                                                        <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center mb-2 sm:mb-3 shadow-lg">
-                                                            <FileText className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
+                                                                {/* Date and Recipient */}
+                                                                <div className="mb-8">
+                                                                    <p className="text-gray-600 mb-4">{formatDate(letter.created_at)}</p>
+                                                                    <div>
+                                                                        <p className="font-semibold text-gray-900">
+                                                                            {letter.recipient_title || 'Hiring Manager'}
+                                                                        </p>
+                                                                        <p className="text-gray-700">
+                                                                            {letter.recipient_company || 'Company Name'}
+                                                                        </p>
+                                                                    </div>
+                                                                </div>
+
+                                                                {/* Body */}
+                                                                <div className="flex-1">
+                                                                    <div className="text-gray-700 leading-relaxed text-sm">
+                                                                        {letter.body ? 
+                                                                            letter.body.replace(/<[^>]*>/g, '').substring(0, 800) + '...' 
+                                                                            : 'Dear Hiring Manager, I am writing to express my interest in the position...'
+                                                                        }
+                                                                    </div>
+                                                                </div>
+
+                                                                {/* Signature */}
+                                                                <div className="mt-8">
+                                                                    <p className="text-gray-700">Sincerely,</p>
+                                                                    <p className="font-semibold text-gray-900 mt-2">
+                                                                        {letter.name || 'Your Name'}
+                                                                    </p>
+                                                                </div>
+                                                            </div>
                                                         </div>
-                                                        <h4 className="font-semibold text-slate-900 text-xs sm:text-sm mb-1 line-clamp-1 group-hover:text-blue-600 transition-colors">
-                                                            {letter.name || 'Untitled Cover Letter'}
-                                                        </h4>
-                                                        <p className="text-xs text-slate-600 line-clamp-1 font-medium">
-                                                            {letter.recipient_title || 'Position not specified'}
-                                                        </p>
                                                     </div>
-                                                </div>
-
-                                                <div className="flex-1 text-xs text-slate-600 line-clamp-6 sm:line-clamp-8 mb-2 sm:mb-3 leading-relaxed">
-                                                    {letter.body.replace(/<[^>]*>/g, '').substring(0, 200)}...
-                                                </div>
-
-                                                <div className="flex items-center text-xs text-slate-500">
-                                                    <Building2 className="w-3 h-3 mr-1 text-blue-500" />
-                                                    <span className="line-clamp-1 font-medium">
-                                                        {letter.recipient_company || 'Company not specified'}
-                                                    </span>
                                                 </div>
                                             </div>
                                         </div>
@@ -388,12 +429,15 @@ const CoverLetterPage: React.FC = () => {
                                 </Link>
 
                                 {/* Cover Letter Info - Outside card */}
-                                <div className="text-center mt-3">
-                                    <h3 className="font-medium text-gray-900 text-sm sm:text-base mb-1 group-hover:text-blue-600 transition-colors line-clamp-1">
+                                <div className="text-center">
+                                    <h3 className="font-medium text-gray-900 text-base mb-1 group-hover:text-blue-600 transition-colors line-clamp-1">
                                         {letter.name || 'Untitled Cover Letter'}
                                     </h3>
-                                    <div className="flex items-center justify-center space-x-2 text-xs sm:text-sm text-gray-500">
-                                        <Calendar className="w-3 h-3 text-emerald-500" />
+                                    <p className="text-sm text-gray-500 mb-1">
+                                        {letter.recipient_title || 'Position not specified'}
+                                    </p>
+                                    <div className="flex items-center justify-center text-xs text-gray-400">
+                                        <Calendar className="w-3 h-3 mr-1" />
                                         <span>{formatDate(letter.updated_at)}</span>
                                     </div>
                                 </div>

@@ -411,13 +411,7 @@ function SkillsStep({ onNext, onPrev }: SkillsStepProps) {
                     >
                       <div className="flex items-center justify-between">
                         <span>{skillName}</span>
-                        {isAdded && <span className="text-blue-600 text-xs">✓</span>}
                       </div>
-                      {isAdded && (
-                        <div className="text-xs text-blue-600 mt-1 font-medium">
-                          Click to remove
-                        </div>
-                      )}
                     </motion.button>
                   )
                 })}

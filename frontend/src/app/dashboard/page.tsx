@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { FileText, Mail, Plus, Crown, User, CreditCard, Sparkles, Download, Edit, Star, Target, ChevronRight } from 'lucide-react'
+import { FileText, Mail, Plus, Crown, User, CreditCard, Sparkles, Trash2, Edit, Star, Target, ChevronRight, Loader2 } from 'lucide-react'
 import { useAuth } from '@/components/AuthContext'
 import axiosInstance from '@/lib/axios'
 import Navbar from '@/components/Navbar'
@@ -108,6 +108,7 @@ function Dashboard() {
     const [resumes, setResumes] = useState<Resume[]>([])
     const [loading, setLoading] = useState(true)
     const [showPaymentHistory, setShowPaymentHistory] = useState(false)
+    const [deletingResumeId, setDeletingResumeId] = useState<number | null>(null)
 
     useEffect(() => {
         if (authLoading || premiumLoading) return
@@ -154,6 +155,32 @@ function Dashboard() {
             setResumes([])
         } finally {
             setLoading(false)
+        }
+    }
+
+    const handleDeleteResume = async (resumeId: number, event: React.MouseEvent) => {
+        event.stopPropagation()
+        
+        if (deletingResumeId) return
+        
+        const confirmDelete = window.confirm('Are you sure you want to delete this resume? This action cannot be undone.')
+        if (!confirmDelete) return
+
+        try {
+            setDeletingResumeId(resumeId)
+            await axiosInstance.delete(`/api/resume-op/${resumeId}`)
+            setResumes(prev => prev.filter(resume => resume.id !== resumeId))
+            
+            setStats(prev => ({
+                ...prev,
+                totalResumes: Math.max(0, prev.totalResumes - 1)
+            }))
+            
+        } catch (error) {
+            console.error('Failed to delete resume:', error)
+            alert('Failed to delete resume. Please try again.')
+        } finally {
+            setDeletingResumeId(null)
         }
     }
 
@@ -351,6 +378,7 @@ function Dashboard() {
                                                     initial={{ opacity: 0, x: -20 }}
                                                     animate={{ opacity: 1, x: 0 }}
                                                     transition={{ delay: 0.4 + index * 0.1 }}
+                                                    onClick={() => router.push(`/resusme/${resume.id}`)}
                                                     className="group flex items-center justify-between p-4 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 rounded-xl transition-all duration-200 cursor-pointer border border-transparent hover:border-blue-200"
                                                 >
                                                     <div className="flex items-center gap-4">
@@ -373,11 +401,20 @@ function Dashboard() {
                                                         </div>
                                                     </div>
                                                     <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-200">
-                                                        <button className="p-2 hover:bg-blue-100 rounded-lg transition-colors">
+                                                        <button 
+                                                            onClick={()=> router.push(`/template/${resume.id}`)}
+                                                            className="p-2 hover:bg-blue-100 rounded-lg transition-colors">
                                                             <Edit className="w-4 h-4 text-blue-600" />
                                                         </button>
-                                                        <button className="p-2 hover:bg-emerald-100 rounded-lg transition-colors">
-                                                            <Download className="w-4 h-4 text-emerald-600" />
+                                                        <button 
+                                                            onClick={(e) => handleDeleteResume(resume.id, e)}
+                                                            disabled={deletingResumeId === resume.id}
+                                                            className="p-2 hover:bg-red-100 rounded-lg transition-colors disabled:opacity-50">
+                                                            {deletingResumeId === resume.id ? (
+                                                                <Loader2 className="w-4 h-4 text-red-600 animate-spin" />
+                                                            ) : (
+                                                                <Trash2 className="w-4 h-4 text-red-600" />
+                                                            )}
                                                         </button>
                                                     </div>
                                                 </motion.div>

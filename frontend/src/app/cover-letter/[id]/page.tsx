@@ -89,7 +89,18 @@ function CoverLetterPage() {
     const handleDownload = async () => {
         if (isDownloading) return;
 
-        if (!user || !isPremium) {
+        if (!user) {
+            redirectToAuth();
+            return;
+        }
+
+        console.log("User premium status:", isPremium);
+        const tokenResult = await user.getIdTokenResult(true);
+
+        console.log("Token claims:", tokenResult.claims);
+        await refreshStatus();
+        
+        if (!isPremium) {
             setShowPaymentCard(true);
             await saveCoverLetter();
             return;
@@ -97,10 +108,7 @@ function CoverLetterPage() {
 
         setIsDownloading(true);
         try {
-            let content = document.querySelector(".hidden.sm\\:block [data-cover-letter-content]") as HTMLElement;
-            if (!content) {
-                content = document.querySelector("[data-cover-letter-content]") as HTMLElement;
-            }
+            let content = document.querySelector("[data-cover-letter-content]") as HTMLElement;
 
             if (!content) {
                 alert('Cover letter content not found. Please refresh and try again.');
@@ -241,32 +249,27 @@ function CoverLetterPage() {
             {/* Simplified Header */}
             <div className="bg-white shadow-sm print:hidden sticky top-0 z-20 border-b">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex items-center justify-between h-16">
+                    <div className="flex items-center justify-self-start h-16">
                         <div className="flex items-center space-x-4">
                             <Link
                                 href="/cover-letter"
                                 className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors"
                             >
                                 <ArrowLeft className="w-5 h-5" />
-                                <span className="font-medium">Back to Dashboard</span>
+                                <span className="font-medium">Back</span>
                             </Link>
                         </div>
 
-                        <div className="flex-1 text-center">
-                            <h1 className="text-xl font-semibold text-gray-900">
-                                {name}'s Cover Letter
-                            </h1>
-                        </div>
-
-                        <div className="w-32"></div> {/* Spacer for balance */}
+                        <div className="w-32"></div> 
                     </div>
                 </div>
             </div>
 
-            {/* Action Buttons - Centered above PDF */}
-            <div className="print:hidden py-6">
-                <div className="max-w-4xl mx-auto px-4">
-                    <div className="flex justify-center items-center space-x-6">
+            {/* Action Buttons - Responsive Layout */}
+            <div className="print:hidden py-3 lg:py-4">
+                <div className="max-w-4xl mx-auto px-3">
+                    {/* Desktop Layout */}
+                    <div className="hidden sm:flex justify-center items-center space-x-4">
                         <Link
                             href={`/createcover-letter?coverLetterId=${coverLetterId}&edit=true`}
                             className="text-gray-700 hover:text-blue-600 font-medium transition-colors flex items-center space-x-2"
@@ -311,26 +314,75 @@ function CoverLetterPage() {
                             </span>
                         </button>
                     </div>
+
+                    {/* Mobile Layout */}
+                    <div className="sm:hidden space-y-2">
+                        {/* Row 1 */}
+                        <div className="flex space-x-2">
+                            <Link
+                                href={`/createcover-letter?coverLetterId=${coverLetterId}&edit=true`}
+                                className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2.5 rounded-lg font-medium transition-colors flex items-center justify-center space-x-2 text-sm"
+                            >
+                                <Edit className="w-4 h-4" />
+                                <span>Edit</span>
+                            </Link>
+
+                            <button
+                                onClick={handleSave}
+                                disabled={isSaving}
+                                className="flex-1 bg-green-100 hover:bg-green-200 text-green-700 px-3 py-2.5 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 text-sm"
+                            >
+                                <Save className="w-4 h-4" />
+                                <span>{isSaving ? 'Saving...' : 'Save'}</span>
+                            </button>
+                        </div>
+
+                        {/* Row 2 */}
+                        <div className="flex space-x-2">
+                            <button
+                                onClick={handleShare}
+                                disabled={isSharing}
+                                className="flex-1 bg-purple-100 hover:bg-purple-200 text-purple-700 px-3 py-2.5 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 text-sm"
+                            >
+                                {showShareSuccess ? (
+                                    <CheckCircle className="w-4 h-4 text-green-600" />
+                                ) : (
+                                    <Share className="w-4 h-4" />
+                                )}
+                                <span>
+                                    {isSharing ? 'Sharing...' : showShareSuccess ? 'Copied!' : 'Share'}
+                                </span>
+                            </button>
+
+                            <button
+                                onClick={handleDownload}
+                                disabled={isDownloading}
+                                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2.5 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 shadow-md text-sm"
+                            >
+                                <Download className="w-4 h-4" />
+                                <span>
+                                    {isDownloading ? 'Downloading...' : (!user || !isPremium) ? 'Upgrade' : 'Download'}
+                                </span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             {/* Cover Letter Content */}
-            <div className="flex justify-center items-start pb-8 px-4">
-                <div className="w-full mx-auto">
-                    {/* Mobile view - smaller scale */}
-                    <div className="block sm:hidden w-full">
-                        <div
-                            data-cover-letter-content
-                            className="bg-white shadow-xl rounded-lg overflow-hidden mx-auto border"
-                            style={{
-                                width: '95vw',
-                                maxWidth: '350px',
-                                minHeight: '480px',
-                                transform: 'scale(0.98)',
-                                transformOrigin: 'top center'
-                            }}
-                        >
-                            <div className="p-3 text-xs leading-tight">
+            <div className="flex justify-center items-start pb-6">
+                <div className="w-full">
+                    {/* Mobile view - Scaled down */}
+                    <div className="sm:hidden w-full min-h-[400px] pt-10 flex justify-center items-center">
+                        <div className="scale-[0.45] origin-top">
+                            <div
+                                data-cover-letter-content
+                                className="bg-white shadow-xl rounded-lg overflow-hidden border"
+                                style={{
+                                    width: '794px',
+                                    minHeight: '1123px'
+                                }}
+                            >
                                 <CoverLetterTemplate
                                     data={{
                                         name,
@@ -344,22 +396,41 @@ function CoverLetterPage() {
                                     }}
                                     isPremium={isPremium}
                                     isPreview={true}
-                                    size="small"
+                                    size="normal"
                                 />
                             </div>
                         </div>
                     </div>
 
-                    {/* Desktop view - A4 size */}
-                    <div className="hidden sm:block max-w-4xl mx-auto">
+                    {/* Tablet view - A4 ratio ONLY */}
+                    <div className="hidden sm:block md:hidden w-full">
                         <div
+                            className="mx-auto bg-white shadow-xl rounded-lg overflow-hidden border aspect-[210/297] w-full max-w-[600px]"
                             data-cover-letter-content
-                            className="bg-white shadow-xl rounded-lg overflow-hidden mx-auto border"
-                            style={{
-                                maxWidth: '794px',
-                                minHeight: '1123px',
-                                width: '100%'
-                            }}
+                        >
+                            <CoverLetterTemplate
+                                data={{
+                                    name,
+                                    email,
+                                    phone,
+                                    address,
+                                    recipient_title,
+                                    recipient_company,
+                                    body,
+                                    template_id: 1
+                                }}
+                                isPremium={isPremium}
+                                isPreview={true}
+                                size="normal"
+                            />
+                        </div>
+                    </div>
+
+                    {/* Desktop view - A4 ratio ONLY */}
+                    <div className="hidden md:block max-w-4xl mx-auto">
+                        <div
+                            className="mx-auto bg-white shadow-xl rounded-lg overflow-hidden border aspect-[210/297] w-full max-w-[794px]"
+                            data-cover-letter-content
                         >
                             <CoverLetterTemplate
                                 data={{

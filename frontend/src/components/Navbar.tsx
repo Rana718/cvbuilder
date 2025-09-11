@@ -302,9 +302,7 @@ function Navbar() {
         );
     }, [loading, user, closeMenu]);
 
-    const renderNavLink = useCallback((href: string, Icon: React.ElementType, label: string, requiresAuth: boolean, isMobile = false) => {
-        if (requiresAuth && !user) return null;
-
+    const renderNavLink = useCallback((href: string, Icon: React.ElementType, label: string, isMobile = false) => {
         const isActive = isActiveLink(href);
         const baseClasses = `relative transition-all duration-300 flex items-center space-x-3 px-4 py-3 rounded-lg group ${
             isActive 
@@ -332,7 +330,7 @@ function Navbar() {
                 )}
             </Link>
         );
-    }, [user, isActiveLink, closeMenu]);
+    }, [isActiveLink, closeMenu]);
 
     return (
         <nav className="bg-white/95 backdrop-blur-lg shadow-sm border-b border-gray-200/50 sticky top-0 z-50">
@@ -357,27 +355,22 @@ function Navbar() {
 
                     {/* Desktop Navigation */}
                     <div className="hidden lg:flex items-center space-x-1">
-                        {renderNavLink('/dashboard', BarChart3, 'Dashboard', true)}
+                        {renderNavLink('/dashboard', BarChart3, 'Dashboard')}
                         
-                        {user && (
-                            <>
-                                <Dropdown
-                                    label="Resume"
-                                    items={resumeDropdownItems}
-                                    icon={FolderOpen}
-                                    isActive={isActiveDropdown(resumeDropdownItems)}
-                                />
-                                
-                                <Dropdown
-                                    label="Cover Letters"
-                                    items={coverLetterDropdownItems}
-                                    icon={Mail}
-                                    isActive={isActiveDropdown(coverLetterDropdownItems)}
-                                />
-                            </>
-                        )}
+                        <Dropdown
+                            label="Resume"
+                            items={resumeDropdownItems}
+                            icon={FolderOpen}
+                            isActive={isActiveDropdown(resumeDropdownItems)}
+                        />
                         
-                        {!user && renderNavLink('/template', FileText, 'Templates', false)}
+                        <Dropdown
+                            label="Cover Letters"
+                            items={coverLetterDropdownItems}
+                            icon={Mail}
+                            isActive={isActiveDropdown(coverLetterDropdownItems)}
+                        />
+                        
                     </div>
 
                     {/* Desktop Auth Section */}
@@ -420,31 +413,26 @@ function Navbar() {
                             <div className="py-4 space-y-2 max-h-[calc(100vh-4rem)] overflow-y-auto">
                                 {/* Navigation Links */}
                                 <div className="space-y-1">
-                                    {renderNavLink('/dashboard', BarChart3, 'Dashboard', true, true)}
+                                    {renderNavLink('/dashboard', BarChart3, 'Dashboard', true)}
                                     
-                                    {user && (
-                                        <>
-                                            <Dropdown
-                                                label="Resume"
-                                                items={resumeDropdownItems}
-                                                icon={FolderOpen}
-                                                isActive={isActiveDropdown(resumeDropdownItems)}
-                                                isMobile={true}
-                                                onItemClick={closeMenu}
-                                            />
-                                            
-                                            <Dropdown
-                                                label="Cover Letters"
-                                                items={coverLetterDropdownItems}
-                                                icon={Mail}
-                                                isActive={isActiveDropdown(coverLetterDropdownItems)}
-                                                isMobile={true}
-                                                onItemClick={closeMenu}
-                                            />
-                                        </>
-                                    )}
+                                    <Dropdown
+                                        label="Resume"
+                                        items={resumeDropdownItems}
+                                        icon={FolderOpen}
+                                        isActive={isActiveDropdown(resumeDropdownItems)}
+                                        isMobile={true}
+                                        onItemClick={closeMenu}
+                                    />
                                     
-                                    {!user && renderNavLink('/template', FileText, 'Templates', false, true)}
+                                    <Dropdown
+                                        label="Cover Letters"
+                                        items={coverLetterDropdownItems}
+                                        icon={Mail}
+                                        isActive={isActiveDropdown(coverLetterDropdownItems)}
+                                        isMobile={true}
+                                        onItemClick={closeMenu}
+                                    />
+                                    
                                 </div>
                                 
                                 {/* Auth Section */}
