@@ -749,7 +749,7 @@ export default function Home() {
                   <h3 className="text-xl sm:text-2xl font-bold text-white mb-3 sm:mb-4">Professional Plan</h3>
                   <div className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-2">₹90</div>
                   <p className="text-blue-200 mb-2">per month</p>
-                  <p className="text-sm text-blue-300">Cancel anytime • 30-day guarantee</p>
+                  <p className="text-sm text-blue-300">Cancel anytime • 2-day guarantee</p>
                 </div>
 
                 <div className="space-y-3 sm:space-y-4 mb-6 sm:mb-8 flex-grow">
@@ -790,7 +790,7 @@ export default function Home() {
           >
             <div className="inline-flex items-center bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 px-6 sm:px-8 py-3 sm:py-4 rounded-full backdrop-blur-sm">
               <Shield className="h-5 sm:h-6 w-5 sm:w-6 mr-2 sm:mr-3" />
-              <span className="font-semibold text-base sm:text-lg">30-Day Money-Back Guarantee</span>
+              <span className="font-semibold text-base sm:text-lg">2-Day Money-Back Guarantee</span>
             </div>
           </motion.div>
         </div>

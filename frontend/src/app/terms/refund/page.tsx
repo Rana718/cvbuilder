@@ -20,7 +20,7 @@ import {
 } from 'lucide-react';
 
 const sections = [
-    { id: 'guarantee', title: '30-Day Money Back Guarantee' },
+    { id: 'guarantee', title: '2-Day Money Back Guarantee' },
     { id: 'eligibility', title: 'Refund Eligibility' },
     { id: 'process', title: 'How to Request a Refund' },
     { id: 'processing', title: 'Processing Time' },
@@ -216,7 +216,7 @@ export default function RefundPolicy() {
                         {/* Content Sections */}
                         <div className="space-y-12">
                             
-                            {/* 30-Day Guarantee */}
+                            {/* 2-Day Guarantee */}
                             <motion.section 
                                 id="guarantee"
                                 initial={{ opacity: 0, y: 20 }}
@@ -229,10 +229,10 @@ export default function RefundPolicy() {
                                         <Shield className="h-6 w-6 text-white" />
                                     </div>
                                     <div>
-                                        <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-3">30-Day Money Back Guarantee</h2>
+                                        <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-3">2-Day Money Back Guarantee</h2>
                                         <p className="text-gray-600 text-lg leading-relaxed">
-                                            We offer a comprehensive 30-day money-back guarantee for all premium subscriptions and one-time purchases. 
-                                            If you're not completely satisfied with AI Resume Builder, you can request a full refund within 30 days 
+                                            We offer a comprehensive 2-day money-back guarantee for all premium subscriptions and one-time purchases. 
+                                            If you're not completely satisfied with AI Resume Builder, you can request a full refund within 2 days 
                                             of your initial purchase - no questions asked.
                                         </p>
                                     </div>
@@ -246,7 +246,7 @@ export default function RefundPolicy() {
                                     </div>
                                     <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
                                         <Calendar className="h-6 w-6 text-blue-600 mb-2" />
-                                        <h3 className="font-semibold text-gray-900 mb-1">30 Days</h3>
+                                        <h3 className="font-semibold text-gray-900 mb-1">2 Days</h3>
                                         <p className="text-sm text-gray-600">Generous refund window</p>
                                     </div>
                                     <div className="bg-purple-50 border border-purple-200 rounded-xl p-4">
@@ -286,7 +286,7 @@ export default function RefundPolicy() {
                                         </h3>
                                         <div className="space-y-3">
                                             {[
-                                                'Request made within 30 days of purchase',
+                                                'Request made within 2 days of purchase',
                                                 'Account in good standing with our Terms of Service',
                                                 'Reasonable usage of premium features',
                                                 'Valid technical or satisfaction concerns',
@@ -310,7 +310,7 @@ export default function RefundPolicy() {
                                                 'Excessive downloads (over 100 resumes)',
                                                 'Violation of Terms of Service',
                                                 'Fraudulent or duplicate accounts',
-                                                'Requests after 30-day period',
+                                                'Requests after 2-day period',
                                                 'Abuse of refund policy'
                                             ].map((item, index) => (
                                                 <div key={index} className="flex items-start space-x-3">
@@ -478,7 +478,7 @@ export default function RefundPolicy() {
                                 <div className="grid lg:grid-cols-2 gap-6">
                                     <div className="space-y-4">
                                         {[
-                                            { title: 'Expired Subscriptions', desc: 'Subscriptions older than 30 days from purchase' },
+                                            { title: 'Expired Subscriptions', desc: 'Subscriptions older than 2 days from purchase' },
                                             { title: 'Policy Violations', desc: 'Accounts that have violated our Terms of Service' },
                                             { title: 'Free Accounts', desc: 'Free trial accounts with no payment made' }
                                         ].map((item, index) => (

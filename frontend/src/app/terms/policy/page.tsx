@@ -610,7 +610,7 @@ export default function TermsOfService() {
                                                 employment outcomes, interview success, or career advancement as a result of using our platform.
                                             </p>
                                             <div className="text-xs text-gray-500">
-                                                Maximum liability limited to the amount paid for our service in the 12 months 
+                                                Maximum liability limited to the amount paid for our service in the month 
                                                 preceding the claim.
                                             </div>
                                         </div>

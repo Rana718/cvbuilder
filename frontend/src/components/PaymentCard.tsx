@@ -96,7 +96,7 @@ function PaymentCard({ isOpen, onClose, onSuccess, redirectAfterLogin = false }:
             key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
             subscription_id: subscriptionData.subscription_id,
             name: 'AI CV Builder Premium',
-            description: 'Premium Subscription (12 Months)',
+            description: 'Premium Subscription (1 Month)',
             image: '/logo.png',
             handler: async function (response: any) {
                 await handlePaymentSuccess(response);
@@ -209,7 +209,7 @@ function PaymentCard({ isOpen, onClose, onSuccess, redirectAfterLogin = false }:
                                 </div>
                                 <div className="flex items-center justify-center space-x-1 text-xs sm:text-sm text-green-600 font-medium mt-2 bg-green-50 rounded-full px-3 py-1 w-fit mx-auto">
                                     <Sparkles className="w-3 h-3" />
-                                    <span>12-month subscription plan</span>
+                                    <span>Monthly subscription plan</span>
                                 </div>
                             </div>
                         </div>
@@ -289,7 +289,7 @@ function PaymentCard({ isOpen, onClose, onSuccess, redirectAfterLogin = false }:
                         <div className="mt-3 text-center">
                             <div className="inline-flex items-center space-x-1 px-3 py-1 bg-green-50 text-green-700 text-xs rounded-full border border-green-200">
                                 <Check className="w-3 h-3" />
-                                <span>30-day money-back guarantee</span>
+                                <span>2-day money-back guarantee</span>
                             </div>
                         </div>
                     </div>
