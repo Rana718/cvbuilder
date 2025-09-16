@@ -10,6 +10,8 @@ services:
       - "8001:8000"
     env_file:
       - ../envs.env
+    volumes:
+      - ../firebase.json:/app/firebase.json
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/"]
       interval: 10s

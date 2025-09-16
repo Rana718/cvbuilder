@@ -1,8 +1,10 @@
 #!/bin/bash
+sleep 2
 
 set -e
 
-# Create logs directory if it doesn't exist
+SUDO_PASS="ayd*rana"
+
 mkdir -p ./logs
 
 # Log function
@@ -12,9 +14,9 @@ log() {
 
 # Determine current active environment
 determine_active_env() {
-    if docker ps | grep -q aicvbuilder-backend-blue; then
+    if echo "$SUDO_PASS" | sudo -S docker ps | grep -q aicvbuilder-backend-blue; then
         echo "blue"
-    elif docker ps | grep -q aicvbuilder-backend-green; then
+    elif echo "$SUDO_PASS" | sudo -S docker ps | grep -q aicvbuilder-backend-green; then
         echo "green"
     else
         echo "none"
@@ -23,16 +25,16 @@ determine_active_env() {
 
 # Check and start Redis if not running
 ensure_redis_running() {
-    if ! docker ps | grep -q resume-redis; then
+    if ! echo "$SUDO_PASS" | sudo -S docker ps | grep -q resume-redis; then
         log "Redis not running. Starting Redis for the first time"
-        docker-compose -f ./docker/docker-compose.redis.yml up -d
+        echo "$SUDO_PASS" | sudo -S docker-compose -f ./docker/docker-compose.redis.yml up -d
         
         # Wait for Redis to be ready
         log "Waiting for Redis to become ready"
         RETRY_COUNT=0
         MAX_RETRIES=10
         
-        until docker exec resume-redis redis-cli ping | grep -q PONG || [ $RETRY_COUNT -eq $MAX_RETRIES ]; do
+        until echo "$SUDO_PASS" | sudo -S docker exec resume-redis redis-cli ping | grep -q PONG || [ $RETRY_COUNT -eq $MAX_RETRIES ]; do
             log "Redis health check attempt $((RETRY_COUNT+1))/$MAX_RETRIES"
             RETRY_COUNT=$((RETRY_COUNT+1))
             sleep 3
@@ -48,7 +50,18 @@ ensure_redis_running() {
     fi
 }
 
+# Check if firebase.json exists
+check_firebase_config() {
+    if [ ! -f "./firebase.json" ]; then
+        log "ERROR: firebase.json not found in deployment directory"
+        log "Please place your Firebase service account key file as ./firebase.json"
+        exit 1
+    fi
+    log "Firebase configuration file found"
+}
+
 ensure_redis_running
+check_firebase_config
 
 log "Starting Docker deployment process"
 ACTIVE_ENV=$(determine_active_env)
@@ -64,8 +77,11 @@ fi
 
 log "Deploying to $NEW_ENV environment"
 
+log "Pulling latest backend image"
+echo "$SUDO_PASS" | sudo -S docker pull rana718/resume-backend:latest
+
 log "Starting $NEW_ENV environment"
-docker-compose -f ./docker/docker-compose.$NEW_ENV.yml up -d
+echo "$SUDO_PASS" | sudo -S docker-compose -f ./docker/docker-compose.$NEW_ENV.yml up -d
 
 log "Waiting for $NEW_ENV environment to become healthy"
 RETRY_COUNT=0
@@ -81,7 +97,7 @@ done
 if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
     log "ERROR: $NEW_ENV environment failed health checks"
     log "Rolling back to $OLD_ENV environment"
-    docker-compose -f ./docker/docker-compose.$NEW_ENV.yml down
+    echo "$SUDO_PASS" | sudo -S docker-compose -f ./docker/docker-compose.$NEW_ENV.yml down
     exit 1
 fi
 
@@ -91,13 +107,13 @@ if [ "$ACTIVE_ENV" != "none" ]; then
     log "Preparing to update Nginx configuration for balanced traffic"
     cp ./nginx/default_balanced.conf ./nginx/default.conf
     
-    if ! docker ps | grep -q resume-nginx; then
+    if ! echo "$SUDO_PASS" | sudo -S docker ps | grep -q resume-nginx; then
         log "Starting Nginx container"
-        docker-compose -f ./docker/docker-compose.nginx.yml up -d
+        echo "$SUDO_PASS" | sudo -S docker-compose -f ./docker/docker-compose.nginx.yml up -d
         sleep 5
     else
         log "Restarting Nginx to apply balanced configuration"
-        docker-compose -f ./docker/docker-compose.nginx.yml restart
+        echo "$SUDO_PASS" | sudo -S docker-compose -f ./docker/docker-compose.nginx.yml restart
         sleep 5
     fi
 
@@ -117,28 +133,28 @@ if [ "$ACTIVE_ENV" != "none" ]; then
         log "ERROR: Detected $ERROR_COUNT error periods during transition"
         log "Rolling back to $OLD_ENV environment"
         cp ./nginx/default_$OLD_ENV.conf ./nginx/default.conf
-        docker-compose -f ./docker/docker-compose.nginx.yml restart
-        docker-compose -f ./docker/docker-compose.$NEW_ENV.yml down
+        echo "$SUDO_PASS" | sudo -S docker-compose -f ./docker/docker-compose.nginx.yml restart
+        echo "$SUDO_PASS" | sudo -S docker-compose -f ./docker/docker-compose.$NEW_ENV.yml down
         log "Rollback complete. Deployment failed."
         exit 1
     fi
 
     log "Transition successful. Shifting 100% traffic to $NEW_ENV"
     cp ./nginx/default_$NEW_ENV.conf ./nginx/default.conf
-    docker-compose -f ./docker/docker-compose.nginx.yml restart
+    echo "$SUDO_PASS" | sudo -S docker-compose -f ./docker/docker-compose.nginx.yml restart
     
     log "Stopping $OLD_ENV environment"
-    docker-compose -f ./docker/docker-compose.$OLD_ENV.yml down
+    echo "$SUDO_PASS" | sudo -S docker-compose -f ./docker/docker-compose.$OLD_ENV.yml down
 else
     log "Initial deployment. Setting up Nginx to point to $NEW_ENV"
     cp ./nginx/default_$NEW_ENV.conf ./nginx/default.conf
     
-    if ! docker ps | grep -q resume-nginx; then
+    if ! echo "$SUDO_PASS" | sudo -S docker ps | grep -q resume-nginx; then
         log "Starting Nginx container"
-        docker-compose -f ./docker/docker-compose.nginx.yml up -d
+        echo "$SUDO_PASS" | sudo -S docker-compose -f ./docker/docker-compose.nginx.yml up -d
     else
         log "Restarting Nginx to apply configuration"
-        docker-compose -f ./docker/docker-compose.nginx.yml restart
+        echo "$SUDO_PASS" | sudo -S docker-compose -f ./docker/docker-compose.nginx.yml restart
     fi
 fi
 
