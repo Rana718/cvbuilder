@@ -74,7 +74,7 @@ async def create_subscription(
             "plan_id": plan_id,
             "customer_id": razorpay_customer["id"],
             "quantity": 1,
-            "total_count": 12,  # 12 months
+            "total_count": 1,  # 1 month only
             "notes": {
                 "user_id": str(current_user.id),
                 "email": current_user.email

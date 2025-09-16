@@ -1,7 +1,6 @@
 from fastapi import APIRouter
 
-from .public_route import cv_gen, shared
-from . import auth, resumeop, upload, coverletter, rayzorpay, dashboard, cv_parser
+from . import auth, resumeop, upload, coverletter, rayzorpay, dashboard, cv_parser 
 from .admin import adminRouter
 from .public_route import publicrouter
 from .linkedin_auth import linkedinauth
