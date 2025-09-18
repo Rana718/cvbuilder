@@ -320,59 +320,52 @@ function ResumePage() {
                             className="cursor-pointer"
                             onClick={() => handleTemplateChange(template.id)}
                         >
-                            <div className={`relative bg-white border-2 rounded-lg overflow-hidden transition-all duration-200 ${template.id === Number(templateId)
-                                ? 'border-blue-500 shadow-md'
-                                : 'border-gray-200 hover:border-blue-300 hover:shadow-sm'
-                                }`}>
+                            <div className={`relative  overflow-hidden transition-all duration-200 
+                            
+                            `}>
                                 {/* Template Preview */}
-                                <div className="w-full relative overflow-hidden bg-white aspect-[210/297]">
-                                    <div className="absolute inset-0 w-full h-full p-1">
-                                        <div className="w-full h-full transform scale-100 origin-top-left">
-                                            <div className="w-full h-full overflow-hidden rounded border bg-white">
-                                                <TemplateRenderer templateId={template.id} userData={{
-                                                    name: "John Doe",
-                                                    email: "john@example.com",
-                                                    phone: "+1 (555) 123-4567",
-                                                    address: "New York, NY",
-                                                    job_title: "Senior Professional",
-                                                    summary: "Experienced professional with proven track record of success in leading teams and driving business growth.",
-                                                    skills: [
-                                                        { name: "Leadership", rating: 5 },
-                                                        { name: "Strategy", rating: 4 },
-                                                        { name: "Innovation", rating: 5 },
-                                                        { name: "Management", rating: 4 }
-                                                    ],
-                                                    experience: [{
-                                                        title: "Senior Position",
-                                                        company: "Tech Company",
-                                                        duration: "2020 - Present",
-                                                        description: "Led strategic initiatives and drove business growth."
-                                                    }, {
-                                                        title: "Manager",
-                                                        company: "Previous Company",
-                                                        duration: "2018 - 2020",
-                                                        description: "Managed team and projects."
-                                                    }],
-                                                    education: [{
-                                                        degree: "Master's Degree",
-                                                        institution: "University",
-                                                        year: "2018"
-                                                    }],
-                                                    projects: [{
-                                                        title: "Sample Project",
-                                                        description: "Project description"
-                                                    }]
-                                                }} size="small" />
-                                            </div>
-                                        </div>
+                                <div className="w-full bg-white overflow-hidden flex justify-center" style={{ height: '320px' }}>
+                                    <div className="w-[794px] h-[1200px] transform scale-[0.3] origin-top bg-white border border-gray-500">
+                                        <TemplateRenderer templateId={template.id} userData={{
+                                            name: "John Doe",
+                                            email: "john@example.com",
+                                            phone: "+1 (555) 123-4567",
+                                            address: "New York, NY",
+                                            job_title: "Senior Professional",
+                                            summary: "Experienced professional with proven track record of success in leading teams and driving business growth.",
+                                            skills: [
+                                                { name: "Leadership", rating: 5 },
+                                                { name: "Strategy", rating: 4 },
+                                                { name: "Innovation", rating: 5 },
+                                                { name: "Management", rating: 4 }
+                                            ],
+                                            experience: [{
+                                                title: "Senior Position",
+                                                company: "Tech Company",
+                                                duration: "2020 - Present",
+                                                description: "Led strategic initiatives and drove business growth."
+                                            }, {
+                                                title: "Manager",
+                                                company: "Previous Company",
+                                                duration: "2018 - 2020",
+                                                description: "Managed team and projects."
+                                            }],
+                                            education: [{
+                                                degree: "Master's Degree",
+                                                institution: "University",
+                                                year: "2018"
+                                            }],
+                                            projects: [{
+                                                title: "Sample Project",
+                                                description: "Project description"
+                                            }]
+                                        }} size="normal" />
                                     </div>
                                 </div>
 
-                                {/* Template Name */}
-                                <div className="p-2 text-center border-t bg-gray-50">
-                                    <p className="text-xs font-medium text-gray-800 truncate">{template.name}</p>
+                                <div className="mt-2 text-center">
+                                    <h4 className="text-sm font-semibold text-gray-900">{template.name}</h4>
                                 </div>
-
                                 {/* Selected Indicator */}
                                 {template.id === Number(templateId) && (
                                     <div className="absolute top-2 left-2 bg-blue-500 text-white rounded-full p-1 z-10 shadow-md">
@@ -423,8 +416,8 @@ function ResumePage() {
                     </button>
 
                     {showTemplateSelector && (
-                        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-end lg:hidden">
-                            <div className="bg-white w-full h-[90vh] rounded-t-2xl transform transition-transform overflow-hidden">
+                        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center lg:hidden p-4">
+                            <div className="bg-white w-full max-w-4xl h-[85vh] rounded-lg overflow-hidden">
                                 <TemplateSelectorPanel />
                             </div>
                         </div>
