@@ -86,7 +86,7 @@ export default function RefundPolicy() {
                                 <h1 className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
                                     Refund Policy
                                 </h1>
-                                <p className="text-sm text-gray-600">AI Resume Builder</p>
+                                <p className="text-sm text-gray-600">ResumeAI</p>
                             </div>
                         </div>
                         <div className="hidden md:flex items-center space-x-2 text-sm text-gray-600">
@@ -208,7 +208,7 @@ export default function RefundPolicy() {
                                 </span>
                             </h1>
                             <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-                                We stand behind our AI Resume Builder with a comprehensive refund policy. 
+                                We stand behind our ResumeAI with a comprehensive refund policy. 
                                 Your satisfaction is our priority, and we're committed to making things right.
                             </p>
                         </motion.div>
@@ -232,7 +232,7 @@ export default function RefundPolicy() {
                                         <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-3">2-Day Money Back Guarantee</h2>
                                         <p className="text-gray-600 text-lg leading-relaxed">
                                             We offer a comprehensive 2-day money-back guarantee for all premium subscriptions and one-time purchases. 
-                                            If you're not completely satisfied with AI Resume Builder, you can request a full refund within 2 days 
+                                            If you're not completely satisfied with ResumeAI, you can request a full refund within 2 days 
                                             of your initial purchase - no questions asked.
                                         </p>
                                     </div>

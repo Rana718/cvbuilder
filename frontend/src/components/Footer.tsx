@@ -53,7 +53,7 @@ function Footer() {
                                     <FileText className="h-4 w-4 text-white" />
                                 </div>
                                 <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-                                    AI Resume Builder
+                                    ResumeAI
                                 </span>
                             </div>
                             
@@ -124,7 +124,7 @@ function Footer() {
                         <div>
                             <h3 className="text-base font-semibold mb-4 flex items-center text-yellow-500">
                                 <Award className="h-4 w-4 mr-2" />
-                                Ai Resume 
+                                ResumeAI 
                             </h3>
                             <ul className="space-y-2">
                                 {legalLinks.map((link, index) => (
@@ -172,7 +172,7 @@ function Footer() {
                     <div className="flex flex-col space-y-3 sm:space-y-0 sm:flex-row sm:justify-between sm:items-center">
                         <div className="flex flex-col space-y-2 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-3 text-center sm:text-left">
                             <p className="text-gray-400 text-xs">
-                                © {currentYear} AI Resume Builder. All rights reserved.
+                                © {currentYear} ResumeAI. All rights reserved.
                             </p>
                             <p 
                                 className="text-gray-400 hover:text-white transition cursor-pointer text-xs flex items-center justify-center sm:justify-start space-x-1"

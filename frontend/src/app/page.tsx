@@ -167,7 +167,7 @@ export default function Home() {
                 <div className="relative rounded-3xl overflow-hidden shadow-2xl bg-white p-2">
                   <img
                     src="/img/banner.png"
-                    alt="AI Resume Builder Preview"
+                    alt="ResumeAI Preview"
                     className="w-full max-w-lg xl:max-w-2xl mx-auto rounded-2xl"
                   />
                 </div>
@@ -962,7 +962,7 @@ export default function Home() {
                 company: "Fortune 500 Company",
                 rating: 5,
                 avatar: "SJ",
-                text: "This AI resume builder transformed my career search! The intelligent suggestions helped me articulate my achievements perfectly. I landed my dream role within 3 weeks of updating my resume."
+                text: "This ResumeAI transformed my career search! The intelligent suggestions helped me articulate my achievements perfectly. I landed my dream role within 3 weeks of updating my resume."
               },
               {
                 name: "Michael Chen",
@@ -1134,7 +1134,7 @@ export default function Home() {
               Frequently Asked Questions
             </h2>
             <p className="text-lg text-slate-600">
-              Everything you need to know about our AI resume builder
+              Everything you need to know about our ResumeAI
             </p>
           </motion.div>
 

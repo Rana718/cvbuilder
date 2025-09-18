@@ -34,7 +34,7 @@ function DesktopSidebar({ currentStep, onStepChange }: DesktopSidebarProps) {
           </div>
           {isExpanded && (
             <div className="text-white">
-              <h2 className="font-semibold text-white">AI resume</h2>
+              <h2 className="font-semibold text-white">ResumeAI</h2>
               <p className="text-blue-200 text-xs">Create your perfect CV</p>
             </div>
           )}

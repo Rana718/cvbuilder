@@ -95,7 +95,7 @@ export default function PrivacyPolicy() {
                                 <h1 className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
                                     Privacy Policy
                                 </h1>
-                                <p className="text-sm text-gray-600">AI Resume Builder</p>
+                                <p className="text-sm text-gray-600">ResumeAI</p>
                             </div>
                         </div>
                         <div className="hidden md:flex items-center space-x-2 text-sm text-gray-600">
@@ -218,7 +218,7 @@ export default function PrivacyPolicy() {
                             </h1>
                             <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
                                 We are committed to protecting your privacy and ensuring transparency in how we collect, 
-                                use, and safeguard your personal information while using AI Resume Builder.
+                                use, and safeguard your personal information while using ResumeAI.
                             </p>
                         </motion.div>
 
@@ -240,7 +240,7 @@ export default function PrivacyPolicy() {
                                     <div>
                                         <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-3">Privacy Overview</h2>
                                         <p className="text-gray-600 text-lg leading-relaxed">
-                                            At AI Resume Builder, we believe privacy is a fundamental right. This policy explains how we handle 
+                                            At ResumeAI, we believe privacy is a fundamental right. This policy explains how we handle 
                                             your personal data with care, transparency, and in compliance with global privacy regulations 
                                             including GDPR, CCPA, and other applicable laws.
                                         </p>

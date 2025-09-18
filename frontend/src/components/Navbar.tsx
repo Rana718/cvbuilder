@@ -346,7 +346,7 @@ function Navbar() {
                             <FileText className="h-5 w-5 text-white" />
                         </motion.div>
                         <span className="text-xl font-bold bg-gradient-to-r from-gray-900 to-blue-600 bg-clip-text text-transparent group-hover:from-blue-600 group-hover:to-blue-700 transition-all duration-200 hidden sm:block">
-                            AI Resume Builder
+                            ResumeAI
                         </span>
                         <span className="text-lg font-bold bg-gradient-to-r from-gray-900 to-blue-600 bg-clip-text text-transparent group-hover:from-blue-600 group-hover:to-blue-700 transition-all duration-200 sm:hidden">
                             AIResume

@@ -97,7 +97,7 @@ export default function TermsOfService() {
                                 <h1 className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
                                     Terms of Service
                                 </h1>
-                                <p className="text-sm text-gray-600">AI Resume Builder</p>
+                                <p className="text-sm text-gray-600">ResumeAI</p>
                             </div>
                         </div>
                         <div className="hidden md:flex items-center space-x-2 text-sm text-gray-600">
@@ -219,7 +219,7 @@ export default function TermsOfService() {
                                 </span>
                             </h1>
                             <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-                                Please read these Terms of Service carefully before using AI Resume Builder. 
+                                Please read these Terms of Service carefully before using ResumeAI. 
                                 By accessing or using our service, you agree to be bound by these terms.
                             </p>
                         </motion.div>
@@ -242,7 +242,7 @@ export default function TermsOfService() {
                                     <div>
                                         <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-3">Acceptance of Terms</h2>
                                         <p className="text-gray-600 text-lg leading-relaxed mb-6">
-                                            By accessing and using AI Resume Builder, you accept and agree to be bound by the terms 
+                                            By accessing and using ResumeAI, you accept and agree to be bound by the terms 
                                             and provisions of this agreement. If you do not agree to these terms, please do not use our service.
                                         </p>
                                     </div>
@@ -282,7 +282,7 @@ export default function TermsOfService() {
                                     <div>
                                         <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-3">Service Description</h2>
                                         <p className="text-gray-600 text-lg leading-relaxed mb-6">
-                                            AI Resume Builder is an online platform that provides AI-powered resume creation tools, 
+                                            ResumeAI is an online platform that provides AI-powered resume creation tools, 
                                             professional templates, and career enhancement features.
                                         </p>
                                     </div>
@@ -482,7 +482,7 @@ export default function TermsOfService() {
                                     <div>
                                         <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-3">Intellectual Property Rights</h2>
                                         <p className="text-gray-600 text-lg leading-relaxed">
-                                            AI Resume Builder and its content are protected by intellectual property laws. 
+                                            ResumeAI and its content are protected by intellectual property laws. 
                                             We respect the intellectual property rights of others and expect users to do the same.
                                         </p>
                                     </div>
@@ -594,7 +594,7 @@ export default function TermsOfService() {
                                     <div>
                                         <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-3">Limitation of Liability</h2>
                                         <p className="text-gray-600 text-lg leading-relaxed">
-                                            To the maximum extent permitted by law, AI Resume Builder shall not be liable for any 
+                                            To the maximum extent permitted by law, ResumeAI shall not be liable for any 
                                             indirect, incidental, special, consequential, or punitive damages.
                                         </p>
                                     </div>
