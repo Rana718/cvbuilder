@@ -7,9 +7,11 @@ import { useCoverLetterStore } from '@/store/coverLetterStore';
 import { usePremiumStatus } from '@/hooks/usePremiumStatus';
 import PaymentCard from '@/components/PaymentCard';
 import CoverLetterTemplate from '@/components/templates/CoverLetterTemplate';
-import { ArrowLeft, Download, Save, Edit, Share, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Download, Save, Edit, Share, CheckCircle, Mail, Brain } from 'lucide-react';
 import Link from 'next/link';
 import axiosInstance from '@/lib/axios';
+import { motion } from 'framer-motion';
+import Navbar from '@/components/Navbar';
 
 function CoverLetterPage() {
     const params = useParams();
@@ -37,6 +39,8 @@ function CoverLetterPage() {
         router.push(`/sign-in?callbackUrl=${encodeURIComponent(currentUrl)}`);
     };
 
+    const download_url = process.env.NEXT_PUBLIC_API_KEY_DOWN || '';
+
     const handleSave = async () => {
         if (isSaving || !user) {
             if (!user) redirectToAuth();
@@ -60,11 +64,11 @@ function CoverLetterPage() {
 
     const generatePDF = async (element: HTMLElement) => {
         try {
-            const response = await fetch("/api", {
+            const response = await fetch(download_url, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    html: element.outerHTML, // send HTML for Puppeteer
+                    html: element.outerHTML,
                 }),
             });
 
@@ -94,12 +98,8 @@ function CoverLetterPage() {
             return;
         }
 
-        console.log("User premium status:", isPremium);
-        const tokenResult = await user.getIdTokenResult(true);
-
-        console.log("Token claims:", tokenResult.claims);
         await refreshStatus();
-        
+
         if (!isPremium) {
             setShowPaymentCard(true);
             await saveCoverLetter();
@@ -130,7 +130,7 @@ function CoverLetterPage() {
             return;
         }
 
-        if(!isPremium){
+        if (!isPremium) {
             alert('Sharing is a premium feature. Please upgrade to share your cover letter.')
             return
         }
@@ -233,10 +233,10 @@ function CoverLetterPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 via-gray-50 to-blue-50">
+            <div className="min-h-screen bg-slate-50 flex items-center justify-center">
                 <div className="text-center">
-                    <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                    <p className="text-sm sm:text-base text-gray-700 font-medium">Loading...</p>
+                    <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-500 border-t-transparent mx-auto mb-4"></div>
+                    <p className="text-gray-700 font-medium">Loading...</p>
                 </div>
             </div>
         );
@@ -245,68 +245,65 @@ function CoverLetterPage() {
     if (!loading && !user) return null;
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-100 via-gray-50 to-blue-50 overflow-x-hidden">
-            {/* Simplified Header */}
-            <div className="bg-white shadow-sm print:hidden sticky top-0 z-20 border-b">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex items-center justify-self-start h-16">
-                        <div className="flex items-center space-x-4">
-                            <Link
-                                href="/cover-letter"
-                                className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors"
-                            >
-                                <ArrowLeft className="w-5 h-5" />
-                                <span className="font-medium">Back</span>
-                            </Link>
-                        </div>
+        <div className="min-h-screen bg-slate-50">
+            <Navbar />
 
-                        <div className="w-32"></div> 
-                    </div>
-                </div>
+            {/* Background Elements */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute top-20 left-10 w-96 h-96 bg-gradient-to-r from-blue-400/10 to-indigo-500/10 rounded-full mix-blend-multiply filter blur-3xl animate-pulse"></div>
+                <div className="absolute top-40 right-10 w-80 h-80 bg-gradient-to-r from-purple-400/10 to-pink-500/10 rounded-full mix-blend-multiply filter blur-3xl animate-pulse delay-1000"></div>
+                <div className="absolute bottom-20 left-1/2 w-72 h-72 bg-gradient-to-r from-emerald-400/10 to-teal-500/10 rounded-full mix-blend-multiply filter blur-3xl animate-pulse delay-2000"></div>
             </div>
 
-            {/* Action Buttons - Responsive Layout */}
-            <div className="print:hidden py-3 lg:py-4">
-                <div className="max-w-4xl mx-auto px-3">
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none"></div>
+
+            <div className="relative container mx-auto px-4 py-6">
+
+                {/* Action Buttons */}
+                <motion.div
+                    initial={{ y: 30, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ duration: 0.8, delay: 0.5 }}
+                    className="mb-8"
+                >
                     {/* Desktop Layout */}
                     <div className="hidden sm:flex justify-center items-center space-x-4">
                         <Link
-                            href={`/createcover-letter?coverLetterId=${coverLetterId}&edit=true`}
-                            className="text-gray-700 hover:text-blue-600 font-medium transition-colors flex items-center space-x-2"
+                            href={`/cover-letter/create?coverLetterId=${coverLetterId}&edit=true`}
+                            className="flex items-center space-x-2 px-4 py-2 bg-white/80 backdrop-blur-sm border border-gray-200 hover:border-blue-300 text-gray-700 hover:text-blue-700 rounded-lg transition-all shadow-sm hover:shadow-md"
                         >
                             <Edit className="w-4 h-4" />
-                            <span>Edit Cover Letter</span>
+                            <span>Edit</span>
                         </Link>
 
                         <button
                             onClick={handleSave}
                             disabled={isSaving}
-                            className="text-green-700 hover:text-green-800 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                            className="flex items-center space-x-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors disabled:opacity-50 shadow-sm"
                         >
                             <Save className="w-4 h-4" />
-                            <span>{isSaving ? 'Saving...' : 'Save Cover Letter'}</span>
+                            <span>{isSaving ? 'Saving...' : 'Save'}</span>
                         </button>
 
                         <button
                             onClick={handleShare}
                             disabled={isSharing}
-                            className="text-purple-700 hover:text-purple-800 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                            className="flex items-center space-x-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors disabled:opacity-50 shadow-sm"
                         >
                             {showShareSuccess ? (
-                                <CheckCircle className="w-4 h-4 text-green-600" />
+                                <CheckCircle className="w-4 h-4" />
                             ) : (
                                 <Share className="w-4 h-4" />
                             )}
                             <span>
-                                {isSharing ? 'Sharing...' : showShareSuccess ? 'Link Copied!' : 'Share Cover Letter'}
+                                {isSharing ? 'Sharing...' : showShareSuccess ? 'Copied!' : 'Share'}
                             </span>
                         </button>
 
                         <button
                             onClick={handleDownload}
                             disabled={isDownloading}
-                            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 shadow-md"
-                            title={(!user || !isPremium) ? 'Premium feature - Upgrade to download' : ''}
+                            className="flex items-center space-x-2 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50 shadow-lg font-medium"
                         >
                             <Download className="w-4 h-4" />
                             <span>
@@ -316,12 +313,11 @@ function CoverLetterPage() {
                     </div>
 
                     {/* Mobile Layout */}
-                    <div className="sm:hidden space-y-2">
-                        {/* Row 1 */}
+                    <div className="sm:hidden space-y-3">
                         <div className="flex space-x-2">
                             <Link
-                                href={`/createcover-letter?coverLetterId=${coverLetterId}&edit=true`}
-                                className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2.5 rounded-lg font-medium transition-colors flex items-center justify-center space-x-2 text-sm"
+                                href={`/cover-letter/create?coverLetterId=${coverLetterId}&edit=true`}
+                                className="flex-1 flex items-center justify-center space-x-2 px-3 py-2 bg-white/80 backdrop-blur-sm border border-gray-200 text-gray-700 rounded-lg shadow-sm"
                             >
                                 <Edit className="w-4 h-4" />
                                 <span>Edit</span>
@@ -330,22 +326,21 @@ function CoverLetterPage() {
                             <button
                                 onClick={handleSave}
                                 disabled={isSaving}
-                                className="flex-1 bg-green-100 hover:bg-green-200 text-green-700 px-3 py-2.5 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 text-sm"
+                                className="flex-1 flex items-center justify-center space-x-2 px-3 py-2 bg-green-600 text-white rounded-lg disabled:opacity-50 shadow-sm"
                             >
                                 <Save className="w-4 h-4" />
                                 <span>{isSaving ? 'Saving...' : 'Save'}</span>
                             </button>
                         </div>
 
-                        {/* Row 2 */}
                         <div className="flex space-x-2">
                             <button
                                 onClick={handleShare}
                                 disabled={isSharing}
-                                className="flex-1 bg-purple-100 hover:bg-purple-200 text-purple-700 px-3 py-2.5 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 text-sm"
+                                className="flex-1 flex items-center justify-center space-x-2 px-3 py-2 bg-purple-600 text-white rounded-lg disabled:opacity-50 shadow-sm"
                             >
                                 {showShareSuccess ? (
-                                    <CheckCircle className="w-4 h-4 text-green-600" />
+                                    <CheckCircle className="w-4 h-4" />
                                 ) : (
                                     <Share className="w-4 h-4" />
                                 )}
@@ -357,7 +352,7 @@ function CoverLetterPage() {
                             <button
                                 onClick={handleDownload}
                                 disabled={isDownloading}
-                                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2.5 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 shadow-md text-sm"
+                                className="flex-1 flex items-center justify-center space-x-2 px-3 py-2 bg-blue-600 text-white rounded-lg disabled:opacity-50 shadow-lg"
                             >
                                 <Download className="w-4 h-4" />
                                 <span>
@@ -366,93 +361,64 @@ function CoverLetterPage() {
                             </button>
                         </div>
                     </div>
-                </div>
-            </div>
+                </motion.div>
 
-            {/* Cover Letter Content */}
-            <div className="flex justify-center items-start pb-6">
-                <div className="w-full">
-                    {/* Mobile view - Scaled down */}
-                    <div className="sm:hidden w-full min-h-[400px] pt-10 flex justify-center items-center">
-                        <div className="scale-[0.45] origin-top">
-                            <div
-                                data-cover-letter-content
-                                className="bg-white shadow-xl rounded-lg overflow-hidden border"
-                                style={{
-                                    width: '794px',
-                                    minHeight: '1123px'
+                {/* Cover Letter Content */}
+                <motion.div
+                    initial={{ y: 30, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ duration: 0.8, delay: 0.7 }}
+                    className="flex justify-center"
+                >
+                    <div className="w-full max-w-4xl">
+                        {/* Mobile view */}
+                        <div className="sm:hidden">
+                            <CoverLetterTemplate
+                                data={{
+                                    name,
+                                    email,
+                                    phone,
+                                    address,
+                                    recipient_title,
+                                    recipient_company,
+                                    body,
+                                    template_id: 1
                                 }}
-                            >
-                                <CoverLetterTemplate
-                                    data={{
-                                        name,
-                                        email,
-                                        phone,
-                                        address,
-                                        recipient_title,
-                                        recipient_company,
-                                        body,
-                                        template_id: 1
-                                    }}
-                                    isPremium={isPremium}
-                                    isPreview={true}
-                                    size="normal"
-                                />
+                                isPremium={isPremium}
+                                isPreview={true}
+                                size="normal"
+                            />
+                        </div>
+
+                        {/* Desktop view */}
+                        <div className="hidden sm:block">
+                            <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-xl border border-white/50 overflow-hidden max-w-[794px] mx-auto">
+                                <div
+                                    data-cover-letter-content
+                                    className="w-full aspect-[210/297]"
+                                >
+                                    <CoverLetterTemplate
+                                        data={{
+                                            name,
+                                            email,
+                                            phone,
+                                            address,
+                                            recipient_title,
+                                            recipient_company,
+                                            body,
+                                            template_id: 1
+                                        }}
+                                        isPremium={isPremium}
+                                        isPreview={true}
+                                        size="normal"
+                                    />
+                                </div>
                             </div>
                         </div>
                     </div>
-
-                    {/* Tablet view - A4 ratio ONLY */}
-                    <div className="hidden sm:block md:hidden w-full">
-                        <div
-                            className="mx-auto bg-white shadow-xl rounded-lg overflow-hidden border aspect-[210/297] w-full max-w-[600px]"
-                            data-cover-letter-content
-                        >
-                            <CoverLetterTemplate
-                                data={{
-                                    name,
-                                    email,
-                                    phone,
-                                    address,
-                                    recipient_title,
-                                    recipient_company,
-                                    body,
-                                    template_id: 1
-                                }}
-                                isPremium={isPremium}
-                                isPreview={true}
-                                size="normal"
-                            />
-                        </div>
-                    </div>
-
-                    {/* Desktop view - A4 ratio ONLY */}
-                    <div className="hidden md:block max-w-4xl mx-auto">
-                        <div
-                            className="mx-auto bg-white shadow-xl rounded-lg overflow-hidden border aspect-[210/297] w-full max-w-[794px]"
-                            data-cover-letter-content
-                        >
-                            <CoverLetterTemplate
-                                data={{
-                                    name,
-                                    email,
-                                    phone,
-                                    address,
-                                    recipient_title,
-                                    recipient_company,
-                                    body,
-                                    template_id: 1
-                                }}
-                                isPremium={isPremium}
-                                isPreview={true}
-                                size="normal"
-                            />
-                        </div>
-                    </div>
-                </div>
+                </motion.div>
             </div>
 
-            {/* Payment Card Modal */}
             <PaymentCard
                 isOpen={showPaymentCard}
                 onClose={() => setShowPaymentCard(false)}
@@ -466,7 +432,7 @@ function CoverLetterPage() {
 const CoverLetterPageWrapper = () => {
     return (
         <Suspense fallback={
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+            <div className="min-h-screen bg-slate-50 flex items-center justify-center">
                 <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-500 border-t-transparent"></div>
             </div>
         }>

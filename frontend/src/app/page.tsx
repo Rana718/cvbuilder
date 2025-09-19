@@ -49,53 +49,45 @@ export default function Home() {
       {/* Navbar */}
       <Navbar />
 
-      {/* Hero Section */}
+      {/* Hero Section - Mobile First */}
       <section className="relative overflow-hidden bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-100/50 min-h-screen flex items-center">
-        {/* Enhanced Background Elements */}
+        {/* Simplified Background */}
         <div className="absolute inset-0">
-          <div className="absolute top-20 left-10 w-96 h-96 bg-gradient-to-r from-blue-400/20 to-indigo-500/20 rounded-full mix-blend-multiply filter blur-3xl animate-pulse"></div>
-          <div className="absolute top-40 right-10 w-80 h-80 bg-gradient-to-r from-purple-400/20 to-pink-500/20 rounded-full mix-blend-multiply filter blur-3xl animate-pulse delay-1000"></div>
-          <div className="absolute bottom-20 left-1/2 w-72 h-72 bg-gradient-to-r from-emerald-400/20 to-teal-500/20 rounded-full mix-blend-multiply filter blur-3xl animate-pulse delay-2000"></div>
+          <div className="absolute top-20 left-10 w-72 h-72 bg-gradient-to-r from-blue-400/10 to-indigo-500/10 rounded-full mix-blend-multiply filter blur-3xl animate-pulse"></div>
+          <div className="absolute top-40 right-10 w-64 h-64 bg-gradient-to-r from-purple-400/10 to-pink-500/10 rounded-full mix-blend-multiply filter blur-3xl animate-pulse delay-1000"></div>
         </div>
 
-        {/* Floating grid pattern */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
-
         <div className="relative container mx-auto px-4 pt-8 md:pt-0">
-          {/* Enhanced AI Badge */}
+          {/* AI Badge */}
           <motion.div
-            initial={{ y: 20, opacity: 0, scale: 0.9 }}
-            animate={{ y: 0, opacity: 1, scale: 1 }}
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="flex justify-center mb-6 sm:mb-8"
+            className="flex justify-center mb-6"
           >
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 blur-xl rounded-full"></div>
-              <div className="relative inline-flex items-center bg-white/90 backdrop-blur-sm border border-white/20 shadow-lg text-slate-700 px-4 sm:px-6 py-2 sm:py-3 rounded-full text-sm font-medium">
-                <div className="w-2 h-2 bg-green-500 rounded-full mr-2 sm:mr-3 animate-pulse"></div>
-                <Sparkles className="h-4 w-4 mr-2 text-blue-600" />
-                <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent font-semibold">
-                  AI-Powered Resume Builder
-                </span>
-              </div>
+            <div className="inline-flex items-center bg-white/90 backdrop-blur-sm border border-white/20 shadow-sm text-slate-700 px-4 py-2 rounded-full text-sm font-medium">
+              <div className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></div>
+              <Sparkles className="h-4 w-4 mr-2 text-blue-600" />
+              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent font-semibold">
+                AI-Powered Resume Builder
+              </span>
             </div>
           </motion.div>
 
-          <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center max-w-7xl mx-auto">
-            {/* Enhanced Left Content */}
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center max-w-6xl mx-auto">
+            {/* Left Content */}
             <div className="text-center lg:text-left">
               <motion.h1
                 initial={{ y: 30, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.8, delay: 0.3 }}
-                className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-slate-900 mb-4 sm:mb-6 leading-[1.1]"
+                className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 mb-4 leading-tight"
               >
                 Build Your
-                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 mt-2 relative">
+                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 mt-2">
                   Dream Career
-                  <div className="absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 rounded-full transform scale-x-0 animate-pulse"></div>
                 </span>
-                <span className="block text-slate-700 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-medium mt-2 sm:mt-4">
+                <span className="block text-slate-700 text-xl sm:text-2xl md:text-3xl font-medium mt-2">
                   with AI Precision
                 </span>
               </motion.h1>
@@ -104,7 +96,7 @@ export default function Home() {
                 initial={{ y: 30, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.8, delay: 0.5 }}
-                className="text-lg sm:text-xl lg:text-2xl text-slate-600 mb-8 sm:mb-10 leading-relaxed max-w-2xl lg:max-w-none font-light px-2 sm:px-0"
+                className="text-base sm:text-lg lg:text-xl text-slate-600 mb-8 leading-relaxed max-w-2xl lg:max-w-none"
               >
                 Transform your career journey with our intelligent AI that crafts compelling resumes,
                 optimizes for ATS systems, and helps you land interviews at top companies.
@@ -114,19 +106,18 @@ export default function Home() {
                 initial={{ y: 30, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.8, delay: 0.7 }}
-                className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start mb-8 sm:mb-12"
+                className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start mb-8"
               >
                 <button
-                  className="group relative bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 sm:px-10 py-4 sm:py-5 rounded-2xl text-base sm:text-lg font-semibold flex items-center justify-center space-x-3 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 overflow-hidden"
+                  className="group bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-xl text-base font-semibold flex items-center justify-center space-x-2 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                   onClick={() => router.push("/template")}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-700 to-purple-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  <span className="relative z-10">Create Resume Now</span>
-                  <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform relative z-10" />
+                  <span>Create Resume Now</span>
+                  <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </button>
                 <button
                   onClick={() => router.push('/resusme/parse')}
-                  className="group bg-white/80 backdrop-blur-sm border-2 border-slate-200 hover:border-blue-300 text-slate-700 hover:text-blue-700 px-6 sm:px-10 py-4 sm:py-5 rounded-2xl text-base sm:text-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                  className="bg-white/80 backdrop-blur-sm border border-slate-200 hover:border-blue-300 text-slate-700 hover:text-blue-700 px-6 py-3 rounded-xl text-base font-semibold transition-all duration-300 shadow-sm hover:shadow-md transform hover:-translate-y-1"
                 >
                   <span className="flex items-center space-x-2">
                     <Download className="h-5 w-5" />
@@ -135,12 +126,12 @@ export default function Home() {
                 </button>
               </motion.div>
 
-              {/* Enhanced Trust Indicators */}
+              {/* Trust Indicators */}
               <motion.div
                 initial={{ y: 30, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.8, delay: 0.9 }}
-                className="flex flex-wrap items-center justify-center lg:justify-start gap-4 sm:gap-8 text-sm px-2 sm:px-0"
+                className="flex flex-wrap items-center justify-center lg:justify-start gap-4 text-sm"
               >
                 {[
                   { icon: CheckCircle, text: "No credit card required", color: "text-emerald-600" },

@@ -44,6 +44,8 @@ function ResumePage() {
         router.push(`/sign-in?callbackUrl=${encodeURIComponent(currentUrl)}`)
     }
 
+    const download_url = process.env.NEXT_PUBLIC_API_KEY_DOWN || '';
+
     const handleSave = async () => {
         if (isSaving || !user) {
             if (!user) redirectToAuth()
@@ -67,11 +69,11 @@ function ResumePage() {
 
     const generatePDF = async (element: HTMLElement) => {
         try {
-            const response = await fetch("/api", {
+            const response = await fetch(download_url, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    html: element.outerHTML, // send HTML for Puppeteer
+                    html: element.outerHTML, 
                 }),
             });
 
@@ -198,7 +200,6 @@ function ResumePage() {
     }
 
     const handleTemplateChange = (newTemplateId: number) => {
-        // Always update the store's templateId, regardless of whether it's local or saved data
         setTemplateId(newTemplateId.toString())
         
         const currentUrl = new URL(window.location.href)
@@ -416,7 +417,7 @@ function ResumePage() {
                     </button>
 
                     {showTemplateSelector && (
-                        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center lg:hidden p-4">
+                        <div className="fixed inset-0 z-50 flex items-center justify-center lg:hidden p-4">
                             <div className="bg-white w-full max-w-4xl h-[85vh] rounded-lg overflow-hidden">
                                 <TemplateSelectorPanel />
                             </div>

@@ -15,7 +15,9 @@ import {
     Sparkles,
     ChevronRight,
     Loader2,
-    X
+    X,
+    Mail,
+    Brain
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -84,7 +86,6 @@ const AIGenerationPopup: React.FC<AIGenerationPopupProps> = ({
 
     return (
         <div className="fixed inset-0 bg-white/20 backdrop-blur-md flex items-center justify-center z-[9999] p-4">
-            {/* Floating Background Elements */}
             <FloatingIcon icon={Sparkles} delay={0} />
             <FloatingIcon icon={FileText} delay={1} />
             <FloatingIcon icon={Wand2} delay={2} />
@@ -93,11 +94,10 @@ const AIGenerationPopup: React.FC<AIGenerationPopupProps> = ({
                 initial={{ opacity: 0, scale: 0.95, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                className="bg-white rounded-lg shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col"
+                className="bg-white/90 backdrop-blur-sm rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col border border-white/50"
                 onClick={(e: React.MouseEvent) => e.stopPropagation()}
             >
-                {/* Header - Fixed */}
-                <div className="flex justify-between items-center p-6 border-b border-gray-200 flex-shrink-0">
+                <div className="flex justify-between items-center p-6 border-b border-gray-200/50 flex-shrink-0">
                     <div className="flex items-center">
                         <motion.div
                             className="p-2 bg-blue-100 rounded-full mr-3"
@@ -110,17 +110,15 @@ const AIGenerationPopup: React.FC<AIGenerationPopupProps> = ({
                     </div>
                     <button
                         onClick={onClose}
-                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                        className="p-2 hover:bg-gray-100 rounded-sm transition-colors"
                     >
                         <X className="w-5 h-5 text-gray-500" />
                     </button>
                 </div>
 
-                {/* Content - Scrollable Area */}
-                <div className="flex-1 overflow-y-auto p-6 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-                    <div className="space-y-6 pb-4">
-                        {/* Job Details */}
-                        <div className="bg-blue-50 rounded-lg p-4 border border-blue-100">
+                <div className="flex-1 overflow-y-auto p-6">
+                    <div className="space-y-6">
+                        <div className="bg-blue-50 rounded-sm p-4 border border-blue-100">
                             <h4 className="font-medium text-gray-900 mb-2">Job Details</h4>
                             <div className="text-sm text-gray-700">
                                 <p><span className="font-medium">Position:</span> {jobTitle}</p>
@@ -128,14 +126,13 @@ const AIGenerationPopup: React.FC<AIGenerationPopupProps> = ({
                             </div>
                         </div>
 
-                        {/* Resume Upload */}
                         <div>
                             <label className="block text-sm font-semibold text-gray-800 mb-2">
                                 Upload Resume (PDF) *
                             </label>
                             <div
                                 onClick={() => fileInputRef.current?.click()}
-                                className="border-2 border-dashed border-blue-300 rounded-lg p-6 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-all"
+                                className="border-2 border-dashed border-blue-300 rounded-sm p-6 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-all"
                             >
                                 <Upload className="w-8 h-8 text-blue-400 mx-auto mb-2" />
                                 <p className="text-sm text-gray-600">
@@ -151,7 +148,6 @@ const AIGenerationPopup: React.FC<AIGenerationPopupProps> = ({
                             />
                         </div>
 
-                        {/* Job Description */}
                         <div>
                             <label className="block text-sm font-semibold text-gray-800 mb-2">
                                 Job Description (Optional)
@@ -159,39 +155,26 @@ const AIGenerationPopup: React.FC<AIGenerationPopupProps> = ({
                             <textarea
                                 value={jobDescription}
                                 onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setJobDescription(e.target.value)}
-                                rows={8}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none transition-all"
+                                rows={6}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none transition-all"
                                 placeholder="Paste the job description here for better AI generation..."
                             />
-                        </div>
-
-                        {/* Extra content to test scrolling */}
-                        <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                            <h4 className="font-medium text-gray-900 mb-2">Tips for Better Results</h4>
-                            <ul className="text-sm text-gray-600 space-y-1">
-                                <li>• Upload a recent PDF version of your resume</li>
-                                <li>• Include the complete job description for better matching</li>
-                                <li>• Ensure your resume highlights relevant skills</li>
-                                <li>• Review and customize the generated content</li>
-                            </ul>
                         </div>
                     </div>
                 </div>
 
-                <div className="flex justify-end space-x-3 pb-2 pr-4 flex-shrink-0">
+                <div className="flex justify-end space-x-3 p-6 border-t border-gray-200/50 flex-shrink-0">
                     <button
                         onClick={onClose}
                         disabled={isLoading}
-                        className="px-6 py-2 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-50"
+                        className="px-6 py-2 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-sm hover:bg-gray-100 transition-colors disabled:opacity-50"
                     >
                         Cancel
                     </button>
-                    <motion.button
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
+                    <button
                         onClick={handleGenerate}
                         disabled={isLoading || !resumeFile}
-                        className="px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center shadow-lg"
+                        className="px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-sm hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center shadow-lg"
                     >
                         {isLoading ? (
                             <>
@@ -204,7 +187,7 @@ const AIGenerationPopup: React.FC<AIGenerationPopupProps> = ({
                                 <span>Generate Cover Letter</span>
                             </>
                         )}
-                    </motion.button>
+                    </button>
                 </div>
             </motion.div>
         </div>
@@ -300,96 +283,76 @@ const CreateCoverLetterPage: React.FC = () => {
     const isFormValid: boolean = !!(name && email && recipient_title && recipient_company && body);
 
     return (
-        <div className="min-h-screen bg-gray-50 relative overflow-hidden">
+        <div className="min-h-screen bg-slate-50">
             <Navbar />
             
-            {/* Background Floating Icons */}
-            <div className="fixed inset-0 pointer-events-none">
-                <motion.div
-                    className="absolute top-20 left-10 opacity-5 text-blue-200"
-                    animate={{
-                        y: [-20, 20, -20],
-                        rotate: [0, 5, -5, 0]
-                    }}
-                    transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-                >
-                    <FileText className="w-16 h-16" />
-                </motion.div>
-
-                <motion.div
-                    className="absolute top-40 right-20 opacity-5 text-blue-200"
-                    animate={{
-                        y: [20, -20, 20],
-                        x: [-10, 10, -10],
-                        rotate: [0, -10, 10, 0]
-                    }}
-                    transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-                >
-                    <User className="w-12 h-12" />
-                </motion.div>
-
-                <motion.div
-                    className="absolute bottom-40 left-20 opacity-5 text-blue-200"
-                    animate={{
-                        y: [-15, 15, -15],
-                        x: [10, -10, 10],
-                        rotate: [0, 15, -15, 0]
-                    }}
-                    transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-                >
-                    <Briefcase className="w-14 h-14" />
-                </motion.div>
-
-                <motion.div
-                    className="absolute bottom-20 right-10 opacity-5 text-blue-200"
-                    animate={{
-                        y: [10, -10, 10],
-                        rotate: [0, 20, -20, 0]
-                    }}
-                    transition={{ duration: 9, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-                >
-                    <Type className="w-10 h-10" />
-                </motion.div>
+            {/* Background Elements */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute top-20 left-10 w-96 h-96 bg-gradient-to-r from-blue-400/10 to-indigo-500/10 rounded-full mix-blend-multiply filter blur-3xl animate-pulse"></div>
+                <div className="absolute top-40 right-10 w-80 h-80 bg-gradient-to-r from-purple-400/10 to-pink-500/10 rounded-full mix-blend-multiply filter blur-3xl animate-pulse delay-1000"></div>
+                <div className="absolute bottom-20 left-1/2 w-72 h-72 bg-gradient-to-r from-emerald-400/10 to-teal-500/10 rounded-full mix-blend-multiply filter blur-3xl animate-pulse delay-2000"></div>
             </div>
+            
+            {/* Floating grid pattern */}
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none"></div>
 
-            <div className="container mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-8 relative z-10">
+            <div className="relative container mx-auto px-4 py-8">
+                {/* AI Badge and Header */}
                 <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 }}
-                    className="max-w-4xl mx-auto"
+                    initial={{ y: 20, opacity: 0, scale: 0.9 }}
+                    animate={{ y: 0, opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.6, delay: 0.2 }}
+                    className="flex justify-center mb-6"
                 >
-                    {/* Header */}
-                    <div className="text-left mb-6 sm:mb-8">
-                        <div className="flex items-start mb-3 sm:mb-4">
-                            <div className="p-2 sm:p-3 bg-blue-100 rounded-full mr-2 sm:mr-3 flex-shrink-0">
-                                <FileText className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-blue-600" />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-1 sm:mb-2">
-                                    {edit ? 'Edit Cover Letter' : 'Create Professional Cover Letter'}
-                                </h1>
-                                <p className="text-sm sm:text-base lg:text-lg text-gray-600">
-                                    Build a compelling cover letter that showcases your qualifications and helps you stand out to employers.
-                                </p>
-                            </div>
+                    <div className="relative">
+                        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 blur-xl rounded-full"></div>
+                        <div className="relative inline-flex items-center bg-white/90 backdrop-blur-sm border border-white/20 shadow-lg text-slate-700 px-6 py-3 rounded-full text-sm font-medium">
+                            <div className="w-2 h-2 bg-green-500 rounded-full mr-3 animate-pulse"></div>
+                            <Mail className="h-4 w-4 mr-2 text-blue-600" />
+                            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent font-semibold">
+                                AI Cover Letter Builder
+                            </span>
                         </div>
                     </div>
+                </motion.div>
 
-                    <div className="space-y-3 sm:space-y-4">
+                <motion.div
+                    initial={{ y: 30, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ duration: 0.8, delay: 0.3 }}
+                    className="text-center mb-8"
+                >
+                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 mb-4 leading-tight">
+                        Create Your
+                        <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 mt-2">
+                            Perfect Cover Letter
+                        </span>
+                        <span className="block text-slate-700 text-2xl md:text-3xl lg:text-4xl font-medium mt-4">
+                            Land Your Dream Job
+                        </span>
+                    </h1>
+                </motion.div>
+
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 }}
+                    className="max-w-4xl mx-auto"
+                >
+                    <div className="space-y-6">
                         {/* Personal Information Section */}
                         <motion.section
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
-                            transition={{ delay: 0.2 }}
-                            className="bg-white p-3 sm:p-4 lg:p-6 rounded-xl border border-gray-200"
+                            transition={{ delay: 0.6 }}
+                            className="bg-white/90 backdrop-blur-sm p-6 rounded-xl border border-white/50 shadow-lg"
                         >
-                            <div className="flex items-center mb-4 sm:mb-6">
-                                <User className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-blue-600 mr-2 sm:mr-3" />
-                                <h2 className="text-base sm:text-lg lg:text-xl font-semibold text-gray-900">Personal Information</h2>
+                            <div className="flex items-center mb-6">
+                                <User className="w-6 h-6 text-blue-600 mr-3" />
+                                <h2 className="text-xl font-semibold text-gray-900">Personal Information</h2>
                             </div>
 
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                     <label htmlFor="name" className="block text-sm font-semibold text-gray-800 mb-2">
                                         Full Name *
@@ -399,7 +362,7 @@ const CreateCoverLetterPage: React.FC = () => {
                                         type="text"
                                         value={name}
                                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('name', e.target.value)}
-                                        className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                                         placeholder="Your full name"
                                         required
                                     />
@@ -413,7 +376,7 @@ const CreateCoverLetterPage: React.FC = () => {
                                         type="email"
                                         value={email}
                                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('email', e.target.value)}
-                                        className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                                         placeholder="your.email@example.com"
                                         required
                                     />
@@ -427,7 +390,7 @@ const CreateCoverLetterPage: React.FC = () => {
                                         type="tel"
                                         value={phone || ''}
                                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('phone', e.target.value)}
-                                        className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                                         placeholder="Your phone number"
                                     />
                                 </div>
@@ -440,7 +403,7 @@ const CreateCoverLetterPage: React.FC = () => {
                                         type="text"
                                         value={address || ''}
                                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('address', e.target.value)}
-                                        className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                                         placeholder="Your address"
                                     />
                                 </div>
@@ -451,15 +414,15 @@ const CreateCoverLetterPage: React.FC = () => {
                         <motion.section
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.3 }}
-                            className="bg-white p-3 sm:p-4 lg:p-6 rounded-xl border border-gray-200"
+                            transition={{ delay: 0.7 }}
+                            className="bg-white/90 backdrop-blur-sm p-6 rounded-xl border border-white/50 shadow-lg"
                         >
-                            <div className="flex items-center mb-4 sm:mb-6">
-                                <Briefcase className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-blue-600 mr-2 sm:mr-3" />
-                                <h2 className="text-base sm:text-lg lg:text-xl font-semibold text-gray-900">Position Details</h2>
+                            <div className="flex items-center mb-6">
+                                <Briefcase className="w-6 h-6 text-blue-600 mr-3" />
+                                <h2 className="text-xl font-semibold text-gray-900">Position Details</h2>
                             </div>
 
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                     <label htmlFor="jobTitle" className="block text-sm font-semibold text-gray-800 mb-2">
                                         Job Title *
@@ -469,7 +432,7 @@ const CreateCoverLetterPage: React.FC = () => {
                                         type="text"
                                         value={recipient_title || ''}
                                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('recipient_title', e.target.value)}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                                         placeholder="e.g., Software Engineer"
                                         required
                                     />
@@ -483,7 +446,7 @@ const CreateCoverLetterPage: React.FC = () => {
                                         type="text"
                                         value={recipient_company || ''}
                                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('recipient_company', e.target.value)}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                                         placeholder="e.g., Google Inc."
                                         required
                                     />
@@ -495,20 +458,18 @@ const CreateCoverLetterPage: React.FC = () => {
                         <motion.section
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.4 }}
-                            className="bg-white p-3 sm:p-4 lg:p-6 rounded-xl border border-gray-200"
+                            transition={{ delay: 0.8 }}
+                            className="bg-white/90 backdrop-blur-sm p-6 rounded-xl border border-white/50 shadow-lg"
                         >
                             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
                                 <div className="flex items-center">
-                                    <Type className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-blue-600 mr-2 sm:mr-3" />
-                                    <h2 className="text-base sm:text-lg lg:text-xl font-semibold text-gray-900">Cover Letter Content *</h2>
+                                    <Type className="w-6 h-6 text-blue-600 mr-3" />
+                                    <h2 className="text-xl font-semibold text-gray-900">Cover Letter Content *</h2>
                                 </div>
-                                <motion.button
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
+                                <button
                                     onClick={() => setShowAIPopup(true)}
                                     disabled={isLoadingAI}
-                                    className="flex items-center justify-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl text-sm font-medium min-w-fit"
+                                    className="flex items-center justify-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-sm hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl text-sm font-medium"
                                 >
                                     {isLoadingAI ? (
                                         <>
@@ -521,7 +482,7 @@ const CreateCoverLetterPage: React.FC = () => {
                                             <span>AI Generate</span>
                                         </>
                                     )}
-                                </motion.button>
+                                </button>
                             </div>
 
                             <SimpleRichTextEditor
@@ -536,25 +497,22 @@ const CreateCoverLetterPage: React.FC = () => {
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.5 }}
-                            className="flex justify-end pt-4 border-t border-gray-300"
+                            transition={{ delay: 0.9 }}
+                            className="flex justify-end pt-6"
                         >
-                            <motion.button
-                                whileHover={{ scale: 1.02, x: 5 }}
-                                whileTap={{ scale: 0.98 }}
+                            <button
                                 onClick={handleNext}
                                 disabled={!isFormValid}
-                                className="flex items-center space-x-2 px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold shadow-lg hover:shadow-xl transition-all"
+                                className="flex items-center space-x-2 px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-sm hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold shadow-lg hover:shadow-xl transition-all"
                             >
                                 <span>Preview Cover Letter</span>
                                 <ChevronRight className="w-5 h-5" />
-                            </motion.button>
+                            </button>
                         </motion.div>
                     </div>
                 </motion.div>
             </div>
 
-            {/* AI Generation Popup */}
             <AIGenerationPopup
                 isOpen={showAIPopup}
                 onClose={() => setShowAIPopup(false)}
@@ -570,7 +528,7 @@ const CreateCoverLetterPage: React.FC = () => {
 const CreateCoverLetterPageWrapper: React.FC = () => {
     return (
         <Suspense fallback={
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+            <div className="min-h-screen bg-slate-50 flex items-center justify-center">
                 <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-500 border-t-transparent"></div>
             </div>
         }>

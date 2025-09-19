@@ -242,13 +242,13 @@ function ProfilePage() {
                                 Profile Settings
                             </motion.h1>
                         </div>
-                        <motion.button 
+                        {/* <motion.button 
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
                             className="p-2 text-slate-500 hover:text-slate-700 hover:bg-white/40 rounded-xl transition-all shadow-sm hover:shadow-md backdrop-blur-sm"
                         >
                             <Settings className="w-5 h-5" />
-                        </motion.button>
+                        </motion.button> */}
                     </div>
                 </div>
             </div>

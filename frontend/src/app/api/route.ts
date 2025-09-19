@@ -6,7 +6,7 @@ export async function POST(req: Request) {
         const { html } = await req.json();
 
         const browser = await puppeteer.launch({
-            headless: true, // ✅ use boolean for TypeScript compatibility
+            headless: true, 
             args: ["--no-sandbox", "--disable-setuid-sandbox"],
         });
 
@@ -22,13 +22,12 @@ export async function POST(req: Request) {
     `);
 
         const pdfBuffer = await page.pdf({
-            format: "a4", // ✅ must be lowercase
+            format: "a4", 
             printBackground: true,
         });
 
         await browser.close();
 
-        // ✅ Convert Buffer → Uint8Array for NextResponse
         return new NextResponse(new Uint8Array(pdfBuffer), {
             status: 200,
             headers: {

@@ -1,5 +1,6 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useRouter } from 'next/navigation'
 import { useStepNavigation } from '@/hooks/useStepNavigation'
 import DesktopSidebar from '@/components/ui/DesktopSidebar'
 import StepIndicator from '@/components/ui/StepIndicator'
@@ -10,13 +11,21 @@ import EducationStep from './steps/EducationStep'
 import SkillsStep from './steps/SkillsStep'
 import ProjectsStep from './steps/ProjectsStep'
 import SummaryStep from './steps/SummaryStep'
-// import AdditionalInfoStep from './steps/AdditionalInfoStep'
+import TemplateSelector from '@/components/TemplateSelector'
+import { CV_TEMPLATES } from '@/constants/templates'
+import { useResumeStore } from '@/store/resumeStore'
+import { TemplatePreview } from '@/components/templates/TemplateRenderer'
+import { Palette, X, Eye } from 'lucide-react'
 
 function DesktopFrom() {
+    const router = useRouter()
     const { currentStep, setCurrentStep } = useStepNavigation()
+    const { templateId, setTemplateId } = useResumeStore()
+    const [showTemplateSelector, setShowTemplateSelector] = useState(false)
+    const [showResumePopup, setShowResumePopup] = useState(false)
 
     const nextStep = () => {
-        if (currentStep < 6) {  // Changed from 5 to 6
+        if (currentStep < 6) {
             setCurrentStep(currentStep + 1)
         }
     }
@@ -35,21 +44,20 @@ function DesktopFrom() {
             4: <SkillsStep onNext={nextStep} onPrev={prevStep} />,
             5: <ProjectsStep onNext={nextStep} onPrev={prevStep} />,
             6: <SummaryStep onNext={nextStep} onPrev={prevStep} />
-            // 7: <AdditionalInfoStep onPrev={prevStep} />
         }
-        
+
         return stepComponents[currentStep as keyof typeof stepComponents] || stepComponents[1]
     }
 
     return (
-        <motion.div 
+        <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3 }}
             className="min-h-screen bg-white"
         >
             {/* Mobile Step Indicator - shown on small/medium screens */}
-            <motion.div 
+            <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: 0.1 }}
@@ -59,7 +67,7 @@ function DesktopFrom() {
             </motion.div>
 
             {/* Left Sidebar - Hidden on mobile */}
-            <motion.div 
+            <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.4, delay: 0.2 }}
@@ -68,9 +76,7 @@ function DesktopFrom() {
                 <DesktopSidebar currentStep={currentStep} onStepChange={setCurrentStep} />
             </motion.div>
 
-            {/* Main Content - responsive layout */}
             <div className="lg:ml-16 flex flex-col lg:flex-row min-h-screen">
-                {/* Form Section */}
                 <div className="flex-1 px-2 py-1 md:px-3 md:py-2">
                     <div className="max-w-4xl mx-auto">
                         <div className="bg-white">
@@ -90,21 +96,119 @@ function DesktopFrom() {
                     </div>
                 </div>
 
-                {/* Right Preview Section - Hidden on mobile/tablet, shown on large screens */}
-                <motion.div 
+                <motion.div
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.4, delay: 0.3 }}
-                    className="hidden xl:block w-120"
+                    className="hidden xl:block w-96"
                 >
-                    <div className="sticky top-0 h-screen flex items-center justify-center">
-                        <div className="w-full pr-1 scale-[0.4]">
-                            <ResumePreview />
+                    <div className="sticky top-0 h-screen flex flex-col items-center justify-center p-4">
+                        <div className="flex flex-col items-center space-y-4">
+                            <div className="relative group scale-[0.45] cursor-pointer" onClick={() => setShowResumePopup(true)}>
+                                <ResumePreview />
+
+                                {/* Hover overlay with view icon */}
+                                <div className="absolute inset-0 bg-black/10 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                                    <div className="bg-white rounded-full p-3 shadow-lg">
+                                        <Eye className="w-6 h-6 text-gray-700" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button
+                                onClick={() => setShowTemplateSelector(true)}
+                                className="absolute bottom-14 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg flex items-center space-x-2 transition-colors shadow-lg font-medium text-xs whitespace-nowrap z-50"
+                            >
+                                <Palette className="w-3 h-3" />
+                                <span>Change Template</span>
+                            </button>
                         </div>
                     </div>
                 </motion.div>
-
             </div>
+
+            {/* Template Selector Modal */}
+            {showTemplateSelector && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+                    <div className="bg-white rounded-2xl shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-hidden">
+                        <div className="flex items-center justify-between p-6 border-b">
+                            <h2 className="text-2xl font-bold text-gray-900">Choose Template</h2>
+                            <button
+                                onClick={() => setShowTemplateSelector(false)}
+                                className="text-gray-400 hover:text-gray-600 p-1"
+                            >
+                                <X className="w-6 h-6" />
+                            </button>
+                        </div>
+
+                        <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {CV_TEMPLATES.map((template) => (
+                                    <div
+                                        key={template.id}
+                                        className={`relative cursor-pointer rounded-xl border-2 transition-all overflow-hidden bg-white shadow-sm hover:shadow-md ${templateId === template.id.toString()
+                                            ? 'border-blue-500 ring-2 ring-blue-200'
+                                            : 'border-gray-200 hover:border-blue-300'
+                                            }`}
+                                        onClick={() => {
+                                            setTemplateId(template.id.toString())
+                                            setShowTemplateSelector(false)
+                                            const currentUrl = new URL(window.location.href)
+                                            currentUrl.pathname = `/template/${template.id}`
+                                            router.push(currentUrl.toString())
+                                        }}
+                                    >
+                                        <div className="aspect-[1/1.414] overflow-hidden relative bg-gray-50 flex items-center justify-center">
+                                            <div className="transform origin-center">
+                                                <div className="">
+                                                    <TemplatePreview templateId={template.id} />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="absolute bottom-0 left-0 right-0 p-3">
+                                            <div className="text-center">
+                                                <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-1.5 px-3 rounded text-xs transition-colors font-medium">
+                                                    {templateId === template.id.toString() ? 'Selected' : 'Use This Template'}
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        {/* Selected Indicator */}
+                                        {templateId === template.id.toString() && (
+                                            <div className="absolute top-2 right-2 bg-blue-500 text-white rounded-full p-1">
+                                                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                                </svg>
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Resume Preview Popup */}
+            {showResumePopup && (
+                <div className="fixed inset-0 z-50" style={{ backgroundColor: 'rgba(0, 0, 0, 0.2)' }}>
+                    {/* Close button */}
+                    <button
+                        onClick={() => setShowResumePopup(false)}
+                        className="absolute top-4 right-6 z-10 bg-white rounded-full p-2 shadow-lg hover:shadow-xl transition-shadow"
+                    >
+                        <X className="w-5 h-5 text-gray-600" />
+                    </button>
+
+                    {/* Full Resume Preview */}
+                    <div className="w-full h-full overflow-y-auto py-5" style={{ display: 'block' }}>
+                        <div className="mx-auto" style={{ width: 'fit-content' }}>
+                            <ResumePreview />
+                        </div>
+                    </div>
+                </div>
+            )}
         </motion.div>
     )
 }

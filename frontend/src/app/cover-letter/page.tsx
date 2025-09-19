@@ -268,7 +268,7 @@ const CoverLetterPage: React.FC = () => {
                         </div>
 
                         <Link
-                            href="/createcover-letter"
+                            href="/cover-letter/create"
                             className="group flex items-center justify-center space-x-2 px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 font-medium text-sm"
                         >
                             <Plus className="w-3 h-3 sm:w-4 sm:h-4 group-hover:rotate-90 transition-transform duration-300" />
@@ -338,7 +338,7 @@ const CoverLetterPage: React.FC = () => {
                         </p>
                         <div className="flex flex-col sm:flex-row gap-3 items-center justify-center">
                             <Link
-                                href="/createcover-letter"
+                                href="/cover-letter/create"
                                 className="group inline-flex items-center px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 text-sm sm:text-base"
                             >
                                 <Plus className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 group-hover:rotate-90 transition-transform duration-300" />
