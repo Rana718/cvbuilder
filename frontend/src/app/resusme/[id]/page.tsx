@@ -6,13 +6,13 @@ import { useAuth } from '@/components/AuthContext'
 import { useResumeStore } from '@/store/resumeStore'
 import { usePremiumStatus } from '@/hooks/usePremiumStatus'
 import ResumePreview from '@/components/ui/ResumePreview'
-import PaymentCard from '@/components/PaymentCard'
 import { ArrowLeft, Download, Save, Edit, Share, CheckCircle, Search, Grid3X3, X } from 'lucide-react'
 import Link from 'next/link'
 import axiosInstance from '@/lib/axios'
 import { CV_TEMPLATES, TEMPLATE_CATEGORIES } from '@/constants/templates'
 import TemplateRenderer from '@/components/templates/TemplateRenderer'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
+import Navbar from '@/components/Navbar'
 
 function ResumePage() {
     const params = useParams()
@@ -39,12 +39,17 @@ function ResumePage() {
     const [searchTerm, setSearchTerm] = useState("")
     const [selectedCategory, setSelectedCategory] = useState("All")
 
-    const redirectToAuth = () => {
+    const redirectToPayment = () => {
         const currentUrl = window.location.pathname + window.location.search
-        router.push(`/sign-in?callbackUrl=${encodeURIComponent(currentUrl)}`)
+        router.push(`/payment?redirect=${encodeURIComponent(currentUrl)}`)
     }
 
     const download_url = process.env.NEXT_PUBLIC_API_KEY_DOWN || '';
+
+    const redirectToAuth = () => {
+        const currentUrl = window.location.pathname + window.location.search
+        router.push(`/auth?redirect=${encodeURIComponent(currentUrl)}`)
+    }
 
     const handleSave = async () => {
         if (isSaving || !user) {
@@ -73,7 +78,7 @@ function ResumePage() {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    html: element.outerHTML, 
+                    html: element.outerHTML,
                 }),
             });
 
@@ -108,10 +113,10 @@ function ResumePage() {
 
         console.log("Token claims:", tokenResult.claims)
         await refreshStatus()
-        
+
         if (!isPremium) {
-            setShowPaymentCard(true)
             await saveResume()
+            redirectToPayment()
             return
         }
 
@@ -152,7 +157,7 @@ function ResumePage() {
             return
         }
 
-        if(!isPremium){
+        if (!isPremium) {
             alert('Sharing is a premium feature. Please upgrade to share your resume.')
             return
         }
@@ -193,15 +198,9 @@ function ResumePage() {
         }
     }
 
-    const handlePaymentSuccess = async () => {
-        await refreshStatus()
-        setShowPaymentCard(false)
-        setTimeout(() => handleDownload(), 1000)
-    }
-
     const handleTemplateChange = (newTemplateId: number) => {
         setTemplateId(newTemplateId.toString())
-        
+
         const currentUrl = new URL(window.location.href)
         currentUrl.searchParams.set('template', newTemplateId.toString())
         router.push(currentUrl.toString())
@@ -225,7 +224,7 @@ function ResumePage() {
         }
 
         const resumeIdNum = Number(resumeId)
-        
+
         if (templateId) {
             setTemplateId(templateId)
         }
@@ -234,7 +233,7 @@ function ResumePage() {
             setDocumentId(resumeIdNum)
         } else {
             setDocumentId(resumeIdNum)
-            
+
             if (!hasData() && !hasLoadedOnce) {
                 setHasLoadedOnce(true)
                 loadResume(resumeIdNum).catch(err => {
@@ -247,10 +246,13 @@ function ResumePage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 via-gray-50 to-blue-50">
+            <div className="min-h-screen bg-slate-50 flex items-center justify-center">
                 <div className="text-center">
-                    <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                    <p className="text-sm sm:text-base text-gray-700 font-medium">Loading...</p>
+                    <div className="relative">
+                        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 blur-xl rounded-full"></div>
+                        <div className="relative animate-spin rounded-full h-12 w-12 border-2 border-blue-500 border-t-transparent mx-auto mb-4"></div>
+                    </div>
+                    <p className="text-slate-700 font-medium">Loading your resume...</p>
                 </div>
             </div>
         )
@@ -259,37 +261,37 @@ function ResumePage() {
     if (!loading && !user) return null
 
     const TemplateSelectorPanel = () => (
-        <div className="bg-white shadow-lg rounded-lg h-full overflow-hidden flex flex-col">
-            <div className="p-2 border-b">
-                <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-base font-semibold text-gray-900">Templates</h3>
+        <div className="bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl h-full overflow-hidden flex flex-col border border-white/20">
+            <div className="p-4 border-b border-gray-200/50">
+                <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Templates</h3>
                     <button
                         onClick={() => setShowTemplateSelector(false)}
-                        className="lg:hidden p-1 hover:bg-gray-100 rounded"
+                        className="lg:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
                     >
-                        <X className="w-5 h-5" />
+                        <X className="w-5 h-5 text-gray-500" />
                     </button>
                 </div>
 
                 {/* Search Bar */}
-                <div className="relative mb-2">
-                    <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <div className="relative mb-3">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                     <input
                         type="text"
-                        placeholder="Search..."
+                        placeholder="Search templates..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                        className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl bg-gray-50/50 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/50 focus:bg-white text-sm transition-all duration-200"
                     />
                 </div>
 
                 {/* Category Filter */}
-                <div className="flex flex-wrap gap-1">
+                <div className="flex flex-wrap gap-2">
                     <button
                         onClick={() => setSelectedCategory("All")}
-                        className={`px-2 py-1 rounded-md text-xs font-medium transition-colors ${"All" === selectedCategory
-                            ? "bg-blue-600 text-white"
-                            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        className={`px-3 py-2 rounded-lg text-xs font-medium transition-all duration-200 ${"All" === selectedCategory
+                            ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md"
+                            : "bg-gray-100/80 text-gray-700 hover:bg-gray-200/80 hover:shadow-sm"
                             }`}
                     >
                         All
@@ -298,9 +300,9 @@ function ResumePage() {
                         <button
                             key={category}
                             onClick={() => setSelectedCategory(category)}
-                            className={`px-2 py-1 rounded-md text-xs font-medium transition-colors ${selectedCategory === category
-                                ? "bg-blue-600 text-white"
-                                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                            className={`px-3 py-2 rounded-lg text-xs font-medium transition-all duration-200 ${selectedCategory === category
+                                ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md"
+                                : "bg-gray-100/80 text-gray-700 hover:bg-gray-200/80 hover:shadow-sm"
                                 }`}
                         >
                             {category}
@@ -310,8 +312,8 @@ function ResumePage() {
             </div>
 
             {/* Templates Grid */}
-            <div className="flex-1 overflow-y-auto p-2">
-                <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
+            <div className="flex-1 overflow-y-auto p-3">
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
                     {filteredTemplates.map((template, i) => (
                         <motion.div
                             key={template.id}
@@ -321,9 +323,11 @@ function ResumePage() {
                             className="cursor-pointer"
                             onClick={() => handleTemplateChange(template.id)}
                         >
-                            <div className={`relative  overflow-hidden transition-all duration-200 
-                            
-                            `}>
+                            <div className={`relative overflow-hidden transition-all duration-200 bg-white rounded-xl border-2 hover:shadow-lg ${
+                                template.id === Number(templateId) 
+                                    ? 'border-blue-500 shadow-lg ring-2 ring-blue-500/20' 
+                                    : 'border-gray-200 hover:border-gray-300'
+                            }`}>
                                 {/* Template Preview */}
                                 <div className="w-full bg-white overflow-hidden flex justify-center" style={{ height: '320px' }}>
                                     <div className="w-[794px] h-[1200px] transform scale-[0.3] origin-top bg-white border border-gray-500">
@@ -364,12 +368,13 @@ function ResumePage() {
                                     </div>
                                 </div>
 
-                                <div className="mt-2 text-center">
-                                    <h4 className="text-sm font-semibold text-gray-900">{template.name}</h4>
+                                <div className="p-3 text-center border-t border-gray-100">
+                                    <h4 className="text-sm font-semibold text-slate-800">{template.name}</h4>
+                                    <p className="text-xs text-gray-500 mt-1">{template.category}</p>
                                 </div>
                                 {/* Selected Indicator */}
                                 {template.id === Number(templateId) && (
-                                    <div className="absolute top-2 left-2 bg-blue-500 text-white rounded-full p-1 z-10 shadow-md">
+                                    <div className="absolute top-3 right-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-full p-1.5 z-10 shadow-lg">
                                         <CheckCircle className="w-4 h-4" />
                                     </div>
                                 )}
@@ -382,76 +387,94 @@ function ResumePage() {
     )
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-100 via-gray-50 to-blue-50 overflow-x-hidden">
-            {/* Simplified Header */}
-            <div className="bg-white shadow-sm print:hidden sticky top-0 z-20 border-b">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex items-center justify-self-start h-16">
-                        <div className="flex items-center space-x-4">
-                            <Link
-                                href="/resusme"
-                                className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors"
-                            >
-                                <ArrowLeft className="w-5 h-5" />
-                                <span className="font-medium">Back</span>
-                            </Link>
-                        </div>
-
-                        <div className="w-32"></div> {/* Spacer for balance */}
-                    </div>
-                </div>
+        <div className="min-h-screen bg-slate-50 overflow-x-hidden">
+            {/* Background Elements */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute top-20 left-10 w-96 h-96 bg-gradient-to-r from-blue-400/10 to-indigo-500/10 rounded-full mix-blend-multiply filter blur-3xl animate-pulse"></div>
+                <div className="absolute top-40 right-10 w-80 h-80 bg-gradient-to-r from-purple-400/10 to-pink-500/10 rounded-full mix-blend-multiply filter blur-3xl animate-pulse delay-1000"></div>
+                <div className="absolute bottom-20 left-1/2 w-72 h-72 bg-gradient-to-r from-emerald-400/10 to-teal-500/10 rounded-full mix-blend-multiply filter blur-3xl animate-pulse delay-2000"></div>
             </div>
 
-            <div className="flex flex-col lg:flex-row min-h-[calc(100vh-4rem)]">
+            {/* Floating grid pattern */}
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none"></div>
+
+            <Navbar />
+
+            <div className="relative flex flex-col lg:flex-row min-h-[calc(100vh-4rem)]">
                 <div className="hidden lg:block w-[450px] xl:w-[500px] 2xl:w-[550px] p-4">
                     <TemplateSelectorPanel />
                 </div>
 
-                <div className="lg:hidden p-3">
-                    <button
+                <div className="lg:hidden p-4">
+                    <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
                         onClick={() => setShowTemplateSelector(!showTemplateSelector)}
-                        className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg font-medium transition-colors flex items-center justify-center space-x-2"
+                        className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-4 py-3 rounded-xl font-medium transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl"
                     >
                         <Grid3X3 className="w-5 h-5" />
                         <span>Change Template</span>
-                    </button>
+                    </motion.button>
 
-                    {showTemplateSelector && (
-                        <div className="fixed inset-0 z-50 flex items-center justify-center lg:hidden p-4">
-                            <div className="bg-white w-full max-w-4xl h-[85vh] rounded-lg overflow-hidden">
-                                <TemplateSelectorPanel />
-                            </div>
-                        </div>
-                    )}
+                    <AnimatePresence>
+                        {showTemplateSelector && (
+                            <motion.div 
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                className="fixed inset-0 z-50 flex items-center justify-center lg:hidden p-4 bg-black/50 backdrop-blur-sm"
+                                onClick={(e) => {
+                                    if (e.target === e.currentTarget) {
+                                        setShowTemplateSelector(false)
+                                    }
+                                }}
+                            >
+                                <motion.div 
+                                    initial={{ scale: 0.9, opacity: 0 }}
+                                    animate={{ scale: 1, opacity: 1 }}
+                                    exit={{ scale: 0.9, opacity: 0 }}
+                                    className="bg-white w-full max-w-4xl h-[85vh] rounded-2xl overflow-hidden shadow-2xl"
+                                >
+                                    <TemplateSelectorPanel />
+                                </motion.div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                 </div>
 
                 {/* Resume Content Area */}
                 <div className="flex-1 lg:pr-4 lg:py-4">
-                    <div className="print:hidden py-3 lg:py-4">
-                        <div className="max-w-4xl mx-auto px-3">
+                    <div className="print:hidden py-4 lg:py-6">
+                        <div className="max-w-6xl mx-auto px-4">
                             {/* Desktop Layout */}
-                            <div className="hidden sm:flex justify-center items-center space-x-4">
-                                <Link
-                                    href={`/template/${templateId}?resumeId=${resumeId}`}
-                                    className="text-gray-700 hover:text-blue-600 font-medium transition-colors flex items-center space-x-2"
-                                >
-                                    <Edit className="w-4 h-4" />
-                                    <span>Edit Resume</span>
-                                </Link>
+                            <div className="hidden sm:flex justify-center items-center space-x-3">
+                                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                                    <Link
+                                        href={`/template/${templateId}?resumeId=${resumeId}`}
+                                        className="inline-flex items-center space-x-2 px-4 py-2.5 bg-white hover:bg-gray-50 text-gray-700 hover:text-blue-600 font-medium transition-all duration-200 rounded-xl border border-gray-200 hover:border-blue-200 shadow-sm hover:shadow-md"
+                                    >
+                                        <Edit className="w-4 h-4" />
+                                        <span>Edit</span>
+                                    </Link>
+                                </motion.div>
 
-                                <button
+                                <motion.button
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
                                     onClick={handleSave}
                                     disabled={isSaving}
-                                    className="text-green-700 hover:text-green-800 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                                    className="inline-flex items-center space-x-2 px-4 py-2.5 bg-green-50 hover:bg-green-100 text-green-700 hover:text-green-800 font-medium transition-all duration-200 rounded-xl border border-green-200 hover:border-green-300 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     <Save className="w-4 h-4" />
-                                    <span>{isSaving ? 'Saving...' : 'Save Resume'}</span>
-                                </button>
+                                    <span>{isSaving ? 'Saving...' : 'Save'}</span>
+                                </motion.button>
 
-                                <button
+                                <motion.button
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
                                     onClick={handleShare}
                                     disabled={isSharing}
-                                    className="text-purple-700 hover:text-purple-800 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                                    className="inline-flex items-center space-x-2 px-4 py-2.5 bg-purple-50 hover:bg-purple-100 text-purple-700 hover:text-purple-800 font-medium transition-all duration-200 rounded-xl border border-purple-200 hover:border-purple-300 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     {showShareSuccess ? (
                                         <CheckCircle className="w-4 h-4 text-green-600" />
@@ -459,30 +482,32 @@ function ResumePage() {
                                         <Share className="w-4 h-4" />
                                     )}
                                     <span>
-                                        {isSharing ? 'Sharing...' : showShareSuccess ? 'Link Copied!' : 'Share Resume'}
+                                        {isSharing ? 'Sharing...' : showShareSuccess ? 'Link Copied!' : 'Share'}
                                     </span>
-                                </button>
+                                </motion.button>
 
-                                <button
+                                <motion.button
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
                                     onClick={handleDownload}
                                     disabled={isDownloading}
-                                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 shadow-md"
+                                    className="inline-flex items-center space-x-2 px-6 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-medium transition-all duration-200 rounded-xl shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
                                     title={(!user || !isPremium) ? 'Premium feature - Upgrade to download' : ''}
                                 >
                                     <Download className="w-4 h-4" />
                                     <span>
-                                        {isDownloading ? 'Downloading...' : (!user || !isPremium) ? 'Upgrade to Download' : 'Download PDF'}
+                                        {isDownloading ? 'Downloading...' : (!user || !isPremium) ? 'Upgrade to Download' : 'Download'}
                                     </span>
-                                </button>
+                                </motion.button>
                             </div>
 
                             {/* Mobile Layout */}
-                            <div className="sm:hidden space-y-2">
+                            <div className="sm:hidden space-y-3">
                                 {/* Row 1 */}
-                                <div className="flex space-x-2">
+                                <div className="flex space-x-3">
                                     <Link
                                         href={`/template/${templateId}?resumeId=${resumeId}`}
-                                        className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2.5 rounded-lg font-medium transition-colors flex items-center justify-center space-x-2 text-sm"
+                                        className="flex-1 bg-white hover:bg-gray-50 text-gray-700 hover:text-blue-600 px-4 py-3 rounded-xl font-medium transition-all duration-200 flex items-center justify-center space-x-2 text-sm border border-gray-200 hover:border-blue-200 shadow-sm hover:shadow-md"
                                     >
                                         <Edit className="w-4 h-4" />
                                         <span>Edit</span>
@@ -491,7 +516,7 @@ function ResumePage() {
                                     <button
                                         onClick={handleSave}
                                         disabled={isSaving}
-                                        className="flex-1 bg-green-100 hover:bg-green-200 text-green-700 px-3 py-2.5 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 text-sm"
+                                        className="flex-1 bg-green-50 hover:bg-green-100 text-green-700 px-4 py-3 rounded-xl font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 text-sm border border-green-200 shadow-sm hover:shadow-md"
                                     >
                                         <Save className="w-4 h-4" />
                                         <span>{isSaving ? 'Saving...' : 'Save'}</span>
@@ -499,11 +524,11 @@ function ResumePage() {
                                 </div>
 
                                 {/* Row 2 */}
-                                <div className="flex space-x-2">
+                                <div className="flex space-x-3">
                                     <button
                                         onClick={handleShare}
                                         disabled={isSharing}
-                                        className="flex-1 bg-purple-100 hover:bg-purple-200 text-purple-700 px-3 py-2.5 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 text-sm"
+                                        className="flex-1 bg-purple-50 hover:bg-purple-100 text-purple-700 px-4 py-3 rounded-xl font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 text-sm border border-purple-200 shadow-sm hover:shadow-md"
                                     >
                                         {showShareSuccess ? (
                                             <CheckCircle className="w-4 h-4 text-green-600" />
@@ -518,7 +543,7 @@ function ResumePage() {
                                     <button
                                         onClick={handleDownload}
                                         disabled={isDownloading}
-                                        className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2.5 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 shadow-md text-sm"
+                                        className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-4 py-3 rounded-xl font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 shadow-lg text-sm"
                                     >
                                         <Download className="w-4 h-4" />
                                         <span>
@@ -542,7 +567,7 @@ function ResumePage() {
                             {/* Tablet view - A4 ratio ONLY */}
                             <div className="hidden sm:block md:hidden w-full">
                                 <div
-                                    className="mx-auto bg-white shadow-xl rounded-lg overflow-hidden border aspect-[210/297] w-full max-w-[600px]"
+                                    className="mx-auto bg-white shadow-2xl rounded-2xl overflow-hidden border border-gray-200/50 aspect-[210/297] w-full max-w-[600px]"
                                     data-resume-content
                                 >
                                     <ResumePreview />
@@ -552,7 +577,7 @@ function ResumePage() {
                             {/* Desktop view - A4 ratio ONLY */}
                             <div className="hidden md:block max-w-4xl mx-auto">
                                 <div
-                                    className="mx-auto bg-white shadow-xl rounded-lg overflow-hidden border aspect-[210/297] w-full max-w-[794px]"
+                                    className="mx-auto bg-white shadow-2xl rounded-2xl overflow-hidden border border-gray-200/50 aspect-[210/297] w-full max-w-[794px]"
                                     data-resume-content
                                 >
                                     <ResumePreview />
@@ -564,12 +589,6 @@ function ResumePage() {
             </div>
 
             {/* Payment Card Modal */}
-            <PaymentCard
-                isOpen={showPaymentCard}
-                onClose={() => setShowPaymentCard(false)}
-                onSuccess={handlePaymentSuccess}
-                redirectAfterLogin={true}
-            />
         </div>
     )
 }
@@ -577,8 +596,14 @@ function ResumePage() {
 const ResumePageWrapper = () => {
     return (
         <Suspense fallback={
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-500 border-t-transparent"></div>
+            <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+                <div className="text-center">
+                    <div className="relative">
+                        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 blur-xl rounded-full"></div>
+                        <div className="relative animate-spin rounded-full h-12 w-12 border-2 border-blue-500 border-t-transparent mx-auto mb-4"></div>
+                    </div>
+                    <p className="text-slate-700 font-medium">Loading resume editor...</p>
+                </div>
             </div>
         }>
             <ResumePage />

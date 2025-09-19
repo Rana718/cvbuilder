@@ -492,7 +492,7 @@ function Dashboard() {
                                     </button>
 
                                     <button
-                                        onClick={() => router.push('/rateing')}
+                                        onClick={() => router.push('/resusme/rateing')}
                                         className="w-full flex items-center gap-4 p-4 text-left hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 rounded-xl transition-all duration-200 group border border-transparent hover:border-purple-200"
                                     >
                                         <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 group-hover:from-purple-600 group-hover:to-pink-600 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-200">

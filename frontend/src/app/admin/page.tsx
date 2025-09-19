@@ -53,12 +53,14 @@ export default function AdminDashboard() {
     const { data, loading, error, refetch } = useDashboardData();
 
     const formatCurrency = (amount: number) => {
+        // Convert paise to rupees by dividing by 100
+        const rupees = amount / 100;
         return new Intl.NumberFormat('en-IN', {
             style: 'currency',
             currency: 'INR',
             minimumFractionDigits: 0,
             maximumFractionDigits: 0,
-        }).format(amount);
+        }).format(rupees);
     };
 
     const formatDate = (dateString: string) => {

@@ -5,7 +5,6 @@ import { useParams, useSearchParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/components/AuthContext';
 import { useCoverLetterStore } from '@/store/coverLetterStore';
 import { usePremiumStatus } from '@/hooks/usePremiumStatus';
-import PaymentCard from '@/components/PaymentCard';
 import CoverLetterTemplate from '@/components/templates/CoverLetterTemplate';
 import { ArrowLeft, Download, Save, Edit, Share, CheckCircle, Mail, Brain } from 'lucide-react';
 import Link from 'next/link';
@@ -32,11 +31,15 @@ function CoverLetterPage() {
     const [shareUrl, setShareUrl] = useState('');
     const [showShareSuccess, setShowShareSuccess] = useState(false);
     const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
-    const [showPaymentCard, setShowPaymentCard] = useState(false);
 
     const redirectToAuth = () => {
         const currentUrl = window.location.pathname + window.location.search;
         router.push(`/sign-in?callbackUrl=${encodeURIComponent(currentUrl)}`);
+    };
+
+    const redirectToPayment = () => {
+        const currentUrl = window.location.pathname + window.location.search;
+        router.push(`/payment?redirect=${encodeURIComponent(currentUrl)}`);
     };
 
     const download_url = process.env.NEXT_PUBLIC_API_KEY_DOWN || '';
@@ -101,8 +104,8 @@ function CoverLetterPage() {
         await refreshStatus();
 
         if (!isPremium) {
-            setShowPaymentCard(true);
             await saveCoverLetter();
+            redirectToPayment();
             return;
         }
 
@@ -131,8 +134,8 @@ function CoverLetterPage() {
         }
 
         if (!isPremium) {
-            alert('Sharing is a premium feature. Please upgrade to share your cover letter.')
-            return
+            redirectToPayment();
+            return;
         }
 
         if (shareableUuid && shareUrl) {
@@ -169,12 +172,6 @@ function CoverLetterPage() {
         } finally {
             setIsSharing(false);
         }
-    };
-
-    const handlePaymentSuccess = async () => {
-        await refreshStatus();
-        setShowPaymentCard(false);
-        setTimeout(() => handleDownload(), 1000);
     };
 
     const copyShareUrl = async () => {
@@ -418,13 +415,6 @@ function CoverLetterPage() {
                     </div>
                 </motion.div>
             </div>
-
-            <PaymentCard
-                isOpen={showPaymentCard}
-                onClose={() => setShowPaymentCard(false)}
-                onSuccess={handlePaymentSuccess}
-                redirectAfterLogin={true}
-            />
         </div>
     );
 }

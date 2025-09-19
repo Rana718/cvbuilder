@@ -24,7 +24,7 @@ function Footer() {
     const quickLinks = [
         { href: "/template", label: "Resume Templates", icon: FileText },
         { href: "/createcover-letter", label: "Cover Letters", icon: Mail },
-        { href: "/rateing", label: "Resume Analysis", icon: Star },
+        { href: "/resusme/rateing", label: "Resume Analysis", icon: Star },
         { href: "/resusme", label: "My Resumes", icon: Users }
     ];
 

@@ -46,14 +46,16 @@ export default function PaymentPage() {
     }
   }, [searchParams]);
 
-  useEffect(() => {
-    if (!loading && !user) {
-      router.push('/sign-in?callbackUrl=' + encodeURIComponent(window.location.pathname + window.location.search));
-    }
-  }, [user, loading, router]);
+  // useEffect(() => {
+  //   if (!loading && !user) {
+  //     router.push('/sign-in?callbackUrl=' + encodeURIComponent(window.location.pathname + window.location.search));
+  //   }
+  // }, [user, loading, router]);
 
   const handlePayment = async () => {
-    if (!user) return;
+    if (!user) {
+      router.push('/sign-in?callbackUrl=' + encodeURIComponent(window.location.pathname + window.location.search));
+    }
 
     setIsLoading(true);
     setPaymentStatus('processing');
@@ -131,7 +133,6 @@ export default function PaymentPage() {
         }
       };
 
-      // Poll every 2 seconds for up to 30 seconds
       let attempts = 0;
       const maxAttempts = 15;
 
@@ -415,7 +416,7 @@ export default function PaymentPage() {
         </motion.div>
       </div>
 
-      <Footer/>
+      <Footer />
     </div>
   );
 }

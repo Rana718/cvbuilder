@@ -158,11 +158,9 @@ function DesktopFrom() {
                                             router.push(currentUrl.toString())
                                         }}
                                     >
-                                        <div className="aspect-[1/1.414] overflow-hidden relative bg-gray-50 flex items-center justify-center">
-                                            <div className="transform origin-center">
-                                                <div className="">
-                                                    <TemplatePreview templateId={template.id} />
-                                                </div>
+                                        <div className="aspect-[1/1.414] overflow-hidden relative bg-white flex items-center justify-center p-1">
+                                            <div className="w-full h-full origin-center">
+                                                <TemplatePreview templateId={template.id} size="small" />
                                             </div>
                                         </div>
 

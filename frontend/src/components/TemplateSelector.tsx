@@ -67,7 +67,7 @@ export default function TemplateSelector({ templateId, children }: TemplateSelec
             >
               Create New
             </AlertDialogAction>
-            <AlertDialogAction onClick={handleUseSaved}>
+            <AlertDialogAction onClick={handleUseSaved} className='bg-blue-600 text-white hover:bg-blue-700'>
               Use Saved Data
             </AlertDialogAction>
           </AlertDialogFooter>

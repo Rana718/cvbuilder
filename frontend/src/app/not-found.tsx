@@ -67,7 +67,7 @@ function Page() {
         { href: '/', label: 'Home', icon: Home, color: 'bg-blue-500' },
         { href: '/template', label: 'Resume Templates', icon: FileText, color: 'bg-blue-600' },
         { href: '/createcover-letter', label: 'Cover Letters', icon: Mail, color: 'bg-blue-400' },
-        { href: '/rateing', label: 'Resume Analysis', icon: Star, color: 'bg-blue-700' },
+        { href: '/resusme/rateing', label: 'Resume Analysis', icon: Star, color: 'bg-blue-700' },
         { href: '/resusme', label: 'My Resumes', icon: Users, color: 'bg-blue-500' },
     ];
 
