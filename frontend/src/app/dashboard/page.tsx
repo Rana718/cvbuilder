@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, memo, useMemo, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { FileText, Mail, Plus, Crown, User, CreditCard, Sparkles, Trash2, Edit, Star, Target, ChevronRight, Loader2 } from 'lucide-react'
@@ -9,7 +9,6 @@ import axiosInstance from '@/lib/axios'
 import Navbar from '@/components/Navbar'
 import PaymentHistory from '@/components/PaymentHistory'
 
-// Interfaces
 interface DashboardStats {
     totalResumes: number
     totalCoverLetters: number
@@ -34,21 +33,13 @@ interface SubscriptionStatus {
     plan?: string;
 }
 
-interface PremiumStatus {
-    isPremium: boolean;
-    loading: boolean;
-    subscriptionStatus?: SubscriptionStatus;
-    refreshStatus: () => Promise<void>;
-}
-
-// Premium Status Hook
-const usePremiumStatus = (): PremiumStatus => {
+const usePremiumStatus = () => {
     const { user } = useAuth();
     const [isPremium, setIsPremium] = useState(false);
     const [loading, setLoading] = useState(true);
     const [subscriptionStatus, setSubscriptionStatus] = useState<SubscriptionStatus>();
 
-    const checkPremiumStatus = async () => {
+    const checkPremiumStatus = useCallback(async () => {
         if (!user) {
             setIsPremium(false);
             setSubscriptionStatus(undefined);
@@ -61,7 +52,7 @@ const usePremiumStatus = (): PremiumStatus => {
             const data: SubscriptionStatus = response.data;
             setSubscriptionStatus(data);
             setIsPremium(data.is_premium);
-        } catch (error: any) {
+        } catch (error) {
             console.error('Failed to check premium status:', error);
             try {
                 const tokenResult = await user.getIdTokenResult(true);
@@ -74,24 +65,133 @@ const usePremiumStatus = (): PremiumStatus => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [user]);
 
-    const refreshStatus = async () => {
+    const refreshStatus = useCallback(async () => {
         setLoading(true);
         await checkPremiumStatus();
-    };
+    }, [checkPremiumStatus]);
 
     useEffect(() => {
         checkPremiumStatus();
-    }, [user]);
+    }, [checkPremiumStatus]);
 
-    return {
-        isPremium,
-        loading,
-        subscriptionStatus,
-        refreshStatus
-    };
+    return { isPremium, loading, subscriptionStatus, refreshStatus };
 };
+
+const LoadingSpinner = memo(() => (
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="text-center">
+            <div className="relative w-16 h-16 mx-auto mb-6">
+                <div className="absolute inset-0 border-3 border-slate-200 rounded-full"></div>
+                <div className="absolute inset-0 border-3 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+            <h3 className="text-lg font-medium text-slate-700 mb-2">Loading Dashboard</h3>
+            <p className="text-sm text-slate-500">Preparing your workspace...</p>
+        </div>
+    </div>
+));
+
+const StatCard = memo(({ stat, index }: { stat: any; index: number }) => (
+    <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: index * 0.15 }}
+        className={`relative overflow-hidden bg-white rounded-2xl border ${stat.borderColor} shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105`}
+    >
+        <div className="absolute top-0 right-0 w-20 h-20 -mr-10 -mt-10 rounded-full bg-gradient-to-br from-white/20 to-white/5"></div>
+        <div className="relative p-6">
+            <div className="flex items-center justify-between mb-4">
+                <div className={`w-14 h-14 ${stat.bgColor} rounded-xl flex items-center justify-center shadow-lg`}>
+                    <stat.icon className="w-7 h-7 text-white" />
+                </div>
+                <div className={`px-3 py-1 ${stat.bgLight} rounded-full`}>
+                    <span className={`text-xs font-semibold ${stat.textColor}`}>Active</span>
+                </div>
+            </div>
+            <div className="text-3xl font-bold text-slate-900 mb-2">{stat.value}</div>
+            <div className="text-sm font-medium text-slate-600">{stat.label}</div>
+        </div>
+    </motion.div>
+));
+
+const ResumeCard = memo(({ resume, index, onEdit, onDelete, isDeletingId }: { 
+    resume: Resume; 
+    index: number; 
+    onEdit: (id: number) => void;
+    onDelete: (id: number, event: React.MouseEvent) => void;
+    isDeletingId: number | null;
+}) => {
+    const formatDate = useCallback((dateString: string) => {
+        return new Date(dateString).toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric'
+        });
+    }, []);
+
+    return (
+        <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.4 + index * 0.1 }}
+            onClick={() => onEdit(resume.id)}
+            className="group flex items-center justify-between p-4 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 rounded-xl transition-all duration-200 cursor-pointer border border-transparent hover:border-blue-200"
+        >
+            <div className="flex items-center gap-4">
+                <div className="relative">
+                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow duration-200">
+                        <FileText className="w-6 h-6 text-white" />
+                    </div>
+                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-white"></div>
+                </div>
+                <div>
+                    <h4 className="font-semibold text-slate-900 group-hover:text-blue-700 transition-colors">
+                        {resume.name || `Resume ${resume.id}`}
+                    </h4>
+                    <p className="text-sm text-slate-600 font-medium">
+                        {resume.job_title || 'No job title specified'}
+                    </p>
+                    <p className="text-xs text-slate-500 mt-1">
+                        Updated {formatDate(resume.updated_at)}
+                    </p>
+                </div>
+            </div>
+            <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-200">
+                <button 
+                    onClick={(e) => { e.stopPropagation(); onEdit(resume.id); }}
+                    className="p-2 hover:bg-blue-100 rounded-lg transition-colors">
+                    <Edit className="w-4 h-4 text-blue-600" />
+                </button>
+                <button 
+                    onClick={(e) => onDelete(resume.id, e)}
+                    disabled={isDeletingId === resume.id}
+                    className="p-2 hover:bg-red-100 rounded-lg transition-colors disabled:opacity-50">
+                    {isDeletingId === resume.id ? (
+                        <Loader2 className="w-4 h-4 text-red-600 animate-spin" />
+                    ) : (
+                        <Trash2 className="w-4 h-4 text-red-600" />
+                    )}
+                </button>
+            </div>
+        </motion.div>
+    );
+});
+
+const QuickActionButton = memo(({ action, router }: { action: any; router: any }) => (
+    <button
+        onClick={() => router.push(action.path)}
+        className={`w-full flex items-center gap-4 p-4 text-left hover:bg-gradient-to-r hover:${action.hoverBg} rounded-xl transition-all duration-200 group border border-transparent hover:${action.hoverBorder}`}
+    >
+        <div className={`w-12 h-12 bg-gradient-to-br ${action.bgGradient} group-hover:${action.hoverGradient} rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-200`}>
+            <action.icon className="w-6 h-6 text-white" />
+        </div>
+        <div className="flex-1">
+            <div className={`font-semibold text-slate-900 group-hover:${action.textColor} transition-colors`}>{action.title}</div>
+            <div className="text-sm text-slate-600">{action.subtitle}</div>
+        </div>
+        <ChevronRight className={`w-5 h-5 text-slate-400 group-hover:${action.textColor} transition-colors`} />
+    </button>
+));
 
 function Dashboard() {
     const { user, loading: authLoading } = useAuth()
@@ -110,17 +210,7 @@ function Dashboard() {
     const [showPaymentHistory, setShowPaymentHistory] = useState(false)
     const [deletingResumeId, setDeletingResumeId] = useState<number | null>(null)
 
-    useEffect(() => {
-        if (authLoading || premiumLoading) return
-        if (!user) {
-            router.push('/sign-in?callbackUrl=' + encodeURIComponent('/dashboard'))
-            return
-        }
-
-        fetchDashboardData()
-    }, [user, authLoading, premiumLoading, router])
-
-    const fetchDashboardData = async () => {
+    const fetchDashboardData = useCallback(async () => {
         try {
             setLoading(true)
             const response = await axiosInstance.get('/api/dashboard/data')
@@ -128,37 +218,27 @@ function Dashboard() {
 
             if (data.error) {
                 console.error('Dashboard API error:', data.error)
-                setStats({
-                    totalResumes: 0,
-                    totalCoverLetters: 0,
-                    completionRate: 0,
-                    isPremium: isPremium
-                })
+                setStats({ totalResumes: 0, totalCoverLetters: 0, completionRate: 0, isPremium })
                 setResumes([])
             } else {
                 setStats({
                     totalResumes: data.totalResumes || 0,
                     totalCoverLetters: data.totalCoverLetters || 0,
                     completionRate: data.completionRate || 0,
-                    isPremium: isPremium
+                    isPremium
                 })
                 setResumes(data.resumes || [])
             }
         } catch (error) {
             console.error('Failed to fetch dashboard data:', error)
-            setStats({
-                totalResumes: 0,
-                totalCoverLetters: 0,
-                completionRate: 0,
-                isPremium: isPremium
-            })
+            setStats({ totalResumes: 0, totalCoverLetters: 0, completionRate: 0, isPremium })
             setResumes([])
         } finally {
             setLoading(false)
         }
-    }
+    }, [isPremium])
 
-    const handleDeleteResume = async (resumeId: number, event: React.MouseEvent) => {
+    const handleDeleteResume = useCallback(async (resumeId: number, event: React.MouseEvent) => {
         event.stopPropagation()
         
         if (deletingResumeId) return
@@ -170,48 +250,120 @@ function Dashboard() {
             setDeletingResumeId(resumeId)
             await axiosInstance.delete(`/api/resume-op/${resumeId}`)
             setResumes(prev => prev.filter(resume => resume.id !== resumeId))
-            
-            setStats(prev => ({
-                ...prev,
-                totalResumes: Math.max(0, prev.totalResumes - 1)
-            }))
-            
+            setStats(prev => ({ ...prev, totalResumes: Math.max(0, prev.totalResumes - 1) }))
         } catch (error) {
             console.error('Failed to delete resume:', error)
             alert('Failed to delete resume. Please try again.')
         } finally {
             setDeletingResumeId(null)
         }
-    }
+    }, [deletingResumeId])
 
-    const getGreeting = () => {
+    const handleEditResume = useCallback((resumeId: number) => {
+        router.push(`/template/${resumeId}`)
+    }, [router])
+
+    useEffect(() => {
+        if (authLoading || premiumLoading) return
+        if (!user) {
+            router.push('/sign-in?callbackUrl=' + encodeURIComponent('/dashboard'))
+            return
+        }
+        fetchDashboardData()
+    }, [user, authLoading, premiumLoading, router, fetchDashboardData])
+
+    const getGreeting = useMemo(() => {
         const hour = new Date().getHours()
         if (hour < 12) return 'Good morning'
         if (hour < 18) return 'Good afternoon'
         return 'Good evening'
-    }
+    }, [])
 
-    const formatDate = (dateString: string) => {
+    const formatDate = useCallback((dateString: string) => {
         return new Date(dateString).toLocaleDateString('en-US', {
             month: 'short',
             day: 'numeric'
         })
-    }
+    }, [])
+
+    const statsData = useMemo(() => [
+        {
+            label: 'Total Resumes',
+            value: stats.totalResumes,
+            icon: FileText,
+            bgColor: 'bg-gradient-to-br from-blue-500 to-blue-600',
+            textColor: 'text-blue-700',
+            bgLight: 'bg-blue-50',
+            borderColor: 'border-blue-200',
+        },
+        {
+            label: 'Cover Letters',
+            value: stats.totalCoverLetters,
+            icon: Mail,
+            bgColor: 'bg-gradient-to-br from-emerald-500 to-emerald-600',
+            textColor: 'text-emerald-700',
+            bgLight: 'bg-emerald-50',
+            borderColor: 'border-emerald-200',
+        },
+        {
+            label: 'Success Rate',
+            value: `${stats.completionRate}%`,
+            icon: Target,
+            bgColor: 'bg-gradient-to-br from-amber-500 to-orange-500',
+            textColor: 'text-orange-700',
+            bgLight: 'bg-orange-50',
+            borderColor: 'border-orange-200',
+        }
+    ], [stats])
+
+    const quickActions = useMemo(() => [
+        {
+            title: 'New Resume',
+            subtitle: 'Create from professional template',
+            icon: FileText,
+            path: '/template',
+            bgGradient: 'from-blue-500 to-blue-600',
+            hoverGradient: 'from-blue-600 to-indigo-600',
+            hoverBg: 'from-blue-50 to-indigo-50',
+            hoverBorder: 'border-blue-200',
+            textColor: 'text-blue-700'
+        },
+        {
+            title: 'Cover Letter',
+            subtitle: 'Write compelling cover letter',
+            icon: Mail,
+            path: '/cover-letter',
+            bgGradient: 'from-emerald-500 to-emerald-600',
+            hoverGradient: 'from-emerald-600 to-green-600',
+            hoverBg: 'from-emerald-50 to-green-50',
+            hoverBorder: 'border-emerald-200',
+            textColor: 'text-emerald-700'
+        },
+        {
+            title: 'Get Feedback',
+            subtitle: 'AI-powered resume analysis',
+            icon: Star,
+            path: '/resusme/rateing',
+            bgGradient: 'from-purple-500 to-purple-600',
+            hoverGradient: 'from-purple-600 to-pink-600',
+            hoverBg: 'from-purple-50 to-pink-50',
+            hoverBorder: 'border-purple-200',
+            textColor: 'text-purple-700'
+        }
+    ], [])
+
+    const premiumFeatures = useMemo(() => [
+        { text: 'Unlimited downloads', icon: '🚀' },
+        { text: 'Premium templates', icon: '✨' },
+        { text: 'AI suggestions', icon: '🤖' },
+        { text: 'Priority support', icon: '💬' }
+    ], [])
 
     if (authLoading || loading || premiumLoading) {
         return (
             <>
                 <Navbar />
-                <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-                    <div className="text-center">
-                        <div className="relative w-16 h-16 mx-auto mb-6">
-                            <div className="absolute inset-0 border-3 border-slate-200 rounded-full"></div>
-                            <div className="absolute inset-0 border-3 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-                        </div>
-                        <h3 className="text-lg font-medium text-slate-700 mb-2">Loading Dashboard</h3>
-                        <p className="text-sm text-slate-500">Preparing your workspace...</p>
-                    </div>
-                </div>
+                <LoadingSpinner />
             </>
         )
     }
@@ -220,17 +372,14 @@ function Dashboard() {
         <>
             <Navbar />
             <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-100/50">
-                {/* Enhanced Background Elements */}
                 <div className="absolute inset-0 overflow-hidden pointer-events-none">
                     <div className="absolute top-20 left-10 w-96 h-96 bg-gradient-to-r from-blue-400/20 to-indigo-500/20 rounded-full mix-blend-multiply filter blur-3xl animate-pulse"></div>
                     <div className="absolute top-40 right-10 w-80 h-80 bg-gradient-to-r from-purple-400/20 to-pink-500/20 rounded-full mix-blend-multiply filter blur-3xl animate-pulse delay-1000"></div>
                     <div className="absolute bottom-20 left-1/2 w-72 h-72 bg-gradient-to-r from-emerald-400/20 to-teal-500/20 rounded-full mix-blend-multiply filter blur-3xl animate-pulse delay-2000"></div>
                 </div>
 
-                {/* Floating grid pattern */}
                 <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none"></div>
 
-                {/* Hero Header */}
                 <div className="relative bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-700 text-white overflow-hidden">
                     <div className="absolute inset-0 bg-black/10"></div>
                     <div className="absolute inset-0 opacity-20">
@@ -262,7 +411,7 @@ function Dashboard() {
                                     transition={{ duration: 0.8, delay: 0.3 }}
                                     className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 text-white"
                                 >
-                                    {getGreeting()}, {user?.displayName?.split(' ')[0] || 'User'}!
+                                    {getGreeting}, {user?.displayName?.split(' ')[0] || 'User'}!
                                 </motion.h1>
                                 <motion.p
                                     initial={{ y: 30, opacity: 0 }}
@@ -287,65 +436,14 @@ function Dashboard() {
                     </div>
                 </div>
 
-                {/* Main Content */}
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                    {/* Stats Grid */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-                        {[
-                            {
-                                label: 'Total Resumes',
-                                value: stats.totalResumes,
-                                icon: FileText,
-                                bgColor: 'bg-gradient-to-br from-blue-500 to-blue-600',
-                                textColor: 'text-blue-700',
-                                bgLight: 'bg-blue-50',
-                                borderColor: 'border-blue-200',
-                            },
-                            {
-                                label: 'Cover Letters',
-                                value: stats.totalCoverLetters,
-                                icon: Mail,
-                                bgColor: 'bg-gradient-to-br from-emerald-500 to-emerald-600',
-                                textColor: 'text-emerald-700',
-                                bgLight: 'bg-emerald-50',
-                                borderColor: 'border-emerald-200',
-                            },
-                            {
-                                label: 'Success Rate',
-                                value: `${stats.completionRate}%`,
-                                icon: Target,
-                                bgColor: 'bg-gradient-to-br from-amber-500 to-orange-500',
-                                textColor: 'text-orange-700',
-                                bgLight: 'bg-orange-50',
-                                borderColor: 'border-orange-200',
-                            }
-                        ].map((stat, index) => (
-                            <motion.div
-                                key={stat.label}
-                                initial={{ opacity: 0, y: 30 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: index * 0.15 }}
-                                className={`relative overflow-hidden bg-white rounded-2xl border ${stat.borderColor} shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105`}
-                            >
-                                <div className="absolute top-0 right-0 w-20 h-20 -mr-10 -mt-10 rounded-full bg-gradient-to-br from-white/20 to-white/5"></div>
-                                <div className="relative p-6">
-                                    <div className="flex items-center justify-between mb-4">
-                                        <div className={`w-14 h-14 ${stat.bgColor} rounded-xl flex items-center justify-center shadow-lg`}>
-                                            <stat.icon className="w-7 h-7 text-white" />
-                                        </div>
-                                        <div className={`px-3 py-1 ${stat.bgLight} rounded-full`}>
-                                            <span className={`text-xs font-semibold ${stat.textColor}`}>Active</span>
-                                        </div>
-                                    </div>
-                                    <div className="text-3xl font-bold text-slate-900 mb-2">{stat.value}</div>
-                                    <div className="text-sm font-medium text-slate-600">{stat.label}</div>
-                                </div>
-                            </motion.div>
+                        {statsData.map((stat, index) => (
+                            <StatCard key={stat.label} stat={stat} index={index} />
                         ))}
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        {/* Recent Resumes - Takes 2 columns */}
                         <div className="lg:col-span-2">
                             <motion.div
                                 initial={{ opacity: 0, y: 30 }}
@@ -373,51 +471,14 @@ function Dashboard() {
                                     {resumes.length > 0 ? (
                                         <div className="space-y-4">
                                             {resumes.slice(0, 4).map((resume, index) => (
-                                                <motion.div
+                                                <ResumeCard 
                                                     key={resume.id}
-                                                    initial={{ opacity: 0, x: -20 }}
-                                                    animate={{ opacity: 1, x: 0 }}
-                                                    transition={{ delay: 0.4 + index * 0.1 }}
-                                                    onClick={() => router.push(`/resusme/${resume.id}`)}
-                                                    className="group flex items-center justify-between p-4 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 rounded-xl transition-all duration-200 cursor-pointer border border-transparent hover:border-blue-200"
-                                                >
-                                                    <div className="flex items-center gap-4">
-                                                        <div className="relative">
-                                                            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow duration-200">
-                                                                <FileText className="w-6 h-6 text-white" />
-                                                            </div>
-                                                            <div className="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-white"></div>
-                                                        </div>
-                                                        <div>
-                                                            <h4 className="font-semibold text-slate-900 group-hover:text-blue-700 transition-colors">
-                                                                {resume.name || `Resume ${resume.id}`}
-                                                            </h4>
-                                                            <p className="text-sm text-slate-600 font-medium">
-                                                                {resume.job_title || 'No job title specified'}
-                                                            </p>
-                                                            <p className="text-xs text-slate-500 mt-1">
-                                                                Updated {formatDate(resume.updated_at)}
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                    <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-200">
-                                                        <button 
-                                                            onClick={()=> router.push(`/template/${resume.id}`)}
-                                                            className="p-2 hover:bg-blue-100 rounded-lg transition-colors">
-                                                            <Edit className="w-4 h-4 text-blue-600" />
-                                                        </button>
-                                                        <button 
-                                                            onClick={(e) => handleDeleteResume(resume.id, e)}
-                                                            disabled={deletingResumeId === resume.id}
-                                                            className="p-2 hover:bg-red-100 rounded-lg transition-colors disabled:opacity-50">
-                                                            {deletingResumeId === resume.id ? (
-                                                                <Loader2 className="w-4 h-4 text-red-600 animate-spin" />
-                                                            ) : (
-                                                                <Trash2 className="w-4 h-4 text-red-600" />
-                                                            )}
-                                                        </button>
-                                                    </div>
-                                                </motion.div>
+                                                    resume={resume}
+                                                    index={index}
+                                                    onEdit={handleEditResume}
+                                                    onDelete={handleDeleteResume}
+                                                    isDeletingId={deletingResumeId}
+                                                />
                                             ))}
                                         </div>
                                     ) : (
@@ -447,9 +508,7 @@ function Dashboard() {
                             </motion.div>
                         </div>
 
-                        {/* Right Sidebar */}
                         <div className="space-y-8">
-                            {/* Quick Actions */}
                             <motion.div
                                 initial={{ opacity: 0, y: 30 }}
                                 animate={{ opacity: 1, y: 0 }}
@@ -463,51 +522,12 @@ function Dashboard() {
                                     </h3>
                                 </div>
                                 <div className="p-6 space-y-4">
-                                    <button
-                                        onClick={() => router.push('/template')}
-                                        className="w-full flex items-center gap-4 p-4 text-left hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 rounded-xl transition-all duration-200 group border border-transparent hover:border-blue-200"
-                                    >
-                                        <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 group-hover:from-blue-600 group-hover:to-indigo-600 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-200">
-                                            <FileText className="w-6 h-6 text-white" />
-                                        </div>
-                                        <div className="flex-1">
-                                            <div className="font-semibold text-slate-900 group-hover:text-blue-700 transition-colors">New Resume</div>
-                                            <div className="text-sm text-slate-600">Create from professional template</div>
-                                        </div>
-                                        <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-blue-600 transition-colors" />
-                                    </button>
-
-                                    <button
-                                        onClick={() => router.push('/cover-letter')}
-                                        className="w-full flex items-center gap-4 p-4 text-left hover:bg-gradient-to-r hover:from-emerald-50 hover:to-green-50 rounded-xl transition-all duration-200 group border border-transparent hover:border-emerald-200"
-                                    >
-                                        <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-emerald-600 group-hover:from-emerald-600 group-hover:to-green-600 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-200">
-                                            <Mail className="w-6 h-6 text-white" />
-                                        </div>
-                                        <div className="flex-1">
-                                            <div className="font-semibold text-slate-900 group-hover:text-emerald-700 transition-colors">Cover Letter</div>
-                                            <div className="text-sm text-slate-600">Write compelling cover letter</div>
-                                        </div>
-                                        <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-emerald-600 transition-colors" />
-                                    </button>
-
-                                    <button
-                                        onClick={() => router.push('/resusme/rateing')}
-                                        className="w-full flex items-center gap-4 p-4 text-left hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 rounded-xl transition-all duration-200 group border border-transparent hover:border-purple-200"
-                                    >
-                                        <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 group-hover:from-purple-600 group-hover:to-pink-600 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-200">
-                                            <Star className="w-6 h-6 text-white" />
-                                        </div>
-                                        <div className="flex-1">
-                                            <div className="font-semibold text-slate-900 group-hover:text-purple-700 transition-colors">Get Feedback</div>
-                                            <div className="text-sm text-slate-600">AI-powered resume analysis</div>
-                                        </div>
-                                        <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-purple-600 transition-colors" />
-                                    </button>
+                                    {quickActions.map((action) => (
+                                        <QuickActionButton key={action.title} action={action} router={router} />
+                                    ))}
                                 </div>
                             </motion.div>
 
-                            {/* Account Status */}
                             <motion.div
                                 initial={{ opacity: 0, y: 30 }}
                                 animate={{ opacity: 1, y: 0 }}
@@ -527,12 +547,7 @@ function Dashboard() {
                                         </div>
                                         <div className="p-6">
                                             <div className="space-y-4 mb-6">
-                                                {[
-                                                    { text: 'Unlimited downloads', icon: '🚀' },
-                                                    { text: 'Premium templates', icon: '✨' },
-                                                    { text: 'AI suggestions', icon: '🤖' },
-                                                    { text: 'Priority support', icon: '💬' }
-                                                ].map((feature, index) => (
+                                                {premiumFeatures.map((feature, index) => (
                                                     <div key={index} className="flex items-center gap-3 text-sm text-slate-700">
                                                         <span className="text-lg">{feature.icon}</span>
                                                         <span className="font-medium">{feature.text}</span>
@@ -581,12 +596,9 @@ function Dashboard() {
                                     </>
                                 )}
                             </motion.div>
-
-
                         </div>
                     </div>
 
-                    {/* Payment History Modal */}
                     {isPremium && showPaymentHistory && (
                         <motion.div
                             initial={{ opacity: 0, y: 30 }}

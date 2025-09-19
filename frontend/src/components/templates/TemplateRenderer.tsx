@@ -1,22 +1,24 @@
 "use client";
 
+import { memo, lazy, Suspense, useMemo } from 'react';
 import { getTemplateById } from '@/constants/templates';
-import ExecutiveElite from './ExecutiveElite';
-import ModernMinimalist from './ModernMinimalist';
-import CreativeDesigner from './CreativeDesigner';
-import MinimalistProfessional from './MinimalistProfessional';
-import CorporateClassic from './CorporateClassic';
-import ModernTech from './ModernTech';
-import CreativePortfolio from './CreativePortfolio';
-import AcademicExcellence from './AcademicExcellence';
-import ClassicTraditional from './ClassicTraditional';
-import CleanSimple from './CleanSimple';
-import BusinessFormal from './BusinessFormal';
-import ClassicElegant from './ClassicElegant';
-import ProfessionalClean from './ProfessionalClean';
-import PhotoCentric from './PhotoCentric';
-import ProfileSidebar from './ProfileSidebar';
-import ModernPortrait from './ModernPortrait';
+
+const ExecutiveElite = lazy(() => import('./ExecutiveElite'));
+const ModernMinimalist = lazy(() => import('./ModernMinimalist'));
+const CreativeDesigner = lazy(() => import('./CreativeDesigner'));
+const MinimalistProfessional = lazy(() => import('./MinimalistProfessional'));
+const CorporateClassic = lazy(() => import('./CorporateClassic'));
+const ModernTech = lazy(() => import('./ModernTech'));
+const CreativePortfolio = lazy(() => import('./CreativePortfolio'));
+const AcademicExcellence = lazy(() => import('./AcademicExcellence'));
+const ClassicTraditional = lazy(() => import('./ClassicTraditional'));
+const CleanSimple = lazy(() => import('./CleanSimple'));
+const BusinessFormal = lazy(() => import('./BusinessFormal'));
+const ClassicElegant = lazy(() => import('./ClassicElegant'));
+const ProfessionalClean = lazy(() => import('./ProfessionalClean'));
+const PhotoCentric = lazy(() => import('./PhotoCentric'));
+const ProfileSidebar = lazy(() => import('./ProfileSidebar'));
+const ModernPortrait = lazy(() => import('./ModernPortrait'));
 
 export interface UserData {
   name: string;
@@ -56,119 +58,119 @@ interface TemplateRendererProps {
   mode?: 'default' | 'live';
 }
 
-export default function TemplateRenderer({ templateId, userData, colors, size = 'normal', mode = 'default' }: TemplateRendererProps) {
-  const template = getTemplateById(templateId);
+const TEMPLATE_COMPONENTS = {
+  1: ExecutiveElite,
+  2: ModernMinimalist,
+  3: CreativeDesigner,
+  4: MinimalistProfessional,
+  5: CorporateClassic,
+  6: ModernTech,
+  7: CreativePortfolio,
+  8: AcademicExcellence,
+  9: ModernPortrait,
+  10: CleanSimple,
+  11: BusinessFormal,
+  12: ClassicElegant,
+  13: ProfessionalClean,
+  14: PhotoCentric,
+  15: ProfileSidebar,
+  16: ClassicTraditional,
+} as const;
+
+const TemplateComponent = memo(({ templateId, userData, colors, size, mode }: TemplateRendererProps) => {
+  const Component = TEMPLATE_COMPONENTS[templateId as keyof typeof TEMPLATE_COMPONENTS] || ModernMinimalist;
+  return <Component userData={userData} colors={colors} size={size} mode={mode} />;
+});
+
+TemplateComponent.displayName = 'TemplateComponent';
+
+const ErrorFallback = memo(() => (
+  <div className="max-w-4xl mx-auto p-8 text-center">
+    <h2 className="text-2xl font-bold text-gray-800 mb-4">Template Not Found</h2>
+    <p className="text-gray-600">The requested template could not be found.</p>
+  </div>
+));
+
+ErrorFallback.displayName = 'ErrorFallback';
+
+const LoadingFallback = memo(() => (
+  <div className="w-full h-full flex items-center justify-center bg-gray-50">
+    <div className="animate-spin rounded-full h-8 w-8 border-2 border-gray-300 border-t-blue-600"></div>
+  </div>
+));
+
+LoadingFallback.displayName = 'LoadingFallback';
+
+const TemplateRenderer = memo(function TemplateRenderer({ templateId, userData, colors, size = 'normal', mode = 'default' }: TemplateRendererProps) {
+  const template = useMemo(() => getTemplateById(templateId), [templateId]);
+  const themeColors = useMemo(() => colors || template?.colors, [colors, template?.colors]);
 
   if (!template) {
-    return (
-      <div className="max-w-4xl mx-auto p-8 text-center">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">Template Not Found</h2>
-        <p className="text-gray-600">The requested template could not be found.</p>
-      </div>
-    );
+    return <ErrorFallback />;
   }
 
-  // Use template default colors if no custom colors provided
-  const themeColors = colors || template.colors;
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <TemplateComponent 
+        templateId={templateId} 
+        userData={userData} 
+        colors={themeColors} 
+        size={size} 
+        mode={mode} 
+      />
+    </Suspense>
+  );
+});
 
-  // Render the appropriate template component based on ID
-  switch (templateId) {
-    case 1: // executive-elite
-      return <ExecutiveElite userData={userData} colors={themeColors} size={size} mode={mode} />;
+export default TemplateRenderer;
 
-    case 2: // modern-minimalist
-      return <ModernMinimalist userData={userData} colors={themeColors} size={size} mode={mode} />;
+const SAMPLE_DATA: UserData = {
+  name: "John Doe",
+  email: "john.doe@example.com",
+  phone: "+1 (555) 123-4567",
+  address: "New York, NY",
+  job_title: "Senior Professional",
+  summary: "Experienced professional with a proven track record of success.",
+  skills: [
+    { name: "Leadership", rating: 5 },
+    { name: "Strategy", rating: 4 },
+    { name: "Innovation", rating: 5 }
+  ],
+  experience: [
+    {
+      title: "Senior Position",
+      company: "Tech Company",
+      duration: "2020 - Present",
+      description: "Led strategic initiatives and drove business growth."
+    }
+  ],
+  education: [
+    {
+      degree: "Master's Degree",
+      institution: "University",
+      year: "2018"
+    }
+  ]
+};
 
-    case 3: // creative-designer
-      return <CreativeDesigner userData={userData} colors={themeColors} size={size} mode={mode} />;
-
-    case 4: // minimalist-professional
-      return <MinimalistProfessional userData={userData} colors={themeColors} size={size} mode={mode} />;
-
-    case 5: // corporate-classic
-      return <CorporateClassic userData={userData} colors={themeColors} size={size} mode={mode} />;
-
-    case 6: // modern-tech
-      return <ModernTech userData={userData} colors={themeColors} size={size} mode={mode} />;
-
-    case 7: // creative-portfolio
-      return <CreativePortfolio userData={userData} colors={themeColors} size={size} mode={mode} />;
-
-    case 8: // academic-excellence
-      return <AcademicExcellence userData={userData} colors={themeColors} size={size} mode={mode} />;
-
-    case 9: // classic-traditional
-      return <ModernPortrait userData={userData} colors={themeColors} size={size} mode={mode} />;
-
-    case 10: // clean-simple
-      return <CleanSimple userData={userData} colors={themeColors} size={size} mode={mode} />;
-
-    case 11: // business-formal
-      return <BusinessFormal userData={userData} colors={themeColors} size={size} mode={mode} />;
-
-    case 12: // classic-elegant
-      return <ClassicElegant userData={userData} colors={themeColors} size={size} mode={mode} />;
-
-    case 13: // professional-clean
-      return <ProfessionalClean userData={userData} colors={themeColors} size={size} mode={mode} />;
-
-    case 14: // photo-centric
-      return <PhotoCentric userData={userData} colors={themeColors} size={size} mode={mode} />;
-
-    case 15: // profile-sidebar
-      return <ProfileSidebar userData={userData} colors={themeColors} size={size} mode={mode} />;
-
-    case 16: // modern-portrait
-      return <ClassicTraditional userData={userData} colors={themeColors} size={size} mode={mode} />;
-
-    default:
-      return <ModernMinimalist userData={userData} colors={themeColors} size={size} mode={mode} />;
-  }
-}
-
-// Export template preview component for template selection
-export function TemplatePreview({ templateId, size = 'small' }: { templateId: number; size?: 'small' | 'normal' }) {
-  const template = getTemplateById(templateId);
+export const TemplatePreview = memo(function TemplatePreview({ 
+  templateId, 
+  size = 'small' 
+}: { 
+  templateId: number; 
+  size?: 'small' | 'normal' 
+}) {
+  const template = useMemo(() => getTemplateById(templateId), [templateId]);
 
   if (!template) return null;
 
-  const sampleData: UserData = {
-    name: "John Doe",
-    email: "john.doe@example.com",
-    phone: "+1 (555) 123-4567",
-    address: "New York, NY",
-    job_title: "Senior Professional",
-    summary: "Experienced professional with a proven track record of success.",
-    skills: [
-      { name: "Leadership", rating: 5 },
-      { name: "Strategy", rating: 4 },
-      { name: "Innovation", rating: 5 }
-    ],
-    experience: [
-      {
-        title: "Senior Position",
-        company: "Tech Company",
-        duration: "2020 - Present",
-        description: "Led strategic initiatives and drove business growth."
-      }
-    ],
-    education: [
-      {
-        degree: "Master's Degree",
-        institution: "University",
-        year: "2018"
-      }
-    ]
-  };
-
   return (
     <div className="relative bg-white border border-gray-200 rounded-lg shadow-md hover:shadow-lg transition-all aspect-[1/1.414] overflow-hidden">
-      <TemplateRenderer templateId={templateId} userData={sampleData} size="small" />
+      <TemplateRenderer templateId={templateId} userData={SAMPLE_DATA} size="small" />
     </div>
   );
-}
+});
 
-// Color theme presets
 export const COLOR_THEMES = {
   blue: {
     primary: '#2563eb',
@@ -212,4 +214,4 @@ export const COLOR_THEMES = {
     text: '#2d3748',
     background: '#ffffff'
   }
-};
+} as const;
