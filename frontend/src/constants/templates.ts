@@ -293,6 +293,69 @@ export const CV_TEMPLATES: Template[] = [
       body: 'Arial'
     },
     layout: 'two-column'
+  },
+  {
+    id: 14,
+    name: 'Photo Centric',
+    category: 'Professional',
+    description: 'Modern template with large profile photo as focal point and clean typography',
+    preview: '/templates/photo-centric.jpg',
+    isPremium: true,
+    hasPhoto: true,
+    colors: {
+      primary: '#1e40af',
+      secondary: '#3b82f6',
+      accent: '#60a5fa',
+      text: '#1f2937',
+      background: '#ffffff'
+    },
+    fonts: {
+      heading: 'Inter',
+      body: 'Inter'
+    },
+    layout: 'single-column'
+  },
+  {
+    id: 15,
+    name: 'Profile Sidebar',
+    category: 'Professional',
+    description: 'Professional template with profile photo in left sidebar and modern styling',
+    preview: '/templates/profile-sidebar.jpg',
+    isPremium: true,
+    hasPhoto: true,
+    colors: {
+      primary: '#059669',
+      secondary: '#047857',
+      accent: '#10b981',
+      text: '#1f2937',
+      background: '#ffffff'
+    },
+    fonts: {
+      heading: 'Roboto',
+      body: 'Roboto'
+    },
+    layout: 'sidebar'
+  },
+  {
+    id: 16,
+    name: 'Modern Portrait',
+    category: 'Creative',
+    description: 'Creative template with artistic profile photo integration and modern elements',
+    preview: '/templates/modern-portrait.jpg',
+    isPremium: true,
+    hasPhoto: true,
+    colors: {
+      primary: '#7c3aed',
+      secondary: '#8b5cf6',
+      accent: '#d946ef',
+      text: '#1f2937',
+      background: '#ffffff'
+    },
+    fonts: {
+      heading: 'Poppins',
+      body: 'Poppins'
+    },
+    layout: 'modern-grid'
   }
 ];
 

@@ -14,6 +14,9 @@ import CleanSimple from './CleanSimple';
 import BusinessFormal from './BusinessFormal';
 import ClassicElegant from './ClassicElegant';
 import ProfessionalClean from './ProfessionalClean';
+import PhotoCentric from './PhotoCentric';
+import ProfileSidebar from './ProfileSidebar';
+import ModernPortrait from './ModernPortrait';
 
 export interface UserData {
   name: string;
@@ -95,7 +98,7 @@ export default function TemplateRenderer({ templateId, userData, colors, size = 
       return <AcademicExcellence userData={userData} colors={themeColors} size={size} mode={mode} />;
 
     case 9: // classic-traditional
-      return <ClassicTraditional userData={userData} colors={themeColors} size={size} mode={mode} />;
+      return <ModernPortrait userData={userData} colors={themeColors} size={size} mode={mode} />;
 
     case 10: // clean-simple
       return <CleanSimple userData={userData} colors={themeColors} size={size} mode={mode} />;
@@ -108,6 +111,15 @@ export default function TemplateRenderer({ templateId, userData, colors, size = 
 
     case 13: // professional-clean
       return <ProfessionalClean userData={userData} colors={themeColors} size={size} mode={mode} />;
+
+    case 14: // photo-centric
+      return <PhotoCentric userData={userData} colors={themeColors} size={size} mode={mode} />;
+
+    case 15: // profile-sidebar
+      return <ProfileSidebar userData={userData} colors={themeColors} size={size} mode={mode} />;
+
+    case 16: // modern-portrait
+      return <ClassicTraditional userData={userData} colors={themeColors} size={size} mode={mode} />;
 
     default:
       return <ModernMinimalist userData={userData} colors={themeColors} size={size} mode={mode} />;
