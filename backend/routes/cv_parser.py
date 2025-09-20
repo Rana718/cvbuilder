@@ -103,8 +103,8 @@ Return ONLY the JSON object, no additional text or formatting.
                 {"role": "system", "content": "You are a CV parser that extracts structured data. Return only valid JSON."},
                 {"role": "user", "content": prompt}
             ],
-            max_tokens=2000,
-            temperature=0.1
+            max_tokens=3000,
+            temperature=0.2
         )
         
         response_text = response.choices[0].message.content.strip()
