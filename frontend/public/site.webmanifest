@@ -1,0 +1,82 @@
+{
+  "name": "ResumeAI.World - AI-Powered Resume Builder",
+  "short_name": "ResumeAI.World",
+  "description": "Create professional resumes and cover letters with our AI-powered CV builder. ATS-friendly templates, LinkedIn integration, and expert guidance.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1e40af",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en-US",
+  "categories": ["business", "productivity", "utilities"],
+  "icons": [
+    {
+      "src": "/favicon-16x16.png",
+      "sizes": "16x16",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Create Resume",
+      "short_name": "New Resume",
+      "description": "Start creating a new professional resume",
+      "url": "/dashboard?action=create-resume",
+      "icons": [
+        {
+          "src": "/img/resume.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Browse Templates",
+      "short_name": "Templates",
+      "description": "Browse professional resume templates",
+      "url": "/template",
+      "icons": [
+        {
+          "src": "/img/templates-icon.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Cover Letter",
+      "short_name": "Cover Letter",
+      "description": "Create a professional cover letter",
+      "url": "/cover-letter",
+      "icons": [
+        {
+          "src": "/img/cover-letter-icon.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
+}

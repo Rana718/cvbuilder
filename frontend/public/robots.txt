@@ -1,0 +1,44 @@
+User-agent: *
+Allow: /
+
+# Allow all crawlers access to CSS and JS files
+Allow: /_next/static/
+Allow: /static/
+Allow: /img/
+Allow: /favicon.ico
+Allow: /apple-touch-icon.png
+Allow: /manifest.json
+
+# Disallow admin and private pages
+Disallow: /admin/
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /profile/
+Disallow: /_next/
+Disallow: /payment/
+
+# Disallow auth pages for better UX
+Disallow: /sign-in
+Disallow: /sign-up
+
+# Allow important public pages
+Allow: /
+Allow: /template
+Allow: /cover-letter
+Allow: /terms/
+Allow: /share
+
+# Sitemap location
+Sitemap: https://resumeai.world/sitemap.xml
+
+# Crawl delay (optional - be respectful to search engines)
+Crawl-delay: 1
+
+# Special rules for specific bots
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 0
+
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1

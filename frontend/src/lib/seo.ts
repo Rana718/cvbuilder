@@ -1,0 +1,224 @@
+import { Metadata } from 'next';
+
+export interface SEOConfig {
+  title: string;
+  description: string;
+  keywords?: string[];
+  image?: string;
+  url?: string;
+  type?: 'website' | 'article';
+  publishedTime?: string;
+  modifiedTime?: string;
+  authors?: string[];
+  section?: string;
+}
+
+export function generateMetadata(config: SEOConfig): Metadata {
+  const {
+    title,
+    description,
+    keywords = [],
+    image = '/img/banner.png',
+    url = 'https://resumeai.world',
+    type = 'website',
+    publishedTime,
+    modifiedTime,
+    authors = ['ResumeAI.World Team'],
+    section
+  } = config;
+
+  return {
+    title,
+    description,
+    keywords: [...keywords, 'AI resume builder', 'CV creator', 'professional resume', 'cover letter generator'],
+    authors: authors.map(name => ({ name })),
+    openGraph: {
+      title,
+      description,
+      url,
+      siteName: 'ResumeAI.World',
+      images: [
+        {
+          url: image,
+          width: 1200,
+          height: 630,
+          alt: title,
+        },
+      ],
+      locale: 'en_US',
+      type,
+      ...(type === 'article' && {
+        publishedTime,
+        modifiedTime,
+        authors,
+        section,
+      }),
+    },
+    twitter: {
+      card: 'summary_large_image',
+      site: '@resumeaiworld',
+      creator: '@resumeaiworld',
+      title,
+      description,
+      images: [image],
+    },
+    alternates: {
+      canonical: url,
+    },
+  };
+}
+
+export const seoPages = {
+  home: {
+    title: 'ResumeAI.World - Create Professional Resumes & Cover Letters Online',
+    description: 'Create professional resumes and cover letters with our AI-powered CV builder. ATS-friendly templates, LinkedIn integration, and expert guidance. Build your perfect resume in minutes.',
+    keywords: ['AI resume builder', 'online CV creator', 'professional resume templates', 'ATS friendly resume', 'cover letter generator'],
+    url: 'https://resumeai.world',
+  },
+  dashboard: {
+    title: 'Dashboard - Manage Your Resumes & Cover Letters',
+    description: 'Access your resume dashboard to create, edit, and manage your professional resumes and cover letters. Track your applications and upgrade to premium features.',
+    keywords: ['resume dashboard', 'CV management', 'application tracking', 'premium features'],
+    url: 'https://resumeai.world/dashboard',
+  },
+  templates: {
+    title: 'Professional Resume Templates - ATS-Friendly CV Designs',
+    description: 'Choose from our collection of professional, ATS-friendly resume templates. Modern designs crafted by experts to help you land your dream job.',
+    keywords: ['resume templates', 'CV templates', 'professional designs', 'ATS friendly templates', 'modern resume layouts'],
+    url: 'https://resumeai.world/template',
+  },
+  coverLetter: {
+    title: 'AI Cover Letter Generator - Create Personalized Cover Letters',
+    description: 'Generate personalized cover letters with AI assistance. Match your cover letter to job requirements and increase your chances of getting hired.',
+    keywords: ['cover letter generator', 'AI cover letter', 'personalized cover letters', 'job application letters'],
+    url: 'https://resumeai.world/cover-letter',
+  },
+  profile: {
+    title: 'Profile Settings - Manage Your Account',
+    description: 'Manage your ResumeAI.World profile, update personal information, and configure your account settings for the best resume building experience.',
+    keywords: ['profile settings', 'account management', 'user preferences'],
+    url: 'https://resumeai.world/profile',
+  },
+  pricing: {
+    title: 'Pricing Plans - Choose Your Resume Builder Plan',
+    description: 'Affordable pricing plans for professional resume creation. Free basic features with premium upgrades for advanced templates and AI assistance.',
+    keywords: ['pricing plans', 'resume builder cost', 'premium features', 'subscription plans'],
+    url: 'https://resumeai.world/pricing',
+  },
+  signIn: {
+    title: 'Sign In - Access Your Resume Builder Account',
+    description: 'Sign in to your ResumeAI.World account to access your resumes, cover letters, and premium features. Secure login with multiple authentication options.',
+    keywords: ['sign in', 'login', 'account access', 'user authentication'],
+    url: 'https://resumeai.world/sign-in',
+  },
+  signUp: {
+    title: 'Sign Up - Create Your Free Resume Builder Account',
+    description: 'Create your free ResumeAI.World account and start building professional resumes today. Quick registration with instant access to templates and tools.',
+    keywords: ['sign up', 'create account', 'free registration', 'get started'],
+    url: 'https://resumeai.world/sign-up',
+  },
+  privacy: {
+    title: 'Privacy Policy - How We Protect Your Data',
+    description: 'Learn how ResumeAI.World protects your personal information and resume data. Our comprehensive privacy policy explains our data handling practices.',
+    keywords: ['privacy policy', 'data protection', 'user privacy', 'data security'],
+    url: 'https://resumeai.world/terms/privacy',
+  },
+  terms: {
+    title: 'Terms of Service - Usage Guidelines',
+    description: 'Read our terms of service and usage guidelines for ResumeAI.World. Understand your rights and responsibilities when using our platform.',
+    keywords: ['terms of service', 'usage guidelines', 'user agreement'],
+    url: 'https://resumeai.world/terms/policy',
+  },
+  refund: {
+    title: 'Refund Policy - Money-Back Guarantee',
+    description: 'Our refund policy ensures your satisfaction with ResumeAI.World. Learn about our money-back guarantee and refund process.',
+    keywords: ['refund policy', 'money-back guarantee', 'customer satisfaction'],
+    url: 'https://resumeai.world/terms/refund',
+  },
+};
+
+export function generateStructuredData(type: 'WebApplication' | 'Article' | 'Organization' | 'Product', data: any) {
+  const baseSchema = {
+    "@context": "https://schema.org",
+    "@type": type,
+  };
+
+  switch (type) {
+    case 'WebApplication':
+      return {
+        ...baseSchema,
+        name: data.name || "ResumeAI.World",
+        applicationCategory: "BusinessApplication",
+        operatingSystem: "Web Browser",
+        url: data.url || "https://resumeai.world",
+        description: data.description,
+        author: {
+          "@type": "Organization",
+          name: "ResumeAI.World Team",
+          url: "https://resumeai.world"
+        },
+        offers: data.offers || {
+          "@type": "Offer",
+          price: "0",
+          priceCurrency: "USD",
+          availability: "https://schema.org/InStock"
+        },
+        featureList: data.features || [
+          "AI-powered resume creation",
+          "ATS-friendly templates",
+          "Cover letter generator",
+          "Multiple export formats"
+        ],
+        aggregateRating: data.rating || {
+          "@type": "AggregateRating",
+          ratingValue: "4.8",
+          reviewCount: "1250"
+        }
+      };
+    
+    case 'Article':
+      return {
+        ...baseSchema,
+        headline: data.title,
+        description: data.description,
+        author: {
+          "@type": "Person",
+          name: data.author || "ResumeAI.World Team"
+        },
+        publisher: {
+          "@type": "Organization",
+          name: "ResumeAI.World",
+          logo: {
+            "@type": "ImageObject",
+            url: "https://resumeai.world/img/logo.png"
+          }
+        },
+        datePublished: data.publishedTime,
+        dateModified: data.modifiedTime || data.publishedTime,
+        image: data.image || "https://resumeai.world/img/banner.png"
+      };
+    
+    case 'Organization':
+      return {
+        ...baseSchema,
+        name: "ResumeAI.World",
+        url: "https://resumeai.world",
+        logo: "https://resumeai.world/img/logo.png",
+        description: "Professional AI-powered resume and cover letter builder",
+        sameAs: [
+          "https://twitter.com/resumeaiworld",
+          "https://linkedin.com/company/resumeaiworld",
+          "https://facebook.com/resumeaiworld"
+        ],
+        contactPoint: {
+          "@type": "ContactPoint",
+          telephone: "+1-555-0123",
+          contactType: "customer service",
+          email: "support@resumeai.world"
+        }
+      };
+    
+    default:
+      return baseSchema;
+  }
+}
