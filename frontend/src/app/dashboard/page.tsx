@@ -555,7 +555,7 @@ function Dashboard() {
                                                 ))}
                                             </div>
                                             <button
-                                                onClick={() => router.push('/pricing')}
+                                                onClick={() => router.push('/payment?returnUrl='+encodeURIComponent('/dashboard'))}
                                                 className="w-full bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 text-white py-3 px-4 rounded-xl font-semibold hover:from-yellow-500 hover:via-orange-600 hover:to-red-600 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
                                             >
                                                 Upgrade Now
