@@ -90,13 +90,13 @@ export default function ResumeParsePage() {
     const [parsedData, setParsedData] = useState<ParsedData | null>(null)
     const [step, setStep] = useState<'upload' | 'parsing' | 'preview' | 'templates'>('upload')
     const [error, setError] = useState<string | null>(null)
-    
-    const { 
-        updatePersonalInfo, 
-        addWorkExperience, 
-        addEducation, 
-        setSkills, 
-        addProject, 
+
+    const {
+        updatePersonalInfo,
+        addWorkExperience,
+        addEducation,
+        setSkills,
+        addProject,
         setSummary,
         addWebsite,
         clearResumeData
@@ -253,18 +253,18 @@ export default function ResumeParsePage() {
     return (
         <div className="min-h-screen bg-slate-50">
             <Navbar />
-            
+
             {/* Background Elements */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 <div className="absolute top-20 left-10 w-96 h-96 bg-gradient-to-r from-blue-400/10 to-indigo-500/10 rounded-full mix-blend-multiply filter blur-3xl animate-pulse"></div>
                 <div className="absolute top-40 right-10 w-80 h-80 bg-gradient-to-r from-purple-400/10 to-pink-500/10 rounded-full mix-blend-multiply filter blur-3xl animate-pulse delay-1000"></div>
                 <div className="absolute bottom-20 left-1/2 w-72 h-72 bg-gradient-to-r from-emerald-400/10 to-teal-500/10 rounded-full mix-blend-multiply filter blur-3xl animate-pulse delay-2000"></div>
             </div>
-            
+
             {/* Floating grid pattern */}
             <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none"></div>
 
-            <div className="relative container mx-auto px-4 py-8">
+            <div className="relative container mx-auto px-2 sm:px-4 md:px-6 lg:px-8 py-2 sm:py-4 md:py-8">
                 {/* AI Badge and Header */}
                 <motion.div
                     initial={{ y: 20, opacity: 0, scale: 0.9 }}
@@ -274,9 +274,9 @@ export default function ResumeParsePage() {
                 >
                     <div className="relative">
                         <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 blur-xl rounded-full"></div>
-                        <div className="relative inline-flex items-center bg-white/90 backdrop-blur-sm border border-white/20 shadow-lg text-slate-700 px-6 py-3 rounded-full text-sm font-medium">
-                            <div className="w-2 h-2 bg-green-500 rounded-full mr-3 animate-pulse"></div>
-                            <Brain className="h-4 w-4 mr-2 text-blue-600" />
+                        <div className="relative inline-flex items-center bg-white/90 backdrop-blur-sm border border-white/20 shadow-lg text-slate-700 px-3 py-2 sm:px-6 sm:py-3 rounded-full text-xs sm:text-sm font-medium">
+                            <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-green-500 rounded-full mr-2 sm:mr-3 animate-pulse"></div>
+                            <Brain className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2 text-blue-600" />
                             <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent font-semibold">
                                 AI Resume Parser
                             </span>
@@ -290,16 +290,16 @@ export default function ResumeParsePage() {
                     transition={{ duration: 0.8, delay: 0.3 }}
                     className="text-center mb-8"
                 >
-                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 mb-4 leading-tight">
+                    <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 mb-3 sm:mb-4 leading-tight px-2">
                         Transform Your
-                        <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 mt-2">
+                        <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 mt-1 sm:mt-2">
                             PDF Resume
                         </span>
-                        <span className="block text-slate-700 text-2xl md:text-3xl lg:text-4xl font-medium mt-4">
+                        <span className="block text-slate-700 text-lg sm:text-xl md:text-2xl lg:text-3xl font-medium mt-2 sm:mt-3">
                             into Professional Magic
                         </span>
                     </h1>
-                    <p className="text-lg md:text-xl text-slate-600 mb-8 leading-relaxed max-w-3xl mx-auto font-light">
+                    <p className="text-sm sm:text-base md:text-lg text-slate-600 mb-4 sm:mb-6 md:mb-8 leading-relaxed max-w-3xl mx-auto font-light px-4">
                         Upload your PDF resume and let our AI extract, enhance, and transform it into a stunning professional template
                     </p>
                 </motion.div>
@@ -309,9 +309,9 @@ export default function ResumeParsePage() {
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ duration: 0.6, delay: 0.5 }}
-                    className="flex justify-center mb-12"
+                    className="flex justify-center mb-8 md:mb-12 px-4"
                 >
-                    <div className="flex items-center space-x-4 bg-white/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg border border-white/20">
+                    <div className="flex items-center space-x-1 sm:space-x-3 bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl p-1.5 sm:p-3 shadow-lg border border-white/20 overflow-x-auto max-w-full">
                         {[
                             { step: 'upload', label: 'Upload', icon: Upload },
                             { step: 'parsing', label: 'Parse', icon: Brain },
@@ -319,27 +319,25 @@ export default function ResumeParsePage() {
                             { step: 'templates', label: 'Templates', icon: Sparkles }
                         ].map((item, index) => (
                             <React.Fragment key={item.step}>
-                                <div className={`flex items-center space-x-2 ${
-                                    step === item.step ? 'text-blue-600' : 
-                                    ['parsing', 'preview', 'templates'].includes(step) && index < ['upload', 'parsing', 'preview', 'templates'].indexOf(step) ? 'text-green-600' : 
-                                    'text-slate-400'
-                                }`}>
-                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
-                                        step === item.step ? 'bg-blue-100 border-2 border-blue-600 shadow-md' : 
-                                        ['parsing', 'preview', 'templates'].includes(step) && index < ['upload', 'parsing', 'preview', 'templates'].indexOf(step) ? 'bg-green-100 border-2 border-green-600' : 
-                                        'bg-slate-100 border-2 border-slate-300'
+                                <div className={`flex items-center space-x-1 flex-shrink-0 ${step === item.step ? 'text-blue-600' :
+                                        ['parsing', 'preview', 'templates'].includes(step) && index < ['upload', 'parsing', 'preview', 'templates'].indexOf(step) ? 'text-green-600' :
+                                            'text-slate-400'
                                     }`}>
+                                    <div className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center transition-all duration-300 ${step === item.step ? 'bg-blue-100 border border-blue-600 shadow-md' :
+                                            ['parsing', 'preview', 'templates'].includes(step) && index < ['upload', 'parsing', 'preview', 'templates'].indexOf(step) ? 'bg-green-100 border border-green-600' :
+                                                'bg-slate-100 border border-slate-300'
+                                        }`}>
                                         {step === item.step && item.step === 'parsing' ? (
-                                            <Loader2 className="w-5 h-5 animate-spin" />
+                                            <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" />
                                         ) : ['parsing', 'preview', 'templates'].includes(step) && index < ['upload', 'parsing', 'preview', 'templates'].indexOf(step) ? (
-                                            <CheckCircle className="w-5 h-5" />
+                                            <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4" />
                                         ) : (
-                                            <item.icon className="w-5 h-5" />
+                                            <item.icon className="w-3 h-3 sm:w-4 sm:h-4" />
                                         )}
                                     </div>
-                                    <span className="font-medium hidden sm:block">{item.label}</span>
+                                    <span className="font-medium text-xs hidden sm:block">{item.label}</span>
                                 </div>
-                                {index < 3 && <ArrowRight className="w-4 h-4 text-slate-400" />}
+                                {index < 3 && <ArrowRight className="w-2 h-2 sm:w-3 sm:h-3 text-slate-400 flex-shrink-0" />}
                             </React.Fragment>
                         ))}
                     </div>
@@ -354,44 +352,47 @@ export default function ResumeParsePage() {
                         className="max-w-2xl mx-auto"
                     >
                         <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm">
-                            <CardHeader className="text-center pb-4">
-                                <CardTitle className="flex items-center justify-center space-x-2 text-2xl">
-                                    <Upload className="w-7 h-7 text-blue-600" />
+                            <CardHeader className="text-center pb-2 sm:pb-4">
+                                <CardTitle className="flex items-center justify-center space-x-2 text-lg sm:text-xl md:text-2xl">
+                                    <Upload className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-blue-600" />
                                     <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                                         Upload Your Resume
                                     </span>
                                 </CardTitle>
                             </CardHeader>
-                            <CardContent className="space-y-6">
-                                <motion.div 
+                            <CardContent className="space-y-4 sm:space-y-6">
+                                <motion.div
                                     variants={itemVariants}
-                                    className="border-2 border-dashed border-slate-300 hover:border-blue-400 rounded-2xl p-12 text-center transition-all duration-300 group cursor-pointer"
+                                    className="border-2 border-dashed border-slate-300 hover:border-blue-400 rounded-xl sm:rounded-2xl p-6 sm:p-10 md:p-12 text-center transition-all duration-300 group cursor-pointer"
                                     whileHover={{ scale: 1.02 }}
                                     whileTap={{ scale: 0.98 }}
                                 >
                                     <div className="relative">
-                                        <FileText className="w-16 h-16 text-slate-400 group-hover:text-blue-500 mx-auto mb-6 transition-colors duration-300" />
-                                        <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
-                                            <Zap className="w-3 h-3 text-white" />
+                                        <FileText className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 text-slate-400 group-hover:text-blue-500 mx-auto mb-3 sm:mb-4 md:mb-6 transition-colors duration-300" />
+                                        <div className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+                                            <Zap className="w-2 h-2 sm:w-2.5 sm:h-2.5 md:w-3 md:h-3 text-white" />
                                         </div>
                                     </div>
-                                    <div className="space-y-3">
-                                        <p className="text-xl font-semibold text-slate-700 group-hover:text-blue-600 transition-colors">
+                                    <div className="space-y-2 sm:space-y-3">
+                                        <p className="text-sm sm:text-lg md:text-xl font-semibold text-slate-700 group-hover:text-blue-600 transition-colors">
                                             {selectedFile ? selectedFile.name : 'Choose a PDF file to upload'}
                                         </p>
-                                        <p className="text-sm text-slate-500">PDF files only, max 10MB</p>
-                                        <div className="flex items-center justify-center space-x-4 text-xs text-slate-400">
+                                        <p className="text-xs sm:text-sm text-slate-500">PDF files only, max 10MB</p>
+                                        <div className="flex items-center justify-center space-x-2 sm:space-x-4 text-xs text-slate-400">
                                             <div className="flex items-center space-x-1">
-                                                <CheckCircle className="w-3 h-3 text-green-500" />
-                                                <span>AI-Powered</span>
+                                                <CheckCircle className="w-2 h-2 sm:w-3 sm:h-3 text-green-500" />
+                                                <span className="hidden sm:inline">AI-Powered</span>
+                                                <span className="sm:hidden">AI</span>
                                             </div>
                                             <div className="flex items-center space-x-1">
-                                                <CheckCircle className="w-3 h-3 text-green-500" />
-                                                <span>Secure Processing</span>
+                                                <CheckCircle className="w-2 h-2 sm:w-3 sm:h-3 text-green-500" />
+                                                <span className="hidden sm:inline">Secure Processing</span>
+                                                <span className="sm:hidden">Secure</span>
                                             </div>
                                             <div className="flex items-center space-x-1">
-                                                <CheckCircle className="w-3 h-3 text-green-500" />
-                                                <span>Instant Results</span>
+                                                <CheckCircle className="w-2 h-2 sm:w-3 sm:h-3 text-green-500" />
+                                                <span className="hidden sm:inline">Instant Results</span>
+                                                <span className="sm:hidden">Fast</span>
                                             </div>
                                         </div>
                                     </div>
@@ -404,7 +405,7 @@ export default function ResumeParsePage() {
                                     />
                                     <label
                                         htmlFor="resume-upload"
-                                        className="inline-block mt-6 px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl cursor-pointer hover:from-blue-700 hover:to-purple-700 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                                        className="inline-block mt-4 sm:mt-6 px-3 py-2 sm:px-6 sm:py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg sm:rounded-xl cursor-pointer hover:from-blue-700 hover:to-purple-700 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-xs sm:text-sm"
                                     >
                                         {selectedFile ? 'Change File' : 'Select File'}
                                     </label>
@@ -426,14 +427,14 @@ export default function ResumeParsePage() {
                                         animate={{ opacity: 1, y: 0 }}
                                         className="flex justify-center"
                                     >
-                                        <Button 
-                                            onClick={handleUpload} 
-                                            size="lg" 
-                                            className="px-10 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300"
+                                        <Button
+                                            onClick={handleUpload}
+                                            className="px-3 py-2 sm:px-8 sm:py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-sm sm:text-base font-semibold rounded-lg sm:rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 w-full sm:w-auto"
                                         >
-                                            <Brain className="mr-3 w-5 h-5" />
-                                            Parse with AI
-                                            <ArrowRight className="ml-3 w-5 h-5" />
+                                            <Brain className="mr-1 sm:mr-2 w-3 h-3 sm:w-4 sm:h-4" />
+                                            <span className="hidden xs:inline">Parse with AI</span>
+                                            <span className="xs:hidden">Parse</span>
+                                            <ArrowRight className="ml-1 sm:ml-2 w-3 h-3 sm:w-4 sm:h-4" />
                                         </Button>
                                     </motion.div>
                                 )}
@@ -451,63 +452,68 @@ export default function ResumeParsePage() {
                         className="max-w-2xl mx-auto"
                     >
                         <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm">
-                            <CardHeader className="text-center pb-4">
-                                <CardTitle className="flex items-center justify-center space-x-2 text-2xl">
+                            <CardHeader className="text-center pb-2 sm:pb-4">
+                                <CardTitle className="flex items-center justify-center space-x-2 text-lg sm:text-xl md:text-2xl">
                                     <div className="relative">
-                                        <Brain className="w-7 h-7 text-blue-600 animate-pulse" />
+                                        <Brain className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-blue-600 animate-pulse" />
                                         <div className="absolute -inset-1 bg-blue-500/20 rounded-full animate-ping"></div>
                                     </div>
                                     <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                                        AI is Analyzing Your Resume
+                                        <span className="hidden sm:inline">AI is Analyzing Your Resume</span>
+                                        <span className="sm:hidden">AI Analyzing...</span>
                                     </span>
                                 </CardTitle>
                             </CardHeader>
-                            <CardContent className="space-y-8">
+                            <CardContent className="space-y-4 sm:space-y-6 md:space-y-8">
                                 <div className="text-center">
                                     <motion.div
                                         animate={{ rotate: 360 }}
                                         transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                                        className="w-20 h-20 mx-auto mb-6 relative"
+                                        className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 mx-auto mb-3 sm:mb-4 md:mb-6 relative"
                                     >
-                                        <div className="w-full h-full border-4 border-blue-200 rounded-full"></div>
-                                        <div className="absolute inset-0 border-4 border-transparent border-t-blue-600 rounded-full animate-spin"></div>
-                                        <div className="absolute inset-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
-                                            <Sparkles className="w-6 h-6 text-white" />
+                                        <div className="w-full h-full border-2 sm:border-3 md:border-4 border-blue-200 rounded-full"></div>
+                                        <div className="absolute inset-0 border-2 sm:border-3 md:border-4 border-transparent border-t-blue-600 rounded-full animate-spin"></div>
+                                        <div className="absolute inset-1 sm:inset-1.5 md:inset-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+                                            <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 md:w-6 md:h-6 text-white" />
                                         </div>
                                     </motion.div>
-                                    <p className="text-lg text-slate-600 mb-6 font-medium">
-                                        Our AI is extracting and organizing your information with precision...
+                                    <p className="text-sm sm:text-base md:text-lg text-slate-600 mb-3 sm:mb-4 md:mb-6 font-medium">
+                                        <span className="hidden sm:inline">Our AI is extracting and organizing your information with precision...</span>
+                                        <span className="sm:hidden">AI processing your resume...</span>
                                     </p>
                                     <div className="relative">
-                                        <Progress value={uploadProgress} className="w-full max-w-md mx-auto h-3 bg-slate-200 rounded-full overflow-hidden" />
+                                        <Progress value={uploadProgress} className="w-full max-w-xs sm:max-w-md mx-auto h-2 sm:h-3 bg-slate-200 rounded-full overflow-hidden" />
                                         <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full" style={{ width: `${uploadProgress}%` }}></div>
                                     </div>
-                                    <p className="text-sm text-slate-500 mt-3 font-medium">{uploadProgress}% complete</p>
-                                    
-                                    <div className="flex justify-center space-x-6 mt-8 text-xs text-slate-400">
-                                        <motion.div 
+                                    <p className="text-xs sm:text-sm text-slate-500 mt-2 sm:mt-3 font-medium">{uploadProgress}% complete</p>
+
+                                    <div className="flex justify-center space-x-2 sm:space-x-4 md:space-x-6 mt-4 sm:mt-6 md:mt-8 text-xs text-slate-400">
+                                        <motion.div
                                             animate={{ opacity: [0.5, 1, 0.5] }}
                                             transition={{ duration: 2, repeat: Infinity }}
                                             className="flex items-center space-x-1"
                                         >
-                                            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                                            <span>Extracting text</span>
+                                            <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-blue-500 rounded-full"></div>
+                                            <span className="hidden sm:inline">Extracting text</span>
+                                            <span className="sm:hidden">Extract</span>
                                         </motion.div>
-                                        <motion.div 
+                                        <motion.div
                                             animate={{ opacity: [0.5, 1, 0.5] }}
                                             transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
                                             className="flex items-center space-x-1"
                                         >
-                                            <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                                            <span>Analyzing structure</span>
+                                            <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-purple-500 rounded-full"></div>
+                                            <span className="hidden sm:inline">Analyzing structure</span>
+                                            <span className="sm:hidden">Analyze</span>
                                         </motion.div>
-                                        <motion.div 
+                                        <motion.div
                                             animate={{ opacity: [0.5, 1, 0.5] }}
                                             transition={{ duration: 2, repeat: Infinity, delay: 1 }}
                                             className="flex items-center space-x-1"
                                         >
-                                            <div className="w-2 h-2 bg-indigo-500 rounded-full"></div>
-                                            <span>Organizing data</span>
+                                            <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-indigo-500 rounded-full"></div>
+                                            <span className="hidden sm:inline">Organizing data</span>
+                                            <span className="sm:hidden">Organize</span>
                                         </motion.div>
                                     </div>
                                 </div>
@@ -543,26 +549,26 @@ export default function ResumeParsePage() {
                                         <User className="w-6 h-6 text-blue-600" />
                                         <span>Personal Information</span>
                                     </h3>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-6 bg-gradient-to-r from-slate-50 to-blue-50/30 rounded-2xl border border-slate-200">
-                                        <div className="flex items-center space-x-2">
-                                            <User className="w-4 h-4 text-slate-500" />
-                                            <span><strong>Name:</strong> {parsedData.name}</span>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 p-4 sm:p-6 bg-gradient-to-r from-slate-50 to-blue-50/30 rounded-2xl border border-slate-200">
+                                        <div className="flex items-center space-x-2 text-sm sm:text-base">
+                                            <User className="w-4 h-4 text-slate-500 flex-shrink-0" />
+                                            <span className="break-words"><strong>Name:</strong> {parsedData.name}</span>
                                         </div>
-                                        <div className="flex items-center space-x-2">
-                                            <Briefcase className="w-4 h-4 text-slate-500" />
-                                            <span><strong>Job Title:</strong> {parsedData.job_title}</span>
+                                        <div className="flex items-center space-x-2 text-sm sm:text-base">
+                                            <Briefcase className="w-4 h-4 text-slate-500 flex-shrink-0" />
+                                            <span className="break-words"><strong>Job Title:</strong> {parsedData.job_title}</span>
                                         </div>
-                                        <div className="flex items-center space-x-2">
-                                            <Mail className="w-4 h-4 text-slate-500" />
-                                            <span>{parsedData.email}</span>
+                                        <div className="flex items-center space-x-2 text-sm sm:text-base">
+                                            <Mail className="w-4 h-4 text-slate-500 flex-shrink-0" />
+                                            <span className="break-all">{parsedData.email}</span>
                                         </div>
-                                        <div className="flex items-center space-x-2">
-                                            <Phone className="w-4 h-4 text-slate-500" />
-                                            <span>{parsedData.phone}</span>
+                                        <div className="flex items-center space-x-2 text-sm sm:text-base">
+                                            <Phone className="w-4 h-4 text-slate-500 flex-shrink-0" />
+                                            <span className="break-words">{parsedData.phone}</span>
                                         </div>
-                                        <div className="flex items-center space-x-2">
-                                            <MapPin className="w-4 h-4 text-slate-500" />
-                                            <span>{[parsedData.city, parsedData.state, parsedData.country].filter(Boolean).join(', ')}</span>
+                                        <div className="flex items-center space-x-2 text-sm sm:text-base sm:col-span-2">
+                                            <MapPin className="w-4 h-4 text-slate-500 flex-shrink-0" />
+                                            <span className="break-words">{[parsedData.city, parsedData.state, parsedData.country].filter(Boolean).join(', ')}</span>
                                         </div>
                                     </div>
                                 </motion.div>
@@ -581,7 +587,7 @@ export default function ResumeParsePage() {
                                 {parsedData.skills && parsedData.skills.length > 0 && (
                                     <motion.div variants={itemVariants}>
                                         <h3 className="text-xl font-semibold mb-4">Skills</h3>
-                                        <div className="flex flex-wrap gap-3">
+                                        <div className="flex flex-wrap gap-2 sm:gap-3">
                                             {parsedData.skills.map((skill, index) => (
                                                 <motion.div
                                                     key={index}
@@ -589,9 +595,9 @@ export default function ResumeParsePage() {
                                                     animate={{ opacity: 1, scale: 1 }}
                                                     transition={{ delay: index * 0.1 }}
                                                 >
-                                                    <Badge 
-                                                        variant="secondary" 
-                                                        className="px-4 py-2 bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 border border-blue-200 hover:from-blue-200 hover:to-purple-200 transition-all duration-200"
+                                                    <Badge
+                                                        variant="secondary"
+                                                        className="px-2 py-1 sm:px-4 sm:py-2 bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 border border-blue-200 hover:from-blue-200 hover:to-purple-200 transition-all duration-200 text-xs sm:text-sm"
                                                     >
                                                         {skill}
                                                     </Badge>
@@ -666,25 +672,25 @@ export default function ResumeParsePage() {
 
                                 <Separator className="my-8" />
 
-                                <motion.div 
+                                <motion.div
                                     variants={itemVariants}
-                                    className="flex justify-center space-x-4"
+                                    className="flex flex-col sm:flex-row justify-center space-y-2 sm:space-y-0 sm:space-x-3 px-4"
                                 >
-                                    <Button 
-                                        variant="outline" 
+                                    <Button
+                                        variant="outline"
                                         onClick={handleStartOver}
-                                        className="px-8 py-3 rounded-xl border-2 hover:bg-slate-50 transition-all duration-200"
+                                        className="px-3 py-2 sm:px-6 sm:py-3 rounded-lg sm:rounded-xl border-2 hover:bg-slate-50 transition-all duration-200 w-full sm:w-auto text-xs sm:text-sm"
                                     >
                                         Start Over
                                     </Button>
-                                    <Button 
-                                        onClick={handleUseData} 
-                                        size="lg"
-                                        className="px-10 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300"
+                                    <Button
+                                        onClick={handleUseData}
+                                        className="px-3 py-2 sm:px-8 sm:py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-sm sm:text-base font-semibold rounded-lg sm:rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 w-full sm:w-auto"
                                     >
-                                        <CheckCircle className="mr-3 w-5 h-5" />
-                                        Use This Data
-                                        <ArrowRight className="ml-3 w-5 h-5" />
+                                        <CheckCircle className="mr-1 sm:mr-2 w-3 h-3 sm:w-4 sm:h-4" />
+                                        <span className="hidden xs:inline">Use This Data</span>
+                                        <span className="xs:hidden">Use Data</span>
+                                        <ArrowRight className="ml-1 sm:ml-2 w-3 h-3 sm:w-4 sm:h-4" />
                                     </Button>
                                 </motion.div>
                             </CardContent>
@@ -701,20 +707,20 @@ export default function ResumeParsePage() {
                         className="space-y-8"
                     >
                         <motion.div variants={itemVariants} className="text-center">
-                            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 mb-3 sm:mb-4 px-4">
                                 Choose Your
-                                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 mt-2">
+                                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 mt-1 sm:mt-2">
                                     Perfect Template
                                 </span>
                             </h2>
-                            <p className="text-lg md:text-xl text-slate-600 leading-relaxed max-w-3xl mx-auto">
+                            <p className="text-sm sm:text-base md:text-lg text-slate-600 leading-relaxed max-w-3xl mx-auto px-4">
                                 Your data is ready! Select a professional template to showcase your experience in style
                             </p>
                         </motion.div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                             {CV_TEMPLATES.slice(0, 12).map((template, i) => (
-                                <TemplateSelector key={template.id} templateId={template.id.toString()}>
+                                <TemplateSelector key={template.id} templateId={template.id.toString()} bypassAlert={true}>
                                     <motion.div
                                         variants={itemVariants}
                                         custom={i}
@@ -729,10 +735,10 @@ export default function ResumeParsePage() {
                                             {/* Template Preview */}
                                             <div className="relative overflow-hidden">
                                                 <TemplatePreview templateId={template.id} size="small" />
-                                                
+
                                                 {/* Hover Overlay */}
                                                 <div className="absolute inset-0 bg-gradient-to-t from-blue-600/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300"></div>
-                                                
+
                                                 {/* Premium Badge */}
                                                 {template.isPremium && (
                                                     <div className="absolute top-3 right-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-lg px-3 py-1 text-xs font-semibold flex items-center space-x-1 shadow-lg">
@@ -764,13 +770,14 @@ export default function ResumeParsePage() {
                             ))}
                         </div>
 
-                        <motion.div variants={itemVariants} className="text-center">
-                            <Button 
-                                variant="outline" 
+                        <motion.div variants={itemVariants} className="text-center px-4">
+                            <Button
+                                variant="outline"
                                 onClick={handleStartOver}
-                                className="px-8 py-3 rounded-xl border-2 hover:bg-slate-50 transition-all duration-200"
+                                className="px-3 py-2 sm:px-6 sm:py-3 rounded-lg sm:rounded-xl border-2 hover:bg-slate-50 transition-all duration-200 w-full sm:w-auto text-xs sm:text-sm"
                             >
-                                Upload Different Resume
+                                <span className="hidden sm:inline">Upload Different Resume</span>
+                                <span className="sm:hidden">Upload Different</span>
                             </Button>
                         </motion.div>
                     </motion.div>

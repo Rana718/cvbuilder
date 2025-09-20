@@ -17,16 +17,21 @@ import {
 interface TemplateSelectorProps {
   templateId: string
   children: React.ReactNode
+  bypassAlert?: boolean
 }
 
-export default function TemplateSelector({ templateId, children }: TemplateSelectorProps) {
+export default function TemplateSelector({ templateId, children, bypassAlert = false }: TemplateSelectorProps) {
   const router = useRouter()
   const { hasData, resetStore } = useResumeStore()
   const [showAlert, setShowAlert] = useState(false)
 
   const handleTemplateClick = () => {
     if (hasData()) {
-      setShowAlert(true)
+      if (bypassAlert) {
+        router.push(`/template/${templateId}`)
+      } else {
+        setShowAlert(true)
+      }
     } else {
       router.push(`/template/${templateId}`)
     }
@@ -61,8 +66,8 @@ export default function TemplateSelector({ templateId, children }: TemplateSelec
             <AlertDialogCancel onClick={() => setShowAlert(false)}>
               Cancel
             </AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={handleCreateNew} 
+            <AlertDialogAction
+              onClick={handleCreateNew}
               className="bg-gray-100 text-gray-900 hover:bg-gray-200"
             >
               Create New

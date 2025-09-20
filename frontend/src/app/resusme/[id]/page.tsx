@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, Suspense } from 'react'
+import React, { useState, useEffect, Suspense, useMemo, useCallback } from 'react'
 import { useParams, useSearchParams, useRouter } from 'next/navigation'
 import { useAuth } from '@/components/AuthContext'
 import { useResumeStore } from '@/store/resumeStore'
@@ -13,6 +13,181 @@ import { CV_TEMPLATES, TEMPLATE_CATEGORIES } from '@/constants/templates'
 import TemplateRenderer from '@/components/templates/TemplateRenderer'
 import { motion, AnimatePresence } from 'framer-motion'
 import Navbar from '@/components/Navbar'
+
+// Memoized sample data to prevent re-creating the object on each render
+const SAMPLE_TEMPLATE_DATA = {
+    name: "John Doe",
+    email: "john@example.com",
+    phone: "+1 (555) 123-4567",
+    address: "New York, NY",
+    job_title: "Senior Professional",
+    summary: "Experienced professional with proven track record of success in leading teams and driving business growth.",
+    skills: [
+        { name: "Leadership", rating: 5 },
+        { name: "Strategy", rating: 4 },
+        { name: "Innovation", rating: 5 },
+        { name: "Management", rating: 4 }
+    ],
+    experience: [{
+        title: "Senior Position",
+        company: "Tech Company",
+        duration: "2020 - Present",
+        description: "Led strategic initiatives and drove business growth."
+    }, {
+        title: "Manager",
+        company: "Previous Company",
+        duration: "2018 - 2020",
+        description: "Managed team and projects."
+    }],
+    education: [{
+        degree: "Master's Degree",
+        institution: "University",
+        year: "2018"
+    }],
+    projects: [{
+        title: "Sample Project",
+        description: "Project description"
+    }]
+}
+
+// Memoized Template Item Component
+const TemplateItem = React.memo(({ 
+    template, 
+    templateId, 
+    onTemplateChange,
+    index 
+}: { 
+    template: any, 
+    templateId: string | null, 
+    onTemplateChange: (id: number) => void,
+    index: number 
+}) => (
+    <motion.div
+        key={template.id}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, delay: index * 0.05 }}
+        className="cursor-pointer"
+        onClick={() => onTemplateChange(template.id)}
+    >
+        <div className={`relative overflow-hidden transition-all duration-200 bg-white rounded-xl border-2 hover:shadow-lg ${
+            template.id === Number(templateId) 
+                ? 'border-blue-500 shadow-lg ring-2 ring-blue-500/20' 
+                : 'border-gray-200 hover:border-gray-300'
+        }`}>
+            {/* Template Preview */}
+            <div className="w-full bg-white overflow-hidden flex justify-center" style={{ height: '320px' }}>
+                <div className="w-[794px] h-[1200px] transform scale-[0.3] origin-top bg-white border border-gray-500">
+                    <TemplateRenderer templateId={template.id} userData={SAMPLE_TEMPLATE_DATA} size="normal" />
+                </div>
+            </div>
+
+            <div className="p-3 text-center border-t border-gray-100">
+                <h4 className="text-sm font-semibold text-slate-800">{template.name}</h4>
+                <p className="text-xs text-gray-500 mt-1">{template.category}</p>
+            </div>
+            {/* Selected Indicator */}
+            {template.id === Number(templateId) && (
+                <div className="absolute top-3 right-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-full p-1.5 z-10 shadow-lg">
+                    <CheckCircle className="w-4 h-4" />
+                </div>
+            )}
+        </div>
+    </motion.div>
+))
+
+TemplateItem.displayName = 'TemplateItem'
+
+// Memoized Template Selector Panel
+const TemplateSelectorPanel = React.memo(({ 
+    searchTerm, 
+    setSearchTerm, 
+    selectedCategory, 
+    setSelectedCategory, 
+    filteredTemplates,
+    templateId,
+    onTemplateChange,
+    onClose 
+}: {
+    searchTerm: string,
+    setSearchTerm: (term: string) => void,
+    selectedCategory: string,
+    setSelectedCategory: (category: string) => void,
+    filteredTemplates: any[],
+    templateId: string | null,
+    onTemplateChange: (id: number) => void,
+    onClose?: () => void
+}) => (
+    <div className="bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl h-full overflow-hidden flex flex-col border border-white/20">
+        <div className="p-4 border-b border-gray-200/50">
+            <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Templates</h3>
+                {onClose && (
+                    <button
+                        onClick={onClose}
+                        className="lg:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                    >
+                        <X className="w-5 h-5 text-gray-500" />
+                    </button>
+                )}
+            </div>
+
+            {/* Search Bar */}
+            <div className="relative mb-3">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <input
+                    type="text"
+                    placeholder="Search templates..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl bg-gray-50/50 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/50 focus:bg-white text-sm transition-all duration-200"
+                />
+            </div>
+
+            {/* Category Filter */}
+            <div className="flex flex-wrap gap-2">
+                <button
+                    onClick={() => setSelectedCategory("All")}
+                    className={`px-3 py-2 rounded-lg text-xs font-medium transition-all duration-200 ${"All" === selectedCategory
+                        ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md"
+                        : "bg-gray-100/80 text-gray-700 hover:bg-gray-200/80 hover:shadow-sm"
+                        }`}
+                >
+                    All
+                </button>
+                {TEMPLATE_CATEGORIES.map((category) => (
+                    <button
+                        key={category}
+                        onClick={() => setSelectedCategory(category)}
+                        className={`px-3 py-2 rounded-lg text-xs font-medium transition-all duration-200 ${selectedCategory === category
+                            ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md"
+                            : "bg-gray-100/80 text-gray-700 hover:bg-gray-200/80 hover:shadow-sm"
+                            }`}
+                    >
+                        {category}
+                    </button>
+                ))}
+            </div>
+        </div>
+
+        {/* Templates Grid */}
+        <div className="flex-1 overflow-y-auto p-3">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+                {filteredTemplates.map((template, i) => (
+                    <TemplateItem
+                        key={template.id}
+                        template={template}
+                        templateId={templateId}
+                        onTemplateChange={onTemplateChange}
+                        index={i}
+                    />
+                ))}
+            </div>
+        </div>
+    </div>
+))
+
+TemplateSelectorPanel.displayName = 'TemplateSelectorPanel'
 
 function ResumePage() {
     const params = useParams()
@@ -38,18 +213,39 @@ function ResumePage() {
     const [showTemplateSelector, setShowTemplateSelector] = useState(false)
     const [searchTerm, setSearchTerm] = useState("")
     const [selectedCategory, setSelectedCategory] = useState("All")
+    
+    // Debounced search term for better performance
+    const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("")
+    
+    // Debounce search term
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearchTerm(searchTerm)
+        }, 300)
+        
+        return () => clearTimeout(timer)
+    }, [searchTerm])
+    
+    // Memoize search and category handlers
+    const handleSearchTermChange = useCallback((term: string) => {
+        setSearchTerm(term)
+    }, [])
+    
+    const handleCategoryChange = useCallback((category: string) => {
+        setSelectedCategory(category)
+    }, [])
 
-    const redirectToPayment = () => {
+    const redirectToPayment = useCallback(() => {
         const currentUrl = window.location.pathname + window.location.search
         router.push(`/payment?redirect=${encodeURIComponent(currentUrl)}`)
-    }
+    }, [router])
 
     const download_url = process.env.NEXT_PUBLIC_API_KEY_DOWN || '';
 
-    const redirectToAuth = () => {
+    const redirectToAuth = useCallback(() => {
         const currentUrl = window.location.pathname + window.location.search
         router.push(`/auth?redirect=${encodeURIComponent(currentUrl)}`)
-    }
+    }, [router])
 
     const handleSave = async () => {
         if (isSaving || !user) {
@@ -138,7 +334,7 @@ function ResumePage() {
         }
     }
 
-    const copyShareUrl = async () => {
+    const copyShareUrl = useCallback(async () => {
         if (shareUrl) {
             try {
                 await navigator.clipboard.writeText(shareUrl)
@@ -149,7 +345,7 @@ function ResumePage() {
                 alert('Failed to copy URL to clipboard')
             }
         }
-    }
+    }, [shareUrl])
 
     const handleShare = async () => {
         if (isSharing || !user) {
@@ -198,22 +394,24 @@ function ResumePage() {
         }
     }
 
-    const handleTemplateChange = (newTemplateId: number) => {
+    const handleTemplateChange = useCallback((newTemplateId: number) => {
         setTemplateId(newTemplateId.toString())
 
         const currentUrl = new URL(window.location.href)
         currentUrl.searchParams.set('template', newTemplateId.toString())
         router.push(currentUrl.toString())
         setShowTemplateSelector(false)
-    }
+    }, [router, setTemplateId])
 
-    const filteredTemplates = CV_TEMPLATES.filter(template => {
-        const matchesSearch = template.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            template.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            template.category.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesCategory = selectedCategory === "All" || template.category === selectedCategory;
-        return matchesSearch && matchesCategory;
-    })
+    const filteredTemplates = useMemo(() => {
+        return CV_TEMPLATES.filter(template => {
+            const matchesSearch = template.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+                template.description.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+                template.category.toLowerCase().includes(debouncedSearchTerm.toLowerCase());
+            const matchesCategory = selectedCategory === "All" || template.category === selectedCategory;
+            return matchesSearch && matchesCategory;
+        });
+    }, [debouncedSearchTerm, selectedCategory])
 
     useEffect(() => {
         if (!resumeId || typeof resumeId !== 'string' || isNaN(Number(resumeId)) || loading) return
@@ -260,132 +458,6 @@ function ResumePage() {
 
     if (!loading && !user) return null
 
-    const TemplateSelectorPanel = () => (
-        <div className="bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl h-full overflow-hidden flex flex-col border border-white/20">
-            <div className="p-4 border-b border-gray-200/50">
-                <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Templates</h3>
-                    <button
-                        onClick={() => setShowTemplateSelector(false)}
-                        className="lg:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                    >
-                        <X className="w-5 h-5 text-gray-500" />
-                    </button>
-                </div>
-
-                {/* Search Bar */}
-                <div className="relative mb-3">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                    <input
-                        type="text"
-                        placeholder="Search templates..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl bg-gray-50/50 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/50 focus:bg-white text-sm transition-all duration-200"
-                    />
-                </div>
-
-                {/* Category Filter */}
-                <div className="flex flex-wrap gap-2">
-                    <button
-                        onClick={() => setSelectedCategory("All")}
-                        className={`px-3 py-2 rounded-lg text-xs font-medium transition-all duration-200 ${"All" === selectedCategory
-                            ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md"
-                            : "bg-gray-100/80 text-gray-700 hover:bg-gray-200/80 hover:shadow-sm"
-                            }`}
-                    >
-                        All
-                    </button>
-                    {TEMPLATE_CATEGORIES.map((category) => (
-                        <button
-                            key={category}
-                            onClick={() => setSelectedCategory(category)}
-                            className={`px-3 py-2 rounded-lg text-xs font-medium transition-all duration-200 ${selectedCategory === category
-                                ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md"
-                                : "bg-gray-100/80 text-gray-700 hover:bg-gray-200/80 hover:shadow-sm"
-                                }`}
-                        >
-                            {category}
-                        </button>
-                    ))}
-                </div>
-            </div>
-
-            {/* Templates Grid */}
-            <div className="flex-1 overflow-y-auto p-3">
-                <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-                    {filteredTemplates.map((template, i) => (
-                        <motion.div
-                            key={template.id}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.3, delay: i * 0.05 }}
-                            className="cursor-pointer"
-                            onClick={() => handleTemplateChange(template.id)}
-                        >
-                            <div className={`relative overflow-hidden transition-all duration-200 bg-white rounded-xl border-2 hover:shadow-lg ${
-                                template.id === Number(templateId) 
-                                    ? 'border-blue-500 shadow-lg ring-2 ring-blue-500/20' 
-                                    : 'border-gray-200 hover:border-gray-300'
-                            }`}>
-                                {/* Template Preview */}
-                                <div className="w-full bg-white overflow-hidden flex justify-center" style={{ height: '320px' }}>
-                                    <div className="w-[794px] h-[1200px] transform scale-[0.3] origin-top bg-white border border-gray-500">
-                                        <TemplateRenderer templateId={template.id} userData={{
-                                            name: "John Doe",
-                                            email: "john@example.com",
-                                            phone: "+1 (555) 123-4567",
-                                            address: "New York, NY",
-                                            job_title: "Senior Professional",
-                                            summary: "Experienced professional with proven track record of success in leading teams and driving business growth.",
-                                            skills: [
-                                                { name: "Leadership", rating: 5 },
-                                                { name: "Strategy", rating: 4 },
-                                                { name: "Innovation", rating: 5 },
-                                                { name: "Management", rating: 4 }
-                                            ],
-                                            experience: [{
-                                                title: "Senior Position",
-                                                company: "Tech Company",
-                                                duration: "2020 - Present",
-                                                description: "Led strategic initiatives and drove business growth."
-                                            }, {
-                                                title: "Manager",
-                                                company: "Previous Company",
-                                                duration: "2018 - 2020",
-                                                description: "Managed team and projects."
-                                            }],
-                                            education: [{
-                                                degree: "Master's Degree",
-                                                institution: "University",
-                                                year: "2018"
-                                            }],
-                                            projects: [{
-                                                title: "Sample Project",
-                                                description: "Project description"
-                                            }]
-                                        }} size="normal" />
-                                    </div>
-                                </div>
-
-                                <div className="p-3 text-center border-t border-gray-100">
-                                    <h4 className="text-sm font-semibold text-slate-800">{template.name}</h4>
-                                    <p className="text-xs text-gray-500 mt-1">{template.category}</p>
-                                </div>
-                                {/* Selected Indicator */}
-                                {template.id === Number(templateId) && (
-                                    <div className="absolute top-3 right-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-full p-1.5 z-10 shadow-lg">
-                                        <CheckCircle className="w-4 h-4" />
-                                    </div>
-                                )}
-                            </div>
-                        </motion.div>
-                    ))}
-                </div>
-            </div>
-        </div>
-    )
-
     return (
         <div className="min-h-screen bg-slate-50 overflow-x-hidden">
             {/* Background Elements */}
@@ -402,7 +474,15 @@ function ResumePage() {
 
             <div className="relative flex flex-col lg:flex-row min-h-[calc(100vh-4rem)]">
                 <div className="hidden lg:block w-[450px] xl:w-[500px] 2xl:w-[550px] p-4">
-                    <TemplateSelectorPanel />
+                    <TemplateSelectorPanel 
+                        searchTerm={searchTerm}
+                        setSearchTerm={handleSearchTermChange}
+                        selectedCategory={selectedCategory}
+                        setSelectedCategory={handleCategoryChange}
+                        filteredTemplates={filteredTemplates}
+                        templateId={templateId}
+                        onTemplateChange={handleTemplateChange}
+                    />
                 </div>
 
                 <div className="lg:hidden p-4">
@@ -435,7 +515,16 @@ function ResumePage() {
                                     exit={{ scale: 0.9, opacity: 0 }}
                                     className="bg-white w-full max-w-4xl h-[85vh] rounded-2xl overflow-hidden shadow-2xl"
                                 >
-                                    <TemplateSelectorPanel />
+                                    <TemplateSelectorPanel 
+                                        searchTerm={searchTerm}
+                                        setSearchTerm={handleSearchTermChange}
+                                        selectedCategory={selectedCategory}
+                                        setSelectedCategory={handleCategoryChange}
+                                        filteredTemplates={filteredTemplates}
+                                        templateId={templateId}
+                                        onTemplateChange={handleTemplateChange}
+                                        onClose={() => setShowTemplateSelector(false)}
+                                    />
                                 </motion.div>
                             </motion.div>
                         )}
