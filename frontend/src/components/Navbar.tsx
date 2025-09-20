@@ -333,13 +333,13 @@ function Navbar() {
             <div className="max-w-7xl mx-auto px-4">
                 <div className="flex justify-between items-center h-14">
                     {/* Logo */}
-                    <Link href="/" className="flex items-center space-x-2 group" onClick={closeMenu}>
-                        <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center shadow-sm">
-                            <FileText className="h-4 w-4 text-white" />
-                        </div>
-                        <span className="text-lg font-bold bg-gradient-to-r from-gray-900 to-blue-600 bg-clip-text text-transparent">
-                            ResumeAI
-                        </span>
+                    <Link href="/" className="flex items-center group" onClick={closeMenu}>
+                        <img 
+                            src="/img/logo.png" 
+                            alt="Logo" 
+                            className="h-8 w-auto object-contain" 
+                            style={{ maxHeight: '32px' }}
+                        />
                     </Link>
 
                     {/* Desktop Navigation */}
