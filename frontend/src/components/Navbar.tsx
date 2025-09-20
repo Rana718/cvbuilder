@@ -248,7 +248,7 @@ function Navbar() {
 
             if (isMobile) {
                 return (
-                    <div className="border-t border-gray-200 pt-3 mt-3">
+                    <div className="border-t border-gray-200 pt-4 mt-4">
                         {profileSection}
                     </div>
                 );
@@ -257,43 +257,43 @@ function Navbar() {
             return profileSection;
         }
 
-        const authButtons = (
-            <>
-                <Link
-                    href="/sign-in"
-                    className={`text-gray-700 hover:text-blue-600 transition-colors px-3 py-2 rounded-lg hover:bg-blue-50 font-medium text-center ${
-                        isMobile ? 'w-full border border-gray-200' : 'text-sm'
-                    }`}
-                    onClick={isMobile ? closeMenu : undefined}
-                >
-                    Sign In
-                </Link>
-                <Link
-                    href="/sign-up"
-                    className={`bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 py-2 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-colors font-medium shadow-sm hover:shadow-md text-center ${
-                        isMobile ? 'w-full' : 'text-sm'
-                    }`}
-                    onClick={isMobile ? closeMenu : undefined}
-                >
-                    <span className="flex items-center justify-center space-x-2">
-                        <Sparkles className="w-4 h-4" />
-                        <span>Sign Up Free</span>
-                    </span>
-                </Link>
-            </>
-        );
-
         if (isMobile) {
             return (
-                <div className="border-t border-gray-200 pt-3 mt-3 space-y-2">
-                    {authButtons}
+                <div className="border-t border-gray-200 pt-4 mt-4 flex flex-col gap-3">
+                    <Link
+                        href="/sign-in"
+                        className="w-full border border-gray-200 text-gray-700 hover:text-blue-600 transition-all duration-200 px-4 py-2 rounded-lg hover:bg-blue-50 font-medium text-center"
+                        onClick={closeMenu}
+                    >
+                        Sign In
+                    </Link>
+                    <Link
+                        href="/sign-up"
+                        className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 py-2 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 font-medium shadow-sm hover:shadow-md text-center"
+                        onClick={closeMenu}
+                    >
+                        <Sparkles className="w-4 h-4" />
+                        <span>Sign Up Free</span>
+                    </Link>
                 </div>
             );
         }
 
         return (
-            <div className="flex items-center space-x-2">
-                {authButtons}
+            <div className="flex items-center gap-3">
+                <Link
+                    href="/sign-in"
+                    className="text-gray-700 hover:text-blue-600 transition-all duration-200 px-4 py-2 rounded-lg hover:bg-blue-50 font-medium text-sm"
+                >
+                    Sign In
+                </Link>
+                <Link
+                    href="/sign-up"
+                    className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 py-2 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 font-medium shadow-sm hover:shadow-md text-sm"
+                >
+                    <Sparkles className="w-4 h-4" />
+                    <span>Sign Up Free</span>
+                </Link>
             </div>
         );
     }, [loading, user, closeMenu]);
