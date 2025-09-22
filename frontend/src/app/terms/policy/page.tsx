@@ -821,11 +821,11 @@ export default function TermsOfService() {
                                         <h3 className="font-semibold text-gray-900 mb-2">General Support</h3>
                                         <p className="text-sm text-gray-600 mb-4">For general questions and account support</p>
                                         <a 
-                                            href="mailto:support@airesumebuidler.com" 
+                                            href="mailto:arhaanresumeai@gmail.com" 
                                             className="inline-flex items-center space-x-2 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-semibold py-2 px-6 rounded-lg hover:shadow-lg transition-all duration-200"
                                         >
                                             <Mail className="h-4 w-4" />
-                                            <span>support@airesumebuidler.com</span>
+                                            <span>arhaanresumeai@gmail.com</span>
                                         </a>
                                     </div>
                                 </div>

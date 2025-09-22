@@ -372,8 +372,8 @@ export default function RefundPolicy() {
                                                     <span className="font-semibold text-gray-900">Email Support</span>
                                                 </div>
                                                 <p className="text-sm text-gray-600 mb-2">Primary method - fastest response</p>
-                                                <a href="mailto:support@airesumebuidler.com" className="text-blue-600 font-medium text-sm hover:text-blue-700 transition-colors">
-                                                    support@airesumebuidler.com
+                                                <a href="mailto:arhaanresumeai@gmail.com" className="text-blue-600 font-medium text-sm hover:text-blue-700 transition-colors">
+                                                    arhaanresumeai@gmail.com
                                                 </a>
                                             </div>
 
@@ -585,7 +585,7 @@ export default function RefundPolicy() {
                                             </p>
                                             <div className="flex items-center space-x-2">
                                                 <ArrowRight className="h-4 w-4 text-blue-600" />
-                                                <span className="text-sm font-medium text-blue-600">Contact us first at support@airesumebuidler.com</span>
+                                                <span className="text-sm font-medium text-blue-600">Contact us first at arhaanresumeai@gmail.com</span>
                                             </div>
                                         </div>
                                     </div>
@@ -617,7 +617,7 @@ export default function RefundPolicy() {
                                         <h3 className="font-semibold text-gray-900 mb-2">Email Support</h3>
                                         <p className="text-sm text-gray-600 mb-4">For detailed refund requests and documentation</p>
                                         <a 
-                                            href="mailto:support@airesumebuidler.com" 
+                                            href="mailto:arhaanresumeai@gmail.com" 
                                             className="inline-flex items-center space-x-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold py-2 px-6 rounded-lg hover:shadow-lg transition-all duration-200"
                                         >
                                             <Mail className="h-4 w-4" />

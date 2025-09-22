@@ -106,8 +106,8 @@ function Footer() {
                             <div className="space-y-2">
                                 <div className="flex items-center space-x-2 text-gray-400">
                                     <Mail className="h-3 w-3 text-blue-500 flex-shrink-0" />
-                                    <a href="mailto:support@airesumebuidler.com" className="text-xs hover:text-white transition-colors break-all">
-                                        support@airesumebuidler.com
+                                    <a href="mailto:arhaanresumeai@gmail.com" className="text-xs hover:text-white transition-colors break-all">
+                                        arhaanresumeai@gmail.com
                                     </a>
                                 </div>
                                 <div className="flex items-center space-x-2 text-gray-400">

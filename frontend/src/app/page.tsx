@@ -87,7 +87,7 @@ export default function Home() {
           >
             <p className="text-slate-600 mb-4">Still have questions?</p>
             <a
-              href="mailto:support@airesumebuidler.com"
+              href="mailto:arhaanresumeai@gmail.com"
               className="inline-flex items-center space-x-2 text-blue-600 hover:text-blue-700 font-medium"
             >
               <Mail className="h-5 w-5" />

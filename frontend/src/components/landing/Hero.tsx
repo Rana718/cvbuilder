@@ -1,9 +1,12 @@
+"use client"
 import { motion } from 'framer-motion'
 import { Sparkles, ArrowRight, Download, CheckCircle, Shield, Award, Brain, TrendingUp } from 'lucide-react'
-import router from 'next/router'
+import { useRouter } from 'next/navigation'
 import React from 'react'
 
 function Hero() {
+    const router = useRouter();
+
     return (
         <section className="relative overflow-hidden bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-100/50 min-h-screen flex items-center">
             {/* Simplified Background */}
