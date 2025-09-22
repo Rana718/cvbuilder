@@ -31,7 +31,8 @@ function Footer() {
     const legalLinks = [
         { href: "/terms/privacy", label: "Privacy Policy" },
         { href: "/terms/policy", label: "Terms of Service" },
-        { href: "/terms/refund", label: "Refund Policy" }
+        { href: "/terms/refund", label: "Refund Policy" },
+        { href: "/terms/shipping", label: "Service Delivery" }
     ];
 
     return (
