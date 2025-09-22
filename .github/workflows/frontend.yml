@@ -26,12 +26,15 @@ jobs:
         uses: oven-sh/setup-bun@v2
 
       - name: Install dependencies
+        working-directory: frontend
         run: bun install
 
       - name: Build Next.js
+        working-directory: frontend
         run: bun run build
 
       - name: Update README
+        working-directory: frontend
         if: success()
         run: |
           echo "1" >> README.md
