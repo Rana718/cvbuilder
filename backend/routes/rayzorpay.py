@@ -33,7 +33,7 @@ async def create_subscription(
         result = await db.execute(
             select(Subscription).where(
                 Subscription.user_id == current_user.id,
-                Subscription.status.in_(["active", "created"])
+                Subscription.status == "active"
             )
         )
         existing_subscription = result.scalar_one_or_none()
@@ -553,8 +553,8 @@ async def reactivate_subscription(
         raise HTTPException(status_code=500, detail="Failed to reactivate subscription")
 
 
-@router.get("/payment-plans")
-async def get_payment_plans():
+# @router.get("/payment-plans")
+# async def get_payment_plans():
     """Get available payment plans"""
     try:
         # Also fetch plan details from Razorpay to verify
