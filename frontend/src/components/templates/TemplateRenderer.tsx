@@ -53,7 +53,7 @@ interface TemplateRendererProps {
     accent: string;
     text: string;
     background: string;
-  };
+  } | null;
   size?: 'small' | 'normal';
   mode?: 'default' | 'live';
 }
@@ -79,7 +79,7 @@ const TEMPLATE_COMPONENTS = {
 
 const TemplateComponent = memo(({ templateId, userData, colors, size, mode }: TemplateRendererProps) => {
   const Component = TEMPLATE_COMPONENTS[templateId as keyof typeof TEMPLATE_COMPONENTS] || ModernMinimalist;
-  return <Component userData={userData} colors={colors} size={size} mode={mode} />;
+  return <Component userData={userData} colors={colors ?? undefined} size={size} mode={mode} />;
 });
 
 TemplateComponent.displayName = 'TemplateComponent';
@@ -166,7 +166,7 @@ export const TemplatePreview = memo(function TemplatePreview({
     accent: string;
     text: string;
     background: string;
-  };
+  } | null;
 }) {
   const template = useMemo(() => getTemplateById(templateId), [templateId]);
 

@@ -282,7 +282,7 @@ export default function TermsOfService() {
                                     <div>
                                         <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-3">Service Description</h2>
                                         <p className="text-gray-600 text-lg leading-relaxed mb-6">
-                                            ResumeAI is an online platform that provides AI-powered resume creation tools, 
+                                            resumeai world is an online platform that provides AI-powered resume creation tools, 
                                             professional templates, and career enhancement features.
                                         </p>
                                     </div>
@@ -482,7 +482,7 @@ export default function TermsOfService() {
                                     <div>
                                         <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-3">Intellectual Property Rights</h2>
                                         <p className="text-gray-600 text-lg leading-relaxed">
-                                            ResumeAI and its content are protected by intellectual property laws. 
+                                            resumeai world and its content are protected by intellectual property laws. 
                                             We respect the intellectual property rights of others and expect users to do the same.
                                         </p>
                                     </div>

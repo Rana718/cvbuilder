@@ -163,7 +163,7 @@ export default function ShippingAndExchange() {
 
                                 <div className="prose prose-gray max-w-none">
                                     <p className="text-gray-700 leading-relaxed mb-4">
-                                        ResumeAI is a digital service platform that provides instant access to AI-powered resume creation tools, 
+                                        Resumeai world is a digital service platform that provides instant access to AI-powered resume creation tools, 
                                         templates, and career resources. Since our services are entirely digital, there are no physical products 
                                         to ship or traditional shipping policies to consider.
                                     </p>

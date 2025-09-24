@@ -10,7 +10,7 @@ const reviews = [
         company: "Fortune 500 Company",
         rating: 5,
         avatar: "SJ",
-        text: "This ResumeAI transformed my career search! The intelligent suggestions helped me articulate my achievements perfectly. I landed my dream role within 3 weeks of updating my resume."
+        text: "This Resumeai world transformed my career search! The intelligent suggestions helped me articulate my achievements perfectly. I landed my dream role within 3 weeks of updating my resume."
     },
     {
         name: "Michael Chen",

@@ -240,7 +240,7 @@ export default function PrivacyPolicy() {
                                     <div>
                                         <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-3">Privacy Overview</h2>
                                         <p className="text-gray-600 text-lg leading-relaxed">
-                                            At ResumeAI, we believe privacy is a fundamental right. This policy explains how we handle 
+                                            At resumeai world, we believe privacy is a fundamental right. This policy explains how we handle 
                                             your personal data with care, transparency, and in compliance with global privacy regulations 
                                             including GDPR, CCPA, and other applicable laws.
                                         </p>
