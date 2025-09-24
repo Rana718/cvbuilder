@@ -87,6 +87,14 @@ export interface ResumeState {
     summary: string
     additionalSections: AdditionalSection[]
     colorTheme: ColorTheme
+    aiGenerated: {
+        skills: boolean
+        summary: boolean
+    }
+    aiSuggestions: {
+        skills: string[]
+        summary: string[]
+    }
 }
 
 interface ResumeStore extends ResumeState {
@@ -149,6 +157,12 @@ interface ResumeStore extends ResumeState {
     // Summary
     setSummary: (summary: string) => void
 
+    // AI Generation tracking
+    setAiGenerated: (field: 'skills' | 'summary', value: boolean) => void
+    isAiGenerated: (field: 'skills' | 'summary') => boolean
+    setAiSuggestions: (field: 'skills' | 'summary', suggestions: string[]) => void
+    getAiSuggestions: (field: 'skills' | 'summary') => string[]
+
     // Additional Sections
     addAdditionalSection: (section: Omit<AdditionalSection, 'id'>) => void
     updateAdditionalSection: (id: string, section: Partial<AdditionalSection>) => void
@@ -188,6 +202,14 @@ const initialState: ResumeState = {
     colorTheme: {
         name: 'Default',
         colors: null
+    },
+    aiGenerated: {
+        skills: false,
+        summary: false
+    },
+    aiSuggestions: {
+        skills: [],
+        summary: []
     }
 }
 
@@ -545,6 +567,21 @@ export const useResumeStore = create<ResumeStore>()(
 
     // Summary
     setSummary: (summary) => set({ summary }),
+
+    // AI Generation tracking
+    setAiGenerated: (field, value) => 
+        set((state) => ({
+            aiGenerated: { ...state.aiGenerated, [field]: value }
+        })),
+
+    isAiGenerated: (field) => get().aiGenerated[field],
+
+    setAiSuggestions: (field, suggestions) =>
+        set((state) => ({
+            aiSuggestions: { ...state.aiSuggestions, [field]: suggestions }
+        })),
+
+    getAiSuggestions: (field) => get().aiSuggestions[field],
 
     // Additional Sections
     addAdditionalSection: (section) =>

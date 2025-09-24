@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { Plus, Award, Star, ChevronLeft, ChevronRight, Sparkles, Trash } from 'lucide-react'
 import { useResumeStore, Skill } from '@/store/resumeStore'
 import { useStreamingSkills } from '@/utils/cvStreamingApi'
@@ -10,24 +10,51 @@ interface SkillsStepProps {
 }
 
 function SkillsStep({ onNext, onPrev }: SkillsStepProps) {
-  const { skills, addSkill, updateSkill, removeSkill, workExperience } = useResumeStore()
+  const { 
+    skills, 
+    addSkill, 
+    updateSkill, 
+    removeSkill, 
+    workExperience, 
+    setAiGenerated, 
+    isAiGenerated,
+    setAiSuggestions,
+    getAiSuggestions
+  } = useResumeStore()
   const { generateSkills } = useStreamingSkills()
   const [showAddForm, setShowAddForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
-  const [aiSuggestedSkills, setAiSuggestedSkills] = useState<string[]>([])
   const [isLoadingSkills, setIsLoadingSkills] = useState(false)
   const [streamingContent, setStreamingContent] = useState('')
   const { documentId } = useResumeStore()
-  const hasCalledAPI = useRef(false)
+  const isInitialized = useRef(false)
   const [formData, setFormData] = useState<Omit<Skill, 'id'>>({
     name: '',
     rating: 3
   })
 
-  const fetchAISkills = async () => {
-    if (hasCalledAPI.current) return
+  // Get suggestions from store
+  const aiSuggestedSkills = getAiSuggestions('skills')
 
-    if (!workExperience || workExperience.length === 0) return
+  // Auto-generate skills on component mount - ONLY ONCE
+  useEffect(() => {
+    if (!isInitialized.current && !isAiGenerated('skills') && !isLoadingSkills) {
+      isInitialized.current = true
+      fetchAISkills()
+    }
+  }, [])
+
+  const handleRegenerateSkills = () => {
+    isInitialized.current = false
+    setAiGenerated('skills', false)
+    setAiSuggestions('skills', [])
+    // Clear existing skills before regenerating
+    skills.forEach(skill => removeSkill(skill.id))
+    fetchAISkills()
+  }
+
+  const fetchAISkills = async () => {
+    if (isLoadingSkills || isAiGenerated('skills')) return
 
     const experienceData = workExperience.map(exp => ({
       title: exp.jobTitle,
@@ -37,31 +64,35 @@ function SkillsStep({ onNext, onPrev }: SkillsStepProps) {
 
     setIsLoadingSkills(true)
     setStreamingContent('')
-    setAiSuggestedSkills([])
-    hasCalledAPI.current = true
 
-    await generateSkills(
-      {
-        workExperience: JSON.stringify(experienceData)
-      },
-      // onChunk - update streaming content
-      (content: string) => {
-        setStreamingContent(prev => prev + content)
-      },
-      // onComplete - set final skills
-      (skills: string[]) => {
-        setAiSuggestedSkills(skills)
-        setIsLoadingSkills(false)
-        setStreamingContent('')
-      },
-      // onError
-      (error: string) => {
-        console.error('Failed to fetch AI skills:', error)
-        setIsLoadingSkills(false)
-        setStreamingContent('')
-        hasCalledAPI.current = false
-      }
-    )
+    try {
+      await generateSkills(
+        {
+          workExperience: JSON.stringify(experienceData)
+        },
+        // onChunk - update streaming content
+        (content: string) => {
+          setStreamingContent(prev => prev + content)
+        },
+        // onComplete - set final skills
+        (skills: string[]) => {
+          setAiSuggestions('skills', skills)
+          setAiGenerated('skills', true)
+          setIsLoadingSkills(false)
+          setStreamingContent('')
+        },
+        // onError
+        (error: string) => {
+          console.error('Failed to fetch AI skills:', error)
+          setIsLoadingSkills(false)
+          setStreamingContent('')
+        }
+      )
+    } catch (error) {
+      console.error('Failed to fetch AI skills:', error)
+      setIsLoadingSkills(false)
+      setStreamingContent('')
+    }
   }
 
   const resetForm = () => {
@@ -328,7 +359,7 @@ function SkillsStep({ onNext, onPrev }: SkillsStepProps) {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={fetchAISkills}
+                onClick={handleRegenerateSkills}
                 className="flex items-center space-x-2 px-3 md:px-4 py-1.5 md:py-2 bg-blue-600 text-white rounded-sm hover:bg-blue-700 text-xs md:text-sm font-medium transition-all"
               >
                 <Sparkles className="w-3 h-3 md:w-4 md:h-4" />

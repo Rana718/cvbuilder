@@ -21,20 +21,38 @@ function SummaryStep({ onNext, onPrev }: SummaryStepProps) {
         setSummary,  
         personalInfo, 
         workExperience, 
-        education, 
         skills,
-        saveResume,
         documentId,
         templateId,
-        generatePreviewId
+        generatePreviewId,
+        setAiGenerated,
+        isAiGenerated,
+        setAiSuggestions,
+        getAiSuggestions
     } = resumeStore
     
-    const [aiSuggestions, setAiSuggestions] = useState<string[]>([])
+    // Get suggestions from store
+    const aiSuggestions = getAiSuggestions('summary')
     const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false)
     const [streamingContent, setStreamingContent] = useState('')
     const [isSaving, setIsSaving] = useState(false)
+    const isInitialized = useRef(false)
     
-    const hasCalledAPI = useRef(false)
+    // Auto-generate summary on component mount - ONLY ONCE
+    useEffect(() => {
+        if (!isInitialized.current && !isAiGenerated('summary') && !isLoadingSuggestions) {
+            isInitialized.current = true
+            fetchAISummary()
+        }
+    }, [])
+
+    const handleRegenerateSummary = () => {
+        isInitialized.current = false
+        setAiGenerated('summary', false)
+        setAiSuggestions('summary', [])
+        setSummary('') // Clear existing summary
+        fetchAISummary()
+    }
 
     const handleFinish = () => {
         if (isSaving) return
@@ -73,39 +91,40 @@ function SummaryStep({ onNext, onPrev }: SummaryStepProps) {
     }
 
     const fetchAISummary = async () => {
-        // Prevent multiple API calls
-        if (hasCalledAPI.current) {
+        if (isLoadingSuggestions) {
             return
         }
         
         setIsLoadingSuggestions(true)
         setStreamingContent('')
-        setAiSuggestions([])
-        hasCalledAPI.current = true
+        setAiSuggestions('summary', [])
         
         const cvData = buildCvData()
         
-        await generateSummary(
-            { cvData },
-            // onChunk - update streaming content
-            (content: string) => {
-                setStreamingContent(prev => prev + content)
-            },
-            // onComplete - set final suggestions
-            (summary: string[]) => {
-                setAiSuggestions(summary)
-                setIsLoadingSuggestions(false)
-                setStreamingContent('')
-            },
-            // onError
-            (error: string) => {
-                console.error('Failed to fetch AI summary suggestions:', error)
-                setIsLoadingSuggestions(false)
-                setStreamingContent('')
-                // Reset the flag on error so user can retry
-                hasCalledAPI.current = false
-            }
-        )
+        try {
+            await generateSummary(
+                { cvData },
+                (content: string) => {
+                    setStreamingContent(prev => prev + content)
+                },
+                (summary: string[]) => {
+                    setAiSuggestions('summary', summary)
+                    setAiGenerated('summary', true)
+                    setIsLoadingSuggestions(false)
+                    setStreamingContent('')
+                    if (summary.length > 0) setSummary(summary[0])
+                },
+                (error: string) => {
+                    console.error('Failed to fetch AI summary suggestions:', error)
+                    setIsLoadingSuggestions(false)
+                    setStreamingContent('')
+                }
+            )
+        } catch (error) {
+            console.error('Failed to fetch AI summary suggestions:', error)
+            setIsLoadingSuggestions(false)
+            setStreamingContent('')
+        }
     }
 
 
@@ -203,7 +222,7 @@ function SummaryStep({ onNext, onPrev }: SummaryStepProps) {
                                 <motion.button
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
-                                    onClick={fetchAISummary}
+                                    onClick={handleRegenerateSummary}
                                     className="flex items-center space-x-2 px-3 md:px-4 py-1.5 md:py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:from-blue-600 hover:to-indigo-700 text-xs md:text-sm font-medium transition-all shadow-md"
                                 >
                                     <Sparkles className="w-3 h-3 md:w-4 md:h-4" />
