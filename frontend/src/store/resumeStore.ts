@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import axiosInstance from '@/lib/axios'
+import { COLOR_THEMES } from '@/components/ui/ColorThemePicker'
 
 export interface PersonalInfo {
     firstName: string
@@ -62,6 +63,17 @@ export interface AdditionalSection {
     content: string
 }
 
+export interface ColorTheme {
+    name: string
+    colors: {
+        primary: string
+        secondary: string
+        accent: string
+        text: string
+        background: string
+    } | null
+}
+
 export interface ResumeState {
     currentStep: number
     templateId: string
@@ -74,6 +86,7 @@ export interface ResumeState {
     projects: Project[]
     summary: string
     additionalSections: AdditionalSection[]
+    colorTheme: ColorTheme
 }
 
 interface ResumeStore extends ResumeState {
@@ -84,6 +97,9 @@ interface ResumeStore extends ResumeState {
 
     // Template
     setTemplateId: (id: string) => void
+
+    // Color Theme
+    setColorTheme: (theme: ColorTheme) => void
 
     // Document ID
     setDocumentId: (id: number) => void
@@ -168,7 +184,11 @@ const initialState: ResumeState = {
     skills: [],
     projects: [],
     summary: '',
-    additionalSections: []
+    additionalSections: [],
+    colorTheme: {
+        name: 'Default',
+        colors: null
+    }
 }
 
 export const useResumeStore = create<ResumeStore>()(
@@ -183,6 +203,9 @@ export const useResumeStore = create<ResumeStore>()(
 
             // Template
             setTemplateId: (id) => set({ templateId: id }),
+
+            // Color Theme
+            setColorTheme: (theme) => set({ colorTheme: theme }),
 
             // Document ID
             setDocumentId: (id) => set({ documentId: id }),
@@ -256,7 +279,7 @@ export const useResumeStore = create<ResumeStore>()(
                     : website.url.replace(/^https?:\/\//, '').replace(/\/$/, '')
             })),
             template_id: parseInt(state.templateId) || 1,
-            theme_color: 'blue'
+            theme_color: state.colorTheme.name.toLowerCase().replace(/\s+/g, '_')
         }
 
         try {
@@ -362,10 +385,17 @@ export const useResumeStore = create<ResumeStore>()(
             ]
         }
 
+        // Find color theme by name or use default
+        const themeColorName = data.theme_color || 'blue_professional'
+        const colorTheme = COLOR_THEMES.find(theme => 
+            theme.name.toLowerCase().replace(/\s+/g, '_') === themeColorName.toLowerCase()
+        ) || COLOR_THEMES[0]
+
         set({
             documentId: data.id,
             shareableUuid: data.sharedable_uuid || null,
             templateId: data.template_id?.toString() || '',
+            colorTheme: colorTheme,
             personalInfo: {
                 firstName: data.name?.split(' ')[0] || '',
                 lastName: data.name?.split(' ').slice(1).join(' ') || '',
@@ -576,7 +606,8 @@ export const useResumeStore = create<ResumeStore>()(
         projects: state.projects,
         summary: state.summary,
         additionalSections: state.additionalSections,
-        currentStep: state.currentStep
+        currentStep: state.currentStep,
+        colorTheme: state.colorTheme
     }),
     // Migration function for version updates
     migrate: (persistedState: any, version: number) => {

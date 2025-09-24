@@ -7,10 +7,12 @@ import { CV_TEMPLATES, TEMPLATE_CATEGORIES } from "@/constants/templates";
 import { TemplatePreview } from "@/components/templates/TemplateRenderer";
 import TemplateSelector from "@/components/TemplateSelector";
 import Navbar from "@/components/Navbar";
+import { COLOR_THEMES } from "@/components/ui/ColorThemePicker";
 
 export default function TemplatesPage() {
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedCategory, setSelectedCategory] = useState("All");
+    const [selectedColorTheme, setSelectedColorTheme] = useState(COLOR_THEMES[0]);
 
     const filteredTemplates = CV_TEMPLATES.filter(template => {
         const matchesSearch = template.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -79,6 +81,39 @@ export default function TemplatesPage() {
                     transition={{ duration: 0.8, delay: 0.5 }}
                     className="mb-8 space-y-4"
                 >
+                    {/* Color Theme Selector */}
+                    <div className="max-w-4xl mx-auto">
+                        <p className="text-center text-sm font-medium text-gray-700 mb-3">Choose Color Theme</p>
+                        <div className="flex justify-center">
+                            <div className="flex gap-3 bg-white/90 backdrop-blur-sm rounded-2xl p-3 shadow-lg overflow-x-auto">
+                                {COLOR_THEMES.map((theme) => (
+                                    <button
+                                        key={theme.name}
+                                        onClick={() => setSelectedColorTheme(theme)}
+                                        className={`flex-shrink-0 p-3 rounded-xl border-2 transition-all ${
+                                            selectedColorTheme.name === theme.name
+                                                ? 'border-blue-500 bg-blue-50 shadow-md'
+                                                : 'border-gray-200 hover:border-gray-300 hover:shadow-sm'
+                                        }`}
+                                        title={theme.name}
+                                    >
+                                        <div className="flex space-x-1">
+                                            <div 
+                                                className="w-5 h-5 rounded border border-gray-300" 
+                                                style={{ 
+                                                backgroundColor: theme.colors?.primary || '#ffffff',
+                                                backgroundImage: theme.colors ? undefined : 'linear-gradient(45deg, #e5e7eb 25%, transparent 25%), linear-gradient(-45deg, #e5e7eb 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #e5e7eb 75%), linear-gradient(-45deg, transparent 75%, #e5e7eb 75%)',
+                                                backgroundSize: theme.colors ? undefined : '5px 5px',
+                                                backgroundPosition: theme.colors ? undefined : '0 0, 0 2.5px, 2.5px -2.5px, -2.5px 0px'
+                                            }}
+                                            />
+                                        </div>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
                     <div className="relative max-w-md mx-auto">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                         <input
@@ -139,7 +174,10 @@ export default function TemplatesPage() {
                                 <TemplateSelector templateId={template.id.toString()}>
                                     <div className="w-full h-full flex items-center justify-center p-2">
                                         <div className="w-full h-full origin-center">
-                                            <TemplatePreview templateId={template.id} />
+                                            <TemplatePreview 
+                                                templateId={template.id} 
+                                                colors={selectedColorTheme.colors ?? undefined}
+                                            />
                                         </div>
                                     </div>
                                 </TemplateSelector>

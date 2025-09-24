@@ -147,7 +147,7 @@ export default function CreativePortfolio({ userData, colors, size = 'normal', m
                   fontSize: styles.name.fontSize,
                   fontWeight: styles.name.fontWeight,
                   letterSpacing: styles.name.letterSpacing,
-                  background: `linear-gradient(45deg, ${theme.primary}, ${theme.secondary})`,
+                  backgroundImage: `linear-gradient(45deg, ${theme.primary}, ${theme.secondary})`,
                   backgroundClip: 'text',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',

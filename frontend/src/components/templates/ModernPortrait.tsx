@@ -181,7 +181,7 @@ export default function ModernPortrait({ userData, colors, size = 'normal', mode
                 fontSize: styles.name.fontSize,
                 fontWeight: styles.name.fontWeight,
                 letterSpacing: styles.name.letterSpacing,
-                background: `linear-gradient(135deg, ${theme.primary}, ${theme.accent})`,
+                backgroundImage: `linear-gradient(135deg, ${theme.primary}, ${theme.accent})`,
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text',

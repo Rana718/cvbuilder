@@ -21,7 +21,8 @@ function ResumePreview({ mode = 'default', pass}: ResumePreviewProps) {
         projects,
         summary, 
         additionalSections, 
-        templateId 
+        templateId,
+        colorTheme
     } = useResumeStore()
     
     // Convert resume store data to UserData format expected by templates
@@ -109,6 +110,7 @@ function ResumePreview({ mode = 'default', pass}: ResumePreviewProps) {
             <TemplateRenderer 
                 templateId={templateIdNumber}
                 userData={userData}
+                colors={colorTheme.colors}
                 size={resumeSize}
                 mode={mode}
             />

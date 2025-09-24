@@ -155,10 +155,18 @@ const SAMPLE_DATA: UserData = {
 
 export const TemplatePreview = memo(function TemplatePreview({ 
   templateId, 
-  size = 'small' 
+  size = 'small',
+  colors
 }: { 
   templateId: number; 
-  size?: 'small' | 'normal' 
+  size?: 'small' | 'normal';
+  colors?: {
+    primary: string;
+    secondary: string;
+    accent: string;
+    text: string;
+    background: string;
+  };
 }) {
   const template = useMemo(() => getTemplateById(templateId), [templateId]);
 
@@ -166,7 +174,12 @@ export const TemplatePreview = memo(function TemplatePreview({
 
   return (
     <div className="relative bg-white border border-gray-200 rounded-lg shadow-md hover:shadow-lg transition-all aspect-[1/1.414] overflow-hidden">
-      <TemplateRenderer templateId={templateId} userData={SAMPLE_DATA} size="small" />
+      <TemplateRenderer 
+        templateId={templateId} 
+        userData={SAMPLE_DATA} 
+        colors={colors}
+        size="small" 
+      />
     </div>
   );
 });

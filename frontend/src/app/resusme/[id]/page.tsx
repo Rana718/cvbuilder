@@ -6,7 +6,8 @@ import { useAuth } from '@/components/AuthContext'
 import { useResumeStore } from '@/store/resumeStore'
 import { usePremiumStatus } from '@/hooks/usePremiumStatus'
 import ResumePreview from '@/components/ui/ResumePreview'
-import { ArrowLeft, Download, Save, Edit, Share, CheckCircle, Search, Grid3X3, X } from 'lucide-react'
+import ColorThemePicker, { COLOR_THEMES } from '@/components/ui/ColorThemePicker'
+import { ArrowLeft, Download, Save, Edit, Share, CheckCircle, Search, Grid3X3, X, Palette } from 'lucide-react'
 import Link from 'next/link'
 import axiosInstance from '@/lib/axios'
 import { CV_TEMPLATES, TEMPLATE_CATEGORIES } from '@/constants/templates'
@@ -55,12 +56,14 @@ const TemplateItem = React.memo(({
     template, 
     templateId, 
     onTemplateChange,
-    index 
+    index,
+    colorTheme 
 }: { 
     template: any, 
     templateId: string | null, 
     onTemplateChange: (id: number) => void,
-    index: number 
+    index: number,
+    colorTheme: any
 }) => (
     <motion.div
         key={template.id}
@@ -78,7 +81,12 @@ const TemplateItem = React.memo(({
             {/* Template Preview */}
             <div className="w-full bg-white overflow-hidden flex justify-center" style={{ height: '320px' }}>
                 <div className="w-[794px] h-[1200px] transform scale-[0.3] origin-top bg-white border border-gray-500">
-                    <TemplateRenderer templateId={template.id} userData={SAMPLE_TEMPLATE_DATA} size="normal" />
+                    <TemplateRenderer 
+                        templateId={template.id} 
+                        userData={SAMPLE_TEMPLATE_DATA} 
+                        colors={colorTheme.colors}
+                        size="normal" 
+                    />
                 </div>
             </div>
 
@@ -107,7 +115,9 @@ const TemplateSelectorPanel = React.memo(({
     filteredTemplates,
     templateId,
     onTemplateChange,
-    onClose 
+    onClose,
+    colorTheme,
+    onColorThemeChange
 }: {
     searchTerm: string,
     setSearchTerm: (term: string) => void,
@@ -116,7 +126,9 @@ const TemplateSelectorPanel = React.memo(({
     filteredTemplates: any[],
     templateId: string | null,
     onTemplateChange: (id: number) => void,
-    onClose?: () => void
+    onClose?: () => void,
+    colorTheme: any,
+    onColorThemeChange: (theme: any) => void
 }) => (
     <div className="bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl h-full overflow-hidden flex flex-col border border-white/20">
         <div className="p-4 border-b border-gray-200/50">
@@ -130,6 +142,37 @@ const TemplateSelectorPanel = React.memo(({
                         <X className="w-5 h-5 text-gray-500" />
                     </button>
                 )}
+            </div>
+
+            {/* Color Theme Selector */}
+            <div className="mb-4">
+                <p className="text-sm font-medium text-gray-700 mb-2">Color Theme</p>
+                <div className="flex gap-2 overflow-x-auto pb-2">
+                    {COLOR_THEMES.map((theme) => (
+                        <button
+                            key={theme.name}
+                            onClick={() => onColorThemeChange(theme)}
+                            className={`flex-shrink-0 p-2 rounded-lg border-2 transition-all ${
+                                colorTheme.name === theme.name
+                                    ? 'border-blue-500 bg-blue-50'
+                                    : 'border-gray-200 hover:border-gray-300'
+                            }`}
+                            title={theme.name}
+                        >
+                            <div className="flex space-x-1">
+                                <div 
+                                    className="w-4 h-4 rounded border border-gray-300" 
+                                    style={{ 
+                                        backgroundColor: theme.colors?.primary || '#ffffff',
+                                        backgroundImage: theme.colors ? undefined : 'linear-gradient(45deg, #e5e7eb 25%, transparent 25%), linear-gradient(-45deg, #e5e7eb 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #e5e7eb 75%), linear-gradient(-45deg, transparent 75%, #e5e7eb 75%)',
+                                        backgroundSize: theme.colors ? undefined : '4px 4px',
+                                        backgroundPosition: theme.colors ? undefined : '0 0, 0 2px, 2px -2px, -2px 0px'
+                                    }}
+                                />
+                            </div>
+                        </button>
+                    ))}
+                </div>
             </div>
 
             {/* Search Bar */}
@@ -180,6 +223,7 @@ const TemplateSelectorPanel = React.memo(({
                         templateId={templateId}
                         onTemplateChange={onTemplateChange}
                         index={i}
+                        colorTheme={colorTheme}
                     />
                 ))}
             </div>
@@ -200,7 +244,7 @@ function ResumePage() {
 
     const {
         personalInfo, setDocumentId, saveResume, loadResume, hasData, documentId,
-        shareableUuid, setShareableUuid, setTemplateId
+        shareableUuid, setShareableUuid, setTemplateId, colorTheme, setColorTheme
     } = useResumeStore()
 
     const [isSaving, setIsSaving] = useState(false)
@@ -482,6 +526,8 @@ function ResumePage() {
                         filteredTemplates={filteredTemplates}
                         templateId={templateId}
                         onTemplateChange={handleTemplateChange}
+                        colorTheme={colorTheme}
+                        onColorThemeChange={setColorTheme}
                     />
                 </div>
 
@@ -524,6 +570,8 @@ function ResumePage() {
                                         templateId={templateId}
                                         onTemplateChange={handleTemplateChange}
                                         onClose={() => setShowTemplateSelector(false)}
+                                        colorTheme={colorTheme}
+                                        onColorThemeChange={setColorTheme}
                                     />
                                 </motion.div>
                             </motion.div>
@@ -546,6 +594,11 @@ function ResumePage() {
                                         <span>Edit</span>
                                     </Link>
                                 </motion.div>
+
+                                <ColorThemePicker
+                                    selectedTheme={colorTheme}
+                                    onThemeChange={setColorTheme}
+                                />
 
                                 <motion.button
                                     whileHover={{ scale: 1.05 }}
@@ -602,6 +655,17 @@ function ResumePage() {
                                         <span>Edit</span>
                                     </Link>
 
+                                    <div className="flex-1 ">
+                                        <ColorThemePicker
+                                            selectedTheme={colorTheme}
+                                            onThemeChange={setColorTheme}
+                                            className="w-full"
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Row 2 */}
+                                <div className="flex space-x-3">
                                     <button
                                         onClick={handleSave}
                                         disabled={isSaving}
@@ -610,10 +674,7 @@ function ResumePage() {
                                         <Save className="w-4 h-4" />
                                         <span>{isSaving ? 'Saving...' : 'Save'}</span>
                                     </button>
-                                </div>
 
-                                {/* Row 2 */}
-                                <div className="flex space-x-3">
                                     <button
                                         onClick={handleShare}
                                         disabled={isSharing}
@@ -628,11 +689,14 @@ function ResumePage() {
                                             {isSharing ? 'Sharing...' : showShareSuccess ? 'Copied!' : 'Share'}
                                         </span>
                                     </button>
+                                </div>
 
+                                {/* Row 3 */}
+                                <div className="flex">
                                     <button
                                         onClick={handleDownload}
                                         disabled={isDownloading}
-                                        className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-4 py-3 rounded-xl font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 shadow-lg text-sm"
+                                        className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-4 py-3 rounded-xl font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 shadow-lg text-sm"
                                     >
                                         <Download className="w-4 h-4" />
                                         <span>

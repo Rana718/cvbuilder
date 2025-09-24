@@ -15,12 +15,13 @@ import TemplateSelector from '@/components/TemplateSelector'
 import { CV_TEMPLATES } from '@/constants/templates'
 import { useResumeStore } from '@/store/resumeStore'
 import { TemplatePreview } from '@/components/templates/TemplateRenderer'
+import { COLOR_THEMES } from '@/components/ui/ColorThemePicker'
 import { Palette, X, Eye } from 'lucide-react'
 
 function DesktopFrom() {
     const router = useRouter()
     const { currentStep, setCurrentStep } = useStepNavigation()
-    const { templateId, setTemplateId } = useResumeStore()
+    const { templateId, setTemplateId, colorTheme, setColorTheme } = useResumeStore()
     const [showTemplateSelector, setShowTemplateSelector] = useState(false)
     const [showResumePopup, setShowResumePopup] = useState(false)
 
@@ -142,6 +143,34 @@ function DesktopFrom() {
                             </button>
                         </div>
 
+                        <div className="p-6 border-b">
+                            <p className="text-sm font-medium text-gray-700 mb-3">Color Theme</p>
+                            <div className="flex gap-2 overflow-x-auto">
+                                {COLOR_THEMES.map((theme) => (
+                                    <button
+                                        key={theme.name}
+                                        onClick={() => setColorTheme(theme)}
+                                        className={`flex-shrink-0 p-2 rounded-lg border-2 transition-all ${
+                                            colorTheme.name === theme.name
+                                                ? 'border-blue-500 bg-blue-50'
+                                                : 'border-gray-200 hover:border-gray-300'
+                                        }`}
+                                        title={theme.name}
+                                    >
+                                        <div 
+                                            className="w-4 h-4 rounded border border-gray-300" 
+                                            style={{ 
+                                            backgroundColor: theme.colors?.primary || '#ffffff',
+                                            backgroundImage: theme.colors ? undefined : 'linear-gradient(45deg, #e5e7eb 25%, transparent 25%), linear-gradient(-45deg, #e5e7eb 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #e5e7eb 75%), linear-gradient(-45deg, transparent 75%, #e5e7eb 75%)',
+                                            backgroundSize: theme.colors ? undefined : '4px 4px',
+                                            backgroundPosition: theme.colors ? undefined : '0 0, 0 2px, 2px -2px, -2px 0px'
+                                        }}
+                                        />
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
                         <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                 {CV_TEMPLATES.map((template) => (
@@ -161,7 +190,11 @@ function DesktopFrom() {
                                     >
                                         <div className="aspect-[1/1.414] overflow-hidden relative bg-white flex items-center justify-center p-1">
                                             <div className="w-full h-full origin-center">
-                                                <TemplatePreview templateId={template.id} size="small" />
+                                                <TemplatePreview 
+                                                    templateId={template.id} 
+                                                    size="small" 
+                                                    colors={colorTheme.colors}
+                                                />
                                             </div>
                                         </div>
 
