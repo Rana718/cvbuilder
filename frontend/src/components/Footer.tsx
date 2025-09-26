@@ -54,7 +54,7 @@ function Footer() {
                                     <FileText className="h-4 w-4 text-white" />
                                 </div>
                                 <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-                                    Resumeai world
+                                    Ai-rezume builder
                                 </span>
                             </div>
                             
@@ -125,7 +125,7 @@ function Footer() {
                         <div>
                             <h3 className="text-base font-semibold mb-4 flex items-center text-yellow-500">
                                 <Award className="h-4 w-4 mr-2" />
-                                Resumeai world 
+                                Ai-rezume builder 
                             </h3>
                             <ul className="space-y-2">
                                 {legalLinks.map((link, index) => (

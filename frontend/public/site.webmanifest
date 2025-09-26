@@ -1,6 +1,6 @@
 {
-  "name": "ResumeAI.World - AI-Powered Resume Builder",
-  "short_name": "ResumeAI.World",
+  "name": "Ai-rezume builder - AI-Powered Resume Builder",
+  "short_name": "Ai-rezume builder",
   "description": "Create professional resumes and cover letters with our AI-powered CV builder. ATS-friendly templates, LinkedIn integration, and expert guidance.",
   "start_url": "/",
   "display": "standalone",

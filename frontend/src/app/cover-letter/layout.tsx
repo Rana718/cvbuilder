@@ -9,7 +9,7 @@ export default function CoverLetterLayout({
   children: React.ReactNode
 }) {
   const structuredData = generateStructuredData('WebApplication', {
-    name: "AI Cover Letter Generator - ResumeAI.World",
+    name: "AI Cover Letter Generator - Ai-rezume builder",
     description: seoPages.coverLetter.description,
     url: seoPages.coverLetter.url,
     features: [

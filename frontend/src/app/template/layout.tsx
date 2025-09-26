@@ -9,7 +9,7 @@ export default function TemplateLayout({
   children: React.ReactNode
 }) {
   const structuredData = generateStructuredData('WebApplication', {
-    name: "Resume Templates - ResumeAI.World",
+    name: "Resume Templates - Ai-rezume builder",
     description: seoPages.templates.description,
     url: seoPages.templates.url,
     features: [

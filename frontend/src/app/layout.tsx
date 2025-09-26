@@ -91,8 +91,8 @@ const nunitoSans = Nunito_Sans({
 
 export const metadata: Metadata = {
   title: {
-    default: "ResumeAI.World - Create Professional Resumes & Cover Letters with AI",
-    template: "%s | ResumeAI.World"
+    default: "Ai-rezume builder - Create Professional Resumes & Cover Letters with AI",
+    template: "%s | Ai-rezume builder"
   },
   description: "Create professional resumes and cover letters with our AI-powered CV builder. ATS-friendly templates, LinkedIn integration, and expert guidance. Build your perfect resume in minutes.",
   keywords: [
@@ -107,9 +107,9 @@ export const metadata: Metadata = {
     "resume templates",
     "CV builder online"
   ],
-  authors: [{ name: "ResumeAI.World Team" }],
-  creator: "ResumeAI.World",
-  publisher: "ResumeAI.World",
+  authors: [{ name: "Ai-rezume builder Team" }],
+  creator: "Ai-rezume builder",
+  publisher: "Ai-rezume builder",
   robots: {
     index: true,
     follow: true,
@@ -133,7 +133,7 @@ export const metadata: Metadata = {
         url: "/img/banner.png",
         width: 1200,
         height: 630,
-        alt: "ResumeAI.World - Professional Resume Creator",
+        alt: "Ai-rezume builder - Professional Resume Creator",
       },
     ],
   },
@@ -141,7 +141,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     site: "@resumeaiworld",
     creator: "@resumeaiworld",
-    title: "ResumeAI.World - Create Professional Resumes & Cover Letters with AI",
+    title: "Ai-rezume builder - Create Professional Resumes & Cover Letters with AI",
     description: "Create professional resumes and cover letters with our AI-powered CV builder. ATS-friendly templates, LinkedIn integration, and expert guidance.",
     images: ["/img/banner.png"],
   },
@@ -150,7 +150,7 @@ export const metadata: Metadata = {
     yandex: "your-yandex-verification-code",
     yahoo: "your-yahoo-verification-code",
     other: {
-      me: ["mailto:contact@resumeai.world"],
+      me: ["mailto:contact@Ai-rezume builder"],
     },
   },
   alternates: {
@@ -174,7 +174,7 @@ export default function RootLayout({
     description: "Create professional resumes and cover letters with our AI-powered CV builder. ATS-friendly templates, LinkedIn integration, and expert guidance.",
     author: {
       "@type": "Organization",
-      name: "ResumeAI.World Team",
+      name: "Ai-rezume builder Team",
       url: "https://resumeai.world"
     },
     offers: {
@@ -210,9 +210,9 @@ export default function RootLayout({
         <meta name="theme-color" content="#1e40af" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="ResumeAI.World" />
+        <meta name="apple-mobile-web-app-title" content="Ai-rezume builder" />
         <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="application-name" content="ResumeAI.World" />
+        <meta name="application-name" content="Ai-rezume builder" />
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />

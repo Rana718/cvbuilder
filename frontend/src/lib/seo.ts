@@ -23,7 +23,7 @@ export function generateMetadata(config: SEOConfig): Metadata {
     type = 'website',
     publishedTime,
     modifiedTime,
-    authors = ['ResumeAI.World Team'],
+    authors = ['Ai-rezume builder Team'],
     section
   } = config;
 
@@ -36,7 +36,7 @@ export function generateMetadata(config: SEOConfig): Metadata {
       title,
       description,
       url,
-      siteName: 'ResumeAI.World',
+      siteName: 'Ai-rezume builder',
       images: [
         {
           url: image,
@@ -70,7 +70,7 @@ export function generateMetadata(config: SEOConfig): Metadata {
 
 export const seoPages = {
   home: {
-    title: 'ResumeAI.World - Create Professional Resumes & Cover Letters Online',
+    title: 'Ai-rezume builder - Create Professional Resumes & Cover Letters Online',
     description: 'Create professional resumes and cover letters with our AI-powered CV builder. ATS-friendly templates, LinkedIn integration, and expert guidance. Build your perfect resume in minutes.',
     keywords: ['AI resume builder', 'online CV creator', 'professional resume templates', 'ATS friendly resume', 'cover letter generator'],
     url: 'https://resumeai.world',
@@ -95,7 +95,7 @@ export const seoPages = {
   },
   profile: {
     title: 'Profile Settings - Manage Your Account',
-    description: 'Manage your ResumeAI.World profile, update personal information, and configure your account settings for the best resume building experience.',
+    description: 'Manage your Ai-rezume builder profile, update personal information, and configure your account settings for the best resume building experience.',
     keywords: ['profile settings', 'account management', 'user preferences'],
     url: 'https://resumeai.world/profile',
   },
@@ -107,31 +107,31 @@ export const seoPages = {
   },
   signIn: {
     title: 'Sign In - Access Your Resume Builder Account',
-    description: 'Sign in to your ResumeAI.World account to access your resumes, cover letters, and premium features. Secure login with multiple authentication options.',
+    description: 'Sign in to your Ai-rezume builder account to access your resumes, cover letters, and premium features. Secure login with multiple authentication options.',
     keywords: ['sign in', 'login', 'account access', 'user authentication'],
     url: 'https://resumeai.world/sign-in',
   },
   signUp: {
     title: 'Sign Up - Create Your Free Resume Builder Account',
-    description: 'Create your free ResumeAI.World account and start building professional resumes today. Quick registration with instant access to templates and tools.',
+    description: 'Create your free Ai-rezume builder account and start building professional resumes today. Quick registration with instant access to templates and tools.',
     keywords: ['sign up', 'create account', 'free registration', 'get started'],
     url: 'https://resumeai.world/sign-up',
   },
   privacy: {
     title: 'Privacy Policy - How We Protect Your Data',
-    description: 'Learn how ResumeAI.World protects your personal information and resume data. Our comprehensive privacy policy explains our data handling practices.',
+    description: 'Learn how Ai-rezume builder protects your personal information and resume data. Our comprehensive privacy policy explains our data handling practices.',
     keywords: ['privacy policy', 'data protection', 'user privacy', 'data security'],
     url: 'https://resumeai.world/terms/privacy',
   },
   terms: {
     title: 'Terms of Service - Usage Guidelines',
-    description: 'Read our terms of service and usage guidelines for ResumeAI.World. Understand your rights and responsibilities when using our platform.',
+    description: 'Read our terms of service and usage guidelines for Ai-rezume builder. Understand your rights and responsibilities when using our platform.',
     keywords: ['terms of service', 'usage guidelines', 'user agreement'],
     url: 'https://resumeai.world/terms/policy',
   },
   refund: {
     title: 'Refund Policy - Money-Back Guarantee',
-    description: 'Our refund policy ensures your satisfaction with ResumeAI.World. Learn about our money-back guarantee and refund process.',
+    description: 'Our refund policy ensures your satisfaction with Ai-rezume builder. Learn about our money-back guarantee and refund process.',
     keywords: ['refund policy', 'money-back guarantee', 'customer satisfaction'],
     url: 'https://resumeai.world/terms/refund',
   },
@@ -147,14 +147,14 @@ export function generateStructuredData(type: 'WebApplication' | 'Article' | 'Org
     case 'WebApplication':
       return {
         ...baseSchema,
-        name: data.name || "ResumeAI.World",
+        name: data.name || "Ai-rezume builder",
         applicationCategory: "BusinessApplication",
         operatingSystem: "Web Browser",
         url: data.url || "https://resumeai.world",
         description: data.description,
         author: {
           "@type": "Organization",
-          name: "ResumeAI.World Team",
+          name: "Ai-rezume builder Team",
           url: "https://resumeai.world"
         },
         offers: data.offers || {
@@ -183,11 +183,11 @@ export function generateStructuredData(type: 'WebApplication' | 'Article' | 'Org
         description: data.description,
         author: {
           "@type": "Person",
-          name: data.author || "ResumeAI.World Team"
+          name: data.author || "Ai-rezume builder Team"
         },
         publisher: {
           "@type": "Organization",
-          name: "ResumeAI.World",
+          name: "Ai-rezume builder",
           logo: {
             "@type": "ImageObject",
             url: "https://resumeai.world/img/logo.png"
@@ -201,7 +201,7 @@ export function generateStructuredData(type: 'WebApplication' | 'Article' | 'Org
     case 'Organization':
       return {
         ...baseSchema,
-        name: "ResumeAI.World",
+        name: "Ai-rezume builder",
         url: "https://resumeai.world",
         logo: "https://resumeai.world/img/logo.png",
         description: "Professional AI-powered resume and cover letter builder",
