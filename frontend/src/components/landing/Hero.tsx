@@ -8,14 +8,15 @@ function Hero() {
     const router = useRouter();
 
     return (
-        <section className="relative overflow-hidden bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-100/50 min-h-screen flex items-center">
-            {/* Simplified Background */}
+        <section className="relative overflow-hidden bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-100/50 min-h-screen flex items-start md:items-center pt-6 md:pt-0">
             <div className="absolute inset-0">
                 <div className="absolute top-20 left-10 w-72 h-72 bg-gradient-to-r from-blue-400/10 to-indigo-500/10 rounded-full mix-blend-multiply filter blur-3xl animate-pulse"></div>
                 <div className="absolute top-40 right-10 w-64 h-64 bg-gradient-to-r from-purple-400/10 to-pink-500/10 rounded-full mix-blend-multiply filter blur-3xl animate-pulse delay-1000"></div>
             </div>
 
-            <div className="relative container mx-auto px-4 pt-8 md:pt-0">
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none"></div>
+
+            <div className="relative container mx-auto px-4">
                 {/* AI Badge */}
                 <motion.div
                     initial={{ y: 20, opacity: 0 }}

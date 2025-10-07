@@ -7,15 +7,15 @@ from middleware.auth import get_current_user
 import razorpay
 import os
 from datetime import datetime, timedelta
-from typing import Optional, List
 import uuid
 import logging
+import hmac
+import hashlib
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
-# Initialize Razorpay client
 razorpay_client = razorpay.Client(auth=(
     os.getenv("NEXT_PUBLIC_RAZORPAY_KEY_ID"),
     os.getenv("RAZORPAY_KEY_SECRET")
@@ -29,32 +29,15 @@ async def create_subscription(
 ):
     """Create a new Razorpay subscription for the user"""
     try:
-        # Check if user already has an active subscription
-        result = await db.execute(
-            select(Subscription).where(
-                Subscription.user_id == current_user.id,
-                Subscription.status == "active"
-            )
-        )
-        existing_subscription = result.scalar_one_or_none()
-        
-        if existing_subscription:
-            raise HTTPException(
-                status_code=400,
-                detail="User already has an active subscription"
-            )
-        
-        # Create customer in Razorpay
         customer_data = {
             "name": current_user.full_name,
             "email": current_user.email,
-            "fail_existing": "0"  # Don't fail if customer already exists
+            "fail_existing": "0"  
         }
         
         try:
             razorpay_customer = razorpay_client.customer.create(customer_data)
         except Exception as e:
-            # If customer already exists, fetch it
             if "Customer already exists" in str(e):
                 customers = razorpay_client.customer.all({"email": current_user.email})
                 if customers['items']:
@@ -65,7 +48,6 @@ async def create_subscription(
                 logger.error(f"Razorpay customer creation error: {str(e)}")
                 raise HTTPException(status_code=500, detail=f"Failed to create customer: {str(e)}")
         
-        # Create subscription in Razorpay
         plan_id = os.getenv("PLAN_ID")
         if not plan_id:
             raise HTTPException(status_code=500, detail="Plan ID not configured")
@@ -74,7 +56,7 @@ async def create_subscription(
             "plan_id": plan_id,
             "customer_id": razorpay_customer["id"],
             "quantity": 1,
-            "total_count": 1,  # 1 month only
+            "total_count": 1, 
             "notes": {
                 "user_id": str(current_user.id),
                 "email": current_user.email
@@ -87,7 +69,6 @@ async def create_subscription(
             logger.error(f"Razorpay subscription creation error: {str(e)}")
             raise HTTPException(status_code=500, detail=f"Failed to create subscription: {str(e)}")
         
-        # Save subscription to database
         subscription = Subscription(
             user_id=current_user.id,
             razorpay_customer_id=razorpay_customer["id"],
@@ -124,9 +105,11 @@ async def get_subscription_status(
     """Get user's subscription status"""
     try:
         result = await db.execute(
-            select(Subscription).where(Subscription.user_id == current_user.id)
+            select(Subscription)
+            .where(Subscription.user_id == current_user.id)
+            .order_by(desc(Subscription.created_at))
         )
-        subscription = result.scalar_one_or_none()
+        subscription = result.first()
         
         if not subscription:
             return {
@@ -135,9 +118,9 @@ async def get_subscription_status(
                 "status": "none"
             }
         
-        # Check if subscription is expired
+        subscription = subscription[0]  
+        
         if subscription.current_period_end and subscription.current_period_end < datetime.utcnow():
-            # Update user premium status if expired
             if current_user.is_premium:
                 current_user.is_premium = False
                 subscription.status = "expired"
@@ -167,23 +150,22 @@ async def cancel_subscription(
             select(Subscription).where(
                 Subscription.user_id == current_user.id,
                 Subscription.status == "active"
-            )
+            ).order_by(desc(Subscription.created_at))
         )
-        subscription = result.scalar_one_or_none()
+        subscription = result.first()
         
         if not subscription:
             raise HTTPException(status_code=404, detail="No active subscription found")
         
-        # Cancel subscription in Razorpay
+        subscription = subscription[0]  
+        
         try:
             razorpay_client.subscription.cancel(subscription.subscription_id, {
-                "cancel_at_cycle_end": 1  # Cancel at the end of current cycle
+                "cancel_at_cycle_end": 1
             })
         except Exception as e:
             logger.error(f"Error cancelling subscription in Razorpay: {str(e)}")
-            # Continue with local cancellation even if Razorpay fails
         
-        # Update subscription status
         subscription.status = "cancelled"
         subscription.updated_at = datetime.utcnow()
         await db.commit()
@@ -212,10 +194,6 @@ async def verify_payment(
         if not all([razorpay_payment_id, razorpay_order_id, razorpay_signature]):
             raise HTTPException(status_code=400, detail="Missing payment verification data")
         
-        # Verify payment signature
-        import hmac
-        import hashlib
-        
         key_secret = os.getenv("RAZORPAY_KEY_SECRET")
         message = f"{razorpay_order_id}|{razorpay_payment_id}"
         signature = hmac.new(
@@ -227,7 +205,6 @@ async def verify_payment(
         if not hmac.compare_digest(signature, razorpay_signature):
             raise HTTPException(status_code=400, detail="Invalid payment signature")
         
-        # Fetch payment details from Razorpay
         try:
             payment_details = razorpay_client.payment.fetch(razorpay_payment_id)
         except Exception as e:
@@ -237,18 +214,17 @@ async def verify_payment(
         if payment_details.get("status") != "captured":
             raise HTTPException(status_code=400, detail="Payment not captured")
         
-        # Update user to premium
         current_user.is_premium = True
         current_user.updated_at = datetime.utcnow()
         
-        # Find or create subscription
         result = await db.execute(
-            select(Subscription).where(Subscription.user_id == current_user.id)
+            select(Subscription)
+            .where(Subscription.user_id == current_user.id)
+            .order_by(desc(Subscription.created_at))
         )
-        subscription = result.scalar_one_or_none()
+        subscription_row = result.first()
         
-        if not subscription:
-            # Create new subscription record
+        if not subscription_row:
             subscription = Subscription(
                 user_id=current_user.id,
                 razorpay_customer_id=payment_details.get("customer_id", f"cust_{current_user.id}"),
@@ -258,14 +234,13 @@ async def verify_payment(
                 current_period_end=datetime.utcnow() + timedelta(days=30)
             )
             db.add(subscription)
-            await db.flush()  # Get subscription ID
+            await db.flush()  
         else:
-            # Update existing subscription
+            subscription = subscription_row[0]
             subscription.status = "active"
             subscription.current_period_end = datetime.utcnow() + timedelta(days=30)
             subscription.updated_at = datetime.utcnow()
         
-        # Add payment history
         payment_history = PaymentHistory(
             user_id=current_user.id,
             subscription_id=subscription.id,
@@ -286,7 +261,6 @@ async def verify_payment(
         
         await db.commit()
         
-        # Try to update Firebase claims (don't fail if this fails)
         try:
             from config.firebase import set_custom_user_claims
             set_custom_user_claims(current_user.firebase_uid, {"premium": "true", "dbUser": "true"})
@@ -319,7 +293,6 @@ async def get_payment_history(
     try:
         offset = (page - 1) * limit
         
-        # Get payment history
         result = await db.execute(
             select(PaymentHistory)
             .where(PaymentHistory.user_id == current_user.id)
@@ -329,7 +302,6 @@ async def get_payment_history(
         )
         payments = result.scalars().all()
         
-        # Get total count
         count_result = await db.execute(
             select(PaymentHistory)
             .where(PaymentHistory.user_id == current_user.id)
@@ -341,7 +313,7 @@ async def get_payment_history(
             payment_data = {
                 "id": payment.id,
                 "razorpay_payment_id": payment.razorpay_payment_id,
-                "amount": payment.amount / 100,  # Convert paise to rupees
+                "amount": payment.amount / 100,  
                 "currency": payment.currency,
                 "status": payment.status,
                 "method": payment.method,
@@ -377,25 +349,27 @@ async def get_subscription_details(
     """Get detailed subscription information including Razorpay data"""
     try:
         result = await db.execute(
-            select(Subscription).where(Subscription.user_id == current_user.id)
+            select(Subscription)
+            .where(Subscription.user_id == current_user.id)
+            .order_by(desc(Subscription.created_at))
         )
-        subscription = result.scalar_one_or_none()
+        subscription_row = result.first()
         
-        if not subscription:
+        if not subscription_row:
             return {
                 "has_subscription": False,
                 "is_premium": current_user.is_premium,
                 "status": "none"
             }
         
-        # Fetch subscription details from Razorpay
+        subscription = subscription_row[0] 
+        
         razorpay_subscription = None
         try:
             razorpay_subscription = razorpay_client.subscription.fetch(subscription.subscription_id)
         except Exception as e:
             logger.error(f"Failed to fetch Razorpay subscription: {str(e)}")
         
-        # Get recent payments for this subscription
         payment_result = await db.execute(
             select(PaymentHistory)
             .where(PaymentHistory.subscription_id == subscription.id)
@@ -425,7 +399,6 @@ async def get_subscription_details(
             ]
         }
         
-        # Add Razorpay subscription details if available
         if razorpay_subscription:
             response_data.update({
                 "razorpay_status": razorpay_subscription.get("status"),
@@ -443,63 +416,6 @@ async def get_subscription_details(
         raise HTTPException(status_code=500, detail="Failed to get subscription details")
 
 
-@router.post("/cancel-subscription")
-async def cancel_subscription(
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
-):
-    """Cancel user's subscription with enhanced feedback"""
-    try:
-        result = await db.execute(
-            select(Subscription).where(
-                Subscription.user_id == current_user.id,
-                Subscription.status.in_(["active", "created"])
-            )
-        )
-        subscription = result.scalar_one_or_none()
-        
-        if not subscription:
-            raise HTTPException(status_code=404, detail="No active subscription found")
-        
-        # Cancel subscription in Razorpay
-        razorpay_response = None
-        try:
-            razorpay_response = razorpay_client.subscription.cancel(subscription.subscription_id, {
-                "cancel_at_cycle_end": 1  # Cancel at the end of current cycle
-            })
-            logger.info(f"Razorpay cancellation response: {razorpay_response}")
-        except Exception as e:
-            logger.error(f"Error cancelling subscription in Razorpay: {str(e)}")
-            # Continue with local cancellation even if Razorpay fails
-        
-        # Update subscription status
-        subscription.status = "cancelled"
-        subscription.updated_at = datetime.utcnow()
-        
-        # Keep user premium until current period ends
-        # Don't immediately revoke premium status
-        
-        await db.commit()
-        
-        response = {
-            "message": "Subscription cancelled successfully",
-            "cancellation_date": subscription.updated_at.isoformat(),
-            "premium_until": subscription.current_period_end.isoformat() if subscription.current_period_end else None,
-            "status": subscription.status
-        }
-        
-        if razorpay_response:
-            response["razorpay_status"] = razorpay_response.get("status")
-        
-        return response
-    
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Error cancelling subscription: {str(e)}")
-        raise HTTPException(status_code=500, detail="Failed to cancel subscription")
-
-
 @router.post("/reactivate-subscription")
 async def reactivate_subscription(
     current_user: User = Depends(get_current_user),
@@ -511,30 +427,26 @@ async def reactivate_subscription(
             select(Subscription).where(
                 Subscription.user_id == current_user.id,
                 Subscription.status == "cancelled"
-            )
+            ).order_by(desc(Subscription.created_at))
         )
-        subscription = result.scalar_one_or_none()
+        subscription_row = result.first()
         
-        if not subscription:
+        if not subscription_row:
             raise HTTPException(status_code=404, detail="No cancelled subscription found")
         
-        # Check if subscription is still within current period
+        subscription = subscription_row[0] 
+        
         if subscription.current_period_end and subscription.current_period_end < datetime.utcnow():
             raise HTTPException(status_code=400, detail="Subscription period has already ended")
         
-        # Try to reactivate in Razorpay (this might not be possible depending on Razorpay's policies)
         try:
-            # Note: Razorpay might not allow reactivation of cancelled subscriptions
-            # This is more of a local status change
             pass
         except Exception as e:
             logger.error(f"Error reactivating subscription in Razorpay: {str(e)}")
         
-        # Update subscription status locally
         subscription.status = "active"
         subscription.updated_at = datetime.utcnow()
         
-        # Ensure user premium status is active
         current_user.is_premium = True
         current_user.updated_at = datetime.utcnow()
         
@@ -551,60 +463,3 @@ async def reactivate_subscription(
     except Exception as e:
         logger.error(f"Error reactivating subscription: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to reactivate subscription")
-
-
-# @router.get("/payment-plans")
-# async def get_payment_plans():
-    """Get available payment plans"""
-    try:
-        # Also fetch plan details from Razorpay to verify
-        plan_id = os.getenv("PLAN_ID")
-        if plan_id:
-            try:
-                razorpay_plan = razorpay_client.plan.fetch(plan_id)
-                logger.info(f"Razorpay plan details: {razorpay_plan}")
-            except Exception as e:
-                logger.error(f"Failed to fetch Razorpay plan: {str(e)}")
-        
-        return {
-            "plans": [
-                {
-                    "id": "premium",
-                    "name": "Premium Plan",
-                    "price": 299,  # ₹299 per month
-                    "currency": "INR",
-                    "interval": "monthly",
-                    "features": [
-                        "Unlimited Resume Downloads",
-                        "Premium Templates",
-                        "AI-Powered Content Suggestions",
-                        "Cover Letter Generator",
-                        "LinkedIn Integration",
-                        "Priority Support"
-                    ]
-                }
-            ]
-        }
-    except Exception as e:
-        logger.error(f"Error fetching payment plans: {str(e)}")
-        return {
-            "plans": [
-                {
-                    "id": "premium",
-                    "name": "Premium Plan",
-                    "price": 299,  # ₹299 per month
-                    "currency": "INR",
-                    "interval": "monthly",
-                    "features": [
-                        "Unlimited Resume Downloads",
-                        "Premium Templates",
-                        "AI-Powered Content Suggestions",
-                        "Cover Letter Generator",
-                        "LinkedIn Integration",
-                        "Priority Support"
-                    ]
-                }
-            ]
-        }
-
-

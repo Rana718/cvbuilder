@@ -22,16 +22,16 @@ jobs:
         with:
           persist-credentials: true
 
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
+      # - name: Setup Bun
+      #   uses: oven-sh/setup-bun@v2
 
-      - name: Install dependencies
-        working-directory: frontend
-        run: bun install
+      # - name: Install dependencies
+      #   working-directory: frontend
+      #   run: bun install
 
-      - name: Build Next.js
-        working-directory: frontend
-        run: bun run build
+      # - name: Build Next.js
+      #   working-directory: frontend
+      #   run: bun run build
 
       - name: Update README
         working-directory: frontend
