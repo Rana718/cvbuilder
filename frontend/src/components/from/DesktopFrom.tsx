@@ -77,7 +77,7 @@ function DesktopFrom() {
                 <DesktopSidebar currentStep={currentStep} onStepChange={setCurrentStep} />
             </motion.div>
 
-            <div className="lg:ml-16 flex flex-col lg:flex-row min-h-screen">
+            <div className="lg:ml-10 flex flex-col lg:flex-row min-h-screen">
                 <div className="flex-1 px-2 py-1 md:px-3 md:py-2">
                     <div className="max-w-4xl mx-auto">
                         <div className="bg-white">
@@ -101,12 +101,12 @@ function DesktopFrom() {
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.4, delay: 0.3 }}
-                    className="hidden xl:block w-96 pointer-events-none"
+                    className="hidden xl:block w-96 pointer-events-none pr-20"
                 >
-                    <div className="sticky top-0 h-screen flex flex-col items-center justify-center p-4">
+                    <div className="sticky top-0 h-screen flex flex-col justify-center">
                         <div className="flex flex-col items-center space-y-4">
                             <div
-                                className="relative group scale-[0.45] cursor-pointer pointer-events-auto"
+                                className="relative group scale-[0.52] cursor-pointer pointer-events-auto"
                                 onClick={() => setShowResumePopup(true)}
                             >
                                 <ResumePreview onlyonepage={true} />

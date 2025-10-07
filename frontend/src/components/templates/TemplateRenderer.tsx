@@ -110,46 +110,15 @@ const TemplateRenderer = memo(function TemplateRenderer({ templateId, userData, 
   }
 
   return (
-    <>
-      <style dangerouslySetInnerHTML={{
-        __html: `
-          .resume-content h1,
-          .resume-content h2, 
-          .resume-content h3,
-          .resume-content h4 {
-            page-break-after: avoid;
-            break-after: avoid;
-          }
-          .resume-content .section-break {
-            page-break-inside: avoid;
-            break-inside: avoid;
-          }
-          .resume-content .experience-item,
-          .resume-content .education-item,
-          .resume-content .project-item {
-            page-break-inside: avoid;
-            break-inside: avoid;
-          }
-        `
-      }} />
-      <div 
-        className="resume-content"
-        style={{
-          orphans: 3,
-          widows: 3
-        }}
-      >
-        <Suspense fallback={<LoadingFallback />}>
-          <TemplateComponent 
-            templateId={templateId} 
-            userData={userData} 
-            colors={themeColors} 
-            size={size} 
-            mode={mode} 
-          />
-        </Suspense>
-      </div>
-    </>
+    <Suspense fallback={<LoadingFallback />}>
+      <TemplateComponent 
+        templateId={templateId} 
+        userData={userData} 
+        colors={themeColors} 
+        size={size} 
+        mode={mode} 
+      />
+    </Suspense>
   );
 });
 

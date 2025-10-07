@@ -119,28 +119,40 @@ function AddExperienceView({ onAddExperience, onEditExperience, onSkip }: AddExp
                 </motion.button>
             </motion.div>
 
-            {/* Skip Option */}
-            {workExperience.length === 0 && (
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.4 }}
-                    className="text-center pt-4"
-                >
-                    <p className="text-gray-500 text-sm mb-3">
-                        Don't have work experience yet? That's okay!
-                    </p>
+            {/* Skip Option - Always show for better UX */}
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.4 }}
+                className="text-center pt-6 border-t border-gray-200"
+            >
+                {workExperience.length === 0 ? (
+                    <>
+                        <p className="text-gray-500 text-sm mb-4">
+                            Don't have work experience yet? That's perfectly fine!
+                        </p>
+                        <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={onSkip}
+                            className="inline-flex items-center space-x-2 px-6 py-3 text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-all font-medium shadow-md"
+                        >
+                            <span>Skip Work Experience</span>
+                            <ArrowRight className="w-4 h-4" />
+                        </motion.button>
+                    </>
+                ) : (
                     <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={onSkip}
-                        className="inline-flex items-center space-x-2 px-4 py-2 text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 rounded-lg transition-all font-medium"
+                        className="inline-flex items-center space-x-2 px-4 py-2 text-gray-600 hover:text-gray-800 bg-gray-100 hover:bg-gray-200 rounded-lg transition-all font-medium"
                     >
-                        <span>Skip this section</span>
+                        <span>Continue without adding more</span>
                         <ArrowRight className="w-4 h-4" />
                     </motion.button>
-                </motion.div>
-            )}
+                )}
+            </motion.div>
         </motion.div>
     )
 }

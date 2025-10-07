@@ -38,7 +38,7 @@ function SkillsStep({ onNext, onPrev }: SkillsStepProps) {
 
   // Auto-generate skills on component mount - ONLY ONCE
   useEffect(() => {
-    if (!isInitialized.current && !isAiGenerated('skills') && !isLoadingSkills && workExperience.length > 0) {
+    if (!isInitialized.current && !isAiGenerated('skills') && !isLoadingSkills) {
       isInitialized.current = true
       fetchAISkills()
     }
@@ -52,17 +52,24 @@ function SkillsStep({ onNext, onPrev }: SkillsStepProps) {
     isInitialized.current = false
     setAiGenerated('skills', false)
     setAiSuggestions('skills', [])
-    // Clear existing skills before regenerating
-    skills.forEach(skill => removeSkill(skill.id))
+    // Clear existing suggested skills but keep manually added ones
+    if (workExperience.length === 0) {
+      // For users without work experience, don't clear manually added skills
+      // Just regenerate suggestions
+    } else {
+      // For users with work experience, clear all and regenerate
+      skills.forEach(skill => removeSkill(skill.id))
+    }
     fetchAISkills()
   }
 
   const fetchAISkills = async () => {
     if (isLoadingSkills || isAiGenerated('skills')) return
 
-    // Handle case when no work experience exists
+    // Handle case when no work experience exists - provide default skills
     if (workExperience.length === 0) {
-      setAiSuggestions('skills', [])
+      const defaultSkills = ['Communication', 'Problem Solving', 'Time Management', 'Teamwork', 'Adaptability', 'Critical Thinking']
+      setAiSuggestions('skills', defaultSkills)
       setAiGenerated('skills', true)
       return
     }
@@ -366,7 +373,7 @@ function SkillsStep({ onNext, onPrev }: SkillsStepProps) {
               <Sparkles className="w-4 h-4 md:w-5 md:h-5 mr-2 text-blue-500" />
               AI-Suggested Skills
             </h4>
-            {workExperience.length > 0 && !isLoadingSkills && (
+            {!isLoadingSkills && (
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -374,7 +381,7 @@ function SkillsStep({ onNext, onPrev }: SkillsStepProps) {
                 className="flex items-center space-x-2 px-3 md:px-4 py-1.5 md:py-2 bg-blue-600 text-white rounded-sm hover:bg-blue-700 text-xs md:text-sm font-medium transition-all"
               >
                 <Sparkles className="w-3 h-3 md:w-4 md:h-4" />
-                <span>Generate Skills</span>
+                <span>{workExperience.length > 0 ? 'Generate Skills' : 'Suggest Common Skills'}</span>
               </motion.button>
             )}
           </div>
@@ -384,23 +391,12 @@ function SkillsStep({ onNext, onPrev }: SkillsStepProps) {
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="text-center py-8 bg-gray-50 rounded-sm border border-gray-200"
+                className="text-center py-8 bg-blue-50 rounded-sm border border-blue-200"
               >
-                <Award className="w-12 h-12 mx-auto mb-3 text-gray-400" />
-                <p className="text-sm text-gray-500 mb-4">
-                  No work experience added. You can still add skills manually or skip this section.
+                <Award className="w-12 h-12 mx-auto mb-3 text-blue-500" />
+                <p className="text-sm text-blue-700 mb-4 font-medium">
+                  No work experience found, but that's okay! We can suggest common professional skills.
                 </p>
-                {skills.length === 0 && (
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={handleSkip}
-                    className="inline-flex items-center space-x-2 px-4 py-2 text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 rounded-lg transition-all font-medium"
-                  >
-                    <span>Skip this section</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </motion.button>
-                )}
               </motion.div>
             )}
 
@@ -419,7 +415,10 @@ function SkillsStep({ onNext, onPrev }: SkillsStepProps) {
                       className="w-8 h-8 border-3 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"
                     />
                     <p className="text-sm text-gray-600 font-medium">
-                      AI is analyzing your experience to suggest relevant skills...
+                      {workExperience.length > 0 
+                        ? "AI is analyzing your experience to suggest relevant skills..."
+                        : "AI is suggesting common professional skills for you..."
+                      }
                     </p>
                   </div>
                 </div>
@@ -471,7 +470,7 @@ function SkillsStep({ onNext, onPrev }: SkillsStepProps) {
               </motion.div>
             )}
 
-            {workExperience.length > 0 && aiSuggestedSkills.length === 0 && !isLoadingSkills && (
+            {aiSuggestedSkills.length === 0 && !isLoadingSkills && (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -479,7 +478,10 @@ function SkillsStep({ onNext, onPrev }: SkillsStepProps) {
               >
                 <Award className="w-12 h-12 mx-auto mb-3 text-gray-400" />
                 <p className="text-sm text-gray-500">
-                  No AI suggestions available. Add skills manually or try regenerating.
+                  {workExperience.length > 0 
+                    ? "No AI suggestions available. Add skills manually or try regenerating."
+                    : "Click 'Suggest Common Skills' above to get started with professional skills."
+                  }
                 </p>
               </motion.div>
             )}
