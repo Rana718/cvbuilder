@@ -393,7 +393,11 @@ export default function CreativeDesigner({ userData, colors, size = 'normal', mo
         <div className="flex-1">
           {/* Professional Experience */}
           {hasContent(userData.experience) && (
-            <div style={{ marginBottom: styles.spacing.section }}>
+            <div style={{ 
+              marginBottom: styles.spacing.section,
+              pageBreakInside: 'avoid',
+              breakInside: 'avoid'
+            }}>
               <div className="flex items-center gap-2 mb-3">
                 <Briefcase 
                   style={{ 
@@ -408,7 +412,9 @@ export default function CreativeDesigner({ userData, colors, size = 'normal', mo
                     fontSize: styles.sectionTitle.fontSize,
                     color: theme.primary,
                     fontWeight: styles.sectionTitle.fontWeight,
-                    letterSpacing: styles.sectionTitle.letterSpacing
+                    letterSpacing: styles.sectionTitle.letterSpacing,
+                    pageBreakAfter: 'avoid',
+                    breakAfter: 'avoid'
                   }}
                 >
                   Professional Experience
@@ -421,13 +427,15 @@ export default function CreativeDesigner({ userData, colors, size = 'normal', mo
                   style={{ display: isSmall ? 'none' : 'block' }}
                 />
                 
-                {(userData.experience || []).slice(0, isSmall ? 3 : 5).map((exp, i) => (
+                {(userData.experience || []).map((exp, i) => (
                   <div 
                     key={i} 
-                    className="relative mb-4"
+                    className="experience-item relative mb-4"
                     style={{ 
                       paddingLeft: isSmall ? '0' : '1rem',
-                      marginBottom: styles.spacing.item
+                      marginBottom: styles.spacing.item,
+                      pageBreakInside: 'avoid',
+                      breakInside: 'avoid'
                     }}
                   >
                     {/* Timeline dot */}

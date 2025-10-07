@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { Plus, Award, Star, ChevronLeft, ChevronRight, Sparkles, Trash } from 'lucide-react'
+import { Plus, Award, Star, ChevronLeft, ChevronRight, Sparkles, Trash, ArrowRight } from 'lucide-react'
 import { useResumeStore, Skill } from '@/store/resumeStore'
 import { useStreamingSkills } from '@/utils/cvStreamingApi'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -38,11 +38,15 @@ function SkillsStep({ onNext, onPrev }: SkillsStepProps) {
 
   // Auto-generate skills on component mount - ONLY ONCE
   useEffect(() => {
-    if (!isInitialized.current && !isAiGenerated('skills') && !isLoadingSkills) {
+    if (!isInitialized.current && !isAiGenerated('skills') && !isLoadingSkills && workExperience.length > 0) {
       isInitialized.current = true
       fetchAISkills()
     }
-  }, [])
+  }, [workExperience])
+
+  const handleSkip = () => {
+    onNext()
+  }
 
   const handleRegenerateSkills = () => {
     isInitialized.current = false
@@ -55,6 +59,13 @@ function SkillsStep({ onNext, onPrev }: SkillsStepProps) {
 
   const fetchAISkills = async () => {
     if (isLoadingSkills || isAiGenerated('skills')) return
+
+    // Handle case when no work experience exists
+    if (workExperience.length === 0) {
+      setAiSuggestions('skills', [])
+      setAiGenerated('skills', true)
+      return
+    }
 
     const experienceData = workExperience.map(exp => ({
       title: exp.jobTitle,
@@ -376,9 +387,20 @@ function SkillsStep({ onNext, onPrev }: SkillsStepProps) {
                 className="text-center py-8 bg-gray-50 rounded-sm border border-gray-200"
               >
                 <Award className="w-12 h-12 mx-auto mb-3 text-gray-400" />
-                <p className="text-sm text-gray-500">
-                  Add work experience first to get AI-suggested skills.
+                <p className="text-sm text-gray-500 mb-4">
+                  No work experience added. You can still add skills manually or skip this section.
                 </p>
+                {skills.length === 0 && (
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={handleSkip}
+                    className="inline-flex items-center space-x-2 px-4 py-2 text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 rounded-lg transition-all font-medium"
+                  >
+                    <span>Skip this section</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </motion.button>
+                )}
               </motion.div>
             )}
 
@@ -485,8 +507,7 @@ function SkillsStep({ onNext, onPrev }: SkillsStepProps) {
           whileHover={{ scale: 1.02, x: 5 }}
           whileTap={{ scale: 0.98 }}
           onClick={onNext}
-          disabled={skills.length === 0}
-          className="flex items-center space-x-1 md:space-x-2 px-4 md:px-6 py-3 bg-blue-600 text-white rounded-sm hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-all border border-gray-300"
+          className="flex items-center space-x-1 md:space-x-2 px-4 md:px-6 py-3 bg-blue-600 text-white rounded-sm hover:bg-blue-700 font-medium transition-all border border-gray-300"
         >
           <span className="text-sm md:text-base">Next: Summary</span>
           <ChevronRight className="w-4 h-4 md:w-5 md:h-5" />

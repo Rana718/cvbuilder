@@ -187,20 +187,30 @@ export default function MinimalistProfessional({ userData, colors, size = 'norma
 
           {/* Experience */}
           {hasContent(userData.experience) && (
-            <div style={{ marginBottom: styles.spacing.section }}>
+            <div style={{ 
+              marginBottom: styles.spacing.section,
+              pageBreakInside: 'avoid',
+              breakInside: 'avoid'
+            }}>
               <h2 
                 style={{ 
                   fontSize: styles.sectionTitle.fontSize,
                   fontWeight: styles.sectionTitle.fontWeight,
                   letterSpacing: styles.sectionTitle.letterSpacing,
                   color: theme.primary,
-                  marginBottom: styles.spacing.item
+                  marginBottom: styles.spacing.item,
+                  pageBreakAfter: 'avoid',
+                  breakAfter: 'avoid'
                 }}
               >
                 Experience
               </h2>
-              {(userData.experience || []).slice(0, isSmall ? 3 : 5).map((exp, i) => (
-                <div key={i} style={{ marginBottom: styles.spacing.item }}>
+              {(userData.experience || []).map((exp, i) => (
+                <div key={i} className="experience-item" style={{ 
+                  marginBottom: styles.spacing.item,
+                  pageBreakInside: 'avoid',
+                  breakInside: 'avoid'
+                }}>
                   <div 
                     className="flex justify-between items-start"
                     style={{ marginBottom: '2px' }}

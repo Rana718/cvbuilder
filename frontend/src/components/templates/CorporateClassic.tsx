@@ -208,12 +208,18 @@ export default function CorporateClassic({ userData, colors, size = 'normal', mo
           <div className="flex-1" style={{ flex: '0 0 65%' }}>
             {/* Professional Experience */}
             {hasContent(userData.experience) && (
-              <div style={{ marginBottom: styles.spacing.section }}>
+              <div style={{ 
+                marginBottom: styles.spacing.section,
+                pageBreakInside: 'avoid',
+                breakInside: 'avoid'
+              }}>
                 <div 
                   style={{ 
                     borderBottom: `2px solid ${theme.primary}`,
                     paddingBottom: '4px',
-                    marginBottom: styles.spacing.item
+                    marginBottom: styles.spacing.item,
+                    pageBreakAfter: 'avoid',
+                    breakAfter: 'avoid'
                   }}
                 >
                   <h2 
@@ -227,13 +233,16 @@ export default function CorporateClassic({ userData, colors, size = 'normal', mo
                     Professional Experience
                   </h2>
                 </div>
-                {(userData.experience || []).slice(0, isSmall ? 3 : 5).map((exp, i) => (
+                {(userData.experience || []).map((exp, i) => (
                   <div 
                     key={i} 
+                    className="experience-item"
                     style={{ 
                       marginBottom: styles.spacing.item,
                       paddingBottom: styles.spacing.item,
-                      borderBottom: i < (userData.experience?.length || 0) - 1 ? `1px solid ${theme.accent}30` : 'none'
+                      borderBottom: i < (userData.experience?.length || 0) - 1 ? `1px solid ${theme.accent}30` : 'none',
+                      pageBreakInside: 'avoid',
+                      breakInside: 'avoid'
                     }}
                   >
                     <div className="flex justify-between items-start mb-1">

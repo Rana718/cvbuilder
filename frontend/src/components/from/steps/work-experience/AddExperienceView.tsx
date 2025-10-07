@@ -2,16 +2,17 @@
 
 import React from 'react'
 import { motion } from 'framer-motion'
-import { Plus, Briefcase } from 'lucide-react'
+import { Plus, Briefcase, ArrowRight } from 'lucide-react'
 import { useResumeStore } from '@/store/resumeStore'
 import type { WorkExperience } from '@/store/resumeStore'
 
 interface AddExperienceViewProps {
     onAddExperience: () => void
     onEditExperience: (experience: WorkExperience) => void
+    onSkip: () => void
 }
 
-function AddExperienceView({ onAddExperience, onEditExperience }: AddExperienceViewProps) {
+function AddExperienceView({ onAddExperience, onEditExperience, onSkip }: AddExperienceViewProps) {
     const { workExperience, removeWorkExperience } = useResumeStore()
 
     const handleEdit = (experience: WorkExperience) => {
@@ -126,12 +127,18 @@ function AddExperienceView({ onAddExperience, onEditExperience }: AddExperienceV
                     transition={{ delay: 0.4 }}
                     className="text-center pt-4"
                 >
-                    <p className="text-gray-500 text-sm">
+                    <p className="text-gray-500 text-sm mb-3">
                         Don't have work experience yet? That's okay!
                     </p>
-                    <button className="text-blue-600 hover:text-blue-800 underline text-sm mt-1">
-                        Skip this section
-                    </button>
+                    <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={onSkip}
+                        className="inline-flex items-center space-x-2 px-4 py-2 text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 rounded-lg transition-all font-medium"
+                    >
+                        <span>Skip this section</span>
+                        <ArrowRight className="w-4 h-4" />
+                    </motion.button>
                 </motion.div>
             )}
         </motion.div>

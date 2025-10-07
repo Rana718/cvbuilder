@@ -253,12 +253,18 @@ export default function ModernTech({ userData, colors, size = 'normal', mode = '
 
           {/* Experience */}
           {hasContent(userData.experience) && (
-            <div style={{ marginBottom: styles.spacing.section }}>
+            <div style={{ 
+              marginBottom: styles.spacing.section,
+              pageBreakInside: 'avoid',
+              breakInside: 'avoid'
+            }}>
               <div 
                 className="flex items-center gap-2 mb-3"
                 style={{ 
                   borderLeft: `4px solid ${theme.primary}`,
-                  paddingLeft: '8px'
+                  paddingLeft: '8px',
+                  pageBreakAfter: 'avoid',
+                  breakAfter: 'avoid'
                 }}
               >
                 <Zap style={{ width: isSmall ? '10px' : '16px', height: isSmall ? '10px' : '16px', color: theme.primary }} />
@@ -273,15 +279,18 @@ export default function ModernTech({ userData, colors, size = 'normal', mode = '
                   ./work_experience
                 </h2>
               </div>
-              {(userData.experience || []).slice(0, isSmall ? 3 : 5).map((exp, i) => (
+              {(userData.experience || []).map((exp, i) => (
                 <div 
                   key={i}
+                  className="experience-item"
                   style={{ 
                     backgroundColor: 'white',
                     padding: '12px',
                     borderRadius: '6px',
                     border: `1px solid ${theme.accent}30`,
-                    marginBottom: styles.spacing.item
+                    marginBottom: styles.spacing.item,
+                    pageBreakInside: 'avoid',
+                    breakInside: 'avoid'
                   }}
                 >
                   <div className="flex justify-between items-start mb-2">

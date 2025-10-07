@@ -197,7 +197,11 @@ export default function ModernMinimalist({ userData, colors, size = 'normal', mo
         >
           {/* Skills */}
           {hasContent(userData.skills) && (
-            <div style={{ marginBottom: styles.spacing.section }}>
+            <div style={{ 
+              marginBottom: styles.spacing.section,
+              pageBreakInside: 'avoid',
+              breakInside: 'avoid'
+            }}>
               <h3 
                 className="font-bold uppercase tracking-wide mb-4"
                 style={{ 
@@ -205,7 +209,9 @@ export default function ModernMinimalist({ userData, colors, size = 'normal', mo
                   color: theme.primary,
                   fontWeight: styles.sectionTitle.fontWeight,
                   letterSpacing: styles.sectionTitle.letterSpacing,
-                  marginBottom: styles.spacing.item
+                  marginBottom: styles.spacing.item,
+                  pageBreakAfter: 'avoid',
+                  breakAfter: 'avoid'
                 }}
               >
                 Skills
@@ -246,21 +252,27 @@ export default function ModernMinimalist({ userData, colors, size = 'normal', mo
 
           {/* Education */}
           {hasContent(userData.education) && (
-            <div style={{ marginBottom: styles.spacing.section }}>
+            <div style={{ 
+              marginBottom: styles.spacing.section,
+              pageBreakInside: 'avoid',
+              breakInside: 'avoid'
+            }}>
               <h3 
                 className="font-bold uppercase tracking-wide mb-4"
                 style={{ 
                   fontSize: styles.sectionTitle.fontSize,
                   color: theme.primary,
                   fontWeight: styles.sectionTitle.fontWeight,
-                  letterSpacing: styles.sectionTitle.letterSpacing
+                  letterSpacing: styles.sectionTitle.letterSpacing,
+                  pageBreakAfter: 'avoid',
+                  breakAfter: 'avoid'
                 }}
               >
                 Education
               </h3>
               <div className="space-y-3">
                 {(userData.education || []).slice(0, isSmall ? 3 : 4).map((edu, i) => (
-                  <div key={i} style={{ marginBottom: styles.spacing.micro }}>
+                  <div key={i} className="education-item" style={{ marginBottom: styles.spacing.micro }}>
                     <p className="font-semibold" style={{ 
                       fontSize: styles.text.fontSize,
                       fontWeight: '600',
@@ -407,24 +419,32 @@ export default function ModernMinimalist({ userData, colors, size = 'normal', mo
 
           {/* Experience */}
           {hasContent(userData.experience) && (
-            <div style={{ marginBottom: styles.spacing.section }}>
+            <div style={{ 
+              marginBottom: styles.spacing.section,
+              pageBreakInside: 'avoid',
+              breakInside: 'avoid'
+            }}>
               <h3 
                 className="font-bold uppercase tracking-wide mb-4"
                 style={{ 
                   fontSize: styles.sectionTitle.fontSize,
                   color: theme.primary,
                   fontWeight: styles.sectionTitle.fontWeight,
-                  letterSpacing: styles.sectionTitle.letterSpacing
+                  letterSpacing: styles.sectionTitle.letterSpacing,
+                  pageBreakAfter: 'avoid',
+                  breakAfter: 'avoid'
                 }}
               >
                 Work Experience
               </h3>
               <div className="space-y-6">
-                {(userData.experience || []).slice(0, isSmall ? 3 : 4).map((exp, i) => (
-                  <div key={i} style={{ 
+                {(userData.experience || []).map((exp, i) => (
+                  <div key={i} className="experience-item" style={{ 
                     marginBottom: styles.spacing.section,
                     paddingBottom: styles.spacing.item,
-                    borderBottom: i < (userData.experience || []).length - 1 ? `1px solid ${theme.accent}20` : 'none'
+                    borderBottom: i < (userData.experience || []).length - 1 ? `1px solid ${theme.accent}20` : 'none',
+                    pageBreakInside: 'avoid',
+                    breakInside: 'avoid'
                   }}>
                     <div className="flex justify-between items-start mb-2">
                       <h4 className="font-bold" style={{ 
@@ -479,24 +499,32 @@ export default function ModernMinimalist({ userData, colors, size = 'normal', mo
 
           {/* Projects */}
           {hasContent(userData.projects) && (
-            <div style={{ marginBottom: styles.spacing.section }}>
+            <div style={{ 
+              marginBottom: styles.spacing.section,
+              pageBreakInside: 'avoid',
+              breakInside: 'avoid'
+            }}>
               <h3 
                 className="font-bold uppercase tracking-wide mb-4"
                 style={{ 
                   fontSize: styles.sectionTitle.fontSize,
                   color: theme.primary,
                   fontWeight: styles.sectionTitle.fontWeight,
-                  letterSpacing: styles.sectionTitle.letterSpacing
+                  letterSpacing: styles.sectionTitle.letterSpacing,
+                  pageBreakAfter: 'avoid',
+                  breakAfter: 'avoid'
                 }}
               >
                 Projects
               </h3>
               <div className="space-y-4">
                 {(userData.projects || []).slice(0, isSmall ? 2 : 3).map((project, i) => (
-                  <div key={i} style={{ 
+                  <div key={i} className="project-item" style={{ 
                     marginBottom: styles.spacing.item,
                     paddingBottom: styles.spacing.micro,
-                    borderBottom: i < (userData.projects || []).length - 1 ? `1px solid ${theme.accent}15` : 'none'
+                    borderBottom: i < (userData.projects || []).length - 1 ? `1px solid ${theme.accent}15` : 'none',
+                    pageBreakInside: 'avoid',
+                    breakInside: 'avoid'
                   }}>
                     <h4 className="font-bold" style={{ 
                       fontSize: styles.text.fontSize,

@@ -248,7 +248,7 @@ export default function BusinessFormal({ userData, colors, size = 'normal', mode
                             margin: '0 auto 16px'
                         }}
                     />
-                    {(userData.experience || []).slice(0, isSmall ? 3 : 5).map((exp, i) => (
+                    {(userData.experience || []).map((exp, i) => (
                         <div key={i} style={{ marginBottom: styles.spacing.item }}>
                             <div className="flex justify-between items-start mb-2">
                                 <div>

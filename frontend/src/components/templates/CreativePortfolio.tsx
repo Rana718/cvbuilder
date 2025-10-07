@@ -298,10 +298,18 @@ export default function CreativePortfolio({ userData, colors, size = 'normal', m
 
           {/* Creative experience */}
           {hasContent(userData.experience) && (
-            <div style={{ marginBottom: styles.spacing.section }}>
+            <div style={{ 
+              marginBottom: styles.spacing.section,
+              pageBreakInside: 'avoid',
+              breakInside: 'avoid'
+            }}>
               <div 
                 className="flex items-center gap-3 mb-4"
-                style={{ position: 'relative' }}
+                style={{ 
+                  position: 'relative',
+                  pageBreakAfter: 'avoid',
+                  breakAfter: 'avoid'
+                }}
               >
                 <div 
                   style={{
@@ -342,9 +350,10 @@ export default function CreativePortfolio({ userData, colors, size = 'normal', m
                   }}
                 />
                 
-                {(userData.experience || []).slice(0, isSmall ? 3 : 5).map((exp, i) => (
+                {(userData.experience || []).map((exp, i) => (
                   <div 
                     key={i}
+                    className="experience-item"
                     style={{ 
                       backgroundColor: 'white',
                       padding: '16px',
@@ -353,7 +362,9 @@ export default function CreativePortfolio({ userData, colors, size = 'normal', m
                       marginLeft: '40px',
                       border: `2px solid ${theme.primary}20`,
                       position: 'relative',
-                      boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                      pageBreakInside: 'avoid',
+                      breakInside: 'avoid'
                     }}
                   >
                     {/* Timeline dot */}

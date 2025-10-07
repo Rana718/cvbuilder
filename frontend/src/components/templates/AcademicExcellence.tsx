@@ -312,12 +312,18 @@ export default function AcademicExcellence({ userData, colors, size = 'normal', 
 
         {/* Academic/Professional Experience */}
         {hasContent(userData.experience) && (
-          <div style={{ marginBottom: styles.spacing.section }}>
+          <div style={{ 
+            marginBottom: styles.spacing.section,
+            pageBreakInside: 'avoid',
+            breakInside: 'avoid'
+          }}>
             <div 
               className="flex items-center gap-2 mb-3"
               style={{ 
                 borderBottom: `2px solid ${theme.primary}20`,
-                paddingBottom: '4px'
+                paddingBottom: '4px',
+                pageBreakAfter: 'avoid',
+                breakAfter: 'avoid'
               }}
             >
               <Users style={{ width: isSmall ? '10px' : '16px', height: isSmall ? '10px' : '16px', color: theme.primary }} />
@@ -332,13 +338,16 @@ export default function AcademicExcellence({ userData, colors, size = 'normal', 
                 Professional Experience
               </h2>
             </div>
-            {(userData.experience || []).slice(0, isSmall ? 3 : 5).map((exp, i) => (
+            {(userData.experience || []).map((exp, i) => (
               <div 
                 key={i}
+                className="experience-item"
                 style={{ 
                   marginBottom: styles.spacing.item,
                   paddingLeft: '16px',
-                  borderLeft: `3px solid ${theme.secondary}30`
+                  borderLeft: `3px solid ${theme.secondary}30`,
+                  pageBreakInside: 'avoid',
+                  breakInside: 'avoid'
                 }}
               >
                 <div className="flex justify-between items-start mb-2">

@@ -305,21 +305,31 @@ export default function ExecutiveElite({ userData, colors, size = 'normal', mode
 
         {/* Experience */}
         {hasContent(userData.experience) && (
-          <div style={{ marginBottom: styles.spacing.section }}>
+          <div style={{ 
+            marginBottom: styles.spacing.section,
+            pageBreakInside: 'avoid',
+            breakInside: 'avoid'
+          }}>
             <h2 
               className="font-bold mb-3"
               style={{ 
                 fontSize: styles.sectionTitle.fontSize,
                 color: theme.primary,
                 fontWeight: styles.sectionTitle.fontWeight,
-                letterSpacing: styles.sectionTitle.letterSpacing
+                letterSpacing: styles.sectionTitle.letterSpacing,
+                pageBreakAfter: 'avoid',
+                breakAfter: 'avoid'
               }}
             >
               PROFESSIONAL EXPERIENCE
             </h2>
             <div>
-              {(userData.experience || []).slice(0, isSmall ? 3 : 4).map((exp, i) => (
-                <div key={i} style={{ marginBottom: styles.spacing.section }}>
+              {(userData.experience || []).map((exp, i) => (
+                <div key={i} className="experience-item" style={{ 
+                  marginBottom: styles.spacing.section,
+                  pageBreakInside: 'avoid',
+                  breakInside: 'avoid'
+                }}>
                   <div className="flex justify-between items-start mb-1">
                     <h3 className="font-bold" style={{ fontSize: styles.text.fontSize }}>
                       {exp.title || exp.jobTitle || 'Position'}

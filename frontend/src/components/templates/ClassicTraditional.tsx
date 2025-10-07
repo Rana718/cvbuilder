@@ -211,7 +211,7 @@ export default function ClassicTraditional({ userData, colors, size = 'normal', 
                     >
                         Professional Experience
                     </h2>
-                    {(userData.experience || []).slice(0, isSmall ? 3 : 5).map((exp, i) => (
+                    {(userData.experience || []).map((exp, i) => (
                         <div key={i} style={{ marginBottom: styles.spacing.item }}>
                             <div className="flex justify-between items-start mb-1">
                                 <div>

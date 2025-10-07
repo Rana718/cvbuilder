@@ -35,6 +35,10 @@ function WorkExperienceStep({ onNext, onPrev }: WorkExperienceStepProps) {
     description: ''
   })
 
+  const handleSkip = () => {
+    onNext()
+  }
+
   const resetForm = () => {
     setFormData({
       jobTitle: '',
@@ -132,7 +136,7 @@ function WorkExperienceStep({ onNext, onPrev }: WorkExperienceStepProps) {
   const renderCurrentView = () => {
     switch (currentView) {
       case 'list':
-        return <AddExperienceView onAddExperience={handleAddExperience} onEditExperience={handleEditExperience} />
+        return <AddExperienceView onAddExperience={handleAddExperience} onEditExperience={handleEditExperience} onSkip={handleSkip} />
       case 'form':
         return (
           <ExperienceFormView
@@ -157,7 +161,7 @@ function WorkExperienceStep({ onNext, onPrev }: WorkExperienceStepProps) {
           />
         )
       default:
-        return <AddExperienceView onAddExperience={handleAddExperience} onEditExperience={handleEditExperience} />
+        return <AddExperienceView onAddExperience={handleAddExperience} onEditExperience={handleEditExperience} onSkip={handleSkip} />
     }
   }
 

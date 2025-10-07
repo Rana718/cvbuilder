@@ -13,7 +13,7 @@ function TemplatePage() {
     const { setTemplateId, templateId, populateFromResumeData } = useResumeStore()
 
     const edit = searchParams.get('edit')
-    const resumeId = searchParams.get('resumeId') // Fix parameter name
+    const resumeId = searchParams.get('resumeId')
 
     useEffect(() => {
         if (params.id && params.id !== templateId) {
@@ -22,7 +22,6 @@ function TemplatePage() {
     }, [params.id, setTemplateId, templateId])
 
     useEffect(() => {
-        // Load existing resume data if resumeId is provided
         if (resumeId) {
             const fetchResumeData = async () => {
                 try {
@@ -30,7 +29,7 @@ function TemplatePage() {
                     populateFromResumeData(response.data)
                 } catch (error) {
                     console.error('Failed to fetch resume data:', error)
-                    alert('Failed to load resume data. Starting with a blank resume.')
+                    // alert('Failed to load resume data. Starting with a blank resume.')
                 }
             }
             fetchResumeData()

@@ -109,7 +109,7 @@ function DesktopFrom() {
                                 className="relative group scale-[0.45] cursor-pointer pointer-events-auto"
                                 onClick={() => setShowResumePopup(true)}
                             >
-                                <ResumePreview />
+                                <ResumePreview onlyonepage={true} />
                                 {/* Hover overlay with view icon */}
                                 <div className="absolute inset-0 bg-black/10 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100 pointer-events-none">
                                     <div className="bg-white rounded-full p-3 shadow-lg pointer-events-auto">
