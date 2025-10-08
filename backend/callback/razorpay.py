@@ -178,9 +178,8 @@ async def handle_subscription_charged(db: AsyncSession, subscription_data: dict,
 
 
 async def handle_payment_captured(db: AsyncSession, payment_data: dict):
-    """Handle direct payment capture (for one-time payments)"""
+    """Handle direct payment capture (instant payments)"""
     try:
-        # Extract user info from payment notes or order
         notes = payment_data.get("notes", {})
         user_id = notes.get("user_id")
         
@@ -188,7 +187,6 @@ async def handle_payment_captured(db: AsyncSession, payment_data: dict):
             logger.warning("No user_id found in payment notes")
             return
         
-        # Find user
         result = await db.execute(
             select(User).where(User.id == int(user_id))
         )
@@ -198,30 +196,28 @@ async def handle_payment_captured(db: AsyncSession, payment_data: dict):
             logger.error(f"User not found for user_id: {user_id}")
             return
         
-        # Update user premium status
+        # INSTANT ACTIVATION - No waiting for subscription
         user.is_premium = True
         user.updated_at = datetime.utcnow()
         
-        # Find or create subscription
+        # Find or create subscription record
         result = await db.execute(
             select(Subscription).where(Subscription.user_id == user.id)
         )
         subscription = result.scalar_one_or_none()
         
         if not subscription:
-            # Create new subscription
             subscription = Subscription(
                 user_id=user.id,
                 razorpay_customer_id=payment_data.get("customer_id", f"cust_{user.id}"),
-                subscription_id=f"sub_{user.id}_{int(datetime.utcnow().timestamp())}",
+                subscription_id=f"instant_{user.id}_{int(datetime.utcnow().timestamp())}",
                 plan="premium",
-                status="active",
+                status="active",  # Immediately active
                 current_period_end=datetime.utcnow() + timedelta(days=30)
             )
             db.add(subscription)
-            await db.flush()  # Get subscription ID
+            await db.flush()
         else:
-            # Update existing subscription
             subscription.status = "active"
             subscription.current_period_end = datetime.utcnow() + timedelta(days=30)
             subscription.updated_at = datetime.utcnow()
@@ -236,7 +232,7 @@ async def handle_payment_captured(db: AsyncSession, payment_data: dict):
             currency=payment_data.get("currency", "INR"),
             status=payment_data.get("status", "captured"),
             method=payment_data.get("method", ""),
-            description="Premium subscription payment",
+            description="Premium subscription - First month (Instant)",
             receipt=payment_data.get("receipt", ""),
             card_last4=payment_data.get("card", {}).get("last4", "") if payment_data.get("card") else "",
             card_network=payment_data.get("card", {}).get("network", "") if payment_data.get("card") else "",
@@ -250,19 +246,18 @@ async def handle_payment_captured(db: AsyncSession, payment_data: dict):
         # Update Firebase custom claims
         await update_firebase_claims(user.firebase_uid, {"premium": "true", "dbUser": "true"})
         
-        logger.info(f"Payment captured and premium status updated for user {user.id}")
+        logger.info(f"INSTANT ACTIVATION: Payment captured and premium status updated for user {user.id}")
     
     except Exception as e:
-        logger.error(f"Error handling payment captured: {str(e)}")
+        logger.error(f"Error handling instant payment captured: {str(e)}")
         await db.rollback()
 
 
 async def handle_subscription_activated(db: AsyncSession, subscription_data: dict):
-    """Handle subscription activation"""
+    """Handle subscription mandate activation (for future recurring payments)"""
     try:
         customer_id = subscription_data.get("customer_id")
         
-        # Find user by customer ID
         result = await db.execute(
             select(User).join(Subscription).where(
                 Subscription.razorpay_customer_id == customer_id
@@ -274,30 +269,22 @@ async def handle_subscription_activated(db: AsyncSession, subscription_data: dic
             logger.error(f"User not found for customer_id: {customer_id}")
             return
         
-        # Update subscription status
+        # Update subscription mandate status (user already has premium from instant payment)
         result = await db.execute(
             select(Subscription).where(Subscription.user_id == user.id)
         )
         subscription = result.scalar_one_or_none()
         
         if subscription:
-            subscription.status = "active"
-            subscription.current_period_end = datetime.utcnow() + timedelta(days=30)
+            # Update mandate status - user already premium, just confirming recurring setup
+            subscription.subscription_id = subscription_data.get("id", subscription.subscription_id)
             subscription.updated_at = datetime.utcnow()
             
-            # Update user premium status
-            user.is_premium = True
-            user.updated_at = datetime.utcnow()
-            
             await db.commit()
-            
-            # Update Firebase custom claims
-            await update_firebase_claims(user.firebase_uid, {"premium": "true", "dbUser": "true"})
-            
-            logger.info(f"Activated subscription for user {user.id}")
+            logger.info(f"Subscription mandate activated for user {user.id} - recurring payments ready")
     
     except Exception as e:
-        logger.error(f"Error handling subscription activation: {str(e)}")
+        logger.error(f"Error handling subscription mandate activation: {str(e)}")
         await db.rollback()
 
 

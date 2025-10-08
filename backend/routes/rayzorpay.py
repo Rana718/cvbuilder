@@ -22,6 +22,141 @@ razorpay_client = razorpay.Client(auth=(
 ))
 
 
+@router.post("/create-instant-order")
+async def create_instant_order(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Create instant payment order + background subscription"""
+    try:
+        # Step 1: Create instant payment order (shows success immediately)
+        order_data = {
+            "amount": 9000,  # ₹90 in paise
+            "currency": "INR",
+            "receipt": f"order_{current_user.id}_{int(datetime.utcnow().timestamp())}",
+            "notes": {
+                "user_id": str(current_user.id),
+                "email": current_user.email,
+                "plan": "premium_first_month"
+            }
+        }
+        
+        razorpay_order = razorpay_client.order.create(order_data)
+        
+        # Step 2: Create customer for future subscription (background)
+        customer_data = {
+            "name": current_user.full_name,
+            "email": current_user.email,
+            "fail_existing": "0"
+        }
+        
+        try:
+            razorpay_customer = razorpay_client.customer.create(customer_data)
+        except Exception as e:
+            if "Customer already exists" in str(e):
+                customers = razorpay_client.customer.all({"email": current_user.email})
+                razorpay_customer = customers['items'][0] if customers['items'] else None
+        
+        return {
+            "order_id": razorpay_order["id"],
+            "amount": razorpay_order["amount"],
+            "currency": razorpay_order["currency"],
+            "customer_id": razorpay_customer["id"] if razorpay_customer else None
+        }
+        
+    except Exception as e:
+        logger.error(f"Error creating instant order: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to create payment order")
+
+@router.post("/create-instant-order")
+async def create_instant_order(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Create instant payment order + background subscription"""
+    try:
+        # Step 1: Create instant payment order (shows success immediately)
+        order_data = {
+            "amount": 9000,  # ₹90 in paise
+            "currency": "INR",
+            "receipt": f"order_{current_user.id}_{int(datetime.utcnow().timestamp())}",
+            "notes": {
+                "user_id": str(current_user.id),
+                "email": current_user.email,
+                "plan": "premium_first_month"
+            }
+        }
+        
+        razorpay_order = razorpay_client.order.create(order_data)
+        
+        # Step 2: Create customer for future subscription (background)
+        customer_data = {
+            "name": current_user.full_name,
+            "email": current_user.email,
+            "fail_existing": "0"
+        }
+        
+        try:
+            razorpay_customer = razorpay_client.customer.create(customer_data)
+        except Exception as e:
+            if "Customer already exists" in str(e):
+                customers = razorpay_client.customer.all({"email": current_user.email})
+                razorpay_customer = customers['items'][0] if customers['items'] else None
+        
+        return {
+            "order_id": razorpay_order["id"],
+            "amount": razorpay_order["amount"],
+            "currency": razorpay_order["currency"],
+            "customer_id": razorpay_customer["id"] if razorpay_customer else None
+        }
+        
+    except Exception as e:
+        logger.error(f"Error creating instant order: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to create payment order")
+
+@router.post("/create-background-subscription")
+async def create_background_subscription(
+    payment_data: dict,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Create subscription mandate after successful first payment"""
+    try:
+        customer_id = payment_data.get("customer_id")
+        plan_id = os.getenv("PLAN_ID")
+        
+        subscription_data = {
+            "plan_id": plan_id,
+            "customer_id": customer_id,
+            "quantity": 1,
+            "start_at": int((datetime.utcnow() + timedelta(days=30)).timestamp()),  # Start next month
+            "notes": {
+                "user_id": str(current_user.id),
+                "email": current_user.email
+            }
+        }
+        
+        razorpay_subscription = razorpay_client.subscription.create(subscription_data)
+        
+        # Store subscription in DB
+        subscription = Subscription(
+            user_id=current_user.id,
+            razorpay_customer_id=customer_id,
+            subscription_id=razorpay_subscription["id"],
+            plan="premium",
+            status="created",  # Will be activated when mandate is approved
+            current_period_end=datetime.utcnow() + timedelta(days=30)
+        )
+        
+        db.add(subscription)
+        await db.commit()
+        
+        return {"subscription_id": razorpay_subscription["id"]}
+        
+    except Exception as e:
+        logger.error(f"Error creating background subscription: {str(e)}")
+        return {"error": "Failed to create subscription"}
+
 @router.post("/create-subscription")
 async def create_subscription(
     current_user: User = Depends(get_current_user),

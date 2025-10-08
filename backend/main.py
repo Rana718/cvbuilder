@@ -36,7 +36,7 @@ async def startup_event():
 async def root():
     return {
         "message": "Welcome to the AI CV Builder API!",
-        "version": "1.0.7",
+        "version": "1.0.8",
     } 
 
 @app.get("/private")
