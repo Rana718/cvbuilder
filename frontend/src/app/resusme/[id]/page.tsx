@@ -260,6 +260,7 @@ function ResumePage() {
     const [showTemplateSelector, setShowTemplateSelector] = useState(false)
     const [searchTerm, setSearchTerm] = useState("")
     const [selectedCategory, setSelectedCategory] = useState("All")
+    const [forceRerender, setForceRerender] = useState(0)
     
     // Debounced search term for better performance
     const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("")
@@ -446,9 +447,14 @@ function ResumePage() {
 
         const currentUrl = new URL(window.location.href)
         currentUrl.searchParams.set('template', newTemplateId.toString())
-        router.push(currentUrl.toString())
+        
+        // Use replace instead of push to avoid navigation issues
+        window.history.replaceState({}, '', currentUrl.toString())
         setShowTemplateSelector(false)
-    }, [router, setTemplateId])
+        
+        // Force re-render to ensure template change is visible
+        setForceRerender(prev => prev + 1)
+    }, [setTemplateId])
 
     const filteredTemplates = useMemo(() => {
         return CV_TEMPLATES.filter(template => {
@@ -470,7 +476,8 @@ function ResumePage() {
 
         const resumeIdNum = Number(resumeId)
 
-        if (templateId) {
+        // Always set template ID from URL parameter if present
+        if (templateId && templateId !== useResumeStore.getState().templateId) {
             setTemplateId(templateId)
         }
 
@@ -487,7 +494,7 @@ function ResumePage() {
                 })
             }
         }
-    }, [resumeId, loading, user, router, templateId, setTemplateId, setDocumentId, hasData, loadResume, hasLoadedOnce])
+    }, [resumeId, loading, user, templateId, setTemplateId, setDocumentId, hasData, loadResume, hasLoadedOnce])
 
     if (loading) {
         return (
@@ -734,24 +741,17 @@ function ResumePage() {
                     {/* Resume Content */}
                     <div className="flex justify-center items-start pb-6">
                         <div className="w-full">
-                            {/* Mobile view - scaled down with onlyonepage */}
-                            <div className="sm:hidden w-full min-h-[400px] pt-10 flex justify-center items-center">
-                                <div className="scale-[0.45] origin-top">
-                                    <ResumePreview onlyonepage={true} />
+                            {/* Mobile view - scaled down but allow multiple pages */}
+                            <div className="sm:hidden w-full min-h-[400px] pt-10 flex justify-center">
+                                <div className="scale-[0.45] origin-top space-y-4">
+                                    <ResumePreview key={`mobile-${forceRerender}`} />
                                 </div>
                             </div>
                             
-                            {/* Tablet view - Allow multiple pages */}
-                            <div className="hidden sm:block md:hidden w-full">
-                                <div className="mx-auto max-w-[600px] space-y-4" data-resume-content>
-                                    <ResumePreview />
-                                </div>
-                            </div>
-
-                            {/* Desktop view - Allow multiple pages */}
-                            <div className="hidden md:block max-w-4xl mx-auto">
-                                <div className="mx-auto max-w-[794px] space-y-4" data-resume-content>
-                                    <ResumePreview />
+                            {/* Tablet and Desktop view - Allow multiple pages */}
+                            <div className="hidden sm:block w-full" data-resume-content>
+                                <div className="mx-auto max-w-[794px] space-y-4">
+                                    <ResumePreview key={`desktop-${forceRerender}`} />
                                 </div>
                             </div>
                         </div>

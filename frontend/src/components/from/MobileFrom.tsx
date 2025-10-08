@@ -174,32 +174,23 @@ function MobileFrom() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4"
+                        className="fixed inset-0 z-50"
+                        style={{ backgroundColor: 'rgba(0, 0, 0, 0.2)' }}
                     >
-                        <motion.div
-                            initial={{ scale: 0.9, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            exit={{ scale: 0.9, opacity: 0 }}
-                            className="bg-white rounded-sm shadow-2xl w-full max-w-sm max-h-[90vh] overflow-hidden"
+                        {/* Close button */}
+                        <button
+                            onClick={() => setShowResumePreview(false)}
+                            className="absolute top-4 right-4 z-10 bg-white rounded-full p-2 shadow-lg hover:shadow-xl transition-shadow"
                         >
-                            {/* Modal Header */}
-                            <div className="flex items-center justify-between px-4 pt-2 border-b border-gray-200 bg-white">
-                                <h3 className="text-lg font-semibold text-gray-900">Resume Preview</h3>
-                                <button
-                                    onClick={() => setShowResumePreview(false)}
-                                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                                >
-                                    <X className="w-5 h-5 text-gray-500" />
-                                </button>
-                            </div>
+                            <X className="w-5 h-5 text-gray-600" />
+                        </button>
 
-                            {/* Resume Preview Content */}
-                            <div className="p-4 h-[70vh] flex items-center justify-center bg-gray-50">
-                                <div className="scale-[0.4] origin-center">
-                                    <ResumePreview />
-                                </div>
+                        {/* Full Resume Preview */}
+                        <div className="w-full h-full overflow-y-auto py-5 flex justify-center">
+                            <div className="scale-[0.45] origin-top" style={{ width: 'fit-content' }}>
+                                <ResumePreview />
                             </div>
-                        </motion.div>
+                        </div>
                     </motion.div>
                 )}
             </AnimatePresence>

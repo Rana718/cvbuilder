@@ -10,7 +10,7 @@ const resumeDropdownItems = [
     { href: '/resusme', icon: FolderOpen, label: 'My Resumes' },
     { href: '/template', icon: Plus, label: 'Create New Resume' },
     { href: '/resusme/parse', icon: RefreshCw, label: 'Use Old Resume' },
-    { href: '/resume/rating', icon: Star, label: 'Resume Rating' },
+    { href: '/resusme/rateing', icon: Star, label: 'Resume Rating' },
 ];
 
 const coverLetterDropdownItems = [
