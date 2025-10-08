@@ -18,8 +18,8 @@ export function generateMetadata(config: SEOConfig): Metadata {
     title,
     description,
     keywords = [],
-    image = '/img/banner.png',
-    url = 'https://resumeai.world',
+    image = 'https://airesumebuilder.com/img/banner.png',
+    url = 'https://airesumebuilder.com',
     type = 'website',
     publishedTime,
     modifiedTime,
@@ -56,8 +56,8 @@ export function generateMetadata(config: SEOConfig): Metadata {
     },
     twitter: {
       card: 'summary_large_image',
-      site: '@resumeaiworld',
-      creator: '@resumeaiworld',
+      site: '@airesumebuilder',
+      creator: '@airesumebuilder',
       title,
       description,
       images: [image],
@@ -73,67 +73,67 @@ export const seoPages = {
     title: 'Ai-rezume builder - Create Professional Resumes & Cover Letters Online',
     description: 'Create professional resumes and cover letters with our AI-powered CV builder. ATS-friendly templates, LinkedIn integration, and expert guidance. Build your perfect resume in minutes.',
     keywords: ['AI resume builder', 'online CV creator', 'professional resume templates', 'ATS friendly resume', 'cover letter generator'],
-    url: 'https://resumeai.world',
+    url: 'https://airesumebuilder.com',
   },
   dashboard: {
     title: 'Dashboard - Manage Your Resumes & Cover Letters',
     description: 'Access your resume dashboard to create, edit, and manage your professional resumes and cover letters. Track your applications and upgrade to premium features.',
     keywords: ['resume dashboard', 'CV management', 'application tracking', 'premium features'],
-    url: 'https://resumeai.world/dashboard',
+    url: 'https://airesumebuilder.com/dashboard',
   },
   templates: {
     title: 'Professional Resume Templates - ATS-Friendly CV Designs',
     description: 'Choose from our collection of professional, ATS-friendly resume templates. Modern designs crafted by experts to help you land your dream job.',
     keywords: ['resume templates', 'CV templates', 'professional designs', 'ATS friendly templates', 'modern resume layouts'],
-    url: 'https://resumeai.world/template',
+    url: 'https://airesumebuilder.com/template',
   },
   coverLetter: {
     title: 'AI Cover Letter Generator - Create Personalized Cover Letters',
     description: 'Generate personalized cover letters with AI assistance. Match your cover letter to job requirements and increase your chances of getting hired.',
     keywords: ['cover letter generator', 'AI cover letter', 'personalized cover letters', 'job application letters'],
-    url: 'https://resumeai.world/cover-letter',
+    url: 'https://airesumebuilder.com/cover-letter',
   },
   profile: {
     title: 'Profile Settings - Manage Your Account',
     description: 'Manage your Ai-rezume builder profile, update personal information, and configure your account settings for the best resume building experience.',
     keywords: ['profile settings', 'account management', 'user preferences'],
-    url: 'https://resumeai.world/profile',
+    url: 'https://airesumebuilder.com/profile',
   },
   pricing: {
     title: 'Pricing Plans - Choose Your Resume Builder Plan',
     description: 'Affordable pricing plans for professional resume creation. Free basic features with premium upgrades for advanced templates and AI assistance.',
     keywords: ['pricing plans', 'resume builder cost', 'premium features', 'subscription plans'],
-    url: 'https://resumeai.world/pricing',
+    url: 'https://airesumebuilder.com/pricing',
   },
   signIn: {
     title: 'Sign In - Access Your Resume Builder Account',
     description: 'Sign in to your Ai-rezume builder account to access your resumes, cover letters, and premium features. Secure login with multiple authentication options.',
     keywords: ['sign in', 'login', 'account access', 'user authentication'],
-    url: 'https://resumeai.world/sign-in',
+    url: 'https://airesumebuilder.com/sign-in',
   },
   signUp: {
     title: 'Sign Up - Create Your Free Resume Builder Account',
     description: 'Create your free Ai-rezume builder account and start building professional resumes today. Quick registration with instant access to templates and tools.',
     keywords: ['sign up', 'create account', 'free registration', 'get started'],
-    url: 'https://resumeai.world/sign-up',
+    url: 'https://airesumebuilder.com/sign-up',
   },
   privacy: {
     title: 'Privacy Policy - How We Protect Your Data',
     description: 'Learn how Ai-rezume builder protects your personal information and resume data. Our comprehensive privacy policy explains our data handling practices.',
     keywords: ['privacy policy', 'data protection', 'user privacy', 'data security'],
-    url: 'https://resumeai.world/terms/privacy',
+    url: 'https://airesumebuilder.com/terms/privacy',
   },
   terms: {
     title: 'Terms of Service - Usage Guidelines',
     description: 'Read our terms of service and usage guidelines for Ai-rezume builder. Understand your rights and responsibilities when using our platform.',
     keywords: ['terms of service', 'usage guidelines', 'user agreement'],
-    url: 'https://resumeai.world/terms/policy',
+    url: 'https://airesumebuilder.com/terms/policy',
   },
   refund: {
     title: 'Refund Policy - Money-Back Guarantee',
     description: 'Our refund policy ensures your satisfaction with Ai-rezume builder. Learn about our money-back guarantee and refund process.',
     keywords: ['refund policy', 'money-back guarantee', 'customer satisfaction'],
-    url: 'https://resumeai.world/terms/refund',
+    url: 'https://airesumebuilder.com/terms/refund',
   },
 };
 
@@ -150,12 +150,12 @@ export function generateStructuredData(type: 'WebApplication' | 'Article' | 'Org
         name: data.name || "Ai-rezume builder",
         applicationCategory: "BusinessApplication",
         operatingSystem: "Web Browser",
-        url: data.url || "https://resumeai.world",
+        url: data.url || "https://airesumebuilder.com",
         description: data.description,
         author: {
           "@type": "Organization",
           name: "Ai-rezume builder Team",
-          url: "https://resumeai.world"
+          url: "https://airesumebuilder.com"
         },
         offers: data.offers || {
           "@type": "Offer",
@@ -190,20 +190,20 @@ export function generateStructuredData(type: 'WebApplication' | 'Article' | 'Org
           name: "Ai-rezume builder",
           logo: {
             "@type": "ImageObject",
-            url: "https://resumeai.world/img/logo.png"
+            url: "https://airesumebuilder.com/img/logo.png"
           }
         },
         datePublished: data.publishedTime,
         dateModified: data.modifiedTime || data.publishedTime,
-        image: data.image || "https://resumeai.world/img/banner.png"
+        image: data.image || "https://airesumebuilder.com/img/banner.png"
       };
     
     case 'Organization':
       return {
         ...baseSchema,
         name: "Ai-rezume builder",
-        url: "https://resumeai.world",
-        logo: "https://resumeai.world/img/logo.png",
+        url: "https://airesumebuilder.com",
+        logo: "https://airesumebuilder.com/img/logo.png",
         description: "Professional AI-powered resume and cover letter builder",
         sameAs: [
           "https://twitter.com/resumeaiworld",
@@ -214,7 +214,7 @@ export function generateStructuredData(type: 'WebApplication' | 'Article' | 'Org
           "@type": "ContactPoint",
           telephone: "+1-555-0123",
           contactType: "customer service",
-          email: "support@resumeai.world"
+          email: "support@airesumebuilder.com"
         }
       };
     

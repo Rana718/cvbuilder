@@ -124,26 +124,26 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://resumeai.world",
-    siteName: "ResumeAI.World",
-    title: "ResumeAI.World - Create Professional Resumes & Cover Letters with AI",
+    url: "https://airesumebuilder.com",
+    siteName: "AI Resume Builder",
+    title: "AI Resume Builder - Create Professional Resumes & Cover Letters with AI",
     description: "Create professional resumes and cover letters with our AI-powered CV builder. ATS-friendly templates, LinkedIn integration, and expert guidance.",
     images: [
       {
-        url: "/img/banner.png",
+        url: "https://airesumebuilder.com/img/banner.png",
         width: 1200,
         height: 630,
-        alt: "Ai-rezume builder - Professional Resume Creator",
+        alt: "AI Resume Builder - Professional Resume Creator",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    site: "@resumeaiworld",
-    creator: "@resumeaiworld",
-    title: "Ai-rezume builder - Create Professional Resumes & Cover Letters with AI",
+    site: "@airesumebuilder",
+    creator: "@airesumebuilder",
+    title: "AI Resume Builder - Create Professional Resumes & Cover Letters with AI",
     description: "Create professional resumes and cover letters with our AI-powered CV builder. ATS-friendly templates, LinkedIn integration, and expert guidance.",
-    images: ["/img/banner.png"],
+    images: ["https://airesumebuilder.com/img/banner.png"],
   },
   verification: {
     google: "your-google-site-verification-code",
@@ -154,7 +154,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://resumeai.world",
+    canonical: "https://airesumebuilder.com",
   },
   category: "Business Tools",
 };
@@ -167,15 +167,15 @@ export default function RootLayout({
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    name: "ResumeAI.World",
+    name: "AI Resume Builder",
     applicationCategory: "BusinessApplication",
     operatingSystem: "Web Browser",
-    url: "https://resumeai.world",
+    url: "https://airesumebuilder.com",
     description: "Create professional resumes and cover letters with our AI-powered CV builder. ATS-friendly templates, LinkedIn integration, and expert guidance.",
     author: {
       "@type": "Organization",
-      name: "Ai-rezume builder Team",
-      url: "https://resumeai.world"
+      name: "AI Resume Builder Team",
+      url: "https://airesumebuilder.com"
     },
     offers: {
       "@type": "Offer",
@@ -206,7 +206,7 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-        <link rel="canonical" href="https://resumeai.world" />
+        <link rel="canonical" href="https://airesumebuilder.com" />
         <meta name="theme-color" content="#1e40af" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />

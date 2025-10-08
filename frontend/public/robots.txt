@@ -29,7 +29,7 @@ Allow: /terms/
 Allow: /share
 
 # Sitemap location
-Sitemap: https://resumeai.world/sitemap.xml
+Sitemap: https://airesumebuilder.com/sitemap.xml
 
 # Crawl delay (optional - be respectful to search engines)
 Crawl-delay: 1

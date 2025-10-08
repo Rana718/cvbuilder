@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next'
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://resumeai.world'
+  const baseUrl = 'https://airesumebuilder.com'
   const lastModified = new Date()
 
   const staticPages = [
