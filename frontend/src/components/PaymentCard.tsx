@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Check, Crown, Download, Sparkles } from 'lucide-react';
 import { useAuth } from '@/components/AuthContext';
+import { showAlert } from '@/components/ui/alert-utils'
 import { useRouter } from 'next/navigation';
 import axiosInstance from '@/lib/axios';
 
@@ -74,7 +75,7 @@ function PaymentCard({ isOpen, onClose, onSuccess, redirectAfterLogin = false }:
         } catch (error: any) {
             console.error('Error creating subscription:', error);
             const errorMessage = error.response?.data?.detail || error.message || 'Failed to create subscription. Please try again.';
-            alert(errorMessage);
+            showAlert(errorMessage);
         } finally {
             setIsLoading(false);
         }
@@ -126,7 +127,7 @@ function PaymentCard({ isOpen, onClose, onSuccess, redirectAfterLogin = false }:
     const handlePaymentSuccess = async (response: any) => {
         try {
             console.log('Payment successful:', response);
-            alert('Payment successful! Your premium subscription is now active.');
+            showAlert('Payment successful! Your premium subscription is now active.');
 
             if (onSuccess) {
                 onSuccess();
@@ -135,7 +136,7 @@ function PaymentCard({ isOpen, onClose, onSuccess, redirectAfterLogin = false }:
             onClose();
         } catch (error) {
             console.error('Error handling payment success:', error);
-            alert('Payment was successful, but there was an error updating your account. Please contact support.');
+            showAlert('Payment was successful, but there was an error updating your account. Please contact support.');
         }
     };
 

@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react'
 import { useResumeStore } from '@/store/resumeStore'
 import { Upload, X, User } from 'lucide-react'
+import { showAlert } from './ui/alert-utils'
 
 export default function ImageUpload() {
   const { personalInfo, uploadImage } = useResumeStore()
@@ -14,12 +15,12 @@ export default function ImageUpload() {
     if (!file) return
 
     if (!file.type.startsWith('image/')) {
-      alert('Please select an image file')
+      showAlert('Please select an image file')
       return
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      alert('Image size should be less than 5MB')
+      showAlert('Image size should be less than 5MB')
       return
     }
 
@@ -27,7 +28,7 @@ export default function ImageUpload() {
     try {
       await uploadImage(file)
     } catch (error) {
-      alert('Failed to upload image')
+      showAlert('Failed to upload image')
     } finally {
       setIsUploading(false)
     }

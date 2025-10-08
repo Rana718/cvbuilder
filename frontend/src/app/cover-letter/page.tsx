@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { Plus, Edit, Trash2, Search, FileText, MoreHorizontal, Share2, Calendar, Building2 } from 'lucide-react';
 import axiosInstance from '@/lib/axios';
 import Navbar from '@/components/Navbar';
+import { showAlert } from '@/components/ui/alert-utils';
 
 interface CoverLetter {
     id: number;
@@ -146,7 +147,7 @@ const CoverLetterPage: React.FC = () => {
             setCoverLetters(coverLetters.filter(letter => letter.id !== coverLetterId));
         } catch (error: any) {
             console.error('Failed to delete cover letter:', error);
-            alert('Failed to delete cover letter. Please try again.');
+            showAlert('Failed to delete cover letter. Please try again.', 'error');
         }
     };
 
@@ -160,9 +161,9 @@ const CoverLetterPage: React.FC = () => {
             }).catch(console.error);
         } else {
             navigator.clipboard.writeText(shareUrl).then(() => {
-                alert('Link copied to clipboard!');
+                showAlert('Link copied to clipboard!', 'success');
             }).catch(() => {
-                alert(`Share this link: ${shareUrl}`);
+                showAlert(`Share this link: ${shareUrl}`);
             });
         }
     };

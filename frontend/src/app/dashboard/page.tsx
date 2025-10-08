@@ -8,6 +8,7 @@ import { useAuth } from '@/components/AuthContext'
 import axiosInstance from '@/lib/axios'
 import Navbar from '@/components/Navbar'
 import PaymentHistory from '@/components/PaymentHistory'
+import { showAlert } from '@/components/ui/alert-utils'
 
 interface DashboardStats {
     totalResumes: number
@@ -253,7 +254,7 @@ function Dashboard() {
             setStats(prev => ({ ...prev, totalResumes: Math.max(0, prev.totalResumes - 1) }))
         } catch (error) {
             console.error('Failed to delete resume:', error)
-            alert('Failed to delete resume. Please try again.')
+            showAlert('Failed to delete resume. Please try again.', 'error')
         } finally {
             setDeletingResumeId(null)
         }

@@ -3,6 +3,7 @@ import { Star, CheckCircle, Award, Shield } from 'lucide-react'
 import React from 'react'
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthContext";
+import { showAlert } from '@/components/ui/alert-utils'
 import { usePremiumStatus } from '@/hooks/usePremiumStatus';
 
 function Pricing() {
@@ -17,7 +18,7 @@ function Pricing() {
         }
 
         if (isPremium) {
-            alert('You are already a premium user!');
+            showAlert('You are already a premium user!');
             return;
         }
 

@@ -61,26 +61,28 @@ function PaymentContent() {
     setPaymentStatus('processing');
 
     try {
-      const response = await axiosInstance.post('/api/payment/create-subscription');
-      const subscriptionData = response.data;
-      await initiateRazorpayPayment(subscriptionData);
+      // Step 1: Create instant order (not subscription)
+      const response = await axiosInstance.post('/api/payment/create-instant-order');
+      const orderData = response.data;
+      await initiateInstantPayment(orderData);
     } catch (error: any) {
-      console.error('Error creating subscription:', error);
-      const errorMessage = error.response?.data?.detail || error.message || 'Failed to create subscription. Please try again.';
+      console.error('Error creating order:', error);
       setPaymentStatus('failed');
       setIsLoading(false);
     }
   };
 
-  const initiateRazorpayPayment = async (subscriptionData: any) => {
+  const initiateInstantPayment = async (orderData: any) => {
     const options = {
       key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-      subscription_id: subscriptionData.subscription_id,
+      order_id: orderData.order_id,  // Use order_id instead of subscription_id
+      amount: orderData.amount,
+      currency: orderData.currency,
       name: 'AI CV Builder Premium',
-      description: 'Premium Subscription (1 Month)',
+      description: 'Premium Plan - First Month',
       image: '/logo.png',
       handler: async function (response: any) {
-        await handlePaymentSuccess(response);
+        await handleInstantPaymentSuccess(response, orderData.customer_id);
       },
       prefill: {
         name: user?.displayName || '',
@@ -105,58 +107,33 @@ function PaymentContent() {
     rzp.open();
   };
 
-  const handlePaymentSuccess = async (response: any) => {
+  const handleInstantPaymentSuccess = async (response: any, customerId: string) => {
     try {
       setPaymentStatus('processing');
 
-      // Poll subscription status until webhook updates it
-      const checkStatus = async () => {
-        try {
-          const statusResponse = await axiosInstance.get('/api/payment/subscription-status');
-          const statusData = statusResponse.data;
+      // Step 1: Verify instant payment (immediate activation)
+      const verifyResponse = await axiosInstance.post('/api/payment/verify-payment', {
+        razorpay_payment_id: response.razorpay_payment_id,
+        razorpay_order_id: response.razorpay_order_id,
+        razorpay_signature: response.razorpay_signature
+      });
 
-          if (statusData.is_premium && statusData.status === 'active') {
-            setPaymentStatus('success');
-            setTimeout(() => {
-              if (redirectUrl) {
-                window.location.href = redirectUrl;
-              } else {
-                router.push('/dashboard');
-              }
-            }, 2000);
-            return true;
+      if (verifyResponse.data.success) {
+        // Step 2: Create background subscription for next month
+        axiosInstance.post('/api/payment/create-background-subscription', {
+          customer_id: customerId
+        }).catch(err => console.log('Background subscription creation failed:', err));
+
+        // Immediate success - no waiting!
+        setPaymentStatus('success');
+        setTimeout(() => {
+          if (redirectUrl) {
+            window.location.href = redirectUrl;
+          } else {
+            router.push('/dashboard');
           }
-          return false;
-        } catch (error) {
-          console.error('Status check error:', error);
-          return false;
-        }
-      };
-
-      let attempts = 0;
-      const maxAttempts = 15;
-
-      const pollStatus = async () => {
-        const success = await checkStatus();
-        if (success) return;
-
-        attempts++;
-        if (attempts < maxAttempts) {
-          setTimeout(pollStatus, 2000);
-        } else {
-          // Timeout - assume success anyway
-          setPaymentStatus('success');
-          setTimeout(() => {
-            if (redirectUrl) {
-              window.location.href = redirectUrl;
-            } else {
-              router.push('/dashboard');
-            }
-          }, 1000);
-        }
-      };
-
-      pollStatus();
+        }, 2000);
+      }
 
     } catch (error) {
       console.error('Error handling payment success:', error);

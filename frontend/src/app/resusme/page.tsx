@@ -9,6 +9,7 @@ import { Plus, Edit, Trash2, Search, MoreHorizontal, Share2, Calendar, User, Bri
 import axiosInstance from '@/lib/axios';
 import TemplateRenderer from '@/components/templates/TemplateRenderer';
 import Navbar from '@/components/Navbar';
+import { showAlert } from '@/components/ui/alert-utils'
 
 interface Resume {
     id: number;
@@ -160,7 +161,7 @@ const ResumePage: React.FC = () => {
             setResumes(resumes.filter(resume => resume.id !== resumeId));
         } catch (error: any) {
             console.error('Failed to delete resume:', error);
-            alert('Failed to delete resume. Please try again.');
+            showAlert('Failed to delete resume. Please try again.', 'error');
         }
     };
 
@@ -174,9 +175,9 @@ const ResumePage: React.FC = () => {
             }).catch(console.error);
         } else {
             navigator.clipboard.writeText(shareUrl).then(() => {
-                alert('Link copied to clipboard!');
+                showAlert('Link copied to clipboard!', 'success');
             }).catch(() => {
-                alert(`Share this link: ${shareUrl}`);
+                showAlert(`Share this link: ${shareUrl}`);
             });
         }
     };

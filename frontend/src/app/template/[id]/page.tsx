@@ -29,7 +29,7 @@ function TemplatePage() {
                     populateFromResumeData(response.data)
                 } catch (error) {
                     console.error('Failed to fetch resume data:', error)
-                    // alert('Failed to load resume data. Starting with a blank resume.')
+                    // showAlert('Failed to load resume data. Starting with a blank resume.')
                 }
             }
             fetchResumeData()

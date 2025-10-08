@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import axiosInstance from '@/lib/axios'
 import { ExternalLink, Linkedin, Unlink, RefreshCw, Calendar } from 'lucide-react'
+import { showAlert } from './ui/alert-utils'
 
 interface LinkedInProfile {
     id: number
@@ -100,10 +101,10 @@ const LinkedInIntegration = () => {
             await axiosInstance.delete('/api/linkedin/disconnect')
             setConnectionStatus({ is_connected: false })
             setLinkedinProfile(null)
-            alert('LinkedIn profile disconnected successfully')
+            showAlert('LinkedIn profile disconnected successfully')
         } catch (error) {
             console.error('Failed to disconnect LinkedIn:', error)
-            alert('Failed to disconnect LinkedIn profile')
+            showAlert('Failed to disconnect LinkedIn profile')
         }
     }
 
@@ -112,10 +113,10 @@ const LinkedInIntegration = () => {
             setSyncing(true)
             await axiosInstance.post('/api/linkedin/sync')
             await fetchLinkedInProfile()
-            alert('LinkedIn profile synced successfully')
+            showAlert('LinkedIn profile synced successfully')
         } catch (error) {
             console.error('Failed to sync LinkedIn profile:', error)
-            alert('Failed to sync LinkedIn profile')
+            showAlert('Failed to sync LinkedIn profile')
         } finally {
             setSyncing(false)
         }

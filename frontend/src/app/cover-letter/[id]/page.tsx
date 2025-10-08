@@ -11,6 +11,7 @@ import Link from 'next/link';
 import axiosInstance from '@/lib/axios';
 import { motion } from 'framer-motion';
 import Navbar from '@/components/Navbar';
+import { showAlert } from '@/components/ui/alert-utils';
 
 function CoverLetterPage() {
     const params = useParams();
@@ -56,10 +57,10 @@ function CoverLetterPage() {
                 setDocumentId(Number(coverLetterId));
             }
             await saveCoverLetter();
-            alert('Cover letter saved successfully!');
+            showAlert('Cover letter saved successfully!', 'success');
         } catch (error) {
             console.error('Save error:', error);
-            alert('Failed to save cover letter. Please try again.');
+            showAlert('Failed to save cover letter. Please try again.', 'error');
         } finally {
             setIsSaving(false);
         }
@@ -114,14 +115,14 @@ function CoverLetterPage() {
             let content = document.querySelector("[data-cover-letter-content]") as HTMLElement;
 
             if (!content) {
-                alert('Cover letter content not found. Please refresh and try again.');
+                showAlert('Cover letter content not found. Please refresh and try again.', 'error');
                 return;
             }
 
             await generatePDF(content);
         } catch (error: any) {
             console.error("Download error:", error);
-            alert(`Download failed: ${error.message || 'Please try again.'}`);
+            showAlert(`Download failed: ${error.message || 'Please try again.'}`, 'error');
         } finally {
             setIsDownloading(false);
         }
@@ -148,7 +149,7 @@ function CoverLetterPage() {
             if (!documentId) {
                 await handleSave();
                 if (!documentId) {
-                    alert('Please save the cover letter first before sharing.');
+                    showAlert('Please save the cover letter first before sharing.', 'error');
                     return;
                 }
             }
@@ -168,7 +169,7 @@ function CoverLetterPage() {
             setTimeout(() => setShowShareSuccess(false), 3000);
         } catch (error) {
             console.error('Share error:', error);
-            alert('Failed to generate share link. Please try again.');
+            showAlert('Failed to generate share link. Please try again.', 'error');
         } finally {
             setIsSharing(false);
         }
@@ -182,7 +183,7 @@ function CoverLetterPage() {
                 setTimeout(() => setShowShareSuccess(false), 2000);
             } catch (error) {
                 console.error('Failed to copy to clipboard:', error);
-                alert('Failed to copy URL to clipboard');
+                showAlert('Failed to copy URL to clipboard', 'error');
             }
         }
     };

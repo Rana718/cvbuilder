@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Plus, X, Award, Globe, BookOpen, Users, Heart, Settings, User, Trophy } from 'lucide-react'
 import { useResumeStore, AdditionalSection } from '@/store/resumeStore'
 import SimpleRichTextEditor from '@/components/ui/SimpleRichTextEditor'
+import { showAlert } from '@/components/ui/alert-utils'
 import { useRouter } from 'next/navigation'
 
 interface AdditionalInfoStepProps {
@@ -143,11 +144,11 @@ function AdditionalInfoStep({ onPrev }: AdditionalInfoStepProps) {
         router.push(`/resusme/${resumeId}?template=${templateId}`)
       } else {
         console.error('Missing resume ID or template ID after save')
-        alert('Resume saved successfully!')
+        showAlert('Resume saved successfully!')
       }
     } catch (error) {
       console.error('Failed to save resume:', error)
-      alert('Failed to save resume. Please try again.')
+      showAlert('Failed to save resume. Please try again.')
     }
   }
 

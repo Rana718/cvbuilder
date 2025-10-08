@@ -3,6 +3,7 @@
 import React, { useState, useEffect, Suspense, useMemo, useCallback } from 'react'
 import { useParams, useSearchParams, useRouter } from 'next/navigation'
 import { useAuth } from '@/components/AuthContext'
+import { showAlert } from '@/components/ui/alert-utils'
 import { useResumeStore } from '@/store/resumeStore'
 import { usePremiumStatus } from '@/hooks/usePremiumStatus'
 import ResumePreview from '@/components/ui/ResumePreview'
@@ -305,10 +306,10 @@ function ResumePage() {
                 setDocumentId(Number(resumeId))
             }
             await saveResume()
-            alert('Resume saved successfully!')
+            showAlert('Resume saved successfully!')
         } catch (error) {
             console.error('Save error:', error)
-            alert('Failed to save resume. Please try again.')
+            showAlert('Failed to save resume. Please try again.')
         } finally {
             setIsSaving(false)
         }
@@ -367,14 +368,14 @@ function ResumePage() {
             let resumeContent = document.querySelector("[data-resume-content]") as HTMLElement
 
             if (!resumeContent) {
-                alert('Resume content not found. Please refresh and try again.')
+                showAlert('Resume content not found. Please refresh and try again.')
                 return
             }
 
             await generatePDF(resumeContent)
         } catch (error: any) {
             console.error("Download error:", error)
-            alert(`Download failed: ${error.message || 'Please try again.'}`)
+            showAlert(`Download failed: ${error.message || 'Please try again.'}`)
         } finally {
             setIsDownloading(false)
         }
@@ -388,7 +389,7 @@ function ResumePage() {
                 setTimeout(() => setShowShareSuccess(false), 2000)
             } catch (error) {
                 console.error('Failed to copy to clipboard:', error)
-                alert('Failed to copy URL to clipboard')
+                showAlert('Failed to copy URL to clipboard')
             }
         }
     }, [shareUrl])
@@ -400,7 +401,7 @@ function ResumePage() {
         }
 
         if (!isPremium) {
-            alert('Sharing is a premium feature. Please upgrade to share your resume.')
+            showAlert('Sharing is a premium feature. Please upgrade to share your resume.')
             return
         }
 
@@ -414,7 +415,7 @@ function ResumePage() {
             if (!documentId) {
                 await handleSave()
                 if (!documentId) {
-                    alert('Please save the resume first before sharing.')
+                    showAlert('Please save the resume first before sharing.')
                     return
                 }
             }
@@ -434,7 +435,7 @@ function ResumePage() {
             setTimeout(() => setShowShareSuccess(false), 3000)
         } catch (error) {
             console.error('Share error:', error)
-            alert('Failed to generate share link. Please try again.')
+            showAlert('Failed to generate share link. Please try again.')
         } finally {
             setIsSharing(false)
         }

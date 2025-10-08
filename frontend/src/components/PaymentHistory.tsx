@@ -18,6 +18,7 @@ import {
     Building2,
     Trash2
 } from 'lucide-react'
+import { showAlert } from './ui/alert-utils'
 
 interface PaymentHistoryItem {
     id: number
@@ -118,10 +119,10 @@ const PaymentHistory: React.FC<PaymentHistoryProps> = ({ onRefreshStatus }) => {
             }
 
             setShowCancelModal(false)
-            alert('Subscription cancelled successfully. You will retain premium access until your current billing period ends.')
+            showAlert('Subscription cancelled successfully. You will retain premium access until your current billing period ends.')
         } catch (error: any) {
             console.error('Failed to cancel subscription:', error)
-            alert(error.response?.data?.detail || 'Failed to cancel subscription')
+            showAlert(error.response?.data?.detail || 'Failed to cancel subscription')
         } finally {
             setCancelling(false)
         }
@@ -141,10 +142,10 @@ const PaymentHistory: React.FC<PaymentHistoryProps> = ({ onRefreshStatus }) => {
                 onRefreshStatus()
             }
 
-            alert('Subscription reactivated successfully!')
+            showAlert('Subscription reactivated successfully!')
         } catch (error: any) {
             console.error('Failed to reactivate subscription:', error)
-            alert(error.response?.data?.detail || 'Failed to reactivate subscription')
+            showAlert(error.response?.data?.detail || 'Failed to reactivate subscription')
         }
     }
 

@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react'
 import { FileText, ChevronLeft, ChevronRight, Sparkles, Target, User } from 'lucide-react'
 import { useResumeStore } from '@/store/resumeStore'
 import SimpleRichTextEditor from '@/components/ui/SimpleRichTextEditor'
+import { showAlert } from '@/components/ui/alert-utils'
 import { useStreamingSummary } from '@/utils/cvStreamingApi'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -73,7 +74,7 @@ function SummaryStep({ onNext, onPrev }: SummaryStepProps) {
             router.push(`/resusme/${tempResumeId}?template=${currentTemplateId}`)
         } else {
             // Fallback if no template is selected
-            alert('Please select a template first.')
+            showAlert('Please select a template first.')
             setIsSaving(false)
         }
     }
