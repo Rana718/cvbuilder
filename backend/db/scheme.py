@@ -154,6 +154,7 @@ class Subscription(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    plan_id = Column(Integer, ForeignKey("plans.id"), nullable=True)
     razorpay_customer_id = Column(String(255), nullable=False)
     subscription_id = Column(String(255), nullable=False)
     plan = Column(String(100), default="free", nullable=False) 
@@ -164,10 +165,64 @@ class Subscription(Base):
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
     user = relationship("User", back_populates="subscription")
+    plan_ref = relationship("Plan", back_populates="subscriptions")
     payment_history = relationship("PaymentHistory", back_populates="subscription", cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"<Subscription(id={self.id}, user_id={self.user_id}, plan='{self.plan}', status='{self.status}')>"
+
+
+class Plan(Base):
+    __tablename__ = "plans"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(100), nullable=False)
+    slug = Column(String(100), unique=True, nullable=False)
+    price = Column(Integer, nullable=False)  # Price in paise (Razorpay compatibility)
+    currency = Column(String(10), default="INR", nullable=False)
+    interval = Column(String(20), default="monthly", nullable=False)  # monthly, yearly
+    features = Column(JSON, nullable=False)
+    is_active = Column(Boolean, default=True)
+    is_popular = Column(Boolean, default=False)
+    sort_order = Column(Integer, default=0)
+    
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+    subscriptions = relationship("Subscription", back_populates="plan_ref")
+
+    def __repr__(self):
+        return f"<Plan(id={self.id}, name='{self.name}', price={self.price})>"
+
+
+class Blog(Base):
+    __tablename__ = "blogs"
+
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String(255), nullable=False)
+    slug = Column(String(255), unique=True, nullable=False, index=True)
+    excerpt = Column(Text)
+    content = Column(Text, nullable=False)
+    featured_image = Column(String(500))
+    meta_title = Column(String(255))
+    meta_description = Column(String(500))
+    keywords = Column(JSON)
+    author_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    category = Column(String(100))
+    tags = Column(JSON)
+    is_published = Column(Boolean, default=False)
+    is_featured = Column(Boolean, default=False)
+    views_count = Column(Integer, default=0)
+    reading_time = Column(Integer, default=5)  # in minutes
+    
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+    published_at = Column(DateTime(timezone=True))
+
+    author = relationship("User")
+
+    def __repr__(self):
+        return f"<Blog(id={self.id}, title='{self.title}', slug='{self.slug}')>"
 
 
 class PaymentHistory(Base):
@@ -176,6 +231,7 @@ class PaymentHistory(Base):
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     subscription_id = Column(Integer, ForeignKey("subscriptions.id", ondelete="CASCADE"), nullable=False)
+    plan_id = Column(Integer, ForeignKey("plans.id"), nullable=True)
     razorpay_payment_id = Column(String(255), nullable=False)
     razorpay_order_id = Column(String(255))
     amount = Column(Integer, nullable=False)  # Amount in paise (smallest currency unit)
@@ -197,6 +253,7 @@ class PaymentHistory(Base):
 
     user = relationship("User")
     subscription = relationship("Subscription", back_populates="payment_history")
+    plan_ref = relationship("Plan")
 
     def __repr__(self):
         return f"<PaymentHistory(id={self.id}, payment_id='{self.razorpay_payment_id}', amount={self.amount}, status='{self.status}')>"

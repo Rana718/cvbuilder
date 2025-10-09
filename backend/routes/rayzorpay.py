@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, desc
 from db.db import get_db
-from db.scheme import User, Subscription, PaymentHistory
+from db.scheme import User, Subscription, PaymentHistory, Plan
 from middleware.auth import get_current_user
 import razorpay
 import os
@@ -21,29 +21,40 @@ razorpay_client = razorpay.Client(auth=(
     os.getenv("RAZORPAY_KEY_SECRET")
 ))
 
-
-@router.post("/create-instant-order")
-async def create_instant_order(
+@router.post("/create-order")
+async def create_order(
+    plan_id: int,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
-    """Create instant payment order + background subscription"""
+    """Create payment order for selected plan"""
     try:
-        # Step 1: Create instant payment order (shows success immediately)
+        # Get plan details
+        result = await db.execute(select(Plan).where(Plan.id == plan_id, Plan.is_active == True))
+        plan = result.scalar_one_or_none()
+        
+        if not plan:
+            raise HTTPException(status_code=404, detail="Plan not found")
+        
+        if plan.price == 0:
+            raise HTTPException(status_code=400, detail="Cannot create payment for free plan")
+        
+        # Create order
         order_data = {
-            "amount": 9000,  # ₹90 in paise
-            "currency": "INR",
-            "receipt": f"order_{current_user.id}_{int(datetime.utcnow().timestamp())}",
+            "amount": plan.price,
+            "currency": plan.currency,
+            "receipt": f"order_{current_user.id}_{plan_id}_{int(datetime.utcnow().timestamp())}",
             "notes": {
                 "user_id": str(current_user.id),
                 "email": current_user.email,
-                "plan": "premium_first_month"
+                "plan_id": str(plan_id),
+                "plan_name": plan.name
             }
         }
         
         razorpay_order = razorpay_client.order.create(order_data)
         
-        # Step 2: Create customer for future subscription (background)
+        # Create customer if needed
         customer_data = {
             "name": current_user.full_name,
             "email": current_user.email,
@@ -61,175 +72,140 @@ async def create_instant_order(
             "order_id": razorpay_order["id"],
             "amount": razorpay_order["amount"],
             "currency": razorpay_order["currency"],
-            "customer_id": razorpay_customer["id"] if razorpay_customer else None
-        }
-        
-    except Exception as e:
-        logger.error(f"Error creating instant order: {str(e)}")
-        raise HTTPException(status_code=500, detail="Failed to create payment order")
-
-@router.post("/create-instant-order")
-async def create_instant_order(
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
-):
-    """Create instant payment order + background subscription"""
-    try:
-        # Step 1: Create instant payment order (shows success immediately)
-        order_data = {
-            "amount": 9000,  # ₹90 in paise
-            "currency": "INR",
-            "receipt": f"order_{current_user.id}_{int(datetime.utcnow().timestamp())}",
-            "notes": {
-                "user_id": str(current_user.id),
-                "email": current_user.email,
-                "plan": "premium_first_month"
+            "customer_id": razorpay_customer["id"] if razorpay_customer else None,
+            "plan": {
+                "id": plan.id,
+                "name": plan.name,
+                "price": plan.price,
+                "features": plan.features
             }
         }
         
-        razorpay_order = razorpay_client.order.create(order_data)
-        
-        # Step 2: Create customer for future subscription (background)
-        customer_data = {
-            "name": current_user.full_name,
-            "email": current_user.email,
-            "fail_existing": "0"
-        }
-        
-        try:
-            razorpay_customer = razorpay_client.customer.create(customer_data)
-        except Exception as e:
-            if "Customer already exists" in str(e):
-                customers = razorpay_client.customer.all({"email": current_user.email})
-                razorpay_customer = customers['items'][0] if customers['items'] else None
-        
-        return {
-            "order_id": razorpay_order["id"],
-            "amount": razorpay_order["amount"],
-            "currency": razorpay_order["currency"],
-            "customer_id": razorpay_customer["id"] if razorpay_customer else None
-        }
-        
+    except HTTPException:
+        raise
     except Exception as e:
-        logger.error(f"Error creating instant order: {str(e)}")
+        logger.error(f"Error creating order: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to create payment order")
 
-@router.post("/create-background-subscription")
-async def create_background_subscription(
+@router.post("/verify-payment")
+async def verify_payment(
     payment_data: dict,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
-    """Create subscription mandate after successful first payment"""
+    """Verify payment and activate plan"""
     try:
-        customer_id = payment_data.get("customer_id")
-        plan_id = os.getenv("PLAN_ID")
+        razorpay_payment_id = payment_data.get("razorpay_payment_id")
+        razorpay_order_id = payment_data.get("razorpay_order_id")
+        razorpay_signature = payment_data.get("razorpay_signature")
+        plan_id = payment_data.get("plan_id")
         
-        subscription_data = {
-            "plan_id": plan_id,
-            "customer_id": customer_id,
-            "quantity": 1,
-            "start_at": int((datetime.utcnow() + timedelta(days=30)).timestamp()),  # Start next month
-            "notes": {
-                "user_id": str(current_user.id),
-                "email": current_user.email
-            }
-        }
+        if not all([razorpay_payment_id, razorpay_order_id, razorpay_signature, plan_id]):
+            raise HTTPException(status_code=400, detail="Missing payment verification data")
         
-        razorpay_subscription = razorpay_client.subscription.create(subscription_data)
+        # Verify signature
+        key_secret = os.getenv("RAZORPAY_KEY_SECRET")
+        message = f"{razorpay_order_id}|{razorpay_payment_id}"
+        signature = hmac.new(
+            key_secret.encode(),
+            message.encode(),
+            hashlib.sha256
+        ).hexdigest()
         
-        # Store subscription in DB
-        subscription = Subscription(
-            user_id=current_user.id,
-            razorpay_customer_id=customer_id,
-            subscription_id=razorpay_subscription["id"],
-            plan="premium",
-            status="created",  # Will be activated when mandate is approved
-            current_period_end=datetime.utcnow() + timedelta(days=30)
+        if not hmac.compare_digest(signature, razorpay_signature):
+            raise HTTPException(status_code=400, detail="Invalid payment signature")
+        
+        # Get payment details
+        payment_details = razorpay_client.payment.fetch(razorpay_payment_id)
+        if payment_details.get("status") != "captured":
+            raise HTTPException(status_code=400, detail="Payment not captured")
+        
+        # Get plan details
+        result = await db.execute(select(Plan).where(Plan.id == plan_id))
+        plan = result.scalar_one_or_none()
+        
+        if not plan:
+            raise HTTPException(status_code=404, detail="Plan not found")
+        
+        # Update user premium status
+        if plan.slug != "free":
+            current_user.is_premium = True
+        current_user.updated_at = datetime.utcnow()
+        
+        # Create or update subscription
+        result = await db.execute(
+            select(Subscription)
+            .where(Subscription.user_id == current_user.id)
+            .order_by(desc(Subscription.created_at))
         )
+        subscription_row = result.first()
         
-        db.add(subscription)
+        if not subscription_row:
+            subscription = Subscription(
+                user_id=current_user.id,
+                plan_id=plan.id,
+                razorpay_customer_id=payment_details.get("customer_id", f"cust_{current_user.id}"),
+                subscription_id=f"sub_{uuid.uuid4()}",
+                plan=plan.slug,
+                status="active",
+                current_period_end=datetime.utcnow() + timedelta(days=30)
+            )
+            db.add(subscription)
+            await db.flush()
+        else:
+            subscription = subscription_row[0]
+            subscription.plan_id = plan.id
+            subscription.plan = plan.slug
+            subscription.status = "active"
+            subscription.current_period_end = datetime.utcnow() + timedelta(days=30)
+            subscription.updated_at = datetime.utcnow()
+        
+        # Create payment history
+        payment_history = PaymentHistory(
+            user_id=current_user.id,
+            subscription_id=subscription.id,
+            plan_id=plan.id,
+            razorpay_payment_id=razorpay_payment_id,
+            razorpay_order_id=razorpay_order_id,
+            amount=payment_details.get("amount", 0),
+            currency=payment_details.get("currency", "INR"),
+            status=payment_details.get("status", "captured"),
+            method=payment_details.get("method", ""),
+            description=f"{plan.name} subscription payment",
+            receipt=payment_details.get("receipt", ""),
+            card_last4=payment_details.get("card", {}).get("last4", "") if payment_details.get("card") else "",
+            card_network=payment_details.get("card", {}).get("network", "") if payment_details.get("card") else "",
+            bank=payment_details.get("bank", "") if payment_details.get("bank") else "",
+            payment_date=datetime.fromtimestamp(payment_details.get("created_at", 0)) if payment_details.get("created_at") else datetime.utcnow()
+        )
+        db.add(payment_history)
+        
         await db.commit()
         
-        return {"subscription_id": razorpay_subscription["id"]}
-        
-    except Exception as e:
-        logger.error(f"Error creating background subscription: {str(e)}")
-        return {"error": "Failed to create subscription"}
-
-@router.post("/create-subscription")
-async def create_subscription(
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
-):
-    """Create a new Razorpay subscription for the user"""
-    try:
-        customer_data = {
-            "name": current_user.full_name,
-            "email": current_user.email,
-            "fail_existing": "0"  
-        }
-        
+        # Update Firebase claims
         try:
-            razorpay_customer = razorpay_client.customer.create(customer_data)
+            from config.firebase import set_custom_user_claims
+            set_custom_user_claims(current_user.firebase_uid, {"premium": str(current_user.is_premium).lower(), "dbUser": "true"})
         except Exception as e:
-            if "Customer already exists" in str(e):
-                customers = razorpay_client.customer.all({"email": current_user.email})
-                if customers['items']:
-                    razorpay_customer = customers['items'][0]
-                else:
-                    raise HTTPException(status_code=500, detail="Failed to create customer")
-            else:
-                logger.error(f"Razorpay customer creation error: {str(e)}")
-                raise HTTPException(status_code=500, detail=f"Failed to create customer: {str(e)}")
-        
-        plan_id = os.getenv("PLAN_ID")
-        if not plan_id:
-            raise HTTPException(status_code=500, detail="Plan ID not configured")
-            
-        subscription_data = {
-            "plan_id": plan_id,
-            "customer_id": razorpay_customer["id"],
-            "quantity": 1,
-            "total_count": 1, 
-            "notes": {
-                "user_id": str(current_user.id),
-                "email": current_user.email
-            }
-        }
-        
-        try:
-            razorpay_subscription = razorpay_client.subscription.create(subscription_data)
-        except Exception as e:
-            logger.error(f"Razorpay subscription creation error: {str(e)}")
-            raise HTTPException(status_code=500, detail=f"Failed to create subscription: {str(e)}")
-        
-        subscription = Subscription(
-            user_id=current_user.id,
-            razorpay_customer_id=razorpay_customer["id"],
-            subscription_id=razorpay_subscription["id"],
-            plan="premium",
-            status=razorpay_subscription["status"],
-            current_period_end=datetime.utcnow() + timedelta(days=30)
-        )
-        
-        db.add(subscription)
-        await db.commit()
-        await db.refresh(subscription)
+            logger.warning(f"Failed to update Firebase claims: {str(e)}")
         
         return {
-            "subscription_id": razorpay_subscription["id"],
-            "status": razorpay_subscription["status"],
-            "short_url": razorpay_subscription.get("short_url"),
-            "customer_id": razorpay_customer["id"]
+            "success": True,
+            "message": "Payment verified and plan activated",
+            "is_premium": current_user.is_premium,
+            "plan": {
+                "id": plan.id,
+                "name": plan.name,
+                "slug": plan.slug
+            }
         }
-    
+        
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Error creating subscription: {str(e)}")
         await db.rollback()
-        raise HTTPException(status_code=500, detail="Failed to create subscription")
+        logger.error(f"Payment verification error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Payment verification failed")
 
 
 @router.get("/subscription-status")
