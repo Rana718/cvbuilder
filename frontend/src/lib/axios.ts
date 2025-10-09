@@ -11,8 +11,13 @@ axiosInstance.interceptors.request.use(
     async (config) => {
         const user = auth.currentUser;
         if (user) {
-            const token = await user.getIdToken();
-            config.headers["Authorization"] = `Bearer ${token}`;
+            try {
+                const token = await user.getIdToken();
+                config.headers["Authorization"] = `Bearer ${token}`;
+            } catch (error) {
+                console.error('Failed to get auth token:', error);
+                // Continue without token - let the API handle the 401
+            }
         }
         return config;
     },
@@ -24,7 +29,28 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
     (response) => response,
     async (error) => {
-        // Don't auto-redirect on 401 - let components handle it
+        const originalRequest = error.config;
+        
+        // If it's a 401 and we haven't already retried
+        if (error.response?.status === 401 && !originalRequest._retry) {
+            originalRequest._retry = true;
+            
+            const user = auth.currentUser;
+            if (user) {
+                try {
+                    // Force refresh the token
+                    const token = await user.getIdToken(true);
+                    originalRequest.headers["Authorization"] = `Bearer ${token}`;
+                    
+                    // Retry the original request
+                    return axiosInstance(originalRequest);
+                } catch (refreshError) {
+                    console.error('Token refresh failed:', refreshError);
+                    // Fall through to reject the original error
+                }
+            }
+        }
+        
         return Promise.reject(error);
     }
 );

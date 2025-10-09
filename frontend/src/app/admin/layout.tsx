@@ -13,7 +13,8 @@ import {
   LogOut,
   Crown,
   Shield,
-  HomeIcon
+  HomeIcon,
+  BookOpen
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -31,6 +32,8 @@ interface AdminLayoutProps {
 const sidebarItems = [
   { icon: Home, label: "Dashboard", href: "/admin" },
   { icon: Users, label: "User Management", href: "/admin/users" },
+  { icon: BookOpen, label: "Content Management", href: "/admin/blogs" },
+  { icon: FileText, label: "Plans & Pricing", href: "/admin/plans" },
   { icon: CreditCard, label: "Payment Management", href: "/admin/payments" },
   { icon: HomeIcon, label: "Home Page", href: "/" },
   // { icon: FileText, label: "Resume Analytics", href: "/admin/analytics" },
@@ -100,8 +103,8 @@ function SidebarContent() {
               key={index}
               href={item.href}
               className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${isActive
-                  ? "bg-blue-50 text-blue-700 border border-blue-200"
-                  : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                ? "bg-blue-50 text-blue-700 border border-blue-200"
+                : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                 }`}
             >
               <item.icon className="h-5 w-5" />

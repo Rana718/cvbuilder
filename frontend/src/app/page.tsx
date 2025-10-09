@@ -20,12 +20,12 @@ export default function Home() {
   const { user } = useAuth();
   const router = useRouter();
 
-  useEffect(() => {
+  // useEffect(() => {
     
-    if (user) {
-      router.push('/dashboard');
-    }
-  }, [user, router])
+  //   if (user) {
+  //     router.push('/dashboard');
+  //   }
+  // }, [user, router])
 
   return (
     <div className="min-h-screen bg-slate-50">

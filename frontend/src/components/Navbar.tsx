@@ -1,6 +1,6 @@
 "use client";
 import { motion, AnimatePresence } from 'framer-motion';
-import { FileText, User, X, Menu, FolderOpen, Mail, TrendingUp, BarChart3, Sparkles, ChevronDown, Plus, RefreshCw, Star } from 'lucide-react';
+import { FileText, User, X, Menu, FolderOpen, Mail, TrendingUp, BarChart3, Sparkles, ChevronDown, Plus, RefreshCw, Star, BookOpen } from 'lucide-react';
 import { useAuth } from './AuthContext';
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import Link from 'next/link';
@@ -359,6 +359,8 @@ function Navbar() {
                             icon={Mail}
                             isActive={isActiveDropdown(coverLetterDropdownItems)}
                         />
+                        
+                        {renderNavLink('/blog', BookOpen, 'Blog')}
                     </div>
 
                     {/* Desktop Auth Section */}
@@ -410,6 +412,7 @@ function Navbar() {
                                         onItemClick={closeMenu}
                                     />
                                     
+                                    {renderNavLink('/blog', BookOpen, 'Blog', true)}
                                 </div>
                                 
                                 {/* Auth Section */}

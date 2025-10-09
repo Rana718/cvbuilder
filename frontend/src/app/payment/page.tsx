@@ -6,30 +6,15 @@ import { motion } from "framer-motion";
 import { Check, Crown, CreditCard, Shield, Zap, Sparkles, Download, X } from "lucide-react";
 import { useAuth } from "@/components/AuthContext";
 import Navbar from "@/components/Navbar";
-import axiosInstance from "@/lib/axios";
-import Image from "next/image";
 import Footer from "@/components/Footer";
+import { plansAPI, Plan } from "@/lib/api/plans";
+import Image from "next/image";
 
 declare global {
   interface Window {
     Razorpay: any;
   }
 }
-
-const PREMIUM_PLAN = {
-  id: "premium",
-  name: "Premium Plan",
-  price: 90,
-  currency: "INR",
-  interval: "monthly",
-  features: [
-    "Unlimited Resume Downloads",
-    "Premium Templates",
-    "AI-Powered Content Suggestions",
-    "No Watermarks",
-    "Priority Support"
-  ]
-};
 
 function PaymentContent() {
   const router = useRouter();
@@ -38,33 +23,52 @@ function PaymentContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState<'idle' | 'processing' | 'success' | 'failed'>('idle');
   const [redirectUrl, setRedirectUrl] = useState<string | null>(null);
+  const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
+  const [plans, setPlans] = useState<Plan[]>([]);
 
   useEffect(() => {
     const redirect = searchParams.get('redirect');
+    const planId = searchParams.get('plan_id');
+    
     if (redirect) {
       setRedirectUrl(decodeURIComponent(redirect));
     }
-  }, [searchParams]);
 
-  // useEffect(() => {
-  //   if (!loading && !user) {
-  //     router.push('/sign-in?callbackUrl=' + encodeURIComponent(window.location.pathname + window.location.search));
-  //   }
-  // }, [user, loading, router]);
+    const fetchPlans = async () => {
+      try {
+        const plansData = await plansAPI.getPlans();
+        setPlans(plansData);
+        
+        if (planId) {
+          const plan = plansData.find(p => p.id === parseInt(planId));
+          if (plan) {
+            setSelectedPlan(plan);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching plans:', error);
+      }
+    };
+
+    fetchPlans();
+  }, [searchParams]);
 
   const handlePayment = async () => {
     if (!user) {
       router.push('/sign-in?callbackUrl=' + encodeURIComponent(window.location.pathname + window.location.search));
+      return;
+    }
+
+    if (!selectedPlan) {
+      return;
     }
 
     setIsLoading(true);
     setPaymentStatus('processing');
 
     try {
-      // Step 1: Create instant order (not subscription)
-      const response = await axiosInstance.post('/api/payment/create-instant-order');
-      const orderData = response.data;
-      await initiateInstantPayment(orderData);
+      const response = await plansAPI.createOrder(selectedPlan.id);
+      await initiatePayment(response);
     } catch (error: any) {
       console.error('Error creating order:', error);
       setPaymentStatus('failed');
@@ -72,17 +76,17 @@ function PaymentContent() {
     }
   };
 
-  const initiateInstantPayment = async (orderData: any) => {
+  const initiatePayment = async (orderData: any) => {
     const options = {
       key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-      order_id: orderData.order_id,  // Use order_id instead of subscription_id
+      order_id: orderData.order_id,
       amount: orderData.amount,
       currency: orderData.currency,
-      name: 'AI CV Builder Premium',
-      description: 'Premium Plan - First Month',
+      name: 'AI CV Builder',
+      description: `${selectedPlan?.name} - Payment`,
       image: '/logo.png',
       handler: async function (response: any) {
-        await handleInstantPaymentSuccess(response, orderData.customer_id);
+        await handlePaymentSuccess(response);
       },
       prefill: {
         name: user?.displayName || '',
@@ -90,7 +94,7 @@ function PaymentContent() {
       },
       notes: {
         user_id: user?.uid,
-        plan: PREMIUM_PLAN.id
+        plan_id: selectedPlan?.id
       },
       theme: {
         color: '#3B82F6'
@@ -107,24 +111,18 @@ function PaymentContent() {
     rzp.open();
   };
 
-  const handleInstantPaymentSuccess = async (response: any, customerId: string) => {
+  const handlePaymentSuccess = async (response: any) => {
     try {
       setPaymentStatus('processing');
 
-      // Step 1: Verify instant payment (immediate activation)
-      const verifyResponse = await axiosInstance.post('/api/payment/verify-payment', {
+      const verifyResponse = await plansAPI.verifyPayment({
         razorpay_payment_id: response.razorpay_payment_id,
         razorpay_order_id: response.razorpay_order_id,
-        razorpay_signature: response.razorpay_signature
+        razorpay_signature: response.razorpay_signature,
+        plan_id: selectedPlan!.id
       });
 
-      if (verifyResponse.data.success) {
-        // Step 2: Create background subscription for next month
-        axiosInstance.post('/api/payment/create-background-subscription', {
-          customer_id: customerId
-        }).catch(err => console.log('Background subscription creation failed:', err));
-
-        // Immediate success - no waiting!
+      if (verifyResponse.success) {
         setPaymentStatus('success');
         setTimeout(() => {
           if (redirectUrl) {
@@ -175,6 +173,7 @@ function PaymentContent() {
       </div>
     );
   }
+
   if (paymentStatus === 'success') {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
@@ -189,12 +188,53 @@ function PaymentContent() {
           <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-2">
             Payment Successful!
           </h2>
-          <p className="text-gray-600 mb-4">Your premium subscription is now active.</p>
+          <p className="text-gray-600 mb-4">Your {selectedPlan?.name} is now active.</p>
           <div className="animate-pulse text-blue-600 flex items-center justify-center space-x-2">
             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
             <span>{redirectUrl ? 'Redirecting...' : 'Taking you to dashboard...'}</span>
           </div>
         </motion.div>
+      </div>
+    );
+  }
+
+  if (!selectedPlan && plans.length > 0) {
+    return (
+      <div className="min-h-screen bg-slate-50">
+        <Navbar />
+        <div className="container mx-auto px-4 py-12">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-gray-900 mb-4">Select a Plan</h1>
+            <p className="text-gray-600">Choose the plan that works best for you</p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+            {plans.map((plan) => (
+              <div key={plan.id} className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+                <h3 className="text-xl font-bold text-gray-900 mb-2">{plan.name}</h3>
+                <div className="text-3xl font-bold text-blue-600 mb-4">
+                  {plan.currency === 'INR' ? '₹' : '$'}{plan.price / 100}
+                  <span className="text-sm text-gray-500">/{plan.interval}</span>
+                </div>
+                <ul className="space-y-2 mb-6">
+                  {plan.features.map((feature, i) => (
+                    <li key={i} className="flex items-center text-sm text-gray-600">
+                      <Check className="w-4 h-4 text-green-500 mr-2" />
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+                <button
+                  onClick={() => setSelectedPlan(plan)}
+                  className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Select {plan.name}
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+        <Footer />
       </div>
     );
   }
@@ -209,9 +249,6 @@ function PaymentContent() {
         <div className="absolute top-40 right-10 w-80 h-80 bg-gradient-to-r from-purple-400/10 to-pink-500/10 rounded-full mix-blend-multiply filter blur-3xl animate-pulse delay-1000"></div>
         <div className="absolute bottom-20 left-1/2 w-72 h-72 bg-gradient-to-r from-emerald-400/10 to-teal-500/10 rounded-full mix-blend-multiply filter blur-3xl animate-pulse delay-2000"></div>
       </div>
-
-      {/* Floating grid pattern */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none"></div>
 
       <div className="relative container mx-auto px-4 py-12">
         <motion.div
@@ -233,7 +270,7 @@ function PaymentContent() {
                 <div className="relative inline-flex items-center bg-white/90 backdrop-blur-sm border border-white/20 shadow-lg text-slate-700 px-6 py-3 rounded-full text-sm font-medium">
                   <Crown className="h-4 w-4 mr-2 text-yellow-500" />
                   <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent font-semibold">
-                    Premium Upgrade
+                    {selectedPlan?.name} Upgrade
                   </span>
                 </div>
               </div>
@@ -246,7 +283,7 @@ function PaymentContent() {
               </span>
             </h1>
             <p className="text-xl text-slate-600 max-w-2xl mx-auto">
-              Get unlimited access to all premium features for just ₹90/month
+              Get access to {selectedPlan?.name} for just {selectedPlan?.currency === 'INR' ? '₹' : '$'}{selectedPlan ? selectedPlan.price / 100 : 0}/{selectedPlan?.interval}
             </p>
           </div>
 
@@ -271,102 +308,104 @@ function PaymentContent() {
             </motion.div>
 
             {/* Pricing Card */}
-            <motion.div
-              initial={{ x: 30, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-              className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/20 overflow-hidden"
-            >
-              {/* Premium Badge */}
-              <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white text-center py-4">
-                <div className="flex items-center justify-center space-x-2">
-                  <Crown className="w-5 h-5" />
-                  <span className="font-semibold">Premium Plan</span>
-                  <Sparkles className="w-4 h-4 animate-pulse" />
-                </div>
-              </div>
-
-              <div className="p-8">
-                {/* Price */}
-                <div className="text-center mb-8">
-                  <div className="flex items-baseline justify-center space-x-2 mb-2">
-                    <span className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                      ₹{PREMIUM_PLAN.price}
-                    </span>
-                    <span className="text-slate-600 font-medium">/month</span>
-                  </div>
-                  <div className="inline-flex items-center space-x-1 px-3 py-1 bg-green-50 text-green-700 text-sm rounded-full border border-green-200">
-                    <Sparkles className="w-3 h-3" />
-                    <span>Monthly subscription plan</span>
+            {selectedPlan && (
+              <motion.div
+                initial={{ x: 30, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ duration: 0.8, delay: 0.4 }}
+                className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/20 overflow-hidden"
+              >
+                {/* Premium Badge */}
+                <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white text-center py-4">
+                  <div className="flex items-center justify-center space-x-2">
+                    <Crown className="w-5 h-5" />
+                    <span className="font-semibold">{selectedPlan.name}</span>
+                    {selectedPlan.is_popular && <Sparkles className="w-4 h-4 animate-pulse" />}
                   </div>
                 </div>
 
-                {/* Features */}
-                <div className="space-y-4 mb-8">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center space-x-2">
-                    <span>Unlock Premium Features</span>
-                  </h3>
-                  {PREMIUM_PLAN.features.map((feature, index) => (
-                    <div key={index} className="flex items-center space-x-3 group">
-                      <div className="flex-shrink-0 w-5 h-5 bg-gradient-to-br from-green-400 to-green-500 rounded-full flex items-center justify-center">
-                        <Check className="h-3 w-3 text-white" />
-                      </div>
-                      <span className="text-slate-700 group-hover:text-slate-900 transition-colors">
-                        {feature}
+                <div className="p-8">
+                  {/* Price */}
+                  <div className="text-center mb-8">
+                    <div className="flex items-baseline justify-center space-x-2 mb-2">
+                      <span className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                        {selectedPlan.currency === 'INR' ? '₹' : '$'}{selectedPlan.price / 100}
                       </span>
+                      <span className="text-slate-600 font-medium">/{selectedPlan.interval}</span>
                     </div>
-                  ))}
-                </div>
+                    <div className="inline-flex items-center space-x-1 px-3 py-1 bg-green-50 text-green-700 text-sm rounded-full border border-green-200">
+                      <Sparkles className="w-3 h-3" />
+                      <span>{selectedPlan.interval.charAt(0).toUpperCase() + selectedPlan.interval.slice(1)} subscription plan</span>
+                    </div>
+                  </div>
 
-                {/* Payment Button */}
-                <button
-                  onClick={handlePayment}
-                  disabled={isLoading}
-                  className="w-full bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 hover:from-blue-700 hover:via-purple-700 hover:to-indigo-700 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98] relative overflow-hidden group"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out" />
+                  {/* Features */}
+                  <div className="space-y-4 mb-8">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center space-x-2">
+                      <span>Unlock Premium Features</span>
+                    </h3>
+                    {selectedPlan.features.map((feature, index) => (
+                      <div key={index} className="flex items-center space-x-3 group">
+                        <div className="flex-shrink-0 w-5 h-5 bg-gradient-to-br from-green-400 to-green-500 rounded-full flex items-center justify-center">
+                          <Check className="h-3 w-3 text-white" />
+                        </div>
+                        <span className="text-slate-700 group-hover:text-slate-900 transition-colors">
+                          {feature}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
 
-                  {isLoading ? (
-                    <>
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                      <span>Processing...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Crown className="w-5 h-5" />
-                      <span>Subscribe Now - ₹{PREMIUM_PLAN.price}</span>
-                    </>
+                  {/* Payment Button */}
+                  <button
+                    onClick={handlePayment}
+                    disabled={isLoading}
+                    className="w-full bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 hover:from-blue-700 hover:via-purple-700 hover:to-indigo-700 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98] relative overflow-hidden group"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out" />
+
+                    {isLoading ? (
+                      <>
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                        <span>Processing...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Crown className="w-5 h-5" />
+                        <span>Subscribe Now - {selectedPlan.currency === 'INR' ? '₹' : '$'}{selectedPlan.price / 100}</span>
+                      </>
+                    )}
+                  </button>
+
+                  {/* Security Note */}
+                  <div className="mt-4 space-y-2">
+                    <div className="flex items-center justify-center space-x-2 text-sm text-slate-600">
+                      <Shield className="w-4 h-4" />
+                      <span>Secure payment powered by Razorpay</span>
+                    </div>
+                    <div className="flex items-center justify-center space-x-4 text-xs text-gray-400">
+                      <div className="flex items-center space-x-1">
+                        <div className="w-2 h-2 bg-blue-400 rounded-full" />
+                        <span>256-bit SSL</span>
+                      </div>
+                      <div className="w-px h-3 bg-gray-300" />
+                      <div className="flex items-center space-x-1">
+                        <div className="w-2 h-2 bg-green-400 rounded-full" />
+                        <span>PCI Compliant</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Error State */}
+                  {paymentStatus === 'failed' && (
+                    <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm text-center flex items-center justify-center space-x-2">
+                      <X className="w-4 h-4" />
+                      <span>Payment failed. Please try again.</span>
+                    </div>
                   )}
-                </button>
-
-                {/* Security Note */}
-                <div className="mt-4 space-y-2">
-                  <div className="flex items-center justify-center space-x-2 text-sm text-slate-600">
-                    <Shield className="w-4 h-4" />
-                    <span>Secure payment powered by Razorpay</span>
-                  </div>
-                  <div className="flex items-center justify-center space-x-4 text-xs text-gray-400">
-                    <div className="flex items-center space-x-1">
-                      <div className="w-2 h-2 bg-blue-400 rounded-full" />
-                      <span>256-bit SSL</span>
-                    </div>
-                    <div className="w-px h-3 bg-gray-300" />
-                    <div className="flex items-center space-x-1">
-                      <div className="w-2 h-2 bg-green-400 rounded-full" />
-                      <span>PCI Compliant</span>
-                    </div>
-                  </div>
                 </div>
-
-                {/* Error State */}
-                {paymentStatus === 'failed' && (
-                  <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm text-center flex items-center justify-center space-x-2">
-                    <X className="w-4 h-4" />
-                    <span>Payment failed. Please try again.</span>
-                  </div>
-                )}
-              </div>
-            </motion.div>
+              </motion.div>
+            )}
           </div>
 
           {/* Benefits */}

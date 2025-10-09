@@ -1,6 +1,7 @@
 import { MetadataRoute } from 'next'
+import { blogsAPI } from '@/lib/api/blogs'
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://airesumebuilder.com'
   const lastModified = new Date()
 
@@ -24,6 +25,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
+      url: `${baseUrl}/blog`,
+      lastModified,
+      changeFrequency: 'daily' as const,
+      priority: 0.8,
+    },
+    {
       url: `${baseUrl}/terms/privacy`,
       lastModified,
       changeFrequency: 'monthly' as const,
@@ -43,12 +50,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ]
 
-  // You can add dynamic pages here if needed
-  // For example, if you have public template pages or blog posts
-  const dynamicPages: any[] = []
-
   // Template pages (if they are publicly accessible)
-  const templateIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] // Replace with actual template IDs
+  const templateIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
   const templatePages = templateIds.map(id => ({
     url: `${baseUrl}/template/${id}`,
     lastModified,
@@ -56,9 +59,23 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.6,
   }))
 
+  // Blog pages
+  let blogPages: any[] = []
+  try {
+    const blogsResponse = await blogsAPI.getBlogs(1, 100) // Get first 100 blogs
+    blogPages = blogsResponse.blogs.map(blog => ({
+      url: `${baseUrl}/blog/${blog.slug}`,
+      lastModified: new Date(blog.updated_at),
+      changeFrequency: 'weekly' as const,
+      priority: 0.7,
+    }))
+  } catch (error) {
+    console.error('Error fetching blogs for sitemap:', error)
+  }
+
   return [
     ...staticPages,
     ...templatePages,
-    ...dynamicPages,
+    ...blogPages,
   ]
 }
