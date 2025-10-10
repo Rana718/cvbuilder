@@ -395,17 +395,14 @@ const ResumePage: React.FC = () => {
 
                                         {/* Resume Preview */}
                                         <div className="relative">
-                                            <div className="aspect-[3/4] overflow-hidden ">
-                                                <div className="w-full h-full flex items-center justify-center">
-                                                    <div className="transform scale-[0.45] md:scale-[0.34] shadow-xl border border-gray-900">
-                                                        <div className="w-[794px] h-[1123px]">
-                                                            <TemplateRenderer
-                                                                templateId={resume.template_id}
-                                                                userData={convertToUserData(resume)}
-                                                                size="normal"
-                                                            />
-                                                        </div>
-                                                    </div>
+                                            <div className="aspect-[210/297] overflow-hidden bg-white rounded-lg shadow-lg border border-gray-300">
+                                                <div className="w-full h-full">
+                                                    <TemplateRenderer
+                                                        templateId={resume.template_id}
+                                                        userData={convertToUserData(resume)}
+                                                        size="small"
+                                                        mode="live"
+                                                    />
                                                 </div>
                                             </div>
                                         </div>
