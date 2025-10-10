@@ -96,18 +96,49 @@ function ResumePreview({ mode = 'default', pass = false, onlyonepage, forPDF = f
     const showWatermark = !pass
 
     useEffect(() => {
-        if (isLiveMode || onlyonepage) return // Skip pagination for live mode or when only one page is requested
+        if (isLiveMode || onlyonepage) return 
 
         const timer = setTimeout(() => {
             if (contentRef.current) {
                 const contentHeight = contentRef.current.scrollHeight
-                const pageHeight = 297 * 3.779527559 // 297mm to pixels (1mm = 3.779527559px)
-                const headerMargin = 20 * 3.779527559 // 20mm top margin
-                const footerMargin = 15 * 3.779527559 // 15mm bottom margin
+                const pageHeight = 297 * 3.779527559 
+                const headerMargin = 20 * 3.779527559 
+                const footerMargin = 15 * 3.779527559 
                 const safePageHeight = pageHeight - headerMargin - footerMargin
 
-                if (contentHeight > safePageHeight) {
-                    // Content overflows, create multiple pages with intelligent page breaks
+                const hasTextContentOnSecondPage = () => {
+                    if (!contentRef.current) return false
+                    
+                    const walker = document.createTreeWalker(
+                        contentRef.current,
+                        NodeFilter.SHOW_TEXT,
+                        null
+                    )
+                    
+                    let hasTextBeyondFirstPage = false
+                    let node
+                    
+                    while (node = walker.nextNode()) {
+                        const text = node.textContent?.trim() || ''
+                        if (text.length > 0) {
+                            const parent = node.parentElement
+                            if (parent) {
+                                const rect = parent.getBoundingClientRect()
+                                const containerRect = contentRef.current.getBoundingClientRect()
+                                const relativeTop = rect.top - containerRect.top + contentRef.current.scrollTop
+                                
+                                if (relativeTop > safePageHeight) {
+                                    hasTextBeyondFirstPage = true
+                                    break
+                                }
+                            }
+                        }
+                    }
+                    
+                    return hasTextBeyondFirstPage
+                }
+
+                if (contentHeight > safePageHeight && hasTextContentOnSecondPage()) {
                     const pageCount = Math.ceil(contentHeight / safePageHeight)
                     const newPages = []
 
@@ -115,13 +146,14 @@ function ResumePreview({ mode = 'default', pass = false, onlyonepage, forPDF = f
                         newPages.push(
                             <div
                                 key={i}
-                                className="bg-white relative page-break"
+                                className="relative page-break"
                                 style={{
                                     width: '210mm',
                                     height: '297mm',
                                     overflow: 'hidden',
                                     pageBreakAfter: i < pageCount - 1 ? 'always' : 'auto',
-                                    position: 'relative'
+                                    position: 'relative',
+                                    backgroundColor: colorTheme?.colors?.background || '#ffffff'
                                 }}
                             >
                                 <div
@@ -159,7 +191,6 @@ function ResumePreview({ mode = 'default', pass = false, onlyonepage, forPDF = f
         return () => clearTimeout(timer)
     }, [userData, templateIdNumber, colorTheme, resumeSize, mode, showWatermark, isLiveMode, onlyonepage, forPDF])
 
-    // If we have multiple pages, render them (but not if onlyonepage is true)
     if (pages.length > 0 && !isLiveMode && !onlyonepage) {
         return (
             <div className="space-y-4">
@@ -174,27 +205,29 @@ function ResumePreview({ mode = 'default', pass = false, onlyonepage, forPDF = f
 
     return (
         <div
-            className={`bg-white overflow-hidden relative ${isLiveMode ? 'border border-black rounded-[4px]' : forPDF ? '' : 'shadow-2xl border border-gray-300'}`}
+            className={`relative ${isLiveMode ? 'border border-black rounded-[4px]' : forPDF ? '' : 'shadow-2xl border border-gray-300'}`}
             style={{
                 aspectRatio: isLiveMode ? '210/297' : undefined,
-                width: forPDF ? '210mm' : (isLiveMode ? '100%' : onlyonepage ? '210mm' : '280mm'),
-                maxWidth: forPDF ? '210mm' : (isLiveMode ? '100%' : onlyonepage ? '210mm' : '280mm'),
-                minHeight: forPDF ? '297mm' : (isLiveMode ? 'auto' : onlyonepage ? '297mm' : 'auto'),
-                height: forPDF ? '297mm' : (onlyonepage ? '297mm' : 'auto'),
-                overflow: forPDF || onlyonepage ? 'hidden' : 'visible',
+                width: forPDF ? '210mm' : (isLiveMode ? '100%' : onlyonepage ? '210mm' : '210mm'),
+                maxWidth: forPDF ? '210mm' : (isLiveMode ? '100%' : onlyonepage ? '210mm' : '210mm'),
+                height: forPDF ? '297mm' : (onlyonepage ? '297mm' : '297mm'),
+                overflow: 'hidden',
                 margin: forPDF ? '0' : undefined,
                 padding: forPDF ? '15mm 20mm' : undefined,
-                boxSizing: forPDF ? 'border-box' : undefined
+                boxSizing: forPDF ? 'border-box' : undefined,
+                pageBreakAfter: 'auto',
+                position: 'relative',
+                backgroundColor: colorTheme?.colors?.background || '#ffffff'
             }}
             data-resume-content
         >
             <div
                 ref={contentRef}
                 style={{
-                    minHeight: forPDF ? 'auto' : (isLiveMode ? 'auto' : onlyonepage ? '267mm' : '297mm'),
-                    height: forPDF ? 'auto' : (onlyonepage ? '100%' : 'auto'),
-                    paddingBottom: forPDF ? '0' : (onlyonepage ? '0' : '20px'),
-                    width: '100%'
+                    height: '100%',
+                    minHeight: '100%',
+                    position: 'relative',
+                    paddingBottom: '0'
                 }}
             >
                 <TemplateRenderer

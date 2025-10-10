@@ -82,10 +82,9 @@ const CoverLetterTemplate: React.FC<CoverLetterTemplateProps> = ({
                 </div>
 
                 {/* Closing */}
-                <div className={`mt-6 sm:mt-8 ${isSmall ? 'text-xs' : 'text-sm'} text-gray-700`}>
+                <div className={`mt-6 ${isSmall ? 'text-xs' : 'text-sm'} text-gray-700`}>
                     <div className="mb-4 sm:mb-6">
-                        <div className="mb-2">Sincerely,</div>
-                        <div className="h-6 sm:h-8"></div>
+                        <div className="mb-1">Sincerely,</div>
                         <div className="font-medium">{data.name || 'Your Name'}</div>
                     </div>
                 </div>

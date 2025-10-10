@@ -48,7 +48,7 @@ function CoverLetterPage() {
     const handleSave = async () => {
         if (isSaving || !user) {
             if (!user) redirectToAuth();
-            return;
+            return false;
         }
 
         setIsSaving(true);
@@ -58,11 +58,14 @@ function CoverLetterPage() {
             }
             await saveCoverLetter();
             showAlert('Cover letter saved successfully!', 'success');
+            return true;
         } catch (error) {
             console.error('Save error:', error);
             showAlert('Failed to save cover letter. Please try again.', 'error');
+            return false;
         } finally {
             setIsSaving(false);
+            return false;
         }
     };
 
@@ -147,8 +150,8 @@ function CoverLetterPage() {
         setIsSharing(true);
         try {
             if (!documentId) {
-                await handleSave();
-                if (!documentId) {
+                const res = await handleSave();
+                if (!documentId && !res) {
                     showAlert('Please save the cover letter first before sharing.', 'error');
                     return;
                 }
@@ -156,8 +159,8 @@ function CoverLetterPage() {
 
             let uuid = shareableUuid;
             if (!uuid) {
-                const response = await axiosInstance.post(`/api/cover-letters/share/${documentId}`);
-                uuid = response.data.shareable_uuid;
+                const response = await axiosInstance.post(`/api/cover-letters/${documentId}/share`);
+                uuid = response.data.shareable_link;
                 setShareableUuid(uuid);
             }
 
