@@ -16,7 +16,6 @@ axiosInstance.interceptors.request.use(
                 config.headers["Authorization"] = `Bearer ${token}`;
             } catch (error) {
                 console.error('Failed to get auth token:', error);
-                // Continue without token - let the API handle the 401
             }
         }
         return config;

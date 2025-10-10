@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useStepNavigation } from '@/hooks/useStepNavigation'
+import { usePremiumStatus } from '@/hooks/usePremiumStatus'
 import { ArrowLeft, ChevronDown, FileText, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import ResumePreview from '@/components/ui/ResumePreview'
@@ -22,6 +23,7 @@ const STEPS = [
 
 function MobileFrom() {
     const { currentStep, setCurrentStep } = useStepNavigation()
+    const { isPremium } = usePremiumStatus()
     const [showStepMenu, setShowStepMenu] = useState(false)
     const [showResumePreview, setShowResumePreview] = useState(false)
     const router = useRouter()
@@ -188,7 +190,7 @@ function MobileFrom() {
                         {/* Full Resume Preview */}
                         <div className="w-full h-full overflow-y-auto py-5 flex justify-center">
                             <div className="scale-[0.45] origin-top" style={{ width: 'fit-content' }}>
-                                <ResumePreview />
+                                <ResumePreview pass={isPremium} />
                             </div>
                         </div>
                     </motion.div>

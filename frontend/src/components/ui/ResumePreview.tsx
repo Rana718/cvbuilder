@@ -1,19 +1,16 @@
 import React, { JSX, useEffect, useRef, useState } from 'react'
 import { useResumeStore } from '@/store/resumeStore'
 import TemplateRenderer from '@/components/templates/TemplateRenderer'
-import { useAuth } from '@/components/AuthContext'
-import { usePremiumStatus } from '@/hooks/usePremiumStatus'
 import Watermark from '@/components/ui/Watermark'
 
 interface ResumePreviewProps {
     mode?: 'default' | 'live'
     pass?: boolean
     onlyonepage?: boolean
+    forPDF?: boolean
 }
 
-function ResumePreview({ mode = 'default', pass, onlyonepage }: ResumePreviewProps) {
-    const { user } = useAuth()
-    const { isPremium } = usePremiumStatus()
+function ResumePreview({ mode = 'default', pass = false, onlyonepage, forPDF = false }: ResumePreviewProps) {
     const {
         personalInfo,
         workExperience,
@@ -96,7 +93,7 @@ function ResumePreview({ mode = 'default', pass, onlyonepage }: ResumePreviewPro
     const isLiveMode = mode === 'live'
     const resumeSize = isLiveMode ? 'small' : 'normal'
 
-    const showWatermark = pass ? false : (!user || !isPremium)
+    const showWatermark = !pass
 
     useEffect(() => {
         if (isLiveMode || onlyonepage) return // Skip pagination for live mode or when only one page is requested
@@ -132,7 +129,7 @@ function ResumePreview({ mode = 'default', pass, onlyonepage }: ResumePreviewPro
                                         transform: `translateY(-${i * safePageHeight}px)`,
                                         height: `${contentHeight + footerMargin}px`,
                                         position: 'relative',
-                                        paddingBottom: '15px' // Small padding at bottom for better appearance
+                                        paddingBottom: '0'
                                     }}
                                 >
                                     <TemplateRenderer
@@ -160,7 +157,7 @@ function ResumePreview({ mode = 'default', pass, onlyonepage }: ResumePreviewPro
         }, 100)
 
         return () => clearTimeout(timer)
-    }, [userData, templateIdNumber, colorTheme, resumeSize, mode, showWatermark, isLiveMode, onlyonepage])
+    }, [userData, templateIdNumber, colorTheme, resumeSize, mode, showWatermark, isLiveMode, onlyonepage, forPDF])
 
     // If we have multiple pages, render them (but not if onlyonepage is true)
     if (pages.length > 0 && !isLiveMode && !onlyonepage) {
@@ -177,23 +174,27 @@ function ResumePreview({ mode = 'default', pass, onlyonepage }: ResumePreviewPro
 
     return (
         <div
-            className={`bg-white overflow-hidden relative ${isLiveMode ? 'border border-black rounded-[4px]' : 'shadow-2xl border border-gray-300'}`}
+            className={`bg-white overflow-hidden relative ${isLiveMode ? 'border border-black rounded-[4px]' : forPDF ? '' : 'shadow-2xl border border-gray-300'}`}
             style={{
                 aspectRatio: isLiveMode ? '210/297' : undefined,
-                width: isLiveMode ? '100%' : onlyonepage ? '210mm' : '280mm',
-                maxWidth: isLiveMode ? '100%' : onlyonepage ? '210mm' : '280mm',
-                minHeight: isLiveMode ? 'auto' : onlyonepage ? '297mm' : 'auto',
-                height: onlyonepage ? '297mm' : 'auto',
-                overflow: onlyonepage ? 'hidden' : 'visible'
+                width: forPDF ? '210mm' : (isLiveMode ? '100%' : onlyonepage ? '210mm' : '280mm'),
+                maxWidth: forPDF ? '210mm' : (isLiveMode ? '100%' : onlyonepage ? '210mm' : '280mm'),
+                minHeight: forPDF ? '297mm' : (isLiveMode ? 'auto' : onlyonepage ? '297mm' : 'auto'),
+                height: forPDF ? '297mm' : (onlyonepage ? '297mm' : 'auto'),
+                overflow: forPDF || onlyonepage ? 'hidden' : 'visible',
+                margin: forPDF ? '0' : undefined,
+                padding: forPDF ? '15mm 20mm' : undefined,
+                boxSizing: forPDF ? 'border-box' : undefined
             }}
             data-resume-content
         >
-            <div 
-                ref={contentRef} 
-                style={{ 
-                    minHeight: isLiveMode ? 'auto' : onlyonepage ? '297mm' : '297mm',
-                    height: onlyonepage ? '100%' : 'auto',
-                    paddingBottom: onlyonepage ? '0' : '20px'
+            <div
+                ref={contentRef}
+                style={{
+                    minHeight: forPDF ? 'auto' : (isLiveMode ? 'auto' : onlyonepage ? '267mm' : '297mm'),
+                    height: forPDF ? 'auto' : (onlyonepage ? '100%' : 'auto'),
+                    paddingBottom: forPDF ? '0' : (onlyonepage ? '0' : '20px'),
+                    width: '100%'
                 }}
             >
                 <TemplateRenderer

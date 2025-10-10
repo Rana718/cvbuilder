@@ -316,15 +316,80 @@ function ResumePage() {
         }
     }
 
-    const generatePDF = async (element: HTMLElement) => {
+    const generatePDF = async () => {
         try {
+            // Get the existing resume content from the page first
+            let resumeContent = document.querySelector("[data-resume-content]") as HTMLElement;
+            let shouldCleanup = false;
+            let root: any = null;
+            let tempContainer: HTMLElement | null = null;
+
+            // If no existing content, create temporary container
+            if (!resumeContent) {
+                tempContainer = document.createElement('div');
+                tempContainer.style.position = 'absolute';
+                tempContainer.style.top = '-9999px';
+                tempContainer.style.left = '-9999px';
+                tempContainer.style.width = '210mm';
+                tempContainer.style.height = 'auto';
+                tempContainer.style.visibility = 'hidden';
+                document.body.appendChild(tempContainer);
+
+                const { createRoot } = await import('react-dom/client');
+                root = createRoot(tempContainer);
+                
+                await new Promise<void>((resolve) => {
+                    root.render(
+                        React.createElement(ResumePreview, {
+                            forPDF: true,
+                            pass: isPremium
+                        })
+                    );
+                    setTimeout(resolve, 2000); // Wait longer for render
+                });
+
+                resumeContent = tempContainer.querySelector("[data-resume-content]") as HTMLElement;
+                shouldCleanup = true;
+            }
+
+            if (!resumeContent) {
+                if (shouldCleanup && root && tempContainer) {
+                    root.unmount();
+                    document.body.removeChild(tempContainer);
+                }
+                showAlert('Resume content not found. Please refresh and try again.');
+                return;
+            }
+
+            // Clone and clean the content
+            const clonedContent = resumeContent.cloneNode(true) as HTMLElement;
+            
+            // Remove watermarks for premium users only
+            if (isPremium) {
+                const watermarks = clonedContent.querySelectorAll('.watermark-element, [data-watermark="true"], [class*="watermark"]');
+                watermarks.forEach(watermark => watermark.remove());
+            }
+
+            // Simple PDF styling - no gaps
+            clonedContent.style.position = 'static';
+            clonedContent.style.margin = '0';
+            clonedContent.style.padding = '0';
+            clonedContent.style.width = '100%';
+            clonedContent.style.background = 'white';
+
             const response = await fetch(download_url, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    html: element.outerHTML,
+                    html: clonedContent.outerHTML,
                 }),
             });
+
+            // Cleanup temporary container if created
+            if (shouldCleanup && root && tempContainer) {
+                root.unmount();
+                document.body.removeChild(tempContainer);
+            }
 
             if (!response.ok) {
                 throw new Error(`PDF generation failed: ${response.statusText}`);
@@ -366,14 +431,7 @@ function ResumePage() {
 
         setIsDownloading(true)
         try {
-            let resumeContent = document.querySelector("[data-resume-content]") as HTMLElement
-
-            if (!resumeContent) {
-                showAlert('Resume content not found. Please refresh and try again.')
-                return
-            }
-
-            await generatePDF(resumeContent)
+            await generatePDF()
         } catch (error: any) {
             console.error("Download error:", error)
             showAlert(`Download failed: ${error.message || 'Please try again.'}`)
@@ -494,7 +552,7 @@ function ResumePage() {
                 })
             }
         }
-    }, [resumeId, loading, user, templateId, setTemplateId, setDocumentId, hasData, loadResume, hasLoadedOnce])
+    }, [resumeId, templateId, setTemplateId, setDocumentId, hasData, loadResume, hasLoadedOnce, user])
 
     if (loading) {
         return (
@@ -509,8 +567,6 @@ function ResumePage() {
             </div>
         )
     }
-
-    if (!loading && !user) return null
 
     return (
         <div className="min-h-screen bg-slate-50 overflow-x-hidden">
@@ -649,8 +705,8 @@ function ResumePage() {
                                 </motion.button>
 
                                 <motion.button
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
+                                    whileHover={{ scale: isPremium ? 1.05 : 1.02 }}
+                                    whileTap={{ scale: isPremium ? 0.95 : 0.98 }}
                                     onClick={handleDownload}
                                     disabled={isDownloading}
                                     className="inline-flex items-center space-x-2 px-6 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-medium transition-all duration-200 rounded-xl shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
@@ -744,14 +800,14 @@ function ResumePage() {
                             {/* Mobile view - scaled down but allow multiple pages */}
                             <div className="sm:hidden w-full min-h-[400px] pt-10 flex justify-center">
                                 <div className="scale-[0.45] origin-top space-y-4">
-                                    <ResumePreview key={`mobile-${forceRerender}`} />
+                                    <ResumePreview pass={isPremium} key={`mobile-${forceRerender}-${isPremium}`} />
                                 </div>
                             </div>
                             
                             {/* Tablet and Desktop view - Allow multiple pages */}
                             <div className="hidden sm:block w-full" data-resume-content>
                                 <div className="mx-auto max-w-[794px] space-y-4">
-                                    <ResumePreview key={`desktop-${forceRerender}`} />
+                                    <ResumePreview pass={isPremium} key={`desktop-${forceRerender}-${isPremium}`} />
                                 </div>
                             </div>
                         </div>

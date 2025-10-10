@@ -96,14 +96,14 @@ export default function ModernMinimalist({ userData, colors, size = 'normal', mo
 
   return (
     <div
-      className="w-full h-full flex flex-col bg-white"
+      className="w-full h-full bg-white"
       style={{
         fontFamily: styles.container.fontFamily,
         fontSize: styles.container.fontSize,
         lineHeight: styles.container.lineHeight,
         color: theme.text,
         backgroundColor: theme.background,
-        minHeight: isSmall ? 'auto' : '297mm',
+        minHeight: isSmall ? 'auto' : 'auto',
         width: isSmall ? 'auto' : '210mm',
         margin: '0 auto',
         boxShadow: isSmall ? 'none' : '0 0 20px rgba(0,0,0,0.1)',

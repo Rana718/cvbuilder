@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import { useStepNavigation } from '@/hooks/useStepNavigation'
+import { usePremiumStatus } from '@/hooks/usePremiumStatus'
 import DesktopSidebar from '@/components/ui/DesktopSidebar'
 import StepIndicator from '@/components/ui/StepIndicator'
 import ResumePreview from '@/components/ui/ResumePreview'
@@ -21,6 +22,7 @@ import { Palette, X, Eye } from 'lucide-react'
 function DesktopFrom() {
     const router = useRouter()
     const { currentStep, setCurrentStep } = useStepNavigation()
+    const { isPremium } = usePremiumStatus()
     const { templateId, setTemplateId, colorTheme, setColorTheme } = useResumeStore()
     const [showTemplateSelector, setShowTemplateSelector] = useState(false)
     const [showResumePopup, setShowResumePopup] = useState(false)
@@ -109,7 +111,7 @@ function DesktopFrom() {
                                 className="relative group scale-[0.52] xl:scale-[0.59] cursor-pointer pointer-events-auto"
                                 onClick={() => setShowResumePopup(true)}
                             >
-                                <ResumePreview onlyonepage={true} />
+                                <ResumePreview onlyonepage={true} pass={isPremium} />
                                 {/* Hover overlay with view icon */}
                                 <div className="absolute inset-0 bg-black/10 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100 pointer-events-none">
                                     <div className="bg-white rounded-full p-3 shadow-lg pointer-events-auto">
@@ -236,7 +238,7 @@ function DesktopFrom() {
                     {/* Full Resume Preview */}
                     <div className="w-full h-full overflow-y-auto py-5" style={{ display: 'block' }}>
                         <div className="mx-auto" style={{ width: 'fit-content' }}>
-                            <ResumePreview />
+                            <ResumePreview pass={isPremium} />
                         </div>
                     </div>
                 </div>
