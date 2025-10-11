@@ -18,6 +18,7 @@ import "./globals.css";
 import AuthContext from "@/components/AuthContext";
 import { Toaster } from "sonner";
 import Script from "next/script";
+import { Analytics } from "@vercel/analytics/next"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -229,6 +230,7 @@ export default function RootLayout({
       >
         <AuthContext>{children}</AuthContext>
         <Toaster />
+        <Analytics/>
       </body>
     </html>
   );
