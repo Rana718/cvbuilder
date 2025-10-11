@@ -1,5 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "primereact/resources/themes/lara-light-blue/theme.css";
+@import "primereact/resources/primereact.min.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -209,7 +211,9 @@
 
 /* Enhanced prose styles for blog content */
 .prose-blog {
-  line-height: 1.7;
+  line-height: 1.4;
+  color: #374151;
+  font-size: 1rem;
 }
 
 .prose-blog h1,
@@ -218,60 +222,358 @@
 .prose-blog h4,
 .prose-blog h5,
 .prose-blog h6 {
-  margin-top: 1.5em;
+  margin-top: 1.25em;
   margin-bottom: 0.5em;
-  line-height: 1.3;
+  line-height: 1.2;
+  color: #111827;
+  font-weight: 600;
+}
+
+.prose-blog h1 {
+  font-size: 2em;
+  margin-top: 0;
+}
+
+.prose-blog h2 {
+  font-size: 1.5em;
+}
+
+.prose-blog h3 {
+  font-size: 1.25em;
 }
 
 .prose-blog p {
-  margin-bottom: 1em;
+  margin: 0.25em 0;
+  line-height: 1.4;
+}
+
+.prose-blog p:first-child {
+  margin-top: 0;
+}
+
+.prose-blog p:empty {
+  margin: 0;
+  line-height: 0.5;
+}
+
+.prose-blog br {
+  content: "";
+  display: block;
+  margin: 0;
+  line-height: 0.5;
 }
 
 .prose-blog ul,
 .prose-blog ol {
-  margin-bottom: 1em;
-  padding-left: 1.5em;
+  margin-top: 0.75em;
+  margin-bottom: 0.75em;
+  padding-left: 1.75em;
+  line-height: 1.4;
+}
+
+.prose-blog ul {
+  list-style-type: disc;
+}
+
+.prose-blog ol {
+  list-style-type: decimal;
 }
 
 .prose-blog li {
-  margin-bottom: 0.5em;
+  margin-top: 0.15em;
+  margin-bottom: 0.15em;
+  padding-left: 0.25em;
+  line-height: 1.4;
+}
+
+.prose-blog li > p {
+  margin: 0;
+  display: inline;
+}
+
+.prose-blog ul ul,
+.prose-blog ol ul {
+  list-style-type: circle;
+}
+
+.prose-blog ul ul ul,
+.prose-blog ol ul ul,
+.prose-blog ol ol ul {
+  list-style-type: square;
+}
+
+.prose-blog ol ol {
+  list-style-type: lower-alpha;
+}
+
+.prose-blog ol ol ol {
+  list-style-type: lower-roman;
 }
 
 .prose-blog blockquote {
   border-left: 4px solid #3b82f6;
   padding-left: 1em;
-  margin: 1.5em 0;
+  margin: 1em 0;
   background-color: #f8fafc;
   border-radius: 0.375rem;
-  padding: 1rem;
+  padding: 0.75rem 1rem;
+  font-style: italic;
+  color: #4b5563;
+  line-height: 1.5;
+}
+
+.prose-blog blockquote p {
+  margin: 0.5em 0;
 }
 
 .prose-blog img {
   border-radius: 0.5rem;
-  margin: 1.5em 0;
+  margin: 1em 0;
+  max-width: 100%;
+  height: auto;
+}
+
+.prose-blog a {
+  color: #3b82f6;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+  transition: color 0.2s;
+}
+
+.prose-blog a:hover {
+  color: #2563eb;
+}
+
+.prose-blog strong {
+  font-weight: 600;
+  color: #111827;
+}
+
+.prose-blog em {
+  font-style: italic;
+}
+
+.prose-blog code {
+  background-color: #f3f4f6;
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+  font-size: 0.875em;
+  font-family: 'Courier New', monospace;
+}
+
+.prose-blog pre {
+  background-color: #1f2937;
+  color: #f9fafb;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  margin: 1em 0;
+}
+
+.prose-blog pre code {
+  background-color: transparent;
+  color: inherit;
+  padding: 0;
+}
+
+/* Quill editor font classes for blog display */
+.prose-blog .ql-font-serif,
+.prose-blog [class*="ql-font-serif"] {
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+.prose-blog .ql-font-monospace,
+.prose-blog [class*="ql-font-monospace"] {
+  font-family: 'Monaco', 'Courier New', monospace;
+  background-color: #f3f4f6;
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+}
+
+/* Quill size classes */
+.prose-blog .ql-size-small {
+  font-size: 0.75em;
+}
+
+.prose-blog .ql-size-large {
+  font-size: 1.5em;
+}
+
+.prose-blog .ql-size-huge {
+  font-size: 2.5em;
+}
+
+/* Hide Quill UI elements that shouldn't display in rendered content */
+.prose-blog .ql-ui {
+  display: none;
 }
 
 /* Mobile-first responsive text scaling */
 @media (max-width: 640px) {
   .prose-blog {
-    font-size: 0.875rem;
-    line-height: 1.6;
+    font-size: 0.9375rem;
+    line-height: 1.4;
   }
   
-  .prose-blog h1 { font-size: 1.5rem; }
-  .prose-blog h2 { font-size: 1.25rem; }
-  .prose-blog h3 { font-size: 1.125rem; }
-  .prose-blog h4 { font-size: 1rem; }
+  .prose-blog h1 { font-size: 1.5rem; margin-top: 1em; }
+  .prose-blog h2 { font-size: 1.25rem; margin-top: 1em; }
+  .prose-blog h3 { font-size: 1.125rem; margin-top: 0.875em; }
+  .prose-blog h4 { font-size: 1rem; margin-top: 0.875em; }
+  
+  .prose-blog p {
+    margin: 0.25em 0;
+    line-height: 1.4;
+  }
+  
+  .prose-blog ul,
+  .prose-blog ol {
+    padding-left: 1.5em;
+    margin: 0.625em 0;
+    line-height: 1.4;
+  }
+  
+  .prose-blog li {
+    margin: 0.1em 0;
+    line-height: 1.4;
+  }
 }
 
 @media (min-width: 768px) {
   .prose-blog {
     font-size: 1rem;
-    line-height: 1.7;
+    line-height: 1.4;
   }
   
-  .prose-blog h1 { font-size: 2rem; }
-  .prose-blog h2 { font-size: 1.5rem; }
-  .prose-blog h3 { font-size: 1.25rem; }
-  .prose-blog h4 { font-size: 1.125rem; }
+  .prose-blog h1 { font-size: 2rem; margin-top: 1.25em; }
+  .prose-blog h2 { font-size: 1.5rem; margin-top: 1.25em; }
+  .prose-blog h3 { font-size: 1.25rem; margin-top: 1em; }
+  .prose-blog h4 { font-size: 1.125rem; margin-top: 1em; }
+}
+
+/* PrimeReact Editor Styling - Better editor appearance */
+.p-editor-container {
+  border-radius: 0.5rem;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+}
+
+.p-editor-container .ql-toolbar {
+  background-color: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 0.75rem;
+}
+
+.p-editor-container .ql-editor {
+  font-size: 18px !important;
+  line-height: 1.6 !important;
+  min-height: 400px;
+  padding: 1.5rem !important;
+  background-color: #ffffff;
+}
+
+/* Force all editor content to use larger font */
+.p-editor-container .ql-editor * {
+  font-size: inherit !important;
+}
+
+.p-editor-container .ql-editor.ql-blank::before {
+  font-size: 18px;
+  font-style: normal;
+  color: #9ca3af;
+}
+
+.p-editor-container .ql-editor p {
+  font-size: 18px !important;
+  line-height: 1.6 !important;
+  margin: 0.5em 0;
+}
+
+.p-editor-container .ql-editor h1 {
+  font-size: 2.25em !important;
+  line-height: 1.3 !important;
+  font-weight: 700;
+  margin: 1em 0 0.5em;
+}
+
+.p-editor-container .ql-editor h2 {
+  font-size: 1.75em !important;
+  line-height: 1.3 !important;
+  font-weight: 600;
+  margin: 0.875em 0 0.5em;
+}
+
+.p-editor-container .ql-editor h3 {
+  font-size: 1.35em !important;
+  line-height: 1.3 !important;
+  font-weight: 600;
+  margin: 0.75em 0 0.5em;
+}
+
+.p-editor-container .ql-editor ul,
+.p-editor-container .ql-editor ol {
+  padding-left: 1.5em;
+  margin: 0.75em 0;
+  font-size: 18px !important;
+}
+
+.p-editor-container .ql-editor ul li {
+  list-style-type: disc;
+  font-size: 18px !important;
+  line-height: 1.6 !important;
+  padding-left: 0.25em;
+}
+
+.p-editor-container .ql-editor ol li {
+  list-style-type: decimal;
+  font-size: 18px !important;
+  line-height: 1.6 !important;
+  padding-left: 0.25em;
+}
+
+.p-editor-container .ql-editor blockquote {
+  border-left: 4px solid #3b82f6;
+  padding-left: 1em;
+  margin: 1em 0;
+  font-style: italic;
+  color: #4b5563;
+  font-size: 18px !important;
+}
+
+.p-editor-container .ql-editor a {
+  color: #3b82f6;
+  text-decoration: underline;
+}
+
+.p-editor-container .ql-editor strong {
+  font-weight: 600;
+}
+
+.p-editor-container .ql-editor em {
+  font-style: italic;
+}
+
+.p-editor-container .ql-editor code {
+  background-color: #f3f4f6;
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  font-family: 'Monaco', 'Courier New', monospace;
+  font-size: 16px;
+}
+
+/* Editor toolbar button styling */
+.p-editor-container .ql-toolbar button {
+  width: 34px;
+  height: 34px;
+  border-radius: 0.25rem;
+  transition: background-color 0.2s;
+}
+
+.p-editor-container .ql-toolbar button:hover {
+  background-color: #e5e7eb;
+}
+
+.p-editor-container .ql-toolbar button.ql-active {
+  background-color: #dbeafe;
+  color: #3b82f6;
 }

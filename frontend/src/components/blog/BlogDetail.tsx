@@ -3,7 +3,6 @@
 import { motion } from 'framer-motion';
 import { Calendar, Clock, Eye, ArrowLeft, Share2 } from 'lucide-react';
 import Link from 'next/link';
-import Image from 'next/image';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Blog } from '@/lib/api/blogs';
@@ -133,7 +132,7 @@ export default function BlogDetail({ blog }: Props) {
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2 }}
-          className="prose prose-sm md:prose-base lg:prose-lg prose-blog max-w-none mb-6 md:mb-8 prose-headings:text-gray-900 prose-p:text-gray-700 prose-p:leading-relaxed prose-a:text-blue-600 prose-strong:text-gray-900"
+          className="prose-blog max-w-none mb-6 md:mb-8"
           dangerouslySetInnerHTML={{ __html: blog.content }}
         />
 
