@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useStepNavigation } from '@/hooks/useStepNavigation'
 import { usePremiumStatus } from '@/hooks/usePremiumStatus'
-import { ArrowLeft, ChevronDown, FileText, X } from 'lucide-react'
+import { ArrowLeft, ChevronDown, FileText, X, Home } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import ResumePreview from '@/components/ui/ResumePreview'
 import PersonalInfoStep from './steps/PersonalInfoStep'
@@ -67,12 +67,12 @@ function MobileFrom() {
             {/* Mobile Top Bar */}
             <div className="sticky top-0 z-40 bg-white border-b border-gray-200 px-4 py-3">
                 <div className="flex items-center justify-between">
-                    {/* Back Button */}
+                    {/* Home Button */}
                     <button
-                        onClick={() => router.push('/template')}
+                        onClick={() => router.push('/')}
                         className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                     >
-                        <ArrowLeft className="w-5 h-5 text-gray-600" />
+                        <Home className="w-5 h-5 text-gray-600" />
                     </button>
 
                     {/* Step Indicator with Dropdown */}

@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
-import { User, Briefcase, GraduationCap, Award, FolderOpen, FileText, ChevronRight } from 'lucide-react'
+import { User, Briefcase, GraduationCap, Award, FolderOpen, FileText, ChevronRight, Home } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 
 interface DesktopSidebarProps {
   currentStep: number
@@ -17,6 +18,7 @@ const steps = [
 
 function DesktopSidebar({ currentStep, onStepChange }: DesktopSidebarProps) {
   const [isExpanded, setIsExpanded] = useState(false)
+  const router = useRouter()
 
   return (
     <div 
@@ -39,6 +41,27 @@ function DesktopSidebar({ currentStep, onStepChange }: DesktopSidebarProps) {
             </div>
           )}
         </div>
+      </div>
+
+      {/* Home Button */}
+      <div className={`mt-4 ${isExpanded ? 'px-2' : 'px-2'}`}>
+        <button
+          onClick={() => router.push('/')}
+          className={`w-full text-left transition-all duration-200 hover:bg-white/10 rounded-xl ${
+            isExpanded ? 'p-3' : 'p-2 flex justify-center'
+          }`}
+        >
+          <div className={`flex items-center ${isExpanded ? 'space-x-3' : 'justify-center'}`}>
+            <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-white/20 text-white border border-white/30">
+              <Home className="w-4 h-4 flex-shrink-0" />
+            </div>
+            {isExpanded && (
+              <div className="flex-1">
+                <span className="font-medium text-blue-200 block">Home</span>
+              </div>
+            )}
+          </div>
+        </button>
       </div>
 
       {/* Navigation */}
