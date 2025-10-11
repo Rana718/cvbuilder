@@ -25,10 +25,10 @@ export const metadata: Metadata = {
     title: 'Resume & Career Tips Blog | AI Resume Builder',
     description: 'Expert tips on resume writing, career advice, job search strategies, and professional development.',
     type: 'website',
-    url: 'https://airesumebuilder.com/blog',
+    url: 'https://airezumebuilder.com/blog',
     siteName: 'AI Resume Builder',
     images: [{
-      url: 'https://airesumebuilder.com/img/og-blog.jpg',
+      url: 'https://airezumebuilder.com/img/og-blog.jpg',
       width: 1200,
       height: 630,
       alt: 'AI Resume Builder Blog - Resume & Career Tips',
@@ -38,11 +38,11 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Resume & Career Tips Blog | AI Resume Builder',
     description: 'Expert tips on resume writing, career advice, job search strategies, and professional development.',
-    images: ['https://airesumebuilder.com/img/og-blog.jpg'],
+    images: ['https://airezumebuilder.com/img/og-blog.jpg'],
     creator: '@airesumebuilder',
   },
   alternates: {
-    canonical: 'https://airesumebuilder.com/blog',
+    canonical: 'https://airezumebuilder.com/blog',
   },
   robots: {
     index: true,
@@ -62,19 +62,19 @@ export default function BlogPage() {
     '@type': 'Blog',
     name: 'AI Resume Builder Blog',
     description: 'Expert tips on resume writing, career advice, job search strategies, and professional development.',
-    url: 'https://airesumebuilder.com/blog',
+    url: 'https://airezumebuilder.com/blog',
     publisher: {
       '@type': 'Organization',
       name: 'AI Resume Builder',
       logo: {
         '@type': 'ImageObject',
-        url: 'https://airesumebuilder.com/img/logo.png'
+        url: 'https://airezumebuilder.com/img/logo.png'
       }
     },
     inLanguage: 'en-US',
     mainEntityOfPage: {
       '@type': 'WebPage',
-      '@id': 'https://airesumebuilder.com/blog'
+      '@id': 'https://airezumebuilder.com/blog'
     }
   };
 

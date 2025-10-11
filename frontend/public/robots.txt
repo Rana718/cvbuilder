@@ -29,7 +29,7 @@ Allow: /terms/
 Allow: /share
 
 # Sitemap location
-Sitemap: https://airesumebuilder.com/sitemap.xml
+Sitemap: https://airezumebuilder.com/sitemap.xml
 
 # Crawl delay (optional - be respectful to search engines)
 Crawl-delay: 1

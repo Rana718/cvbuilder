@@ -14,7 +14,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     
     const title = blog.meta_title || `${blog.title} | AI Resume Builder Blog`;
     const description = blog.meta_description || blog.excerpt || 'Expert resume writing and career tips to help you land your dream job.';
-    const url = `https://airesumebuilder.com/blog/${slug}`;
+    const url = `https://airezumebuilder.com/blog/${slug}`;
     const publishedTime = blog.published_at || blog.created_at;
     const modifiedTime = blog.updated_at || publishedTime;
     
@@ -37,7 +37,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
           height: 630,
           alt: blog.title,
         }] : [{
-          url: 'https://airesumebuilder.com/img/og-blog.jpg',
+          url: 'https://airezumebuilder.com/img/og-blog.jpg',
           width: 1200,
           height: 630,
           alt: 'AI Resume Builder Blog',
@@ -51,7 +51,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         card: 'summary_large_image',
         title,
         description,
-        images: blog.featured_image ? [blog.featured_image] : ['https://airesumebuilder.com/img/og-blog.jpg'],
+        images: blog.featured_image ? [blog.featured_image] : ['https://airezumebuilder.com/img/og-blog.jpg'],
         creator: '@airesumebuilder',
       },
       alternates: {
@@ -75,7 +75,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         title: 'Blog Post | AI Resume Builder',
         description: 'Read our latest blog post about resume writing and career tips.',
         type: 'article',
-        images: ['https://airesumebuilder.com/img/og-blog.jpg'],
+        images: ['https://airezumebuilder.com/img/og-blog.jpg'],
       },
     };
   }
@@ -92,25 +92,25 @@ export default async function BlogPostPage({ params }: Props) {
       '@type': 'BlogPosting',
       headline: blog.title,
       description: blog.excerpt,
-      image: blog.featured_image || 'https://airesumebuilder.com/img/og-blog.jpg',
+      image: blog.featured_image || 'https://airezumebuilder.com/img/og-blog.jpg',
       datePublished: blog.published_at || blog.created_at,
       dateModified: blog.updated_at || blog.published_at || blog.created_at,
       author: {
         '@type': 'Organization',
         name: 'AI Resume Builder Team',
-        url: 'https://airesumebuilder.com'
+        url: 'https://airezumebuilder.com'
       },
       publisher: {
         '@type': 'Organization',
         name: 'AI Resume Builder',
         logo: {
           '@type': 'ImageObject',
-          url: 'https://airesumebuilder.com/img/logo.png'
+          url: 'https://airezumebuilder.com/img/logo.png'
         }
       },
       mainEntityOfPage: {
         '@type': 'WebPage',
-        '@id': `https://airesumebuilder.com/blog/${slug}`
+        '@id': `https://airezumebuilder.com/blog/${slug}`
       },
       articleSection: blog.category || 'Career Tips',
       keywords: blog.keywords?.join(', ') || blog.tags?.join(', ') || 'resume, career, job search',

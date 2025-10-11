@@ -124,13 +124,13 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://airesumebuilder.com",
+    url: "https://airezumebuilder.com",
     siteName: "AI Resume Builder",
     title: "AI Resume Builder - Create Professional Resumes & Cover Letters with AI",
     description: "Create professional resumes and cover letters with our AI-powered CV builder. ATS-friendly templates, LinkedIn integration, and expert guidance.",
     images: [
       {
-        url: "https://airesumebuilder.com/img/banner.png",
+        url: "https://airezumebuilder.com/img/banner.png",
         width: 1200,
         height: 630,
         alt: "AI Resume Builder - Professional Resume Creator",
@@ -143,7 +143,7 @@ export const metadata: Metadata = {
     creator: "@airesumebuilder",
     title: "AI Resume Builder - Create Professional Resumes & Cover Letters with AI",
     description: "Create professional resumes and cover letters with our AI-powered CV builder. ATS-friendly templates, LinkedIn integration, and expert guidance.",
-    images: ["https://airesumebuilder.com/img/banner.png"],
+    images: ["https://airezumebuilder.com/img/banner.png"],
   },
   verification: {
     google: "your-google-site-verification-code",
@@ -154,7 +154,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://airesumebuilder.com",
+    canonical: "https://airezumebuilder.com",
   },
   category: "Business Tools",
 };
@@ -170,12 +170,12 @@ export default function RootLayout({
     name: "AI Resume Builder",
     applicationCategory: "BusinessApplication",
     operatingSystem: "Web Browser",
-    url: "https://airesumebuilder.com",
+    url: "https://airezumebuilder.com",
     description: "Create professional resumes and cover letters with our AI-powered CV builder. ATS-friendly templates, LinkedIn integration, and expert guidance.",
     author: {
       "@type": "Organization",
       name: "AI Resume Builder Team",
-      url: "https://airesumebuilder.com"
+      url: "https://airezumebuilder.com"
     },
     offers: {
       "@type": "Offer",
@@ -206,7 +206,7 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-        <link rel="canonical" href="https://airesumebuilder.com" />
+        <link rel="canonical" href="https://airezumebuilder.com" />
         <meta name="theme-color" content="#1e40af" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />

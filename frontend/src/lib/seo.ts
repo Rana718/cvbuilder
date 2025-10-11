@@ -18,8 +18,8 @@ export function generateMetadata(config: SEOConfig): Metadata {
     title,
     description,
     keywords = [],
-    image = 'https://airesumebuilder.com/img/banner.png',
-    url = 'https://airesumebuilder.com',
+    image = 'https://airezumebuilder.com/img/banner.png',
+    url = 'https://airezumebuilder.com',
     type = 'website',
     publishedTime,
     modifiedTime,
@@ -73,67 +73,67 @@ export const seoPages = {
     title: 'Ai-rezume builder - Create Professional Resumes & Cover Letters Online',
     description: 'Create professional resumes and cover letters with our AI-powered CV builder. ATS-friendly templates, LinkedIn integration, and expert guidance. Build your perfect resume in minutes.',
     keywords: ['AI resume builder', 'online CV creator', 'professional resume templates', 'ATS friendly resume', 'cover letter generator'],
-    url: 'https://airesumebuilder.com',
+    url: 'https://airezumebuilder.com',
   },
   dashboard: {
     title: 'Dashboard - Manage Your Resumes & Cover Letters',
     description: 'Access your resume dashboard to create, edit, and manage your professional resumes and cover letters. Track your applications and upgrade to premium features.',
     keywords: ['resume dashboard', 'CV management', 'application tracking', 'premium features'],
-    url: 'https://airesumebuilder.com/dashboard',
+    url: 'https://airezumebuilder.com/dashboard',
   },
   templates: {
     title: 'Professional Resume Templates - ATS-Friendly CV Designs',
     description: 'Choose from our collection of professional, ATS-friendly resume templates. Modern designs crafted by experts to help you land your dream job.',
     keywords: ['resume templates', 'CV templates', 'professional designs', 'ATS friendly templates', 'modern resume layouts'],
-    url: 'https://airesumebuilder.com/template',
+    url: 'https://airezumebuilder.com/template',
   },
   coverLetter: {
     title: 'AI Cover Letter Generator - Create Personalized Cover Letters',
     description: 'Generate personalized cover letters with AI assistance. Match your cover letter to job requirements and increase your chances of getting hired.',
     keywords: ['cover letter generator', 'AI cover letter', 'personalized cover letters', 'job application letters'],
-    url: 'https://airesumebuilder.com/cover-letter',
+    url: 'https://airezumebuilder.com/cover-letter',
   },
   profile: {
     title: 'Profile Settings - Manage Your Account',
     description: 'Manage your Ai-rezume builder profile, update personal information, and configure your account settings for the best resume building experience.',
     keywords: ['profile settings', 'account management', 'user preferences'],
-    url: 'https://airesumebuilder.com/profile',
+    url: 'https://airezumebuilder.com/profile',
   },
   pricing: {
     title: 'Pricing Plans - Choose Your Resume Builder Plan',
     description: 'Affordable pricing plans for professional resume creation. Free basic features with premium upgrades for advanced templates and AI assistance.',
     keywords: ['pricing plans', 'resume builder cost', 'premium features', 'subscription plans'],
-    url: 'https://airesumebuilder.com/pricing',
+    url: 'https://airezumebuilder.com/pricing',
   },
   signIn: {
     title: 'Sign In - Access Your Resume Builder Account',
     description: 'Sign in to your Ai-rezume builder account to access your resumes, cover letters, and premium features. Secure login with multiple authentication options.',
     keywords: ['sign in', 'login', 'account access', 'user authentication'],
-    url: 'https://airesumebuilder.com/sign-in',
+    url: 'https://airezumebuilder.com/sign-in',
   },
   signUp: {
     title: 'Sign Up - Create Your Free Resume Builder Account',
     description: 'Create your free Ai-rezume builder account and start building professional resumes today. Quick registration with instant access to templates and tools.',
     keywords: ['sign up', 'create account', 'free registration', 'get started'],
-    url: 'https://airesumebuilder.com/sign-up',
+    url: 'https://airezumebuilder.com/sign-up',
   },
   privacy: {
     title: 'Privacy Policy - How We Protect Your Data',
     description: 'Learn how Ai-rezume builder protects your personal information and resume data. Our comprehensive privacy policy explains our data handling practices.',
     keywords: ['privacy policy', 'data protection', 'user privacy', 'data security'],
-    url: 'https://airesumebuilder.com/terms/privacy',
+    url: 'https://airezumebuilder.com/terms/privacy',
   },
   terms: {
     title: 'Terms of Service - Usage Guidelines',
     description: 'Read our terms of service and usage guidelines for Ai-rezume builder. Understand your rights and responsibilities when using our platform.',
     keywords: ['terms of service', 'usage guidelines', 'user agreement'],
-    url: 'https://airesumebuilder.com/terms/policy',
+    url: 'https://airezumebuilder.com/terms/policy',
   },
   refund: {
     title: 'Refund Policy - Money-Back Guarantee',
     description: 'Our refund policy ensures your satisfaction with Ai-rezume builder. Learn about our money-back guarantee and refund process.',
     keywords: ['refund policy', 'money-back guarantee', 'customer satisfaction'],
-    url: 'https://airesumebuilder.com/terms/refund',
+    url: 'https://airezumebuilder.com/terms/refund',
   },
 };
 
@@ -150,12 +150,12 @@ export function generateStructuredData(type: 'WebApplication' | 'Article' | 'Org
         name: data.name || "Ai-rezume builder",
         applicationCategory: "BusinessApplication",
         operatingSystem: "Web Browser",
-        url: data.url || "https://airesumebuilder.com",
+        url: data.url || "https://airezumebuilder.com",
         description: data.description,
         author: {
           "@type": "Organization",
           name: "Ai-rezume builder Team",
-          url: "https://airesumebuilder.com"
+          url: "https://airezumebuilder.com"
         },
         offers: data.offers || {
           "@type": "Offer",
@@ -190,20 +190,20 @@ export function generateStructuredData(type: 'WebApplication' | 'Article' | 'Org
           name: "Ai-rezume builder",
           logo: {
             "@type": "ImageObject",
-            url: "https://airesumebuilder.com/img/logo.png"
+            url: "https://airezumebuilder.com/img/logo.png"
           }
         },
         datePublished: data.publishedTime,
         dateModified: data.modifiedTime || data.publishedTime,
-        image: data.image || "https://airesumebuilder.com/img/banner.png"
+        image: data.image || "https://airezumebuilder.com/img/banner.png"
       };
     
     case 'Organization':
       return {
         ...baseSchema,
         name: "Ai-rezume builder",
-        url: "https://airesumebuilder.com",
-        logo: "https://airesumebuilder.com/img/logo.png",
+        url: "https://airezumebuilder.com",
+        logo: "https://airezumebuilder.com/img/logo.png",
         description: "Professional AI-powered resume and cover letter builder",
         sameAs: [
           "https://twitter.com/resumeaiworld",
@@ -214,7 +214,7 @@ export function generateStructuredData(type: 'WebApplication' | 'Article' | 'Org
           "@type": "ContactPoint",
           telephone: "+1-555-0123",
           contactType: "customer service",
-          email: "support@airesumebuilder.com"
+          email: "support@airezumebuilder.com"
         }
       };
     

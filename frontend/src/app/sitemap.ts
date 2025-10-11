@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next'
 import { blogsAPI } from '@/lib/api/blogs'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://airesumebuilder.com'
+  const baseUrl = 'https://airezumebuilder.com'
   const lastModified = new Date()
 
   const staticPages = [
