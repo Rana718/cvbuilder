@@ -1,6 +1,6 @@
 from typing import Dict, Any, List, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func, delete, update
+from sqlalchemy import select, func, delete, update, case
 from db.scheme import User, Resume, PaymentHistory
 from config.firebase import set_custom_user_claims, remove_custom_user_claims
 from fastapi import HTTPException
@@ -28,7 +28,13 @@ class UserManagementController:
         total_resumes_result = await db.execute(select(func.count(Resume.id)))
         total_resumes = total_resumes_result.scalar()
         
-        # Get detailed user data with resume count and total spent
+        total_spent_subquery = select(
+            PaymentHistory.user_id,
+            func.sum(PaymentHistory.amount).label('user_total_spent')
+        ).where(
+            PaymentHistory.status == 'captured'
+        ).group_by(PaymentHistory.user_id).subquery()
+        
         users_query = select(
             User.id,
             User.full_name,
@@ -38,8 +44,11 @@ class UserManagementController:
             User.status,
             User.is_premium,
             func.count(Resume.id).label('total_resumes'),
-            func.coalesce(func.sum(PaymentHistory.amount), 0).label('total_spent')
-        ).outerjoin(Resume).outerjoin(PaymentHistory).group_by(User.id)
+            func.coalesce(total_spent_subquery.c.user_total_spent, 0).label('total_spent')
+        ).outerjoin(Resume).outerjoin(
+            total_spent_subquery, 
+            total_spent_subquery.c.user_id == User.id
+        ).group_by(User.id, total_spent_subquery.c.user_total_spent)
         
         users_result = await db.execute(users_query)
         users_data = []
@@ -54,7 +63,7 @@ class UserManagementController:
                 "status": row.status,
                 "is_premium": row.is_premium,
                 "total_resumes": row.total_resumes,
-                "total_spent": row.total_spent / 100 if row.total_spent else 0  # Convert paise to rupees
+                "total_spent": row.total_spent / 100 if row.total_spent else 0 
             })
         
         return {

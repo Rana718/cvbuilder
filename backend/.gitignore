@@ -11,3 +11,4 @@ wheels/
 
 .env
 firebase.json
+make_prime_user.py
