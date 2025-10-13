@@ -11,6 +11,8 @@ import EducationStep from './steps/EducationStep'
 import SkillsStep from './steps/SkillsStep'
 import ProjectsStep from './steps/ProjectsStep'
 import SummaryStep from './steps/SummaryStep'
+import { CV_TEMPLATES } from '@/constants/templates'
+import { useResumeStore } from '@/store/resumeStore'
 
 const STEPS = [
     { id: 1, name: 'Personal Info', icon: '👤' },
@@ -24,6 +26,7 @@ const STEPS = [
 function MobileFrom() {
     const { currentStep, setCurrentStep } = useStepNavigation()
     const { isPremium } = usePremiumStatus()
+    const { templateId } = useResumeStore()
     const [showStepMenu, setShowStepMenu] = useState(false)
     const [showResumePreview, setShowResumePreview] = useState(false)
     const router = useRouter()
@@ -190,7 +193,10 @@ function MobileFrom() {
                         {/* Full Resume Preview */}
                         <div className="w-full h-full overflow-y-auto py-5 flex justify-center">
                             <div className="scale-[0.45] origin-top" style={{ width: 'fit-content' }}>
-                                <ResumePreview pass={isPremium} />
+                                <ResumePreview 
+                                    pass={isPremium} 
+                                    isFree={CV_TEMPLATES.find(t => t.id === Number(templateId))?.isFree || false}
+                                />
                             </div>
                         </div>
                     </motion.div>

@@ -39,8 +39,8 @@ const BasicWhite: React.FC<BasicWhiteProps> = ({ userData: data, size = 'normal'
             style={{
                 transform: `scale(${scale})`,
                 transformOrigin: 'top left',
-                width: isSmall ? `${100 / scale}%` : '100%',
-                height: isSmall ? `${100 / scale}%` : '100%',
+                width: '210mm', 
+                height: '297mm',
                 fontFamily: 'Arial, sans-serif',
                 padding: '40px',
                 lineHeight: '1.6'

@@ -9,7 +9,6 @@ import axiosInstance from '@/lib/axios'
 import Navbar from '@/components/Navbar'
 import PaymentHistory from '@/components/PaymentHistory'
 import { showAlert } from '@/components/ui/alert-utils'
-import { useDownloadStatus } from '@/hooks/useDownloadStatus'
 
 interface DashboardStats {
     totalResumes: number
@@ -582,9 +581,10 @@ function Dashboard() {
                                                         <div className="w-3 h-3 bg-emerald-500 rounded-full animate-pulse"></div>
                                                         <span className="text-sm font-semibold text-emerald-800">Active Subscription</span>
                                                     </div>
-                                                    <div className="text-xs text-emerald-600 font-medium">
-                                                        Renews on {formatDate(subscriptionStatus.current_period_end)}
-                                                    </div>
+                                                    {/* <div className="text-xs text-emerald-600 font-medium">
+                                                        {/* Renews on {formatDate(subscriptionStatus.current_period_end)} 
+                                                        {subscriptionStatus.plan}
+                                                    </div> */}
                                                 </div>
                                             )}
                                             <button

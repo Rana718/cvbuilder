@@ -120,14 +120,27 @@ export default function ExecutiveElite({ userData, colors, size = 'normal', mode
       >
         {/* Profile */}
         <div className="text-center" style={{ marginBottom: styles.spacing.section }}>
-          <div 
-            className="bg-white/20 rounded-full mx-auto"
-            style={{ 
-              width: isSmall ? '2.5rem' : '5rem', 
-              height: isSmall ? '2.5rem' : '5rem',
-              marginBottom: styles.spacing.item 
-            }}
-          />
+          {hasContent(userData.image_url) ? (
+            <img
+              src={userData.image_url}
+              alt={userData.name}
+              className="rounded-full mx-auto object-cover"
+              style={{ 
+                width: isSmall ? '2.5rem' : '5rem', 
+                height: isSmall ? '2.5rem' : '5rem',
+                marginBottom: styles.spacing.item 
+              }}
+            />
+          ) : (
+            <div 
+              className="bg-white/20 rounded-full mx-auto"
+              style={{ 
+                width: isSmall ? '2.5rem' : '5rem', 
+                height: isSmall ? '2.5rem' : '5rem',
+                marginBottom: styles.spacing.item 
+              }}
+            />
+          )}
           <h1 
             className="font-bold text-white"
             style={{ 

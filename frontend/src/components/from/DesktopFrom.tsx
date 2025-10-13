@@ -111,8 +111,11 @@ function DesktopFrom() {
                                 className="relative group scale-[0.52] xl:scale-[0.59] cursor-pointer pointer-events-auto"
                                 onClick={() => setShowResumePopup(true)}
                             >
-                                <ResumePreview onlyonepage={true} pass={isPremium} />
-                                {/* Hover overlay with view icon */}
+                                <ResumePreview 
+                                    onlyonepage={true} 
+                                    pass={isPremium} 
+                                    isFree={CV_TEMPLATES.find(t => t.id === Number(templateId))?.isFree || false}
+                                />
                                 <div className="absolute inset-0 bg-black/10 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100 pointer-events-none">
                                     <div className="bg-white rounded-full p-3 shadow-lg pointer-events-auto">
                                         <Eye className="w-6 h-6 text-gray-700" />
@@ -253,7 +256,10 @@ function DesktopFrom() {
                     {/* Full Resume Preview */}
                     <div className="w-full h-full overflow-y-auto py-5" style={{ display: 'block' }}>
                         <div className="mx-auto" style={{ width: 'fit-content' }}>
-                            <ResumePreview pass={isPremium} />
+                            <ResumePreview 
+                                pass={isPremium} 
+                                isFree={CV_TEMPLATES.find(t => t.id === Number(templateId))?.isFree || false}
+                            />
                         </div>
                     </div>
                 </div>

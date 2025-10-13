@@ -39,8 +39,8 @@ const EssentialResume: React.FC<EssentialResumeProps> = ({ userData: data, size 
             style={{
                 transform: `scale(${scale})`,
                 transformOrigin: 'top left',
-                width: isSmall ? `${100 / scale}%` : '100%',
-                height: isSmall ? `${100 / scale}%` : '100%',
+                width: '210mm', 
+                height: '297mm',
                 fontFamily: 'Calibri, Arial, sans-serif',
                 padding: '35px',
                 lineHeight: '1.5',

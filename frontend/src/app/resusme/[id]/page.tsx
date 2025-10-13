@@ -1,286 +1,52 @@
 'use client'
 
 import React, { useState, useEffect, Suspense, useMemo, useCallback } from 'react'
-import { useParams, useSearchParams, useRouter } from 'next/navigation'
+import { useParams, useSearchParams } from 'next/navigation'
 import { useAuth } from '@/components/AuthContext'
-import { showAlert } from '@/components/ui/alert-utils'
 import { useResumeStore } from '@/store/resumeStore'
 import { usePremiumStatus } from '@/hooks/usePremiumStatus'
+import { useResumeActions } from '@/hooks/useResumeActions'
 import ResumePreview from '@/components/ui/ResumePreview'
-import ColorThemePicker, { COLOR_THEMES } from '@/components/ui/ColorThemePicker'
-import { ArrowLeft, Download, Save, Edit, Share, CheckCircle, Search, Grid3X3, X, Palette, User, Briefcase, FileText } from 'lucide-react'
-import Link from 'next/link'
-import axiosInstance from '@/lib/axios'
-import { CV_TEMPLATES, TEMPLATE_CATEGORIES } from '@/constants/templates'
-import TemplateRenderer from '@/components/templates/TemplateRenderer'
+import { Grid3X3 } from 'lucide-react'
+import { CV_TEMPLATES } from '@/constants/templates'
 import { motion, AnimatePresence } from 'framer-motion'
 import Navbar from '@/components/Navbar'
-
-// Memoized sample data to prevent re-creating the object on each render
-const SAMPLE_TEMPLATE_DATA = {
-    name: "John Doe",
-    email: "john@example.com",
-    phone: "+1 (555) 123-4567",
-    address: "New York, NY",
-    job_title: "Senior Professional",
-    summary: "Experienced professional with proven track record of success in leading teams and driving business growth.",
-    skills: [
-        { name: "Leadership", rating: 5 },
-        { name: "Strategy", rating: 4 },
-        { name: "Innovation", rating: 5 },
-        { name: "Management", rating: 4 }
-    ],
-    experience: [{
-        title: "Senior Position",
-        company: "Tech Company",
-        duration: "2020 - Present",
-        description: "Led strategic initiatives and drove business growth."
-    }, {
-        title: "Manager",
-        company: "Previous Company",
-        duration: "2018 - 2020",
-        description: "Managed team and projects."
-    }],
-    education: [{
-        degree: "Master's Degree",
-        institution: "University",
-        year: "2018"
-    }],
-    projects: [{
-        title: "Sample Project",
-        description: "Project description"
-    }]
-}
-
-// Memoized Template Item Component
-const TemplateItem = React.memo(({ 
-    template, 
-    templateId, 
-    onTemplateChange,
-    index,
-    colorTheme 
-}: { 
-    template: any, 
-    templateId: string | null, 
-    onTemplateChange: (id: number) => void,
-    index: number,
-    colorTheme: any
-}) => (
-    <motion.div
-        key={template.id}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: index * 0.05 }}
-        className="cursor-pointer"
-        onClick={() => onTemplateChange(template.id)}
-    >
-        <div className={`relative overflow-hidden transition-all duration-200 bg-white rounded-xl border-2 hover:shadow-lg ${
-            template.id === Number(templateId) 
-                ? 'border-blue-500 shadow-lg ring-2 ring-blue-500/20' 
-                : 'border-gray-200 hover:border-gray-300'
-        }`}>
-            {/* FREE Badge */}
-            {template.isFree && (
-                <div className="absolute top-2 left-2 bg-green-500 text-white px-2 py-1 rounded-full text-xs font-bold z-20 shadow-lg">
-                    FREE
-                </div>
-            )}
-            
-            {/* Template Preview */}
-            <div className="w-full bg-white overflow-hidden flex justify-center" style={{ height: '320px' }}>
-                <div 
-                    className="bg-white border border-gray-500"
-                    style={{
-                        width: template.isFree ? '595px' : '794px',
-                        height: template.isFree ? '842px' : '1122px',
-                        transform: template.isFree ? 'scale(0.38)' : 'scale(0.285)',
-                        transformOrigin: 'top center'
-                    }}
-                >
-                    <TemplateRenderer 
-                        templateId={template.id} 
-                        userData={SAMPLE_TEMPLATE_DATA} 
-                        colors={template.isFree ? undefined : colorTheme.colors}
-                        size="normal" 
-                    />
-                </div>
-            </div>
-
-            <div className="p-3 text-center border-t border-gray-100">
-                <h4 className="text-sm font-semibold text-slate-800">{template.name}</h4>
-                <p className="text-xs text-gray-500 mt-1">{template.category}</p>
-            </div>
-            {/* Selected Indicator */}
-            {template.id === Number(templateId) && (
-                <div className="absolute top-3 right-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-full p-1.5 z-10 shadow-lg">
-                    <CheckCircle className="w-4 h-4" />
-                </div>
-            )}
-        </div>
-    </motion.div>
-))
-
-TemplateItem.displayName = 'TemplateItem'
-
-// Memoized Template Selector Panel
-const TemplateSelectorPanel = React.memo(({ 
-    searchTerm, 
-    setSearchTerm, 
-    selectedCategory, 
-    setSelectedCategory, 
-    filteredTemplates,
-    templateId,
-    onTemplateChange,
-    onClose,
-    colorTheme,
-    onColorThemeChange
-}: {
-    searchTerm: string,
-    setSearchTerm: (term: string) => void,
-    selectedCategory: string,
-    setSelectedCategory: (category: string) => void,
-    filteredTemplates: any[],
-    templateId: string | null,
-    onTemplateChange: (id: number) => void,
-    onClose?: () => void,
-    colorTheme: any,
-    onColorThemeChange: (theme: any) => void
-}) => (
-    <div className="bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl h-full overflow-hidden flex flex-col border border-white/20">
-        <div className="p-4 border-b border-gray-200/50">
-            <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Templates</h3>
-                {onClose && (
-                    <button
-                        onClick={onClose}
-                        className="lg:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                    >
-                        <X className="w-5 h-5 text-gray-500" />
-                    </button>
-                )}
-            </div>
-
-            {/* Color Theme Selector */}
-            <div className="mb-4">
-                <p className="text-sm font-medium text-gray-700 mb-2">Color Theme</p>
-                <div className="flex gap-2 overflow-x-auto pb-2">
-                    {COLOR_THEMES.map((theme) => (
-                        <button
-                            key={theme.name}
-                            onClick={() => onColorThemeChange(theme)}
-                            className={`flex-shrink-0 p-2 rounded-lg border-2 transition-all ${
-                                colorTheme.name === theme.name
-                                    ? 'border-blue-500 bg-blue-50'
-                                    : 'border-gray-200 hover:border-gray-300'
-                            }`}
-                            title={theme.name}
-                        >
-                            <div className="flex space-x-1">
-                                <div 
-                                    className="w-4 h-4 rounded border border-gray-300" 
-                                    style={{ 
-                                        backgroundColor: theme.colors?.primary || '#ffffff',
-                                        backgroundImage: theme.colors ? undefined : 'linear-gradient(45deg, #e5e7eb 25%, transparent 25%), linear-gradient(-45deg, #e5e7eb 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #e5e7eb 75%), linear-gradient(-45deg, transparent 75%, #e5e7eb 75%)',
-                                        backgroundSize: theme.colors ? undefined : '4px 4px',
-                                        backgroundPosition: theme.colors ? undefined : '0 0, 0 2px, 2px -2px, -2px 0px'
-                                    }}
-                                />
-                            </div>
-                        </button>
-                    ))}
-                </div>
-            </div>
-
-            {/* Search Bar */}
-            <div className="relative mb-3">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <input
-                    type="text"
-                    placeholder="Search templates..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl bg-gray-50/50 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/50 focus:bg-white text-sm transition-all duration-200"
-                />
-            </div>
-
-            {/* Category Filter */}
-            <div className="flex flex-wrap gap-2">
-                <button
-                    onClick={() => setSelectedCategory("All")}
-                    className={`px-3 py-2 rounded-lg text-xs font-medium transition-all duration-200 ${"All" === selectedCategory
-                        ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md"
-                        : "bg-gray-100/80 text-gray-700 hover:bg-gray-200/80 hover:shadow-sm"
-                        }`}
-                >
-                    All
-                </button>
-                {TEMPLATE_CATEGORIES.map((category) => (
-                    <button
-                        key={category}
-                        onClick={() => setSelectedCategory(category)}
-                        className={`px-3 py-2 rounded-lg text-xs font-medium transition-all duration-200 ${selectedCategory === category
-                            ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md"
-                            : "bg-gray-100/80 text-gray-700 hover:bg-gray-200/80 hover:shadow-sm"
-                            }`}
-                    >
-                        {category}
-                    </button>
-                ))}
-            </div>
-        </div>
-
-        {/* Templates Grid */}
-        <div className="flex-1 overflow-y-auto p-3">
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-                {filteredTemplates.map((template, i) => (
-                    <TemplateItem
-                        key={template.id}
-                        template={template}
-                        templateId={templateId}
-                        onTemplateChange={onTemplateChange}
-                        index={i}
-                        colorTheme={colorTheme}
-                    />
-                ))}
-            </div>
-        </div>
-    </div>
-))
-
-TemplateSelectorPanel.displayName = 'TemplateSelectorPanel'
+import TemplateSelectorPanel from '@/components/resume/TemplateSelectorPanel'
+import { DesktopActionButtons, MobileActionButtons } from '@/components/resume/ActionButtons'
+import QuickEditModal from '@/components/resume/QuickEditModal'
+import { LoadingSpinner, EditorLoadingSpinner } from '@/components/resume/LoadingSpinner'
+import { BackgroundDecorations } from '@/components/resume/BackgroundDecorations'
 
 function ResumePage() {
     const params = useParams()
     const searchParams = useSearchParams()
-    const router = useRouter()
     const { user, loading } = useAuth()
     const { isPremium, refreshStatus } = usePremiumStatus()
     const templateId = searchParams.get('template')
     const resumeId = params.id
 
     const {
-        personalInfo, setDocumentId, saveResume, loadResume, hasData, documentId,
-        shareableUuid, setShareableUuid, setTemplateId, colorTheme, setColorTheme
+        setDocumentId, loadResume, hasData, setTemplateId, colorTheme, setColorTheme
     } = useResumeStore()
 
+    const {
+        isSaving,
+        isDownloading,
+        isSharing,
+        showShareSuccess,
+        handleSave,
+        handleDownload,
+        handleShare
+    } = useResumeActions(user, isPremium, templateId, refreshStatus)
+
     const [showQuickEdit, setShowQuickEdit] = useState(false)
-    const [editSection, setEditSection] = useState<'personal' | 'summary' | 'experience'>('personal')
-    const [isSaving, setIsSaving] = useState(false)
-    const [isDownloading, setIsDownloading] = useState(false)
-    const [isSharing, setIsSharing] = useState(false)
-    const [shareUrl, setShareUrl] = useState('')
-    const [showShareSuccess, setShowShareSuccess] = useState(false)
     const [hasLoadedOnce, setHasLoadedOnce] = useState(false)
-    const [showPaymentCard, setShowPaymentCard] = useState(false)
     const [showTemplateSelector, setShowTemplateSelector] = useState(false)
     const [searchTerm, setSearchTerm] = useState("")
     const [selectedCategory, setSelectedCategory] = useState("All")
     const [forceRerender, setForceRerender] = useState(0)
-    
-    // Debounced search term for better performance
     const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("")
     
-    // Debounce search term
     useEffect(() => {
         const timer = setTimeout(() => {
             setDebouncedSearchTerm(searchTerm)
@@ -289,7 +55,6 @@ function ResumePage() {
         return () => clearTimeout(timer)
     }, [searchTerm])
     
-    // Memoize search and category handlers
     const handleSearchTermChange = useCallback((term: string) => {
         setSearchTerm(term)
     }, [])
@@ -298,244 +63,15 @@ function ResumePage() {
         setSelectedCategory(category)
     }, [])
 
-    const redirectToPayment = useCallback(() => {
-        const currentUrl = window.location.pathname + window.location.search
-        router.push(`/payment?redirect=${encodeURIComponent(currentUrl)}`)
-    }, [router])
-
-    const download_url = process.env.NEXT_PUBLIC_API_KEY_DOWN || '';
-
-    const redirectToAuth = useCallback(() => {
-        const currentUrl = window.location.pathname + window.location.search
-        router.push(`/sign-in?redirect=${encodeURIComponent(currentUrl)}`)
-    }, [router])
-
-    const handleSave = async () => {
-        if (isSaving || !user) {
-            if (!user) redirectToAuth()
-            return
-        }
-
-        setIsSaving(true)
-        try {
-            if (resumeId && typeof resumeId === 'string' && !isNaN(Number(resumeId))) {
-                setDocumentId(Number(resumeId))
-            }
-            await saveResume()
-            showAlert('Resume saved successfully!')
-        } catch (error) {
-            console.error('Save error:', error)
-            showAlert('Failed to save resume. Please try again.')
-        } finally {
-            setIsSaving(false)
-        }
-    }
-
-    const generatePDF = async () => {
-        try {
-            // Get the existing resume content from the page first
-            let resumeContent = document.querySelector("[data-resume-content]") as HTMLElement;
-            let shouldCleanup = false;
-            let root: any = null;
-            let tempContainer: HTMLElement | null = null;
-
-            // If no existing content, create temporary container
-            if (!resumeContent) {
-                tempContainer = document.createElement('div');
-                tempContainer.style.position = 'absolute';
-                tempContainer.style.top = '-9999px';
-                tempContainer.style.left = '-9999px';
-                tempContainer.style.width = '210mm';
-                tempContainer.style.height = 'auto';
-                tempContainer.style.visibility = 'hidden';
-                document.body.appendChild(tempContainer);
-
-                const { createRoot } = await import('react-dom/client');
-                root = createRoot(tempContainer);
-                
-                await new Promise<void>((resolve) => {
-                    root.render(
-                        React.createElement(ResumePreview, {
-                            forPDF: true,
-                            pass: isPremium
-                        })
-                    );
-                    setTimeout(resolve, 2000); // Wait longer for render
-                });
-
-                resumeContent = tempContainer.querySelector("[data-resume-content]") as HTMLElement;
-                shouldCleanup = true;
-            }
-
-            if (!resumeContent) {
-                if (shouldCleanup && root && tempContainer) {
-                    root.unmount();
-                    document.body.removeChild(tempContainer);
-                }
-                showAlert('Resume content not found. Please refresh and try again.');
-                return;
-            }
-
-            // Clone and clean the content
-            const clonedContent = resumeContent.cloneNode(true) as HTMLElement;
-            
-            // Check if using a free template
-            const currentTemplate = CV_TEMPLATES.find(t => t.id === Number(templateId))
-            const isFreeTemplate = currentTemplate?.isFree || false
-            
-            // Remove watermarks only for premium users AND non-free templates
-            // Free templates never have watermarks anyway
-            if (isPremium && !isFreeTemplate) {
-                const watermarks = clonedContent.querySelectorAll('.watermark-element, [data-watermark="true"], [class*="watermark"]');
-                watermarks.forEach(watermark => watermark.remove());
-            }
-
-            // Simple PDF styling - no gaps
-            clonedContent.style.position = 'static';
-            clonedContent.style.margin = '0';
-            clonedContent.style.padding = '0';
-            clonedContent.style.width = '100%';
-            clonedContent.style.background = 'white';
-
-            const response = await fetch(download_url, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    html: clonedContent.outerHTML,
-                }),
-            });
-
-            // Cleanup temporary container if created
-            if (shouldCleanup && root && tempContainer) {
-                root.unmount();
-                document.body.removeChild(tempContainer);
-            }
-
-            if (!response.ok) {
-                throw new Error(`PDF generation failed: ${response.statusText}`);
-            }
-
-            const blob = await response.blob();
-            const url = window.URL.createObjectURL(blob);
-            const link = document.createElement("a");
-            link.href = url;
-            const filename = `${personalInfo.firstName || 'Resume'}_${personalInfo.lastName || 'Document'}.pdf`.replace(/\s+/g, '_');
-            link.download = filename;
-            link.click();
-            window.URL.revokeObjectURL(url);
-        } catch (error) {
-            console.error("PDF generation error:", error);
-            throw error;
-        }
-    }
-
-    const handleDownload = async () => {
-        if (isDownloading) return
-
-        if (!user) {
-            redirectToAuth()
-            return
-        }
-
-        console.log("User premium status:", isPremium)
-        const tokenResult = await user.getIdTokenResult(true);
-
-        console.log("Token claims:", tokenResult.claims)
-        await refreshStatus()
-
-        // Check if using a free template
-        const currentTemplate = CV_TEMPLATES.find(t => t.id === Number(templateId))
-        const isFreeTemplate = currentTemplate?.isFree || false
-
-        // Allow download for free templates without premium, require premium for others
-        if (!isPremium && !isFreeTemplate) {
-            await saveResume()
-            redirectToPayment()
-            return
-        }
-
-        setIsDownloading(true)
-        try {
-            await generatePDF()
-        } catch (error: any) {
-            console.error("Download error:", error)
-            showAlert(`Download failed: ${error.message || 'Please try again.'}`)
-        } finally {
-            setIsDownloading(false)
-        }
-    }
-
-    const copyShareUrl = useCallback(async () => {
-        if (shareUrl) {
-            try {
-                await navigator.clipboard.writeText(shareUrl)
-                setShowShareSuccess(true)
-                setTimeout(() => setShowShareSuccess(false), 2000)
-            } catch (error) {
-                console.error('Failed to copy to clipboard:', error)
-                showAlert('Failed to copy URL to clipboard')
-            }
-        }
-    }, [shareUrl])
-
-    const handleShare = async () => {
-        if (isSharing || !user) {
-            if (!user) redirectToAuth()
-            return
-        }
-
-        if (!isPremium) {
-            showAlert('Sharing is a premium feature. Please upgrade to share your resume.')
-            return
-        }
-
-        if (shareableUuid && shareUrl) {
-            copyShareUrl()
-            return
-        }
-
-        setIsSharing(true)
-        try {
-            if (!documentId) {
-                await handleSave()
-                if (!documentId) {
-                    showAlert('Please save the resume first before sharing.')
-                    return
-                }
-            }
-
-            let uuid = shareableUuid
-            if (!uuid) {
-                const response = await axiosInstance.post(`/api/resume-op/share/${documentId}`)
-                uuid = response.data.shareable_uuid
-                setShareableUuid(uuid)
-            }
-
-            const newShareUrl = `${window.location.origin}/share?uuid=${uuid}&template=${templateId}&resume=true`
-            setShareUrl(newShareUrl)
-
-            await navigator.clipboard.writeText(newShareUrl)
-            setShowShareSuccess(true)
-            setTimeout(() => setShowShareSuccess(false), 3000)
-        } catch (error) {
-            console.error('Share error:', error)
-            showAlert('Failed to generate share link. Please try again.')
-        } finally {
-            setIsSharing(false)
-        }
-    }
-
     const handleTemplateChange = useCallback((newTemplateId: number) => {
         setTemplateId(newTemplateId.toString())
 
         const currentUrl = new URL(window.location.href)
         currentUrl.searchParams.set('template', newTemplateId.toString())
         
-        // Use replace instead of push to avoid navigation issues
         window.history.replaceState({}, '', currentUrl.toString())
         setShowTemplateSelector(false)
         
-        // Force re-render to ensure template change is visible
         setForceRerender(prev => prev + 1)
     }, [setTemplateId])
 
@@ -543,28 +79,27 @@ function ResumePage() {
         return CV_TEMPLATES.filter(template => {
             const matchesSearch = template.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
                 template.description.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
-                template.category.toLowerCase().includes(debouncedSearchTerm.toLowerCase());
-            const matchesCategory = selectedCategory === "All" || template.category === selectedCategory;
-            return matchesSearch && matchesCategory;
+                template.category.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
+            const matchesCategory = selectedCategory === "All" || template.category === selectedCategory
+            return matchesSearch && matchesCategory
         }).sort((a, b) => {
-            // Sort free templates first
-            if (a.isFree && !b.isFree) return -1;
-            if (!a.isFree && b.isFree) return 1;
-            return 0;
-        });
+            if (a.isFree && !b.isFree) return -1
+            if (!a.isFree && b.isFree) return 1
+            return 0
+        })
     }, [debouncedSearchTerm, selectedCategory])
 
     useEffect(() => {
         if (!resumeId || typeof resumeId !== 'string' || isNaN(Number(resumeId)) || loading) return
 
         if (!user) {
-            redirectToAuth()
+            const currentUrl = window.location.pathname + window.location.search
+            window.location.href = `/sign-in?callbackUrl=${encodeURIComponent(currentUrl)}`
             return
         }
 
         const resumeIdNum = Number(resumeId)
 
-        // Always set template ID from URL parameter if present
         if (templateId && templateId !== useResumeStore.getState().templateId) {
             setTemplateId(templateId)
         }
@@ -578,37 +113,22 @@ function ResumePage() {
                 setHasLoadedOnce(true)
                 loadResume(resumeIdNum).catch(err => {
                     console.error('Failed to load resume:', err)
-                    if (err.response?.status === 401) redirectToAuth()
+                    if (err.response?.status === 401) {
+                        const currentUrl = window.location.pathname + window.location.search
+                        window.location.href = `/sign-in?callbackUrl=${encodeURIComponent(currentUrl)}`
+                    }
                 })
             }
         }
-    }, [resumeId, templateId, setTemplateId, setDocumentId, hasData, loadResume, hasLoadedOnce, user])
+    }, [resumeId, templateId, setTemplateId, setDocumentId, hasData, loadResume, hasLoadedOnce, user, loading])
 
     if (loading) {
-        return (
-            <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-                <div className="text-center">
-                    <div className="relative">
-                        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 blur-xl rounded-full"></div>
-                        <div className="relative animate-spin rounded-full h-12 w-12 border-2 border-blue-500 border-t-transparent mx-auto mb-4"></div>
-                    </div>
-                    <p className="text-slate-700 font-medium">Loading your resume...</p>
-                </div>
-            </div>
-        )
+        return <LoadingSpinner />
     }
 
     return (
         <div className="min-h-screen bg-slate-50 overflow-x-hidden">
-            {/* Background Elements */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute top-20 left-10 w-96 h-96 bg-gradient-to-r from-blue-400/10 to-indigo-500/10 rounded-full mix-blend-multiply filter blur-3xl animate-pulse"></div>
-                <div className="absolute top-40 right-10 w-80 h-80 bg-gradient-to-r from-purple-400/10 to-pink-500/10 rounded-full mix-blend-multiply filter blur-3xl animate-pulse delay-1000"></div>
-                <div className="absolute bottom-20 left-1/2 w-72 h-72 bg-gradient-to-r from-emerald-400/10 to-teal-500/10 rounded-full mix-blend-multiply filter blur-3xl animate-pulse delay-2000"></div>
-            </div>
-
-            {/* Floating grid pattern */}
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none"></div>
+            <BackgroundDecorations />
 
             <Navbar />
 
@@ -679,167 +199,39 @@ function ResumePage() {
                 <div className="flex-1 lg:pr-4 lg:py-4">
                     <div className="print:hidden py-4 lg:py-6">
                         <div className="max-w-6xl mx-auto px-4">
-                            {/* Desktop Layout */}
-                            <div className="hidden sm:flex justify-center items-center space-x-3">
-                                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                                    <Link
-                                        href={`/template/${templateId}?resumeId=${resumeId}`}
-                                        className="inline-flex items-center space-x-2 px-4 py-2.5 bg-white hover:bg-gray-50 text-gray-700 hover:text-blue-600 font-medium transition-all duration-200 rounded-xl border border-gray-200 hover:border-blue-200 shadow-sm hover:shadow-md"
-                                    >
-                                        <Edit className="w-4 h-4" />
-                                        <span>Edit</span>
-                                    </Link>
-                                </motion.div>
+                            <DesktopActionButtons
+                                templateId={templateId}
+                                resumeId={resumeId as string}
+                                isSaving={isSaving}
+                                isSharing={isSharing}
+                                isDownloading={isDownloading}
+                                showShareSuccess={showShareSuccess}
+                                isPremium={isPremium}
+                                user={user}
+                                colorTheme={colorTheme}
+                                onSave={() => handleSave(resumeId)}
+                                onShare={handleShare}
+                                onDownload={handleDownload}
+                                onQuickEdit={() => setShowQuickEdit(true)}
+                                onColorThemeChange={setColorTheme}
+                            />
 
-                                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                                    <button
-                                        onClick={() => setShowQuickEdit(true)}
-                                        className="inline-flex items-center space-x-2 px-4 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium transition-all duration-200 rounded-xl shadow-sm hover:shadow-md"
-                                    >
-                                        <FileText className="w-4 h-4" />
-                                        <span>Quick Edit</span>
-                                    </button>
-                                </motion.div>
-
-                                <ColorThemePicker
-                                    selectedTheme={colorTheme}
-                                    onThemeChange={setColorTheme}
-                                />
-
-                                <motion.button
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
-                                    onClick={handleSave}
-                                    disabled={isSaving}
-                                    className="inline-flex items-center space-x-2 px-4 py-2.5 bg-green-50 hover:bg-green-100 text-green-700 hover:text-green-800 font-medium transition-all duration-200 rounded-xl border border-green-200 hover:border-green-300 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    <Save className="w-4 h-4" />
-                                    <span>{isSaving ? 'Saving...' : 'Save'}</span>
-                                </motion.button>
-
-                                <motion.button
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
-                                    onClick={handleShare}
-                                    disabled={isSharing}
-                                    className="inline-flex items-center space-x-2 px-4 py-2.5 bg-purple-50 hover:bg-purple-100 text-purple-700 hover:text-purple-800 font-medium transition-all duration-200 rounded-xl border border-purple-200 hover:border-purple-300 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    {showShareSuccess ? (
-                                        <CheckCircle className="w-4 h-4 text-green-600" />
-                                    ) : (
-                                        <Share className="w-4 h-4" />
-                                    )}
-                                    <span>
-                                        {isSharing ? 'Sharing...' : showShareSuccess ? 'Link Copied!' : 'Share'}
-                                    </span>
-                                </motion.button>
-
-                                <motion.button
-                                    whileHover={{ scale: isPremium ? 1.05 : 1.02 }}
-                                    whileTap={{ scale: isPremium ? 0.95 : 0.98 }}
-                                    onClick={handleDownload}
-                                    disabled={isDownloading}
-                                    className="inline-flex items-center space-x-2 px-6 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-medium transition-all duration-200 rounded-xl shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
-                                    title={
-                                        !user 
-                                            ? (CV_TEMPLATES.find(t => t.id === Number(templateId))?.isFree ? 'Login to download' : 'Login required') 
-                                            : (!isPremium && !CV_TEMPLATES.find(t => t.id === Number(templateId))?.isFree) 
-                                                ? 'Premium feature - Upgrade to download' 
-                                                : ''
-                                    }
-                                >
-                                    <Download className="w-4 h-4" />
-                                    <span>
-                                        {isDownloading 
-                                            ? 'Downloading...' 
-                                            : !user 
-                                                ? (CV_TEMPLATES.find(t => t.id === Number(templateId))?.isFree ? 'Login to Download' : 'Login Required')
-                                                : (!isPremium && !CV_TEMPLATES.find(t => t.id === Number(templateId))?.isFree) 
-                                                    ? 'Upgrade to Download' 
-                                                    : 'Download'
-                                        }
-                                    </span>
-                                </motion.button>
-                            </div>
-
-                            {/* Mobile Layout */}
-                            <div className="sm:hidden space-y-3">
-                                {/* Row 1 */}
-                                <div className="flex space-x-3">
-                                    <Link
-                                        href={`/template/${templateId}?resumeId=${resumeId}`}
-                                        className="flex-1 bg-white hover:bg-gray-50 text-gray-700 hover:text-blue-600 px-4 py-3 rounded-xl font-medium transition-all duration-200 flex items-center justify-center space-x-2 text-sm border border-gray-200 hover:border-blue-200 shadow-sm hover:shadow-md"
-                                    >
-                                        <Edit className="w-4 h-4" />
-                                        <span>Edit</span>
-                                    </Link>
-
-                                    <button
-                                        onClick={() => setShowQuickEdit(true)}
-                                        className="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-4 py-3 rounded-xl font-medium transition-all duration-200 flex items-center justify-center space-x-2 text-sm shadow-sm hover:shadow-md"
-                                    >
-                                        <FileText className="w-4 h-4" />
-                                        <span>Quick Edit</span>
-                                    </button>
-                                </div>
-
-                                {/* Row 2 */}
-                                <div className="w-full">
-                                    <ColorThemePicker
-                                        selectedTheme={colorTheme}
-                                        onThemeChange={setColorTheme}
-                                        className="w-full"
-                                    />
-                                </div>
-
-                                {/* Row 3 */}
-                                <div className="flex space-x-3">
-                                    <button
-                                        onClick={handleSave}
-                                        disabled={isSaving}
-                                        className="flex-1 bg-green-50 hover:bg-green-100 text-green-700 px-4 py-3 rounded-xl font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 text-sm border border-green-200 shadow-sm hover:shadow-md"
-                                    >
-                                        <Save className="w-4 h-4" />
-                                        <span>{isSaving ? 'Saving...' : 'Save'}</span>
-                                    </button>
-
-                                    <button
-                                        onClick={handleShare}
-                                        disabled={isSharing}
-                                        className="flex-1 bg-purple-50 hover:bg-purple-100 text-purple-700 px-4 py-3 rounded-xl font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 text-sm border border-purple-200 shadow-sm hover:shadow-md"
-                                    >
-                                        {showShareSuccess ? (
-                                            <CheckCircle className="w-4 h-4 text-green-600" />
-                                        ) : (
-                                            <Share className="w-4 h-4" />
-                                        )}
-                                        <span>
-                                            {isSharing ? 'Sharing...' : showShareSuccess ? 'Copied!' : 'Share'}
-                                        </span>
-                                    </button>
-                                </div>
-
-                                {/* Row 4 */}
-                                <div className="flex">
-                                    <button
-                                        onClick={handleDownload}
-                                        disabled={isDownloading}
-                                        className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-4 py-3 rounded-xl font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 shadow-lg text-sm"
-                                    >
-                                        <Download className="w-4 h-4" />
-                                        <span>
-                                            {isDownloading 
-                                                ? 'Downloading...' 
-                                                : !user 
-                                                    ? (CV_TEMPLATES.find(t => t.id === Number(templateId))?.isFree ? 'Login' : 'Login')
-                                                    : (!isPremium && !CV_TEMPLATES.find(t => t.id === Number(templateId))?.isFree) 
-                                                        ? 'Upgrade' 
-                                                        : 'Download'
-                                            }
-                                        </span>
-                                    </button>
-                                </div>
-                            </div>
+                            <MobileActionButtons
+                                templateId={templateId}
+                                resumeId={resumeId as string}
+                                isSaving={isSaving}
+                                isSharing={isSharing}
+                                isDownloading={isDownloading}
+                                showShareSuccess={showShareSuccess}
+                                isPremium={isPremium}
+                                user={user}
+                                colorTheme={colorTheme}
+                                onSave={() => handleSave(resumeId)}
+                                onShare={handleShare}
+                                onDownload={handleDownload}
+                                onQuickEdit={() => setShowQuickEdit(true)}
+                                onColorThemeChange={setColorTheme}
+                            />
                         </div>
                     </div>
 
@@ -847,17 +239,23 @@ function ResumePage() {
                     {/* Resume Content */}
                     <div className="flex justify-center items-start pb-6">
                         <div className="w-full">
-                            {/* Mobile view - scaled down and allow multiple pages */}
                             <div className="sm:hidden w-full min-h-[400px] pt-10">
                                 <div className="flex flex-col items-center space-y-4 scale-[0.45] origin-top">
-                                    <ResumePreview pass={isPremium} key={`mobile-${forceRerender}-${isPremium}`} />
+                                    <ResumePreview 
+                                        pass={isPremium} 
+                                        isFree={CV_TEMPLATES.find(t => t.id === Number(templateId))?.isFree || false}
+                                        key={`mobile-${forceRerender}-${isPremium}`} 
+                                    />
                                 </div>
                             </div>
                             
-                            {/* Tablet and Desktop view - Allow multiple pages */}
                             <div className="hidden sm:block w-full" data-resume-content>
                                 <div className="mx-auto max-w-[794px]">
-                                    <ResumePreview pass={isPremium} key={`desktop-${forceRerender}-${isPremium}`} />
+                                    <ResumePreview 
+                                        pass={isPremium} 
+                                        isFree={CV_TEMPLATES.find(t => t.id === Number(templateId))?.isFree || false}
+                                        key={`desktop-${forceRerender}-${isPremium}`} 
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -865,172 +263,23 @@ function ResumePage() {
                 </div>
             </div>
 
-            {/* Quick Edit Modal */}
             <AnimatePresence>
                 {showQuickEdit && (
-                    <motion.div 
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
-                        onClick={(e) => {
-                            if (e.target === e.currentTarget) {
-                                setShowQuickEdit(false)
-                            }
-                        }}
-                    >
-                        <motion.div 
-                            initial={{ scale: 0.9, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            exit={{ scale: 0.9, opacity: 0 }}
-                            className="bg-white w-full max-w-2xl max-h-[80vh] rounded-2xl overflow-hidden shadow-2xl"
-                        >
-                            <div className="p-6 border-b border-gray-200">
-                                <div className="flex items-center justify-between">
-                                    <h2 className="text-xl font-bold text-gray-900">Quick Edit</h2>
-                                    <button
-                                        onClick={() => setShowQuickEdit(false)}
-                                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                                    >
-                                        <X className="w-5 h-5" />
-                                    </button>
-                                </div>
-                                <div className="flex space-x-2 mt-4">
-                                    <button
-                                        onClick={() => setEditSection('personal')}
-                                        className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                                            editSection === 'personal' 
-                                                ? 'bg-blue-100 text-blue-700' 
-                                                : 'text-gray-600 hover:bg-gray-100'
-                                        }`}
-                                    >
-                                        <User className="w-4 h-4 inline mr-1" />
-                                        Personal
-                                    </button>
-                                    <button
-                                        onClick={() => setEditSection('summary')}
-                                        className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                                            editSection === 'summary' 
-                                                ? 'bg-blue-100 text-blue-700' 
-                                                : 'text-gray-600 hover:bg-gray-100'
-                                        }`}
-                                    >
-                                        <FileText className="w-4 h-4 inline mr-1" />
-                                        Summary
-                                    </button>
-                                </div>
-                            </div>
-                            
-                            <div className="p-6 overflow-y-auto max-h-96">
-                                {editSection === 'personal' && (
-                                    <div className="space-y-4">
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
-                                                <input
-                                                    type="text"
-                                                    value={personalInfo.firstName}
-                                                    onChange={(e) => useResumeStore.getState().updatePersonalInfo({ firstName: e.target.value })}
-                                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
-                                                <input
-                                                    type="text"
-                                                    value={personalInfo.lastName}
-                                                    onChange={(e) => useResumeStore.getState().updatePersonalInfo({ lastName: e.target.value })}
-                                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                                />
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">Job Title</label>
-                                            <input
-                                                type="text"
-                                                value={personalInfo.profession}
-                                                onChange={(e) => useResumeStore.getState().updatePersonalInfo({ profession: e.target.value })}
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                                            <input
-                                                type="email"
-                                                value={personalInfo.email}
-                                                onChange={(e) => useResumeStore.getState().updatePersonalInfo({ email: e.target.value })}
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-                                            <input
-                                                type="tel"
-                                                value={personalInfo.phone}
-                                                onChange={(e) => useResumeStore.getState().updatePersonalInfo({ phone: e.target.value })}
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                            />
-                                        </div>
-                                    </div>
-                                )}
-                                
-                                {editSection === 'summary' && (
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">Professional Summary</label>
-                                        <textarea
-                                            value={useResumeStore.getState().summary}
-                                            onChange={(e) => useResumeStore.getState().setSummary(e.target.value)}
-                                            rows={6}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
-                                            placeholder="Write a compelling summary that showcases your professional background..."
-                                        />
-                                    </div>
-                                )}
-                            </div>
-                            
-                            <div className="p-6 border-t border-gray-200 bg-gray-50">
-                                <div className="flex justify-end space-x-3">
-                                    <button
-                                        onClick={() => setShowQuickEdit(false)}
-                                        className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-                                    >
-                                        Close
-                                    </button>
-                                    <button
-                                        onClick={async () => {
-                                            await handleSave()
-                                            setShowQuickEdit(false)
-                                        }}
-                                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                                    >
-                                        Save Changes
-                                    </button>
-                                </div>
-                            </div>
-                        </motion.div>
-                    </motion.div>
+                    <QuickEditModal
+                        isOpen={showQuickEdit}
+                        onClose={() => setShowQuickEdit(false)}
+                        onSave={() => handleSave(resumeId)}
+                    />
                 )}
             </AnimatePresence>
         </div>
     )
 }
 
-const ResumePageWrapper = () => {
-    return (
-        <Suspense fallback={
-            <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-                <div className="text-center">
-                    <div className="relative">
-                        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 blur-xl rounded-full"></div>
-                        <div className="relative animate-spin rounded-full h-12 w-12 border-2 border-blue-500 border-t-transparent mx-auto mb-4"></div>
-                    </div>
-                    <p className="text-slate-700 font-medium">Loading resume editor...</p>
-                </div>
-            </div>
-        }>
-            <ResumePage />
-        </Suspense>
-    )
-}
+const ResumePageWrapper = () => (
+    <Suspense fallback={<EditorLoadingSpinner />}>
+        <ResumePage />
+    </Suspense>
+)
 
 export default ResumePageWrapper

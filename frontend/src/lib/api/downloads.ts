@@ -6,6 +6,11 @@ export interface DownloadStatus {
   download_limit: number | null;
   remaining_downloads: number | null;
   plan_expired: boolean;
+  is_active: boolean;
+  is_premium: boolean;
+  plan_name: string;
+  plan_slug: string;
+  current_period_end?: string;
   message: string;
 }
 

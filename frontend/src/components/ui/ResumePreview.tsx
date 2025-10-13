@@ -8,9 +8,10 @@ interface ResumePreviewProps {
     pass?: boolean
     onlyonepage?: boolean
     forPDF?: boolean
+    isFree?: boolean
 }
 
-function ResumePreview({ mode = 'default', pass = false, onlyonepage, forPDF = false }: ResumePreviewProps) {
+function ResumePreview({ mode = 'default', pass = false, onlyonepage, forPDF = false, isFree = false }: ResumePreviewProps) {
     const {
         personalInfo,
         workExperience,
@@ -93,7 +94,7 @@ function ResumePreview({ mode = 'default', pass = false, onlyonepage, forPDF = f
     const isLiveMode = mode === 'live'
     const resumeSize = isLiveMode ? 'small' : 'normal'
 
-    const showWatermark = !pass
+    const showWatermark = !pass && !isFree
 
     useEffect(() => {
         if (isLiveMode || onlyonepage) return 
@@ -210,8 +211,9 @@ function ResumePreview({ mode = 'default', pass = false, onlyonepage, forPDF = f
                 aspectRatio: isLiveMode ? '210/297' : undefined,
                 width: forPDF ? '210mm' : (isLiveMode ? '100%' : onlyonepage ? '210mm' : '210mm'),
                 maxWidth: forPDF ? '210mm' : (isLiveMode ? '100%' : onlyonepage ? '210mm' : '210mm'),
-                height: forPDF ? '297mm' : (onlyonepage ? '297mm' : '297mm'),
-                overflow: 'hidden',
+                height: forPDF ? '297mm' : (onlyonepage ? '297mm' : undefined),
+                minHeight: forPDF ? '297mm' : (onlyonepage ? '297mm' : undefined),
+                overflow: onlyonepage ? 'hidden' : 'visible',
                 margin: forPDF ? '0' : undefined,
                 padding: forPDF ? '15mm 20mm' : undefined,
                 boxSizing: forPDF ? 'border-box' : undefined,
