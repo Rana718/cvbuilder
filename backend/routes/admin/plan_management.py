@@ -32,6 +32,7 @@ async def get_all_plans(
                 "currency": plan.currency,
                 "interval": plan.interval,
                 "features": plan.features,
+                "download_limit": plan.download_limit,
                 "is_active": plan.is_active,
                 "is_popular": plan.is_popular,
                 "sort_order": plan.sort_order
@@ -58,6 +59,7 @@ async def create_plan(
             currency=plan_data.currency,
             interval=plan_data.interval,
             features=plan_data.features,
+            download_limit=plan_data.download_limit,
             is_active=plan_data.is_active,
             is_popular=plan_data.is_popular,
             sort_order=plan_data.sort_order
@@ -78,6 +80,7 @@ async def create_plan(
             "currency": plan.currency,
             "interval": plan.interval,
             "features": plan.features,
+            "download_limit": plan.download_limit,
             "is_active": plan.is_active,
             "is_popular": plan.is_popular,
             "sort_order": plan.sort_order
@@ -124,6 +127,7 @@ async def update_plan(
             "currency": plan.currency,
             "interval": plan.interval,
             "features": plan.features,
+            "download_limit": plan.download_limit,
             "is_active": plan.is_active,
             "is_popular": plan.is_popular,
             "sort_order": plan.sort_order

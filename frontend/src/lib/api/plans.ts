@@ -8,6 +8,7 @@ export interface Plan {
   currency: string;
   interval: string;
   features: string[];
+  download_limit?: number | null;
   is_active?: boolean;
   is_popular: boolean;
   sort_order: number;
@@ -20,6 +21,7 @@ export interface CreatePlanData {
   currency?: string;
   interval?: string;
   features: string[];
+  download_limit?: number | null;
   is_active?: boolean;
   is_popular?: boolean;
   sort_order?: number;

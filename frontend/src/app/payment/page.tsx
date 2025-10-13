@@ -210,23 +210,23 @@ function PaymentContent() {
           
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
             {plans.map((plan) => (
-              <div key={plan.id} className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+              <div key={plan.id} className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 flex flex-col">
                 <h3 className="text-xl font-bold text-gray-900 mb-2">{plan.name}</h3>
                 <div className="text-3xl font-bold text-blue-600 mb-4">
                   {plan.currency === 'INR' ? '₹' : '$'}{plan.price / 100}
                   <span className="text-sm text-gray-500">/{plan.interval}</span>
                 </div>
-                <ul className="space-y-2 mb-6">
+                <ul className="space-y-2 mb-6 flex-grow">
                   {plan.features.map((feature, i) => (
                     <li key={i} className="flex items-center text-sm text-gray-600">
-                      <Check className="w-4 h-4 text-green-500 mr-2" />
+                      <Check className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" />
                       {feature}
                     </li>
                   ))}
                 </ul>
                 <button
                   onClick={() => setSelectedPlan(plan)}
-                  className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+                  className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors mt-auto"
                 >
                   Select {plan.name}
                 </button>
@@ -313,7 +313,7 @@ function PaymentContent() {
                 initial={{ x: 30, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ duration: 0.8, delay: 0.4 }}
-                className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/20 overflow-hidden"
+                className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/20 overflow-hidden flex flex-col"
               >
                 {/* Premium Badge */}
                 <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white text-center py-4">
@@ -324,7 +324,7 @@ function PaymentContent() {
                   </div>
                 </div>
 
-                <div className="p-8">
+                <div className="p-8 flex flex-col flex-grow">
                   {/* Price */}
                   <div className="text-center mb-8">
                     <div className="flex items-baseline justify-center space-x-2 mb-2">
@@ -340,7 +340,7 @@ function PaymentContent() {
                   </div>
 
                   {/* Features */}
-                  <div className="space-y-4 mb-8">
+                  <div className="space-y-4 mb-8 flex-grow">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center space-x-2">
                       <span>Unlock Premium Features</span>
                     </h3>

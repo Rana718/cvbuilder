@@ -1,8 +1,8 @@
 import React from "react";
 import Link from "next/link";
 import { 
-    FileText, Mail, Phone, MapPin, Twitter, Linkedin, Github, Facebook,
-    Instagram, Youtube, Star, Award, Users, Zap, Shield, Heart,
+    FileText, Mail, Phone, MapPin, Linkedin, Facebook,
+    Instagram, Star, Award, Users, Zap, Shield, Heart,
     ArrowRight, Download, Sparkles, Globe, Clock
 } from "lucide-react";
 
@@ -14,11 +14,9 @@ function Footer() {
     };
 
     const socialLinks = [
-        { icon: Twitter, href: "#", label: "Twitter", color: "hover:text-blue-400" },
-        { icon: Facebook, href: "#", label: "Facebook", color: "hover:text-blue-500" },
-        { icon: Linkedin, href: "#", label: "LinkedIn", color: "hover:text-blue-600" },
-        { icon: Instagram, href: "#", label: "Instagram", color: "hover:text-pink-500" },
-        { icon: Github, href: "#", label: "GitHub", color: "hover:text-gray-300" }
+        { icon: Facebook, href: "https://www.facebook.com/airezumebuilder", label: "Facebook", color: "hover:text-blue-500" },
+        { icon: Instagram, href: "https://www.instagram.com/airezumebuilder", label: "Instagram", color: "hover:text-pink-500" },
+        { icon: Linkedin, href: "https://www.linkedin.com/company/resume-ai-world/", label: "LinkedIn", color: "hover:text-blue-600" }
     ];
 
     const quickLinks = [

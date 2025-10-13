@@ -171,11 +171,19 @@ function DesktopFrom() {
                                     </button>
                                 ))}
                             </div>
+                            <p className="text-xs text-gray-500 mt-2">
+                                Note: Color themes don't apply to FREE templates
+                            </p>
                         </div>
 
                         <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {CV_TEMPLATES.map((template) => (
+                                {CV_TEMPLATES.sort((a, b) => {
+                                    // Sort free templates first
+                                    if (a.isFree && !b.isFree) return -1;
+                                    if (!a.isFree && b.isFree) return 1;
+                                    return 0;
+                                }).map((template) => (
                                     <div
                                         key={template.id}
                                         className={`relative cursor-pointer rounded-xl border-2 transition-all overflow-hidden bg-white shadow-sm hover:shadow-md ${templateId === template.id.toString()
@@ -190,12 +198,19 @@ function DesktopFrom() {
                                             router.push(currentUrl.toString())
                                         }}
                                     >
+                                        {/* FREE Badge */}
+                                        {template.isFree && (
+                                            <div className="absolute top-2 left-2 bg-green-500 text-white px-2 py-0.5 rounded-full text-xs font-bold z-20 shadow-lg">
+                                                FREE
+                                            </div>
+                                        )}
+                                        
                                         <div className="aspect-[1/1.414] overflow-hidden relative bg-white flex items-center justify-center p-1">
                                             <div className="w-full h-full origin-center">
                                                 <TemplatePreview 
                                                     templateId={template.id} 
                                                     size="small" 
-                                                    colors={colorTheme.colors}
+                                                    colors={template.isFree ? undefined : colorTheme.colors}
                                                 />
                                             </div>
                                         </div>

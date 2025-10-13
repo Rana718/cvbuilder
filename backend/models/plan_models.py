@@ -8,6 +8,7 @@ class PlanBase(BaseModel):
     currency: str = "INR"
     interval: str = "monthly"
     features: List[str]
+    download_limit: Optional[int] = None  # NULL = unlimited, number = limit
     is_active: bool = True
     is_popular: bool = False
     sort_order: int = 0
@@ -22,6 +23,7 @@ class PlanUpdate(BaseModel):
     currency: Optional[str] = None
     interval: Optional[str] = None
     features: Optional[List[str]] = None
+    download_limit: Optional[int] = None
     is_active: Optional[bool] = None
     is_popular: Optional[bool] = None
     sort_order: Optional[int] = None
@@ -34,6 +36,7 @@ class PlanResponse(BaseModel):
     currency: str
     interval: str
     features: List[str]
+    download_limit: Optional[int] = None
     is_active: Optional[bool] = None
     is_popular: bool
     sort_order: int

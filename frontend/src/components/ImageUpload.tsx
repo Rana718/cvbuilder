@@ -26,9 +26,11 @@ export default function ImageUpload() {
 
     setIsUploading(true)
     try {
-      await uploadImage(file)
+      const result = await uploadImage(file)
+      console.log('Image uploaded successfully:', personalInfo.image_url)
     } catch (error) {
       showAlert('Failed to upload image')
+      console.error('Upload error:', error)
     } finally {
       setIsUploading(false)
     }

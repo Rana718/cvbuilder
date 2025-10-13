@@ -9,6 +9,7 @@ import axiosInstance from '@/lib/axios'
 import Navbar from '@/components/Navbar'
 import PaymentHistory from '@/components/PaymentHistory'
 import { showAlert } from '@/components/ui/alert-utils'
+import { useDownloadStatus } from '@/hooks/useDownloadStatus'
 
 interface DashboardStats {
     totalResumes: number

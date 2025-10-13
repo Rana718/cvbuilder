@@ -167,7 +167,17 @@ function Pricing() {
                                         {plan.currency === 'INR' ? '₹' : '$'}{plan.price / 100}
                                     </div>
                                     <p className="text-blue-200 mb-2">per {plan.interval}</p>
-                                    <p className="text-sm text-blue-300">Cancel anytime • 2-day guarantee</p>
+                                    {plan.download_limit && (
+                                        <p className="text-sm text-yellow-300 bg-yellow-500/20 px-2 py-1 rounded">
+                                            {plan.download_limit} downloads included
+                                        </p>
+                                    )}
+                                    {!plan.download_limit && (
+                                        <p className="text-sm text-green-300 bg-green-500/20 px-2 py-1 rounded">
+                                            Unlimited downloads
+                                        </p>
+                                    )}
+                                    <p className="text-sm text-blue-300 mt-2">Cancel anytime • 2-day guarantee</p>
                                 </div>
 
                                 <div className="space-y-3 sm:space-y-4 mb-6 sm:mb-8 flex-grow">

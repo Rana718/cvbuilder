@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { Sparkles, ArrowRight, TrendingUp, CheckCircle, Globe, Star, Award, Brain, FileText, Download, Zap, Shield } from 'lucide-react'
+import Link from 'next/link'
 import React from 'react'
 
 
@@ -115,10 +116,10 @@ function Feature() {
                                         ))}
                                     </div>
 
-                                    <button className="group bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold transition-all transform hover:-translate-y-1 shadow-lg flex items-center space-x-2">
+                                    <Link href={"/template"} className="group bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold transition-all transform hover:-translate-y-1 shadow-lg flex items-center space-x-2">
                                         <span>Experience AI Magic</span>
                                         <ArrowRight className="h-4 sm:h-5 w-4 sm:w-5 group-hover:translate-x-1 transition-transform" />
-                                    </button>
+                                    </Link>
                                 </div>
                             </div>
                         </motion.div>

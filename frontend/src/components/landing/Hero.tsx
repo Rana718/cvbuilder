@@ -33,7 +33,7 @@ function Hero() {
                     </div>
                 </motion.div>
 
-                <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center max-w-6xl mx-auto">
+                <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center max-w-7xl mx-auto">
                     {/* Left Content */}
                     <div className="text-center lg:text-left">
                         <motion.h1
@@ -55,34 +55,54 @@ function Hero() {
                             initial={{ y: 30, opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
                             transition={{ duration: 0.8, delay: 0.5 }}
-                            className="text-base sm:text-lg lg:text-xl text-slate-600 mb-8 leading-relaxed max-w-2xl lg:max-w-none"
+                            className="text-base sm:text-lg lg:text-xl text-slate-600 mb-8 leading-relaxed max-w-2xl mx-auto lg:mx-0"
                         >
                             Transform your career journey with our intelligent AI that crafts compelling resumes,
                             optimizes for ATS systems, and helps you land interviews at top companies.
                         </motion.p>
 
+                        {/* Optimized Button Layout */}
                         <motion.div
                             initial={{ y: 30, opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
                             transition={{ duration: 0.8, delay: 0.7 }}
-                            className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start mb-8"
+                            className="flex flex-col items-center lg:items-start gap-4 mb-8"
                         >
-                            <button
-                                className="group bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-xl text-base font-semibold flex items-center justify-center space-x-2 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-                                onClick={() => router.push("/template")}
-                            >
-                                <span>Create Resume Now</span>
-                                <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                            </button>
-                            <button
-                                onClick={() => router.push('/resusme/parse')}
-                                className="bg-white/80 backdrop-blur-sm border border-slate-200 hover:border-blue-300 text-slate-700 hover:text-blue-700 px-6 py-3 rounded-xl text-base font-semibold transition-all duration-300 shadow-sm hover:shadow-md transform hover:-translate-y-1"
-                            >
-                                <span className="flex items-center space-x-2">
-                                    <Download className="h-5 w-5" />
+                            {/* Primary Actions Row */}
+                            <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                                <button
+                                    className="group bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 whitespace-nowrap"
+                                    onClick={() => router.push("/template")}
+                                >
+                                    <span>Create Resume</span>
+                                    <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                                </button>
+                                <button
+                                    className="group bg-gradient-to-r from-emerald-600 to-teal-600 text-white px-6 py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 whitespace-nowrap"
+                                    onClick={() => router.push("/template")}
+                                >
+                                    <span>Start Free</span>
+                                    <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                                </button>
+                            </div>
+
+                            {/* Secondary Actions Row */}
+                            <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                                <button
+                                    onClick={() => router.push('/resusme/rateing')}
+                                    className="group bg-gradient-to-r from-orange-500 to-red-500 text-white px-5 py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 whitespace-nowrap"
+                                >
+                                    <Brain className="h-4 w-4" />
+                                    <span>Analyze Resume</span>
+                                </button>
+                                <button
+                                    onClick={() => router.push('/resusme/parse')}
+                                    className="group bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-5 py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 whitespace-nowrap"
+                                >
+                                    <Download className="h-4 w-4" />
                                     <span>Import Resume</span>
-                                </span>
-                            </button>
+                                </button>
+                            </div>
                         </motion.div>
 
                         {/* Trust Indicators */}
@@ -90,16 +110,16 @@ function Hero() {
                             initial={{ y: 30, opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
                             transition={{ duration: 0.8, delay: 0.9 }}
-                            className="flex flex-wrap items-center justify-center lg:justify-start gap-4 text-sm"
+                            className="flex flex-wrap items-center justify-center lg:justify-start gap-4 sm:gap-6 text-sm"
                         >
                             {[
-                                { icon: CheckCircle, text: "No credit card required", color: "text-emerald-600" },
-                                { icon: Shield, text: "100% Free to start", color: "text-blue-600" },
+                                { icon: CheckCircle, text: "No credit card", color: "text-emerald-600" },
+                                { icon: Shield, text: "Free to start", color: "text-blue-600" },
                                 { icon: Award, text: "ATS-optimized", color: "text-purple-600" }
                             ].map((item, i) => (
-                                <div key={i} className="flex items-center space-x-2 text-slate-600">
-                                    <item.icon className={`h-4 sm:h-5 w-4 sm:w-5 ${item.color}`} />
-                                    <span className="font-medium text-xs sm:text-sm">{item.text}</span>
+                                <div key={i} className="flex items-center gap-2 text-slate-600">
+                                    <item.icon className={`h-5 w-5 ${item.color}`} />
+                                    <span className="font-medium">{item.text}</span>
                                 </div>
                             ))}
                         </motion.div>

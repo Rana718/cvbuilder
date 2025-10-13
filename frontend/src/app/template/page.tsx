@@ -20,6 +20,11 @@ export default function TemplatesPage() {
             template.category.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesCategory = selectedCategory === "All" || template.category === selectedCategory;
         return matchesSearch && matchesCategory;
+    }).sort((a, b) => {
+        // Sort free templates first
+        if (a.isFree && !b.isFree) return -1;
+        if (!a.isFree && b.isFree) return 1;
+        return 0;
     });
 
     return (
@@ -112,6 +117,9 @@ export default function TemplatesPage() {
                                 ))}
                             </div>
                         </div>
+                        <p className="text-center text-xs text-gray-500 mt-2">
+                            Note: Color themes don't apply to FREE templates
+                        </p>
                     </div>
 
                     <div className="relative max-w-md mx-auto">
@@ -170,13 +178,20 @@ export default function TemplatesPage() {
                             className="group"
                         >
                             <div className="relative aspect-[1/1.414] hover:border-2 hover:border-blue-500 bg-white/90 backdrop-blur-sm rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
+                                {/* FREE Badge */}
+                                {template.isFree && (
+                                    <div className="absolute top-2 left-2 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold z-20 shadow-lg">
+                                        FREE
+                                    </div>
+                                )}
+                                
                                 {/* Template Preview - A4 Format */}
                                 <TemplateSelector templateId={template.id.toString()}>
                                     <div className="w-full h-full flex items-center justify-center p-2">
                                         <div className="w-full h-full origin-center">
                                             <TemplatePreview 
                                                 templateId={template.id} 
-                                                colors={selectedColorTheme.colors ?? undefined}
+                                                colors={template.isFree ? undefined : (selectedColorTheme.colors ?? undefined)}
                                             />
                                         </div>
                                     </div>

@@ -3,6 +3,12 @@
 import { memo, lazy, Suspense, useMemo } from 'react';
 import { getTemplateById } from '@/constants/templates';
 
+// Free Templates
+const BasicWhite = lazy(() => import('./BasicWhite'));
+const SimpleProfessional = lazy(() => import('./SimpleProfessional'));
+const EssentialResume = lazy(() => import('./EssentialResume'));
+
+// Premium Templates
 const ExecutiveElite = lazy(() => import('./ExecutiveElite'));
 const ModernMinimalist = lazy(() => import('./ModernMinimalist'));
 const CreativeDesigner = lazy(() => import('./CreativeDesigner'));
@@ -67,14 +73,17 @@ const TEMPLATE_COMPONENTS = {
   6: ModernTech,
   7: CreativePortfolio,
   8: AcademicExcellence,
-  9: ModernPortrait,
+  9: ClassicTraditional,
   10: CleanSimple,
   11: BusinessFormal,
   12: ClassicElegant,
   13: ProfessionalClean,
   14: PhotoCentric,
   15: ProfileSidebar,
-  16: ClassicTraditional,
+  16: ModernPortrait,
+  17: BasicWhite,
+  18: SimpleProfessional,
+  19: EssentialResume,
 } as const;
 
 const TemplateComponent = memo(({ templateId, userData, colors, size, mode }: TemplateRendererProps) => {

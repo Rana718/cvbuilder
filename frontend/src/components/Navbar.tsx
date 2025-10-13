@@ -1,6 +1,6 @@
 "use client";
 import { motion, AnimatePresence } from 'framer-motion';
-import { FileText, User, X, Menu, FolderOpen, Mail, TrendingUp, BarChart3, Sparkles, ChevronDown, Plus, RefreshCw, Star, BookOpen } from 'lucide-react';
+import { FileText, User, X, Menu, FolderOpen, Mail, TrendingUp, BarChart3, Sparkles, ChevronDown, Plus, RefreshCw, Star, BookOpen, Crown, Home } from 'lucide-react';
 import { useAuth } from './AuthContext';
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import Link from 'next/link';
@@ -344,6 +344,7 @@ function Navbar() {
 
                     {/* Desktop Navigation */}
                     <div className="hidden lg:flex items-center space-x-1">
+                        {renderNavLink('/', Home, 'Home')}
                         {renderNavLink('/dashboard', BarChart3, 'Dashboard')}
                         
                         <Dropdown
@@ -360,6 +361,7 @@ function Navbar() {
                             isActive={isActiveDropdown(coverLetterDropdownItems)}
                         />
                         
+                        {renderNavLink('/payment', Crown, 'Plans & Pricing')}
                         {renderNavLink('/blog', BookOpen, 'Blog')}
                     </div>
 
@@ -392,6 +394,7 @@ function Navbar() {
                             <div className="py-4 space-y-2 max-h-[calc(100vh-4rem)] overflow-y-auto">
                                 {/* Navigation Links */}
                                 <div className="space-y-1">
+                                    {renderNavLink('/', Home, 'Home', true)}
                                     {renderNavLink('/dashboard', BarChart3, 'Dashboard', true)}
                                     
                                     <Dropdown
@@ -412,6 +415,7 @@ function Navbar() {
                                         onItemClick={closeMenu}
                                     />
                                     
+                                    {renderNavLink('/payment', Crown, 'Plans & Pricing', true)}
                                     {renderNavLink('/blog', BookOpen, 'Blog', true)}
                                 </div>
                                 

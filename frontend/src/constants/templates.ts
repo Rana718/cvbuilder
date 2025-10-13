@@ -5,6 +5,7 @@ export interface Template {
   description: string;
   preview: string;
   isPremium: boolean;
+  isFree: boolean; // Free templates that don't require upgrade
   hasPhoto: boolean;
   colors: {
     primary: string;
@@ -21,6 +22,75 @@ export interface Template {
 }
 
 export const CV_TEMPLATES: Template[] = [
+  // FREE TEMPLATES - Simple, basic designs for non-premium users
+  {
+    id: 17,
+    name: 'Basic White',
+    category: 'Professional',
+    description: 'Simple and clean white template - Perfect for getting started',
+    preview: '/templates/basic-white.jpg',
+    isPremium: false,
+    isFree: true,
+    hasPhoto: false,
+    colors: {
+      primary: '#000000',
+      secondary: '#333333',
+      accent: '#555555',
+      text: '#000000',
+      background: '#ffffff'
+    },
+    fonts: {
+      heading: 'Arial',
+      body: 'Arial'
+    },
+    layout: 'single-column'
+  },
+  {
+    id: 18,
+    name: 'Simple Professional',
+    category: 'Professional',
+    description: 'No-frills professional template - Quick and easy',
+    preview: '/templates/simple-professional.jpg',
+    isPremium: false,
+    isFree: true,
+    hasPhoto: false,
+    colors: {
+      primary: '#2c3e50',
+      secondary: '#34495e',
+      accent: '#4a5568',
+      text: '#2c3e50',
+      background: '#ffffff'
+    },
+    fonts: {
+      heading: 'Arial',
+      body: 'Arial'
+    },
+    layout: 'two-column'
+  },
+  {
+    id: 19,
+    name: 'Essential Resume',
+    category: 'Professional',
+    description: 'Essential template with all the basics - Free forever',
+    preview: '/templates/essential-resume.jpg',
+    isPremium: false,
+    isFree: true,
+    hasPhoto: false,
+    colors: {
+      primary: '#1a1a1a',
+      secondary: '#4a4a4a',
+      accent: '#666666',
+      text: '#1a1a1a',
+      background: '#ffffff'
+    },
+    fonts: {
+      heading: 'Calibri',
+      body: 'Calibri'
+    },
+    layout: 'single-column'
+  },
+  
+  // PREMIUM TEMPLATES
   {
     id: 1,
     name: 'Executive Elite',
@@ -28,6 +98,7 @@ export const CV_TEMPLATES: Template[] = [
     description: 'Sophisticated design for C-level executives and senior management',
     preview: '/templates/executive-elite.jpg',
     isPremium: true,
+    isFree: false,
     hasPhoto: true,
     colors: {
       primary: '#1a365d',
@@ -49,6 +120,7 @@ export const CV_TEMPLATES: Template[] = [
     description: 'Clean, contemporary design perfect for tech and creative professionals',
     preview: '/templates/modern-minimalist.jpg',
     isPremium: false,
+    isFree: false,
     hasPhoto: false,
     colors: {
       primary: '#2563eb',
@@ -70,6 +142,7 @@ export const CV_TEMPLATES: Template[] = [
     description: 'Bold and artistic layout for designers and creative professionals',
     preview: '/templates/creative-designer.jpg',
     isPremium: true,
+    isFree: false,
     hasPhoto: true,
     colors: {
       primary: '#7c3aed',
@@ -91,6 +164,7 @@ export const CV_TEMPLATES: Template[] = [
     description: 'Ultra-clean black and white design with Helvetica typography',
     preview: '/templates/minimalist-professional.jpg',
     isPremium: false,
+    isFree: false,
     hasPhoto: false,
     colors: {
       primary: '#000000',
@@ -112,6 +186,7 @@ export const CV_TEMPLATES: Template[] = [
     description: 'Traditional corporate design with blue theme and Times New Roman',
     preview: '/templates/corporate-classic.jpg',
     isPremium: false,
+    isFree: false,
     hasPhoto: true,
     colors: {
       primary: '#1e40af',
@@ -133,6 +208,7 @@ export const CV_TEMPLATES: Template[] = [
     description: 'Tech-focused design with monospace fonts and terminal styling',
     preview: '/templates/modern-tech.jpg',
     isPremium: true,
+    isFree: false,
     hasPhoto: false,
     colors: {
       primary: '#0ea5e9',
@@ -154,6 +230,7 @@ export const CV_TEMPLATES: Template[] = [
     description: 'Artistic design with gradients and creative layouts',
     preview: '/templates/creative-portfolio.jpg',
     isPremium: true,
+    isFree: false,
     hasPhoto: true,
     colors: {
       primary: '#8b5cf6',
@@ -175,6 +252,7 @@ export const CV_TEMPLATES: Template[] = [
     description: 'Formal academic design with serif fonts and scholarly appearance',
     preview: '/templates/academic-excellence.jpg',
     isPremium: false,
+    isFree: false,
     hasPhoto: false,
     colors: {
       primary: '#1e40af',
@@ -196,6 +274,7 @@ export const CV_TEMPLATES: Template[] = [
     description: 'Timeless professional design with traditional serif fonts',
     preview: '/templates/classic-traditional.jpg',
     isPremium: false,
+    isFree: false,
     hasPhoto: false,
     colors: {
       primary: '#2c3e50',
@@ -217,6 +296,7 @@ export const CV_TEMPLATES: Template[] = [
     description: 'Straightforward and clean design perfect for any industry',
     preview: '/templates/clean-simple.jpg',
     isPremium: false,
+    isFree: false,
     hasPhoto: false,
     colors: {
       primary: '#4a5568',
@@ -238,6 +318,7 @@ export const CV_TEMPLATES: Template[] = [
     description: 'Formal business design with centered layout and elegant styling',
     preview: '/templates/business-formal.jpg',
     isPremium: true,
+    isFree: false,
     hasPhoto: false,
     colors: {
       primary: '#1a202c',
@@ -259,6 +340,7 @@ export const CV_TEMPLATES: Template[] = [
     description: 'Sophisticated classical design with decorative elements',
     preview: '/templates/classic-elegant.jpg',
     isPremium: true,
+    isFree: false,
     hasPhoto: false,
     colors: {
       primary: '#1a365d',
@@ -280,6 +362,7 @@ export const CV_TEMPLATES: Template[] = [
     description: 'Ultra-clean professional design with subtle elements',
     preview: '/templates/professional-clean.jpg',
     isPremium: false,
+    isFree: false,
     hasPhoto: false,
     colors: {
       primary: '#374151',
@@ -301,6 +384,7 @@ export const CV_TEMPLATES: Template[] = [
     description: 'Modern template with large profile photo as focal point and clean typography',
     preview: '/templates/photo-centric.jpg',
     isPremium: true,
+    isFree: false,
     hasPhoto: true,
     colors: {
       primary: '#1e40af',
@@ -322,6 +406,7 @@ export const CV_TEMPLATES: Template[] = [
     description: 'Professional template with profile photo in left sidebar and modern styling',
     preview: '/templates/profile-sidebar.jpg',
     isPremium: true,
+    isFree: false,
     hasPhoto: true,
     colors: {
       primary: '#059669',
@@ -343,6 +428,7 @@ export const CV_TEMPLATES: Template[] = [
     description: 'Creative template with artistic profile photo integration and modern elements',
     preview: '/templates/modern-portrait.jpg',
     isPremium: true,
+    isFree: false,
     hasPhoto: true,
     colors: {
       primary: '#7c3aed',

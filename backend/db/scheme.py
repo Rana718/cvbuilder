@@ -160,6 +160,7 @@ class Subscription(Base):
     plan = Column(String(100), default="free", nullable=False) 
     status = Column(String(50), nullable=False)
     current_period_end = Column(DateTime(timezone=True))
+    downloads_used = Column(Integer, default=0)  # Track downloads used
 
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
@@ -182,6 +183,7 @@ class Plan(Base):
     currency = Column(String(10), default="INR", nullable=False)
     interval = Column(String(20), default="monthly", nullable=False)  # monthly, yearly
     features = Column(JSON, nullable=False)
+    download_limit = Column(Integer, nullable=True)  # NULL = unlimited, number = limit
     is_active = Column(Boolean, default=True)
     is_popular = Column(Boolean, default=False)
     sort_order = Column(Integer, default=0)

@@ -42,7 +42,7 @@ function ResumePreview({ mode = 'default', pass = false, onlyonepage, forPDF = f
                     ? website.url.split('/').pop() || ''
                     : website.url.replace(/^https?:\/\//, '').replace(/\/$/, '')
         })) || [],
-        image_url: personalInfo.image_url || '',
+        image_url: personalInfo.image_url && personalInfo.image_url.trim() ? personalInfo.image_url : undefined,
         skills: skills.map(skill => ({
             name: skill.name,
             rating: skill.rating || 3

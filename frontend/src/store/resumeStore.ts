@@ -346,6 +346,7 @@ export const useResumeStore = create<ResumeStore>()(
             });
             
             const imageUrl = response.data.image_url;
+            console.log('Setting image URL:', imageUrl);
             
             set((state) => ({
                 personalInfo: {
@@ -353,6 +354,8 @@ export const useResumeStore = create<ResumeStore>()(
                     image_url: imageUrl
                 }
             }))
+            
+            console.log('Image URL set in store:', get().personalInfo.image_url);
         } catch (error) {
             console.error('Failed to upload image:', error)
             throw error
@@ -427,7 +430,7 @@ export const useResumeStore = create<ResumeStore>()(
                 pincode: data.postal_code || '',
                 phone: data.phone || '',
                 email: data.email || '',
-                image_url: data.image_url || '',
+                image_url: data.image_url && data.image_url.trim() ? data.image_url : '',
                 websites: websites
             },
             summary: data.summary || '',

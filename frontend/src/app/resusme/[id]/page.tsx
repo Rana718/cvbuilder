@@ -79,13 +79,28 @@ const TemplateItem = React.memo(({
                 ? 'border-blue-500 shadow-lg ring-2 ring-blue-500/20' 
                 : 'border-gray-200 hover:border-gray-300'
         }`}>
+            {/* FREE Badge */}
+            {template.isFree && (
+                <div className="absolute top-2 left-2 bg-green-500 text-white px-2 py-1 rounded-full text-xs font-bold z-20 shadow-lg">
+                    FREE
+                </div>
+            )}
+            
             {/* Template Preview */}
             <div className="w-full bg-white overflow-hidden flex justify-center" style={{ height: '320px' }}>
-                <div className="w-[794px] h-[1200px] transform scale-[0.3] origin-top bg-white border border-gray-500">
+                <div 
+                    className="bg-white border border-gray-500"
+                    style={{
+                        width: template.isFree ? '595px' : '794px',
+                        height: template.isFree ? '842px' : '1122px',
+                        transform: template.isFree ? 'scale(0.38)' : 'scale(0.285)',
+                        transformOrigin: 'top center'
+                    }}
+                >
                     <TemplateRenderer 
                         templateId={template.id} 
                         userData={SAMPLE_TEMPLATE_DATA} 
-                        colors={colorTheme.colors}
+                        colors={template.isFree ? undefined : colorTheme.colors}
                         size="normal" 
                     />
                 </div>
@@ -292,7 +307,7 @@ function ResumePage() {
 
     const redirectToAuth = useCallback(() => {
         const currentUrl = window.location.pathname + window.location.search
-        router.push(`/auth?redirect=${encodeURIComponent(currentUrl)}`)
+        router.push(`/sign-in?redirect=${encodeURIComponent(currentUrl)}`)
     }, [router])
 
     const handleSave = async () => {
@@ -364,8 +379,13 @@ function ResumePage() {
             // Clone and clean the content
             const clonedContent = resumeContent.cloneNode(true) as HTMLElement;
             
-            // Remove watermarks for premium users only
-            if (isPremium) {
+            // Check if using a free template
+            const currentTemplate = CV_TEMPLATES.find(t => t.id === Number(templateId))
+            const isFreeTemplate = currentTemplate?.isFree || false
+            
+            // Remove watermarks only for premium users AND non-free templates
+            // Free templates never have watermarks anyway
+            if (isPremium && !isFreeTemplate) {
                 const watermarks = clonedContent.querySelectorAll('.watermark-element, [data-watermark="true"], [class*="watermark"]');
                 watermarks.forEach(watermark => watermark.remove());
             }
@@ -423,7 +443,12 @@ function ResumePage() {
         console.log("Token claims:", tokenResult.claims)
         await refreshStatus()
 
-        if (!isPremium) {
+        // Check if using a free template
+        const currentTemplate = CV_TEMPLATES.find(t => t.id === Number(templateId))
+        const isFreeTemplate = currentTemplate?.isFree || false
+
+        // Allow download for free templates without premium, require premium for others
+        if (!isPremium && !isFreeTemplate) {
             await saveResume()
             redirectToPayment()
             return
@@ -521,6 +546,11 @@ function ResumePage() {
                 template.category.toLowerCase().includes(debouncedSearchTerm.toLowerCase());
             const matchesCategory = selectedCategory === "All" || template.category === selectedCategory;
             return matchesSearch && matchesCategory;
+        }).sort((a, b) => {
+            // Sort free templates first
+            if (a.isFree && !b.isFree) return -1;
+            if (!a.isFree && b.isFree) return 1;
+            return 0;
         });
     }, [debouncedSearchTerm, selectedCategory])
 
@@ -710,11 +740,24 @@ function ResumePage() {
                                     onClick={handleDownload}
                                     disabled={isDownloading}
                                     className="inline-flex items-center space-x-2 px-6 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-medium transition-all duration-200 rounded-xl shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
-                                    title={(!user || !isPremium) ? 'Premium feature - Upgrade to download' : ''}
+                                    title={
+                                        !user 
+                                            ? (CV_TEMPLATES.find(t => t.id === Number(templateId))?.isFree ? 'Login to download' : 'Login required') 
+                                            : (!isPremium && !CV_TEMPLATES.find(t => t.id === Number(templateId))?.isFree) 
+                                                ? 'Premium feature - Upgrade to download' 
+                                                : ''
+                                    }
                                 >
                                     <Download className="w-4 h-4" />
                                     <span>
-                                        {isDownloading ? 'Downloading...' : (!user || !isPremium) ? 'Upgrade to Download' : 'Download'}
+                                        {isDownloading 
+                                            ? 'Downloading...' 
+                                            : !user 
+                                                ? (CV_TEMPLATES.find(t => t.id === Number(templateId))?.isFree ? 'Login to Download' : 'Login Required')
+                                                : (!isPremium && !CV_TEMPLATES.find(t => t.id === Number(templateId))?.isFree) 
+                                                    ? 'Upgrade to Download' 
+                                                    : 'Download'
+                                        }
                                     </span>
                                 </motion.button>
                             </div>
@@ -785,7 +828,14 @@ function ResumePage() {
                                     >
                                         <Download className="w-4 h-4" />
                                         <span>
-                                            {isDownloading ? 'Downloading...' : (!user || !isPremium) ? 'Upgrade' : 'Download'}
+                                            {isDownloading 
+                                                ? 'Downloading...' 
+                                                : !user 
+                                                    ? (CV_TEMPLATES.find(t => t.id === Number(templateId))?.isFree ? 'Login' : 'Login')
+                                                    : (!isPremium && !CV_TEMPLATES.find(t => t.id === Number(templateId))?.isFree) 
+                                                        ? 'Upgrade' 
+                                                        : 'Download'
+                                            }
                                         </span>
                                     </button>
                                 </div>
@@ -797,16 +847,16 @@ function ResumePage() {
                     {/* Resume Content */}
                     <div className="flex justify-center items-start pb-6">
                         <div className="w-full">
-                            {/* Mobile view - scaled down but allow multiple pages */}
-                            <div className="sm:hidden w-full min-h-[400px] pt-10 flex justify-center">
-                                <div className="scale-[0.45] origin-top space-y-4">
+                            {/* Mobile view - scaled down and allow multiple pages */}
+                            <div className="sm:hidden w-full min-h-[400px] pt-10">
+                                <div className="flex flex-col items-center space-y-4 scale-[0.45] origin-top">
                                     <ResumePreview pass={isPremium} key={`mobile-${forceRerender}-${isPremium}`} />
                                 </div>
                             </div>
                             
                             {/* Tablet and Desktop view - Allow multiple pages */}
                             <div className="hidden sm:block w-full" data-resume-content>
-                                <div className="mx-auto max-w-[794px] space-y-4">
+                                <div className="mx-auto max-w-[794px]">
                                     <ResumePreview pass={isPremium} key={`desktop-${forceRerender}-${isPremium}`} />
                                 </div>
                             </div>
