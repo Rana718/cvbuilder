@@ -213,36 +213,24 @@ async def get_subscription_status(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
-    """Get user's subscription status"""
+    """Get user's subscription status with automatic expiration check"""
     try:
-        result = await db.execute(
-            select(Subscription)
-            .where(Subscription.user_id == current_user.id)
-            .order_by(desc(Subscription.created_at))
-        )
-        subscription = result.first()
+        from utils.subscription_utils import verify_and_update_subscription_status
         
-        if not subscription:
-            return {
-                "has_subscription": False,
-                "is_premium": current_user.is_premium,
-                "status": "none"
-            }
-        
-        subscription = subscription[0]  
-        
-        if subscription.current_period_end and subscription.current_period_end < datetime.utcnow():
-            if current_user.is_premium:
-                current_user.is_premium = False
-                subscription.status = "expired"
-                await db.commit()
+        # Verify and update subscription (checks date AND download limits)
+        subscription_info = await verify_and_update_subscription_status(current_user, db)
         
         return {
-            "has_subscription": True,
-            "is_premium": current_user.is_premium,
-            "status": subscription.status,
-            "current_period_end": subscription.current_period_end.isoformat() if subscription.current_period_end else None,
-            "plan": subscription.plan
+            "has_subscription": subscription_info["has_subscription"],
+            "is_premium": subscription_info["is_premium"],
+            "is_active": subscription_info["is_active"],
+            "status": subscription_info.get("subscription_status", "none"),
+            "current_period_end": subscription_info.get("current_period_end"),
+            "plan": subscription_info.get("plan_slug", "free"),
+            "plan_name": subscription_info.get("plan_name", "Free"),
+            "downloads_used": subscription_info.get("downloads_used", 0),
+            "download_limit": subscription_info.get("download_limit"),
+            "can_download": subscription_info.get("can_download", False)
         }
     
     except Exception as e:

@@ -31,6 +31,7 @@ class JWTAuthMiddleware(BaseHTTPMiddleware):
             "/api/linkedin", 
             "/api/payment",
             "/api/dashboard",
+            "/api/downloads",  # Protect download tracking
             "/api/admin"  # Protect all admin routes
         ]
 

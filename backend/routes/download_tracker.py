@@ -1,10 +1,13 @@
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, desc, update
 from db.db import get_db
-from db.scheme import User, Subscription, Plan
+from db.scheme import User
 from middleware.auth import get_current_user
-from datetime import datetime
+from utils.subscription_utils import (
+    verify_and_update_subscription_status,
+    check_download_permission,
+    increment_download_count
+)
 import logging
 
 logger = logging.getLogger(__name__)
@@ -15,64 +18,22 @@ async def get_download_status(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
-    """Get user's download status and remaining downloads"""
+    """Get user's download status and remaining downloads with automatic expiration check"""
     try:
-        # Get user's active subscription
-        result = await db.execute(
-            select(Subscription, Plan)
-            .join(Plan, Subscription.plan_id == Plan.id)
-            .where(
-                Subscription.user_id == current_user.id,
-                Subscription.status == "active"
-            )
-            .order_by(desc(Subscription.created_at))
-        )
-        subscription_data = result.first()
-        
-        if not subscription_data:
-            return {
-                "can_download": False,
-                "downloads_used": 0,
-                "download_limit": 0,
-                "remaining_downloads": 0,
-                "plan_expired": True,
-                "message": "No active subscription"
-            }
-        
-        subscription, plan = subscription_data
-        
-        # Check if subscription is expired
-        if subscription.current_period_end and subscription.current_period_end < datetime.utcnow():
-            return {
-                "can_download": False,
-                "downloads_used": subscription.downloads_used,
-                "download_limit": plan.download_limit,
-                "remaining_downloads": 0,
-                "plan_expired": True,
-                "message": "Subscription expired"
-            }
-        
-        # Check download limits
-        if plan.download_limit is None:  # Unlimited
-            return {
-                "can_download": True,
-                "downloads_used": subscription.downloads_used,
-                "download_limit": None,
-                "remaining_downloads": None,
-                "plan_expired": False,
-                "message": "Unlimited downloads"
-            }
-        
-        remaining = plan.download_limit - subscription.downloads_used
-        can_download = remaining > 0
+        subscription_info = await verify_and_update_subscription_status(current_user, db)
         
         return {
-            "can_download": can_download,
-            "downloads_used": subscription.downloads_used,
-            "download_limit": plan.download_limit,
-            "remaining_downloads": remaining,
-            "plan_expired": False,
-            "message": f"{remaining} downloads remaining" if can_download else "Download limit reached"
+            "can_download": subscription_info["can_download"],
+            "downloads_used": subscription_info["downloads_used"],
+            "download_limit": subscription_info["download_limit"],
+            "remaining_downloads": subscription_info["remaining_downloads"],
+            "plan_expired": subscription_info["is_expired"],
+            "is_active": subscription_info["is_active"],
+            "is_premium": subscription_info["is_premium"],
+            "plan_name": subscription_info["plan_name"],
+            "plan_slug": subscription_info["plan_slug"],
+            "current_period_end": subscription_info.get("current_period_end"),
+            "message": _get_status_message(subscription_info)
         }
         
     except Exception as e:
@@ -84,72 +45,51 @@ async def track_download(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
-    """Track a download and update usage count"""
+    """Track a download and update usage count with automatic limit enforcement"""
     try:
-        # Get user's active subscription
-        result = await db.execute(
-            select(Subscription, Plan)
-            .join(Plan, Subscription.plan_id == Plan.id)
-            .where(
-                Subscription.user_id == current_user.id,
-                Subscription.status == "active"
+        # Check if user has permission to download
+        permission = await check_download_permission(current_user, db)
+        
+        if not permission["allowed"]:
+            raise HTTPException(
+                status_code=403, 
+                detail=permission["message"]
             )
-            .order_by(desc(Subscription.created_at))
-        )
-        subscription_data = result.first()
-        
-        if not subscription_data:
-            raise HTTPException(status_code=403, detail="No active subscription")
-        
-        subscription, plan = subscription_data
-        
-        # Check if subscription is expired
-        if subscription.current_period_end and subscription.current_period_end < datetime.utcnow():
-            raise HTTPException(status_code=403, detail="Subscription expired")
-        
-        # Check download limits
-        if plan.download_limit is not None:
-            if subscription.downloads_used >= plan.download_limit:
-                raise HTTPException(status_code=403, detail="Download limit reached")
         
         # Increment download count
-        await db.execute(
-            update(Subscription)
-            .where(Subscription.id == subscription.id)
-            .values(downloads_used=subscription.downloads_used + 1)
-        )
+        result = await increment_download_count(current_user, db)
         
-        # Check if plan should expire after this download
-        new_downloads_used = subscription.downloads_used + 1
-        plan_expired = False
-        
-        if plan.download_limit is not None and new_downloads_used >= plan.download_limit:
-            # Mark subscription as expired if download limit reached
-            await db.execute(
-                update(Subscription)
-                .where(Subscription.id == subscription.id)
-                .values(status="expired")
-            )
-            # Update user premium status
-            current_user.is_premium = False
-            plan_expired = True
-        
-        await db.commit()
-        
-        remaining = None if plan.download_limit is None else plan.download_limit - new_downloads_used
+        if not result["success"]:
+            raise HTTPException(status_code=403, detail=result["error"])
         
         return {
             "success": True,
-            "downloads_used": new_downloads_used,
-            "download_limit": plan.download_limit,
-            "remaining_downloads": remaining,
-            "plan_expired": plan_expired,
-            "message": "Download tracked successfully"
+            "downloads_used": result["downloads_used"],
+            "download_limit": result["download_limit"],
+            "remaining_downloads": result["remaining_downloads"],
+            "plan_expired": result["plan_expired"],
+            "message": "Download tracked successfully" if not result["plan_expired"] else "Download limit reached - subscription expired"
         }
         
     except HTTPException:
         raise
     except Exception as e:
-        await db.rollback()
         logger.error(f"Error tracking download: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to track download")
+
+def _get_status_message(subscription_info: dict) -> str:
+    """Generate appropriate status message based on subscription info"""
+    if subscription_info["is_expired"]:
+        return "Subscription expired - Please renew to continue"
+    
+    if not subscription_info["is_active"]:
+        return "No active subscription"
+    
+    if subscription_info["download_limit"] is None:
+        return "Unlimited downloads available"
+    
+    remaining = subscription_info["remaining_downloads"]
+    if remaining and remaining > 0:
+        return f"{remaining} download{'s' if remaining != 1 else ''} remaining"
+    else:
+        return "Download limit reached"

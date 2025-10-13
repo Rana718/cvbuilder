@@ -1,7 +1,9 @@
 from typing import Dict
-from sqlalchemy import text
+from sqlalchemy import text, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import datetime, timedelta
+from db.scheme import User
+from utils.subscription_utils import verify_and_update_subscription_status
 import logging
 
 logger = logging.getLogger(__name__)
@@ -11,20 +13,19 @@ class DashboardController:
     async def get_dashboard_data(firebase_uid: str, db: AsyncSession) -> Dict:
         """Get all dashboard data including stats, resumes, and subscription info in one call"""
         try:
-            user_query = await db.execute(
-                text("""
-                    SELECT u.*, s.plan, s.status as subscription_status, s.current_period_end
-                    FROM users u
-                    LEFT JOIN subscriptions s ON u.id = s.user_id
-                    WHERE u.firebase_uid = :firebase_uid
-                """),
-                {"firebase_uid": firebase_uid}
+            # Get user
+            result = await db.execute(
+                select(User).where(User.firebase_uid == firebase_uid)
             )
-            user_data = user_query.fetchone()
+            user = result.scalar_one_or_none()
             
-            if not user_data:
+            if not user:
                 return {"error": "User not found"}
             
+            # Verify and update subscription status (this will auto-expire if needed)
+            subscription_info = await verify_and_update_subscription_status(user, db)
+            
+            # Get resumes
             resumes_query = await db.execute(
                 text("""
                     SELECT id, shareable_uuid, name, email, job_title, template_id, 
@@ -33,14 +34,14 @@ class DashboardController:
                     WHERE user_id = :user_id
                     ORDER BY updated_at DESC
                 """),
-                {"user_id": user_data.id}
+                {"user_id": user.id}
             )
             resumes = resumes_query.fetchall()
             
             # Get cover letters count
             cover_letters_query = await db.execute(
                 text("SELECT COUNT(*) as count FROM cover_letters WHERE user_id = :user_id"),
-                {"user_id": user_data.id}
+                {"user_id": user.id}
             )
             cover_letters_count = cover_letters_query.fetchone().count
             
@@ -57,13 +58,8 @@ class DashboardController:
             completed_resumes = len([r for r in resumes if r.name and r.job_title])
             completion_rate = (completed_resumes / total_resumes * 100) if total_resumes > 0 else 0
             
-            # Premium status
-            is_premium = user_data.is_premium or False
-            subscription_active = (
-                user_data.subscription_status == 'active' if hasattr(user_data, 'subscription_status') 
-                else False
-            )
-            premium_features = 12 if (is_premium or subscription_active) else 3
+            # Premium features count
+            premium_features = 12 if subscription_info["is_premium"] else 3
             
             # Recent activity
             recent_activity = []
@@ -102,19 +98,30 @@ class DashboardController:
                 "premiumFeatures": premium_features,
                 "lastActivity": resumes[0].updated_at.isoformat() if resumes else None,
                 "recentActivity": recent_activity,
-                "isPremium": is_premium or subscription_active,
                 
-                # All resumes data (replaces separate /api/resume-op/all call)
+                # Subscription info (verified and updated)
+                "isPremium": subscription_info["is_premium"],
+                "subscriptionActive": subscription_info["is_active"],
+                "subscriptionExpired": subscription_info["is_expired"],
+                "planName": subscription_info["plan_name"],
+                "planSlug": subscription_info["plan_slug"],
+                "downloadsUsed": subscription_info["downloads_used"],
+                "downloadLimit": subscription_info["download_limit"],
+                "canDownload": subscription_info["can_download"],
+                "remainingDownloads": subscription_info["remaining_downloads"],
+                "currentPeriodEnd": subscription_info.get("current_period_end"),
+                
+                # All resumes data
                 "resumes": formatted_resumes,
                 
                 # User info
                 "user": {
-                    "id": user_data.id,
-                    "email": user_data.email,
-                    "full_name": user_data.full_name,
-                    "is_premium": is_premium,
-                    "subscription_status": getattr(user_data, 'subscription_status', None),
-                    "subscription_plan": getattr(user_data, 'plan', None)
+                    "id": user.id,
+                    "email": user.email,
+                    "full_name": user.full_name,
+                    "is_premium": subscription_info["is_premium"],
+                    "subscription_status": subscription_info.get("subscription_status"),
+                    "subscription_plan": subscription_info["plan_slug"]
                 }
             }
             
@@ -131,5 +138,8 @@ class DashboardController:
                 "lastActivity": None,
                 "recentActivity": [],
                 "resumes": [],
-                "isPremium": False
+                "isPremium": False,
+                "subscriptionActive": False,
+                "subscriptionExpired": True,
+                "canDownload": False
             }
