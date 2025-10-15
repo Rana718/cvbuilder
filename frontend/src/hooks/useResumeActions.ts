@@ -177,7 +177,7 @@ export const useResumeActions = (
         try {
             await generatePDF()
             
-            if (isPremium) {
+            if (isPremium && !isFreeTemplate) {
                 try {
                     const response = await axiosInstance.post('/api/downloads/track-download')
                     const trackResult = response.data

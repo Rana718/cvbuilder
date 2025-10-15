@@ -611,6 +611,9 @@ export const useResumeStore = create<ResumeStore>()(
 
     // Start new resume - explicitly called when user wants to create new
     startNewResume: () => {
+        // Clear localStorage completely
+        localStorage.removeItem('resume-storage')
+        // Reset to initial state
         set({ ...initialState, documentId: null, shareableUuid: null })
     },
 

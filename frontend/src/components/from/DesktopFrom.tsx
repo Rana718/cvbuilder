@@ -12,7 +12,6 @@ import EducationStep from './steps/EducationStep'
 import SkillsStep from './steps/SkillsStep'
 import ProjectsStep from './steps/ProjectsStep'
 import SummaryStep from './steps/SummaryStep'
-import TemplateSelector from '@/components/TemplateSelector'
 import { CV_TEMPLATES } from '@/constants/templates'
 import { useResumeStore } from '@/store/resumeStore'
 import { TemplatePreview } from '@/components/templates/TemplateRenderer'
@@ -79,8 +78,8 @@ function DesktopFrom() {
                 <DesktopSidebar currentStep={currentStep} onStepChange={setCurrentStep} />
             </motion.div>
 
-            <div className="lg:ml-2 flex flex-col lg:flex-row min-h-screen">
-                <div className="flex-1 px-2 py-1 md:px-3 md:py-2">
+            <div className="lg:ml-16 flex flex-col lg:flex-row min-h-screen">
+                <div className="flex-1 px-2 py-1 md:px-3 md:py-2 lg:px-4 xl:px-6">
                     <div className="max-w-4xl mx-auto">
                         <div className="bg-white">
                             <AnimatePresence mode="wait">
@@ -103,30 +102,33 @@ function DesktopFrom() {
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.4, delay: 0.3 }}
-                    className="hidden xl:block w-96 pr-28"
+                    className="hidden xl:block w-[420px] 2xl:w-[480px] pr-6"
                 >
                     <div className="sticky top-4">
                         <div className="flex flex-col items-center">
-                            <div className="relative scale-[0.52] xl:scale-[0.59] origin-top">
+                            {/* Resume Preview with responsive scaling - maintains A4 ratio */}
+                            <div className="relative scale-[0.50] xl:scale-[0.54] 2xl:scale-[0.62] min-[1920px]:scale-[0.70] origin-top pt-4">
                                 <div className="relative">
                                     <ResumePreview 
                                         onlyonepage={true} 
                                         pass={isPremium} 
                                         isFree={CV_TEMPLATES.find(t => t.id === Number(templateId))?.isFree || false}
                                     />
-                                    <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-2 z-10">
+                                    
+                                    {/* Buttons positioned at bottom of visible resume area */}
+                                    <div className="absolute bottom-4 left-0 right-0 flex items-center justify-center gap-3 z-20">
                                         <button
                                             onClick={() => setShowResumePopup(true)}
-                                            className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 rounded-lg flex items-center space-x-2 transition-colors shadow-lg font-medium text-sm whitespace-nowrap"
+                                            className="bg-gray-700 hover:bg-gray-800 text-white px-6 py-3 rounded-lg flex items-center space-x-2 transition-all shadow-xl font-semibold text-base whitespace-nowrap"
                                         >
-                                            <Eye className="w-4 h-4" />
+                                            <Eye className="w-5 h-5" />
                                             <span>Preview</span>
                                         </button>
                                         <button
                                             onClick={() => setShowTemplateSelector(true)}
-                                            className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg flex items-center space-x-2 transition-colors shadow-lg font-medium text-sm whitespace-nowrap"
+                                            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg flex items-center space-x-2 transition-all shadow-xl font-semibold text-base whitespace-nowrap"
                                         >
-                                            <Palette className="w-4 h-4" />
+                                            <Palette className="w-5 h-5" />
                                             <span>Change Template</span>
                                         </button>
                                     </div>
