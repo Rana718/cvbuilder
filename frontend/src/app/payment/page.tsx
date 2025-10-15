@@ -214,7 +214,7 @@ function PaymentContent() {
                 <h3 className="text-xl font-bold text-gray-900 mb-2">{plan.name}</h3>
                 <div className="text-3xl font-bold text-blue-600 mb-4">
                   {plan.currency === 'INR' ? '₹' : '$'}{plan.price / 100}
-                  <span className="text-sm text-gray-500">/{plan.interval}</span>
+                  <span className="text-sm text-gray-500">/{plan.duration_days} days</span>
                 </div>
                 <ul className="space-y-2 mb-6 flex-grow">
                   {plan.features.map((feature, i) => (
@@ -283,7 +283,7 @@ function PaymentContent() {
               </span>
             </h1>
             <p className="text-xl text-slate-600 max-w-2xl mx-auto">
-              Get access to {selectedPlan?.name} for just {selectedPlan?.currency === 'INR' ? '₹' : '$'}{selectedPlan ? selectedPlan.price / 100 : 0}/{selectedPlan?.interval}
+              Get access to {selectedPlan?.name} for just {selectedPlan?.currency === 'INR' ? '₹' : '$'}{selectedPlan ? selectedPlan.price / 100 : 0} for {selectedPlan?.duration_days} days
             </p>
           </div>
 
@@ -331,11 +331,11 @@ function PaymentContent() {
                       <span className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                         {selectedPlan.currency === 'INR' ? '₹' : '$'}{selectedPlan.price / 100}
                       </span>
-                      <span className="text-slate-600 font-medium">/{selectedPlan.interval}</span>
+                      <span className="text-slate-600 font-medium">/{selectedPlan.duration_days} days</span>
                     </div>
                     <div className="inline-flex items-center space-x-1 px-3 py-1 bg-green-50 text-green-700 text-sm rounded-full border border-green-200">
                       <Sparkles className="w-3 h-3" />
-                      <span>{selectedPlan.interval.charAt(0).toUpperCase() + selectedPlan.interval.slice(1)} subscription plan</span>
+                      <span>{selectedPlan.duration_days} days subscription plan</span>
                     </div>
                   </div>
 

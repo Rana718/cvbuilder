@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { Plus, Award, Star, ChevronLeft, ChevronRight, Sparkles, Trash, ArrowRight } from 'lucide-react'
+import { Plus, Award, Star, ChevronLeft, ChevronRight, Sparkles, Trash, ArrowRight, Edit } from 'lucide-react'
 import { useResumeStore, Skill } from '@/store/resumeStore'
 import { useStreamingSkills } from '@/utils/cvStreamingApi'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -10,13 +10,13 @@ interface SkillsStepProps {
 }
 
 function SkillsStep({ onNext, onPrev }: SkillsStepProps) {
-  const { 
-    skills, 
-    addSkill, 
-    updateSkill, 
-    removeSkill, 
-    workExperience, 
-    setAiGenerated, 
+  const {
+    skills,
+    addSkill,
+    updateSkill,
+    removeSkill,
+    workExperience,
+    setAiGenerated,
     isAiGenerated,
     setAiSuggestions,
     getAiSuggestions
@@ -33,10 +33,8 @@ function SkillsStep({ onNext, onPrev }: SkillsStepProps) {
     rating: 3
   })
 
-  // Get suggestions from store
   const aiSuggestedSkills = getAiSuggestions('skills')
 
-  // Auto-generate skills on component mount - ONLY ONCE
   useEffect(() => {
     if (!isInitialized.current && !isAiGenerated('skills') && !isLoadingSkills) {
       isInitialized.current = true
@@ -52,12 +50,9 @@ function SkillsStep({ onNext, onPrev }: SkillsStepProps) {
     isInitialized.current = false
     setAiGenerated('skills', false)
     setAiSuggestions('skills', [])
-    // Clear existing suggested skills but keep manually added ones
     if (workExperience.length === 0) {
-      // For users without work experience, don't clear manually added skills
-      // Just regenerate suggestions
+      
     } else {
-      // For users with work experience, clear all and regenerate
       skills.forEach(skill => removeSkill(skill.id))
     }
     fetchAISkills()
@@ -66,7 +61,6 @@ function SkillsStep({ onNext, onPrev }: SkillsStepProps) {
   const fetchAISkills = async () => {
     if (isLoadingSkills || isAiGenerated('skills')) return
 
-    // Handle case when no work experience exists - provide default skills
     if (workExperience.length === 0) {
       const defaultSkills = ['Communication', 'Problem Solving', 'Time Management', 'Teamwork', 'Adaptability', 'Critical Thinking']
       setAiSuggestions('skills', defaultSkills)
@@ -88,11 +82,9 @@ function SkillsStep({ onNext, onPrev }: SkillsStepProps) {
         {
           workExperience: JSON.stringify(experienceData)
         },
-        // onChunk - update streaming content
         (content: string) => {
           setStreamingContent(prev => prev + content)
         },
-        // onComplete - set final skills
         (skills: string[]) => {
           setAiSuggestions('skills', skills)
           setAiGenerated('skills', true)
@@ -140,10 +132,8 @@ function SkillsStep({ onNext, onPrev }: SkillsStepProps) {
   const addSuggestedSkill = (skillName: string) => {
     const existingSkill = skills.find(skill => skill.name.toLowerCase() === skillName.toLowerCase())
     if (existingSkill) {
-      // If skill exists, remove it (toggle off)
       removeSkill(existingSkill.id)
     } else {
-      // If skill doesn't exist, add it (toggle on)
       addSkill({ name: skillName, rating: 3 })
     }
   }
@@ -239,8 +229,8 @@ function SkillsStep({ onNext, onPrev }: SkillsStepProps) {
                           >
                             <Star
                               className={`w-5 h-5 transition-colors ${star <= skill.rating
-                                  ? 'text-yellow-400 fill-current'
-                                  : 'text-gray-300 hover:text-yellow-200'
+                                ? 'text-yellow-400 fill-current'
+                                : 'text-gray-300 hover:text-yellow-200'
                                 }`}
                             />
                           </motion.button>
@@ -255,8 +245,18 @@ function SkillsStep({ onNext, onPrev }: SkillsStepProps) {
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
+                      onClick={() => handleEdit(skill)}
+                      className="p-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-sm transition-colors"
+                      title="Edit skill name"
+                    >
+                      <Edit className="w-4 h-4" />
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
                       onClick={() => removeSkill(skill.id)}
                       className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-sm transition-colors"
+                      title="Remove skill"
                     >
                       <Trash className="w-4 h-4" />
                     </motion.button>
@@ -415,14 +415,14 @@ function SkillsStep({ onNext, onPrev }: SkillsStepProps) {
                       className="w-8 h-8 border-3 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"
                     />
                     <p className="text-sm text-gray-600 font-medium">
-                      {workExperience.length > 0 
+                      {workExperience.length > 0
                         ? "AI is analyzing your experience to suggest relevant skills..."
                         : "AI is suggesting common professional skills for you..."
                       }
                     </p>
                   </div>
                 </div>
-                
+
                 {/* Show streaming content in real-time */}
                 {streamingContent && (
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
@@ -457,8 +457,8 @@ function SkillsStep({ onNext, onPrev }: SkillsStepProps) {
                       whileTap={{ scale: 0.98 }}
                       onClick={() => addSuggestedSkill(skillName)}
                       className={`text-left p-3 md:p-4 text-xs md:text-sm rounded-sm border transition-all duration-200 font-medium ${isAdded
-                          ? 'bg-blue-50 text-blue-700 border-blue-500'
-                          : 'bg-white text-gray-700 hover:bg-blue-50 hover:text-blue-700 border-gray-200 hover:border-blue-300'
+                        ? 'bg-blue-50 text-blue-700 border-blue-500'
+                        : 'bg-white text-gray-700 hover:bg-blue-50 hover:text-blue-700 border-gray-200 hover:border-blue-300'
                         }`}
                     >
                       <div className="flex items-center justify-between">
@@ -478,7 +478,7 @@ function SkillsStep({ onNext, onPrev }: SkillsStepProps) {
               >
                 <Award className="w-12 h-12 mx-auto mb-3 text-gray-400" />
                 <p className="text-sm text-gray-500">
-                  {workExperience.length > 0 
+                  {workExperience.length > 0
                     ? "No AI suggestions available. Add skills manually or try regenerating."
                     : "Click 'Suggest Common Skills' above to get started with professional skills."
                   }

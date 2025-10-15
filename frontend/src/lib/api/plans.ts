@@ -6,7 +6,8 @@ export interface Plan {
   slug: string;
   price: number;
   currency: string;
-  interval: string;
+  duration_days: number;
+  interval?: string; // Keep for backward compatibility
   features: string[];
   download_limit?: number | null;
   is_active?: boolean;
@@ -19,7 +20,7 @@ export interface CreatePlanData {
   slug: string;
   price: number;
   currency?: string;
-  interval?: string;
+  duration_days: number;
   features: string[];
   download_limit?: number | null;
   is_active?: boolean;

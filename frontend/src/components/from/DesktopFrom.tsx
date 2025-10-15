@@ -103,32 +103,35 @@ function DesktopFrom() {
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.4, delay: 0.3 }}
-                    className="hidden xl:block w-96 pointer-events-none pr-28"
+                    className="hidden xl:block w-96 pr-28"
                 >
-                    <div className="sticky top-0 h-screen flex flex-col justify-center">
-                        <div className="flex flex-col items-center space-y-4">
-                            <div
-                                className="relative group scale-[0.52] xl:scale-[0.59] cursor-pointer pointer-events-auto"
-                                onClick={() => setShowResumePopup(true)}
-                            >
-                                <ResumePreview 
-                                    onlyonepage={true} 
-                                    pass={isPremium} 
-                                    isFree={CV_TEMPLATES.find(t => t.id === Number(templateId))?.isFree || false}
-                                />
-                                <div className="absolute inset-0 bg-black/10 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100 pointer-events-none">
-                                    <div className="bg-white rounded-full p-3 shadow-lg pointer-events-auto">
-                                        <Eye className="w-6 h-6 text-gray-700" />
+                    <div className="sticky top-4">
+                        <div className="flex flex-col items-center">
+                            <div className="relative scale-[0.52] xl:scale-[0.59] origin-top">
+                                <div className="relative">
+                                    <ResumePreview 
+                                        onlyonepage={true} 
+                                        pass={isPremium} 
+                                        isFree={CV_TEMPLATES.find(t => t.id === Number(templateId))?.isFree || false}
+                                    />
+                                    <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-2 z-10">
+                                        <button
+                                            onClick={() => setShowResumePopup(true)}
+                                            className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 rounded-lg flex items-center space-x-2 transition-colors shadow-lg font-medium text-sm whitespace-nowrap"
+                                        >
+                                            <Eye className="w-4 h-4" />
+                                            <span>Preview</span>
+                                        </button>
+                                        <button
+                                            onClick={() => setShowTemplateSelector(true)}
+                                            className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg flex items-center space-x-2 transition-colors shadow-lg font-medium text-sm whitespace-nowrap"
+                                        >
+                                            <Palette className="w-4 h-4" />
+                                            <span>Change Template</span>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
-                            <button
-                                onClick={() => setShowTemplateSelector(true)}
-                                className="absolute bottom-14 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg flex items-center space-x-2 transition-colors shadow-lg font-medium text-xs whitespace-nowrap z-50 pointer-events-auto"
-                            >
-                                <Palette className="w-3 h-3" />
-                                <span>Change Template</span>
-                            </button>
                         </div>
                     </div>
                 </motion.div>

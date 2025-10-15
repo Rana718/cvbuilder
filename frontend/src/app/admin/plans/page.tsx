@@ -29,7 +29,7 @@ export default function AdminPlansPage() {
     slug: '',
     price: 0,
     currency: 'INR',
-    interval: 'monthly',
+    duration_days: 30,
     features: [],
     download_limit: null,
     is_active: true,
@@ -142,7 +142,7 @@ export default function AdminPlansPage() {
       slug: '',
       price: 0,
       currency: 'INR',
-      interval: 'monthly',
+      duration_days: 30,
       features: [],
       download_limit: null,
       is_active: true,
@@ -261,19 +261,18 @@ export default function AdminPlansPage() {
                   </Select>
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Interval</label>
-                  <Select
-                    value={formData.interval}
-                    onValueChange={(value) => setFormData({ ...formData, interval: value })}
-                  >
-                    <SelectTrigger className="w-full h-[42px] rounded-lg">
-                      <SelectValue placeholder="Select interval" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="monthly">Monthly</SelectItem>
-                      <SelectItem value="yearly">Yearly</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Duration (Days)</label>
+                  <input
+                    type="text"
+                    min="1"
+                    value={formData.duration_days}
+                    onChange={(e) => setFormData({ ...formData, duration_days: parseInt(e.target.value) || 1 })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Enter duration in days (min: 1)"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Examples: 1 day, 7 days (week), 30 days (month), 365 days (year)
+                  </p>
                 </div>
               </div>
 
@@ -457,7 +456,7 @@ export default function AdminPlansPage() {
                 <div className="flex items-center space-x-4 mb-3">
                   <div className="flex items-center text-2xl font-bold text-blue-600">
                     ₹{Math.round(plan.price / 100)}
-                    <span className="text-sm text-gray-500 ml-1">/{plan.interval}</span>
+                    <span className="text-sm text-gray-500 ml-1">/{plan.duration_days} days</span>
                   </div>
                   <span className="text-sm text-gray-500">Slug: {plan.slug}</span>
                   <span className="text-sm text-gray-500">Order: {plan.sort_order}</span>
@@ -526,7 +525,7 @@ function EditPlanForm({
     slug: plan.slug,
     price: Math.round(plan.price / 100),
     currency: plan.currency,
-    interval: plan.interval,
+    duration_days: plan.duration_days,
     features: [...plan.features],
     download_limit: plan.download_limit,
     is_active: plan.is_active,
@@ -597,19 +596,18 @@ function EditPlanForm({
           </Select>
         </div>
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">Interval</label>
-          <Select
-            value={formData.interval || 'monthly'}
-            onValueChange={(value) => setFormData({ ...formData, interval: value })}
-          >
-            <SelectTrigger className="w-full h-[42px] rounded-lg">
-              <SelectValue placeholder="Select interval" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="monthly">Monthly</SelectItem>
-              <SelectItem value="yearly">Yearly</SelectItem>
-            </SelectContent>
-          </Select>
+          <label className="block text-sm font-semibold text-gray-700 mb-2">Duration (Days)</label>
+          <input
+            type="text"
+            min="1"
+            value={formData.duration_days || 30}
+            onChange={(e) => setFormData({ ...formData, duration_days: parseInt(e.target.value) || 1 })}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="Enter duration in days (min: 1)"
+          />
+          <p className="text-xs text-gray-500 mt-1">
+            Examples: 1 day, 7 days (week), 30 days (month), 365 days (year)
+          </p>
         </div>
       </div>
 
@@ -619,7 +617,7 @@ function EditPlanForm({
           <span className="text-xs font-normal text-gray-500 ml-2">(Leave empty for unlimited)</span>
         </label>
         <input
-          type="number"
+          type="text"
           value={formData.download_limit || ''}
           onChange={(e) => setFormData({ 
             ...formData, 

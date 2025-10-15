@@ -32,6 +32,8 @@ interface SubscriptionStatus {
     status: string;
     current_period_end?: string;
     plan?: string;
+    download_limit?: number | null;
+    downloads_used?: number;
 }
 
 const usePremiumStatus = () => {
@@ -116,9 +118,9 @@ const StatCard = memo(({ stat, index }: { stat: any; index: number }) => (
     </motion.div>
 ));
 
-const ResumeCard = memo(({ resume, index, onEdit, onDelete, isDeletingId }: { 
-    resume: Resume; 
-    index: number; 
+const ResumeCard = memo(({ resume, index, onEdit, onDelete, isDeletingId }: {
+    resume: Resume;
+    index: number;
     onEdit: (id: number) => void;
     onDelete: (id: number, event: React.MouseEvent) => void;
     isDeletingId: number | null;
@@ -158,12 +160,12 @@ const ResumeCard = memo(({ resume, index, onEdit, onDelete, isDeletingId }: {
                 </div>
             </div>
             <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-200">
-                <button 
+                <button
                     onClick={(e) => { e.stopPropagation(); onEdit(resume.id); }}
                     className="p-2 hover:bg-blue-100 rounded-lg transition-colors">
                     <Edit className="w-4 h-4 text-blue-600" />
                 </button>
-                <button 
+                <button
                     onClick={(e) => onDelete(resume.id, e)}
                     disabled={isDeletingId === resume.id}
                     className="p-2 hover:bg-red-100 rounded-lg transition-colors disabled:opacity-50">
@@ -241,9 +243,9 @@ function Dashboard() {
 
     const handleDeleteResume = useCallback(async (resumeId: number, event: React.MouseEvent) => {
         event.stopPropagation()
-        
+
         if (deletingResumeId) return
-        
+
         const confirmDelete = window.confirm('Are you sure you want to delete this resume? This action cannot be undone.')
         if (!confirmDelete) return
 
@@ -472,7 +474,7 @@ function Dashboard() {
                                     {resumes.length > 0 ? (
                                         <div className="space-y-4">
                                             {resumes.slice(0, 4).map((resume, index) => (
-                                                <ResumeCard 
+                                                <ResumeCard
                                                     key={resume.id}
                                                     resume={resume}
                                                     index={index}
@@ -556,7 +558,7 @@ function Dashboard() {
                                                 ))}
                                             </div>
                                             <button
-                                                onClick={() => router.push('/payment?returnUrl='+encodeURIComponent('/dashboard'))}
+                                                onClick={() => router.push('/payment?returnUrl=' + encodeURIComponent('/dashboard'))}
                                                 className="w-full bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 text-white py-3 px-4 rounded-xl font-semibold hover:from-yellow-500 hover:via-orange-600 hover:to-red-600 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
                                             >
                                                 Upgrade Now
@@ -581,10 +583,27 @@ function Dashboard() {
                                                         <div className="w-3 h-3 bg-emerald-500 rounded-full animate-pulse"></div>
                                                         <span className="text-sm font-semibold text-emerald-800">Active Subscription</span>
                                                     </div>
-                                                    {/* <div className="text-xs text-emerald-600 font-medium">
-                                                        {/* Renews on {formatDate(subscriptionStatus.current_period_end)} 
-                                                        {subscriptionStatus.plan}
-                                                    </div> */}
+                                                    <div className="flex items-center gap-4 text-xs text-emerald-600 font-medium">
+                                                        <div className="flex items-center gap-1">
+                                                            <span>📅</span>
+                                                            <span>
+                                                                {Math.max(0, Math.ceil((new Date(subscriptionStatus.current_period_end).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)))} days left
+                                                            </span>
+                                                        </div>
+                                                        {subscriptionStatus.download_limit ? (
+                                                            <div className="flex items-center gap-1">
+                                                                <span>⬇️</span>
+                                                                <span>
+                                                                    {Math.max(0, subscriptionStatus.download_limit - (subscriptionStatus.downloads_used || 0))} downloads left
+                                                                </span>
+                                                            </div>
+                                                        ) : (
+                                                            <div className="flex items-center gap-1">
+                                                                <span>⬇️</span>
+                                                                <span>Unlimited downloads</span>
+                                                            </div>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             )}
                                             <button
