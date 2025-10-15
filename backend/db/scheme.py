@@ -181,7 +181,7 @@ class Plan(Base):
     slug = Column(String(100), unique=True, nullable=False)
     price = Column(Integer, nullable=False)  # Price in paise (Razorpay compatibility)
     currency = Column(String(10), default="INR", nullable=False)
-    interval = Column(String(20), default="monthly", nullable=False)  # monthly, yearly
+    duration_days = Column(Integer, nullable=False, default=30)  # Duration in days (min 1)
     features = Column(JSON, nullable=False)
     download_limit = Column(Integer, nullable=True)  # NULL = unlimited, number = limit
     is_active = Column(Boolean, default=True)

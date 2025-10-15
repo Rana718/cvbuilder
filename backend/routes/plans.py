@@ -32,7 +32,7 @@ async def get_plans(
                 "slug": plan.slug,
                 "price": plan.price,
                 "currency": plan.currency,
-                "interval": plan.interval,
+                "duration_days": plan.duration_days,
                 "features": plan.features,
                 "is_popular": plan.is_popular,
                 "sort_order": plan.sort_order
@@ -65,7 +65,7 @@ async def get_plan(
             "slug": plan.slug,
             "price": plan.price,
             "currency": plan.currency,
-            "interval": plan.interval,
+            "duration_days": plan.duration_days,
             "features": plan.features,
             "is_popular": plan.is_popular,
             "sort_order": plan.sort_order

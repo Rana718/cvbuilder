@@ -140,6 +140,9 @@ async def verify_payment(
         )
         subscription_row = result.first()
         
+        # Calculate end date using duration_days
+        end_date = datetime.utcnow() + timedelta(days=plan.duration_days)
+        
         if not subscription_row:
             subscription = Subscription(
                 user_id=current_user.id,
@@ -148,7 +151,7 @@ async def verify_payment(
                 subscription_id=f"sub_{uuid.uuid4()}",
                 plan=plan.slug,
                 status="active",
-                current_period_end=datetime.utcnow() + timedelta(days=30)
+                current_period_end=end_date
             )
             db.add(subscription)
             await db.flush()
@@ -157,7 +160,7 @@ async def verify_payment(
             subscription.plan_id = plan.id
             subscription.plan = plan.slug
             subscription.status = "active"
-            subscription.current_period_end = datetime.utcnow() + timedelta(days=30)
+            subscription.current_period_end = end_date
             subscription.updated_at = datetime.utcnow()
         
         # Create payment history
