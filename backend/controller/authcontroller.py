@@ -14,7 +14,6 @@ class AuthController:
     async def AdduserDb(userdata: AddUserProfileRequest) -> Dict[str, Any]:
         try:
             async for db in get_db():
-                # Check if user already exists
                 result = await db.execute(
                     select(User).where(
                         or_(
@@ -26,7 +25,6 @@ class AuthController:
                 existing_user = result.scalar_one_or_none()
                 
                 if existing_user:
-                    # Update existing user with new info if needed
                     updated = False
                     if existing_user.firebase_uid != userdata.firebase_uid:
                         existing_user.firebase_uid = userdata.firebase_uid
@@ -41,7 +39,6 @@ class AuthController:
                         existing_user.google_id = userdata.google_id
                         updated = True
                     
-                    # Update last login
                     existing_user.last_login = datetime.utcnow()
                     updated = True
                     
@@ -49,9 +46,7 @@ class AuthController:
                         await db.commit()
                         await db.refresh(existing_user)
                     
-                    # Log login activity
                     
-                    # Try to set custom claims with the correct UID
                     firebase_success = set_custom_user_claims(userdata.firebase_uid, {"dbUser": "true"})
                     
                     return {"success": True, "user": {
@@ -64,7 +59,6 @@ class AuthController:
                         "firebase_claims_set": firebase_success
                     }}
                 
-                # Create new user
                 new_user = User(
                     email=userdata.email,
                     full_name=userdata.full_name or userdata.email.split('@')[0],
@@ -76,7 +70,6 @@ class AuthController:
                 await db.commit()
                 await db.refresh(new_user)
 
-                # Try to set custom claims
                 firebase_success = set_custom_user_claims(new_user.firebase_uid, {"dbUser": "true"})
                 
                 return {"success": True, "user": {
@@ -133,13 +126,11 @@ class AuthController:
             if not user:
                 return {"success": False, "error": "User not found"}
             
-            # Make user super admin
             user.isSuperAdmin = True
-            user.isAdmin = True  # Super admin is also admin
+            user.isAdmin = True 
             await db.commit()
             await db.refresh(user)
             
-            # Update Firebase custom claims with correct keys
             claims = {
                 "isAdmin": True, 
                 "isSuperAdmin": True,
@@ -170,11 +161,9 @@ class AuthController:
     async def add_admin_by_super_admin(user_email: str, make_admin: bool, make_super_admin: bool, requesting_user: User, db: Session) -> Dict[str, Any]:
         """Add admin role by super admin only"""
         try:
-            # Only super admins can add admins
             if not requesting_user.isSuperAdmin:
                 return {"success": False, "error": "Only super admins can add admin roles"}
             
-            # Find target user
             result = await db.execute(select(User).where(User.email == user_email))
             target_user = result.scalar_one_or_none()
             
@@ -187,23 +176,19 @@ class AuthController:
             await db.commit()
             await db.refresh(target_user)
             
-            # Update Firebase custom claims - try but don't fail if it doesn't work
             firebase_success = True
             claims = {}
             if make_admin:
                 claims["admin"] = True
             else:
-                # Remove admin claim if making user regular
                 firebase_success = remove_custom_user_claims(target_user.firebase_uid, ["admin"]) and firebase_success
                 
             if make_super_admin:
                 claims["superAdmin"] = True
-                claims["admin"] = True  # Super admin is also admin
+                claims["admin"] = True  
             else:
-                # Remove super admin claim if not making super admin
                 firebase_success = remove_custom_user_claims(target_user.firebase_uid, ["superAdmin"]) and firebase_success
             
-            # Only set claims if there are any to set
             if claims:
                 firebase_success = set_custom_user_claims(target_user.firebase_uid, claims) and firebase_success
             

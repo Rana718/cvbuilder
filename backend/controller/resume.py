@@ -44,14 +44,12 @@ class ResumeController:
     
     @staticmethod
     def _create_resume_from_data(resume_data: ResumeCreate, user_id: int) -> Resume:
-        # Convert socail_links to the format expected by the database
         social_links_json = None
         if hasattr(resume_data, 'socail_links') and resume_data.socail_links:
             social_links_json = [link.dict() for link in resume_data.socail_links]
         
-        # Create resume data excluding socail_links and add socail_links instead
         resume_dict = resume_data.dict(exclude={'socail_links'})
-        resume_dict['socail_links'] = social_links_json  # Note: using DB field name with typo
+        resume_dict['socail_links'] = social_links_json  
         
         return Resume(
             user_id=user_id,
@@ -118,7 +116,6 @@ class ResumeController:
         await db.delete(resume)
         await db.commit()
         
-        # Log activity
         return {"message": "Resume deleted successfully"}
     
     @staticmethod
@@ -280,27 +277,22 @@ class ResumeController:
             ResumeFeedbackResponse with rating, feedback, and recommendations
         """
         
-        # Validate file type
         if not resume_file.filename.lower().endswith('.pdf'):
             raise HTTPException(status_code=400, detail="Only PDF files are supported")
         
         try:
-            # Save uploaded file temporarily
             with tempfile.NamedTemporaryFile(delete=False, suffix='.pdf') as temp_file:
                 content = resume_file.file.read()
                 temp_file.write(content)
                 temp_file_path = temp_file.name
             
-            # Extract text from PDF
             resume_text = extract_text_from_pdf(temp_file_path)
             
-            # Clean up temporary file
             os.unlink(temp_file_path)
             
             if not resume_text.strip():
                 raise HTTPException(status_code=400, detail="Could not extract text from PDF")
             
-            # Generate AI feedback
             feedback_result = ResumeController._generate_resume_feedback(
                 resume_text, job_title, job_description
             )
@@ -308,7 +300,6 @@ class ResumeController:
             return feedback_result
             
         except Exception as e:
-            # Clean up temp file if it exists
             if 'temp_file_path' in locals() and os.path.exists(temp_file_path):
                 os.unlink(temp_file_path)
             if isinstance(e, HTTPException):
@@ -323,7 +314,6 @@ class ResumeController:
     ) -> ResumeFeedbackResponse:
         """Generate AI-powered resume feedback using OpenAI"""
         
-        # Create context-aware prompt
         if job_title and job_description:
             context = f"""
             TARGET JOB TITLE: {job_title}
@@ -390,31 +380,27 @@ class ResumeController:
             
             response_text = response.choices[0].message.content.strip()
             
-            # Parse JSON response
             try:
                 feedback_data = json.loads(response_text)
                 
-                # Validate the response structure
                 required_fields = ["overall_rating", "feedback", "strengths", "areas_for_improvement", "recommendations"]
                 for field in required_fields:
                     if field not in feedback_data:
                         raise ValueError(f"Missing required field: {field}")
                 
-                # Ensure rating is within valid range
                 rating = int(feedback_data["overall_rating"])
                 if rating < 1 or rating > 10:
-                    rating = 5  # Default to middle rating if invalid
+                    rating = 5  
                 
                 return ResumeFeedbackResponse(
                     overall_rating=rating,
                     feedback=feedback_data["feedback"],
-                    strengths=feedback_data["strengths"][:5],  # Limit to 5 items
+                    strengths=feedback_data["strengths"][:5],  
                     areas_for_improvement=feedback_data["areas_for_improvement"][:5],
                     recommendations=feedback_data["recommendations"][:5]
                 )
                 
             except (json.JSONDecodeError, ValueError, KeyError) as e:
-                # Fallback response if JSON parsing fails
                 return ResumeFeedbackResponse(
                     overall_rating=5,
                     feedback="Unable to generate detailed feedback due to parsing error. Please try again.",

@@ -90,7 +90,6 @@ async def get_blog(
         if not blog:
             raise HTTPException(status_code=404, detail="Blog not found")
         
-        # Increment views (don't cache this part)
         await db.execute(
             update(Blog)
             .where(Blog.id == blog.id)
@@ -126,7 +125,6 @@ async def get_blog(
 @router.get("/blogs/category/{category}")
 @redis_cache.cache_get(expire_minutes=1440)  # 24 hours cache
 async def get_blogs_by_category(
-    request: Request,
     category: str,
     page: int = Query(1, ge=1),
     limit: int = Query(10, ge=1, le=50),
@@ -134,21 +132,17 @@ async def get_blogs_by_category(
 ):
     """Get blogs by category (cached for 24 hours)"""
     try:
-        # Build query
         query = select(Blog).where(Blog.is_published == True, Blog.category == category)
         
-        # Get total count
         count_query = select(func.count(Blog.id)).where(Blog.is_published == True, Blog.category == category)
         total_result = await db.execute(count_query)
         total = total_result.scalar()
         
-        # Get blogs
         offset = (page - 1) * limit
         query = query.order_by(desc(Blog.published_at)).offset(offset).limit(limit)
         result = await db.execute(query)
         blogs = result.scalars().all()
         
-        # Format response
         blogs_data = [
             {
                 "id": blog.id,

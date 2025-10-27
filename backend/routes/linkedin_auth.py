@@ -21,11 +21,9 @@ async def get_linkedin_status(
 ):
     """Get LinkedIn connection status for the authenticated user"""
     try:
-        # Get database user from Firebase UID
         user = await get_current_user_from_request(request, db)
         user_id = user.id
         
-        # Check if user has LinkedIn profile connected
         result = await db.execute(
             select(LinkedInProfile).where(
                 LinkedInProfile.user_id == user_id,
@@ -53,20 +51,18 @@ async def get_linkedin_status(
 async def get_linkedin_connect_url(request: Request, db: Session = Depends(get_db)):
     """Get LinkedIn OAuth URL for connecting account"""
     try:
-        # Get database user from Firebase UID
         user = await get_current_user_from_request(request, db)
         user_id = user.id
         
         print(f"DEBUG: LinkedIn connect-url called with database user_id: {user_id}")
         
-        # LinkedIn OAuth URL
         base_url = "https://www.linkedin.com/oauth/v2/authorization"
         params = {
             "response_type": "code",
             "client_id": CLIENT_ID,
             "redirect_uri": REDIRECT_URI,
-            "state": str(user_id),  # Pass database user_id as state
-            "scope": "openid profile email"  # Use only basic scopes
+            "state": str(user_id),  
+            "scope": "openid profile email" 
         }
         
         auth_url = f"{base_url}?{urllib.parse.urlencode(params)}"
@@ -122,7 +118,6 @@ async def disconnect_linkedin(
     if not linkedin_profile:
         raise HTTPException(status_code=404, detail="LinkedIn profile not found")
     
-    # Mark as disconnected instead of deleting
     linkedin_profile.is_connected = False
     linkedin_profile.updated_at = datetime.utcnow()
     
@@ -154,8 +149,6 @@ async def sync_linkedin_profile(
     if not linkedin_profile:
         raise HTTPException(status_code=404, detail="LinkedIn profile not connected")
     
-    # TODO: Implement actual sync with LinkedIn API using stored access token
-    # For now, just update the last_synced_at timestamp
     linkedin_profile.last_synced_at = datetime.utcnow()
     linkedin_profile.updated_at = datetime.utcnow()
     
