@@ -1,4 +1,3 @@
-#!/bin/bash
 sleep 2
 
 set -e
@@ -7,12 +6,10 @@ SUDO_PASS="ayd*rana"
 
 mkdir -p ./logs
 
-# Log function
 log() {
     echo "[$(date +'%Y-%m-%d %H:%M:%S')] $1" | tee -a ./logs/logs.log
 }
 
-# Determine current active environment
 determine_active_env() {
     if echo "$SUDO_PASS" | sudo -S docker ps | grep -q aicvbuilder-backend-blue; then
         echo "blue"
@@ -23,13 +20,11 @@ determine_active_env() {
     fi
 }
 
-# Check and start Redis if not running
 ensure_redis_running() {
     if ! echo "$SUDO_PASS" | sudo -S docker ps | grep -q resume-redis; then
         log "Redis not running. Starting Redis for the first time"
         echo "$SUDO_PASS" | sudo -S docker-compose -f ./docker/docker-compose.redis.yml up -d
         
-        # Wait for Redis to be ready
         log "Waiting for Redis to become ready"
         RETRY_COUNT=0
         MAX_RETRIES=10
@@ -50,7 +45,6 @@ ensure_redis_running() {
     fi
 }
 
-# Check if firebase.json exists
 check_firebase_config() {
     if [ ! -f "./firebase.json" ]; then
         log "ERROR: firebase.json not found in deployment directory"

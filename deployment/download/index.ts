@@ -5,9 +5,21 @@ import cors from "cors";
 
 const app = express();
 const PORT = 4000;
-app.use(cors());
+app.use(cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    exposedHeaders: ['Content-Type', 'Content-Disposition']
+}));
 
 app.use(bodyParser.json({ limit: "10mb" }));
+
+app.options("/generate-pdf", (req: Request, res: Response) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Methods", "POST, OPTIONS");
+    res.header("Access-Control-Allow-Headers", "Content-Type");
+    res.sendStatus(200);
+});
 
 app.post("/generate-pdf", async (req: Request, res: Response) => {
     try {
@@ -43,6 +55,9 @@ app.post("/generate-pdf", async (req: Request, res: Response) => {
         res.set({
             "Content-Type": "application/pdf",
             "Content-Disposition": "attachment; filename=download.pdf",
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "POST, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type"
         });
 
         return res.send(pdfBuffer);
@@ -52,6 +67,6 @@ app.post("/generate-pdf", async (req: Request, res: Response) => {
     }
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
     console.log(`🚀 Express server running at http://localhost:${PORT}`);
 });
