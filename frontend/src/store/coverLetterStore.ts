@@ -16,7 +16,6 @@ export interface CoverLetterFormData {
 }
 
 interface CoverLetterStore {
-    // Form data fields
     templateId: string
     documentId: number | null
     shareableUuid: string | null
@@ -29,38 +28,29 @@ interface CoverLetterStore {
     body: string
     resume_id?: number
     
-    // Navigation and state
     isLoading: boolean
     tempCoverLetter: CoverLetterFormData | null
 
-    // Template
     setTemplateId: (id: string) => void
 
-    // Document ID
     setDocumentId: (id: number) => void
     clearDocumentId: () => void
 
-    // Shareable UUID
     setShareableUuid: (uuid: string | null) => void
 
-    // API methods
     saveCoverLetter: () => Promise<void>
     loadCoverLetter: (coverLetterId: number) => Promise<void>
     saveToTemp: (tempId: string) => Promise<void>
     hasData: () => boolean
 
-    // Populate from API data
     populateFromCoverLetterData: (data: any) => void
 
-    // Form data updates
     updateFormData: (data: Partial<CoverLetterFormData>) => void
     updateField: (field: keyof CoverLetterFormData, value: any) => void
     setFormData: (data: Partial<CoverLetterFormData>) => void
 
-    // Loading state
     setLoading: (loading: boolean) => void
 
-    // Reset - only when explicitly called
     resetStore: () => void
     startNewCoverLetter: () => void
 }
@@ -84,21 +74,16 @@ export const useCoverLetterStore = create<CoverLetterStore>()((set, get) => ({
     isLoading: false,
     tempCoverLetter: null,
 
-    // Template
     setTemplateId: (id) => set({ templateId: id }),
 
-    // Document ID
     setDocumentId: (id) => set({ documentId: id }),
     clearDocumentId: () => set({ documentId: null }),
 
-    // Shareable UUID
     setShareableUuid: (uuid) => set({ shareableUuid: uuid }),
 
-    // API methods
     saveCoverLetter: async () => {
         const state = get()
 
-        // Transform frontend data to backend format
         const coverLetterData = {
             name: state.name,
             email: state.email,
@@ -117,11 +102,9 @@ export const useCoverLetterStore = create<CoverLetterStore>()((set, get) => ({
             const isNewCoverLetter = !state.documentId || typeof state.documentId !== 'number'
             
             if (isNewCoverLetter) {
-                // Create new cover letter
                 const response = await axiosInstance.post('/api/cover-letters/', coverLetterData)
                 set({ documentId: response.data.id })
             } else {
-                // Update existing cover letter
                 const response = await axiosInstance.put(`/api/cover-letters/${state.documentId}`, coverLetterData)
                 set({ documentId: response.data.id })
             }
@@ -146,7 +129,6 @@ export const useCoverLetterStore = create<CoverLetterStore>()((set, get) => ({
         }
     },
 
-    // Check if store has data
     hasData: () => {
         const state = get()
         return !!(
@@ -158,7 +140,6 @@ export const useCoverLetterStore = create<CoverLetterStore>()((set, get) => ({
         )
     },
 
-    // Populate from API data
     populateFromCoverLetterData: (data) => {
         set({
             documentId: data.id,
@@ -175,7 +156,6 @@ export const useCoverLetterStore = create<CoverLetterStore>()((set, get) => ({
         })
     },
 
-    // Form data updates
     updateFormData: (data) => set((state) => ({ ...state, ...data })),
 
     updateField: (field, value) => set((state) => ({ ...state, [field]: value })),
@@ -186,7 +166,7 @@ export const useCoverLetterStore = create<CoverLetterStore>()((set, get) => ({
         const state = get()
         const tempData = {
             templateId: state.templateId,
-            documentId: null, // Temp data doesn't have a real ID
+            documentId: null,
             shareableUuid: null,
             name: state.name,
             email: state.email,
@@ -198,20 +178,16 @@ export const useCoverLetterStore = create<CoverLetterStore>()((set, get) => ({
             resume_id: state.resume_id
         }
 
-        // Store in localStorage for temporary access
         localStorage.setItem(`temp-cover-letter-${tempId}`, JSON.stringify(tempData))
         set({ tempCoverLetter: tempData })
     },
 
-    // Loading state
     setLoading: (loading) => set({ isLoading: loading }),
 
-    // Reset - only when explicitly called
     resetStore: () => {
         set({ ...initialState, isLoading: false, tempCoverLetter: null })
     },
 
-    // Start new cover letter - explicitly called when user wants to create new
     startNewCoverLetter: () => {
         set({ 
             ...initialState, 

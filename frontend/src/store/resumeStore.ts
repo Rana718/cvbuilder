@@ -45,7 +45,7 @@ export interface Education {
 export interface Skill {
     id: string
     name: string
-    rating: number // 1-5 stars
+    rating: number 
 }
 
 export interface Project {
@@ -98,25 +98,19 @@ export interface ResumeState {
 }
 
 interface ResumeStore extends ResumeState {
-    // Navigation
     setCurrentStep: (step: number) => void
     nextStep: () => void
     prevStep: () => void
 
-    // Template
     setTemplateId: (id: string) => void
 
-    // Color Theme
     setColorTheme: (theme: ColorTheme) => void
 
-    // Document ID
     setDocumentId: (id: number) => void
     clearDocumentId: () => void
 
-    // Shareable UUID
     setShareableUuid: (uuid: string | null) => void
 
-    // API methods
     saveResume: () => Promise<void>
     loadResume: (resumeId: number) => Promise<void>
     hasData: () => boolean
@@ -125,50 +119,40 @@ interface ResumeStore extends ResumeState {
     isPreviewId: (id: string) => boolean
     isCurrentPreview: () => boolean
 
-    // Populate from API data
     populateFromResumeData: (data: any) => void
 
-    // Personal Info
     updatePersonalInfo: (info: Partial<PersonalInfo>) => void
     addWebsite: (website: { label: string; url: string }) => void
     removeWebsite: (id: string) => void
 
-    // Work Experience
     addWorkExperience: (experience: Omit<WorkExperience, 'id'>) => void
     updateWorkExperience: (id: string, experience: Partial<WorkExperience>) => void
     removeWorkExperience: (id: string) => void
 
-    // Education
     addEducation: (education: Omit<Education, 'id'>) => void
     updateEducation: (id: string, education: Partial<Education>) => void
     removeEducation: (id: string) => void
 
-    // Projects
     addProject: (project: Omit<Project, 'id'>) => void
     updateProject: (id: string, project: Partial<Project>) => void
     removeProject: (id: string) => void
 
-    // Skills
     addSkill: (skill: Omit<Skill, 'id'>) => void
     updateSkill: (id: string, skill: Partial<Skill>) => void
     removeSkill: (id: string) => void
     setSkills: (skills: Skill[]) => void
 
-    // Summary
     setSummary: (summary: string) => void
 
-    // AI Generation tracking
     setAiGenerated: (field: 'skills' | 'summary', value: boolean) => void
     isAiGenerated: (field: 'skills' | 'summary') => boolean
     setAiSuggestions: (field: 'skills' | 'summary', suggestions: string[]) => void
     getAiSuggestions: (field: 'skills' | 'summary') => string[]
 
-    // Additional Sections
     addAdditionalSection: (section: Omit<AdditionalSection, 'id'>) => void
     updateAdditionalSection: (id: string, section: Partial<AdditionalSection>) => void
     removeAdditionalSection: (id: string) => void
 
-    // Reset - only when explicitly called
     resetStore: () => void
     startNewResume: () => void
     clearResumeData: () => void
@@ -218,32 +202,25 @@ export const useResumeStore = create<ResumeStore>()(
         (set, get) => ({
             ...initialState,
 
-            // Navigation
             setCurrentStep: (step) => set({ currentStep: step }),
             nextStep: () => set((state) => ({ currentStep: Math.min(state.currentStep + 1, 6) })),
             prevStep: () => set((state) => ({ currentStep: Math.max(state.currentStep - 1, 1) })),
 
-            // Template
             setTemplateId: (id) => set({ templateId: id }),
 
-            // Color Theme
             setColorTheme: (theme) => set({ colorTheme: theme }),
 
-            // Document ID
             setDocumentId: (id) => set({ documentId: id }),
 
             clearDocumentId: () => {
                 set({ documentId: null })
             },
 
-            // Shareable UUID
             setShareableUuid: (uuid) => set({ shareableUuid: uuid }),
 
-    // API methods
     saveResume: async () => {
         const state = get()
         
-        // Transform frontend data to backend format
         const resumeData = {
             name: `${state.personalInfo.firstName} ${state.personalInfo.lastName}`.trim(),
             email: state.personalInfo.email,
@@ -308,11 +285,9 @@ export const useResumeStore = create<ResumeStore>()(
             const isNewResume = !state.documentId || typeof state.documentId !== 'number'
             
             if (isNewResume) {
-                // Create new resume
                 const response = await axiosInstance.post('/api/resume-op/save', resumeData)
                 set({ documentId: response.data.id })
             } else {
-                // Update existing resume
                 const response = await axiosInstance.put(`/api/resume-op/${state.documentId}`, resumeData)
                 set({ documentId: response.data.id })
             }
@@ -362,7 +337,6 @@ export const useResumeStore = create<ResumeStore>()(
         }
     },
 
-    // Check if store has data
     hasData: () => {
         const state = get()
         return !!(
