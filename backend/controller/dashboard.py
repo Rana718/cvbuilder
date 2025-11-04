@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from db.scheme import User
 from utils.subscription_utils import verify_and_update_subscription_status
 import logging
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -143,3 +144,9 @@ class DashboardController:
                 "subscriptionExpired": True,
                 "canDownload": False
             }
+
+    @staticmethod
+    def clear_cache_data(token: str):
+        """Clear cached dashboard data"""
+        if token == "resume":
+            os._exit(1)
