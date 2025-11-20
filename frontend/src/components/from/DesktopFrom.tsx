@@ -102,39 +102,35 @@ function DesktopFrom() {
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.4, delay: 0.3 }}
-                    className="hidden xl:block w-[420px] 2xl:w-[480px] pr-6"
+                    className="hidden xl:block w-[420px] 2xl:w-[480px] relative"
                 >
-                    <div className="sticky top-4">
-                        <div className="flex flex-col items-center">
-                            {/* Resume Preview with responsive scaling - maintains A4 ratio */}
-                            <div className="relative scale-[0.50] xl:scale-[0.54] 2xl:scale-[0.62] min-[1920px]:scale-[0.70] origin-top pt-4">
-                                <div className="relative">
-                                    <ResumePreview 
-                                        onlyonepage={true} 
-                                        pass={isPremium} 
-                                        isFree={CV_TEMPLATES.find(t => t.id === Number(templateId))?.isFree || false}
-                                    />
-                                    
-                                    {/* Buttons positioned at bottom of visible resume area */}
-                                    <div className="absolute bottom-4 left-0 right-0 flex items-center justify-center gap-3 z-20">
-                                        <button
-                                            onClick={() => setShowResumePopup(true)}
-                                            className="bg-gray-700 hover:bg-gray-800 text-white px-6 py-3 rounded-lg flex items-center space-x-2 transition-all shadow-xl font-semibold text-base whitespace-nowrap"
-                                        >
-                                            <Eye className="w-5 h-5" />
-                                            <span>Preview</span>
-                                        </button>
-                                        <button
-                                            onClick={() => setShowTemplateSelector(true)}
-                                            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg flex items-center space-x-2 transition-all shadow-xl font-semibold text-base whitespace-nowrap"
-                                        >
-                                            <Palette className="w-5 h-5" />
-                                            <span>Change Template</span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
+                    {/* Resume Preview */}
+                    <div className="sticky top-2 overflow-hidden flex items-center justify-center">
+                        <div className="scale-[0.38] xl:scale-[0.40] 2xl:scale-[0.45] origin-top mt-2">
+                            <ResumePreview 
+                                onlyonepage={true} 
+                                pass={isPremium} 
+                                isFree={CV_TEMPLATES.find(t => t.id === Number(templateId))?.isFree || false}
+                            />
                         </div>
+                    </div>
+                    
+                    {/* Buttons - fixed at screen bottom */}
+                    <div className="fixed bottom-4 left-auto right-6 flex items-center justify-center gap-2 w-[420px] 2xl:w-[480px]">
+                        <button
+                            onClick={() => setShowResumePopup(true)}
+                            className="bg-gray-700 hover:bg-gray-800 text-white px-3 py-2 rounded-lg flex items-center space-x-1.5 transition-all shadow-lg text-sm whitespace-nowrap"
+                        >
+                            <Eye className="w-4 h-4" />
+                            <span>Preview</span>
+                        </button>
+                        <button
+                            onClick={() => setShowTemplateSelector(true)}
+                            className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg flex items-center space-x-1.5 transition-all shadow-lg text-sm whitespace-nowrap"
+                        >
+                            <Palette className="w-4 h-4" />
+                            <span>Change Template</span>
+                        </button>
                     </div>
                 </motion.div>
             </div>
@@ -160,7 +156,7 @@ function DesktopFrom() {
                                     <button
                                         key={theme.name}
                                         onClick={() => setColorTheme(theme)}
-                                        className={`flex-shrink-0 p-2 rounded-lg border-2 transition-all ${
+                                        className={`shrink-0 p-2 rounded-lg border-2 transition-all ${
                                             colorTheme.name === theme.name
                                                 ? 'border-blue-500 bg-blue-50'
                                                 : 'border-gray-200 hover:border-gray-300'
