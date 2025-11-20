@@ -164,11 +164,28 @@ export const useResumeActions = (
 
         await refreshStatus()
 
+        
+        let savedBeforeDownload = false
+        if (user) {
+            try {
+                await saveResume()
+                savedBeforeDownload = true
+            } catch (saveError) {
+                console.error('Auto-save before download failed:', saveError)
+            }
+        }
+
         const currentTemplate = CV_TEMPLATES.find(t => t.id === Number(templateId))
         const isFreeTemplate = currentTemplate?.isFree || false
 
         if (!isPremium && !isFreeTemplate) {
-            await saveResume()
+            if (!savedBeforeDownload) {
+                try {
+                    await saveResume()
+                } catch (saveError) {
+                    console.error('Save before payment redirect failed:', saveError)
+                }
+            }
             redirectToPayment()
             return
         }

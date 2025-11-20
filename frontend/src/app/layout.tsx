@@ -220,6 +220,21 @@ export default function RootLayout({
         <link rel="manifest" href="/site.webmanifest" />
         <meta name="msapplication-TileColor" content="#1e40af" />
         <meta name="msapplication-config" content="/browserconfig.xml" />
+
+        {/* Google tag (gtag.js) for SEO tracking */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-9216QG9NR5"
+          strategy="afterInteractive"
+          async
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-9216QG9NR5');
+          `}
+        </Script>
       </head>
       <Script
         src="https://checkout.razorpay.com/v1/checkout.js"

@@ -326,7 +326,7 @@ function SkillsStep({ onNext, onPrev }: SkillsStepProps) {
                 transition={{ delay: 0.2 }}
               >
                 <label className="block text-sm font-semibold text-gray-700 mb-3">
-                  Proficiency Rating *
+                   Rate Yourself *
                 </label>
                 <div className="flex items-center space-x-3 mb-2">
                   {renderStars(formData.rating, true, (rating) => setFormData({ ...formData, rating }))}

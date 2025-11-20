@@ -50,7 +50,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ]
 
-  // Template pages (if they are publicly accessible)
   const templateIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
   const templatePages = templateIds.map(id => ({
     url: `${baseUrl}/template/${id}`,
@@ -59,10 +58,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }))
 
-  // Blog pages
   let blogPages: any[] = []
   try {
-    const blogsResponse = await blogsAPI.getBlogs(1, 100) // Get first 100 blogs
+    const blogsResponse = await blogsAPI.getBlogs(1, 100) 
     blogPages = blogsResponse.blogs.map(blog => ({
       url: `${baseUrl}/blog/${blog.slug}`,
       lastModified: new Date(blog.published_at || blog.created_at),
