@@ -380,7 +380,12 @@ export default function SubscriptionsPage() {
                                             outerRadius={80}
                                             fill="#8884d8"
                                             dataKey="percentage"
-                                            label={({ method, percentage }) => `${method}: ${percentage}%`}
+                                            nameKey="method"
+                                            label={(entry: any) => {
+                                                const name = entry.name ?? entry.payload?.method
+                                                const value = entry.value ?? entry.payload?.percentage
+                                                return `${name}: ${value}%`
+                                            }}
                                         >
                                             {paymentMethods.map((entry, index) => (
                                                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
