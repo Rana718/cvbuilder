@@ -9,10 +9,6 @@ import {
 function Footer() {
     const currentYear = new Date().getFullYear();
     
-    const handleRedirect = () => {
-        window.open("https://aydpm.in/", "_blank");
-    };
-
     const socialLinks = [
         { icon: Facebook, href: "https://www.facebook.com/airezumebuilder", label: "Facebook", color: "hover:text-blue-500" },
         { icon: Instagram, href: "https://www.instagram.com/airezumebuilder", label: "Instagram", color: "hover:text-pink-500" },
@@ -169,20 +165,6 @@ function Footer() {
 
                 <div className="py-4 border-t border-white/10">
                     <div className="flex flex-col space-y-3 sm:space-y-0 sm:flex-row sm:justify-between sm:items-center">
-                        <div className="flex flex-col space-y-2 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-3 text-center sm:text-left">
-                            <p className="text-gray-400 text-xs">
-                                © {currentYear} ResumeAI. All rights reserved.
-                            </p>
-                            <p 
-                                className="text-gray-400 hover:text-white transition cursor-pointer text-xs flex items-center justify-center sm:justify-start space-x-1"
-                                onClick={handleRedirect}
-                            >
-                                <span>Developed with</span>
-                                <Heart className="h-3 w-3 text-red-500 fill-current" />
-                                <span>by AYD Software</span>
-                            </p>
-                        </div>
-                        
                         <div className="flex items-center justify-center sm:justify-end space-x-3">
                             <div className="flex items-center space-x-1 text-xs text-gray-400">
                                 <Shield className="h-3 w-3 text-green-500" />
