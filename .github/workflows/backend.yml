@@ -31,16 +31,4 @@ jobs:
         with:
           context: ./backend
           push: true
-          tags: arhaanr/resume-backend:latest
-
-      - name: Deploy to VPS
-        if: success()
-        uses: appleboy/ssh-action@v1.0.0
-        with:
-          host: ${{ vars.VPS_HOST }}
-          username: ${{ vars.VPS_USER }}
-          password: ${{ vars.VPS_PASS }}
-          script: |
-            cd /home/aydrana/deployment/cvbuilder/deployment
-            echo " ${{ vars.VPS_PASS }}" | sudo -S ./deploy.sh
-            echo "Deployment script executed successfully."
+          tags: ${{ vars.DOCKERHUB_USERNAME }}/resume-backend:latest
